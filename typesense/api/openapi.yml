@@ -1,0 +1,1218 @@
+openapi: 3.0.3
+info:
+  title: Typesense API
+  description: "An open source search engine for building delightful search experiences."
+  version: 0.17.0
+externalDocs:
+  description: Find out more about Typsesense
+  url: https://typesense.org
+security:
+  - api_key_header: []
+tags:
+  - name: collections
+    description: A collection is defined by a schema
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/api/#create-collection
+  - name: documents
+    description: A document is an individual record to be indexed and belongs to a collection
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/api/#index-document
+  - name: promote
+    description: Promote certain documents over others
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/docs/0.17.0/api/#curation
+  - name: keys
+    description: Manage API Keys with fine-grain access control
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/docs/0.17.0/api/#api-keys
+  - name: debug
+    description: Debugging information
+paths:
+  /collections:
+    get:
+      tags:
+        - collections
+      summary: List all collections
+      description:
+        Returns a summary of all your collections. The collections are
+        returned sorted by creation date, with the most recent collections appearing
+        first.
+      operationId: getCollections
+      responses:
+        200:
+          description: List of all collections
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  collections:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Collection"
+    post:
+      tags:
+        - collections
+      summary: Create a new collection
+      description:
+        When a collection is created, we give it a name and describe the
+        fields that will be indexed from the documents added to the collection.
+      operationId: createCollection
+      requestBody:
+        description: The collection object to be created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Collection"
+        required: true
+      x-codegen-request-body-name: collection
+      responses:
+        201:
+          description: Collection successfully created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collection"
+        409:
+          description: Collection already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+  /collections/{collectionName}:
+    get:
+      tags:
+        - collections
+      summary: Retrieve a single collection
+      description: Retrieve the details of a collection, given its name.
+      operationId: getCollection
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Collection fetched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collection"
+        404:
+          description: Collection not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+    delete:
+      tags:
+        - collections
+      summary: Delete a collection
+      description:
+        Permanently drops a collection. This action cannot be undone. For
+        large collections, this might have an impact on read latencies.
+      operationId: deleteCollection
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Collection deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collection"
+        404:
+          description: Collection not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+  /collections/{collectionName}/documents:
+    post:
+      tags:
+        - documents
+      summary: Index a document
+      description:
+        A document to be indexed in a given collection must conform to
+        the schema of the collection.
+      operationId: indexDocument
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection to add the document to
+          required: true
+          schema:
+            type: string
+        - name: action
+          in: query
+          description: Additional action to perform
+          schema:
+            type: string
+            example: upsert
+            enum:
+              - upsert
+      requestBody:
+        description: The document object to be indexed
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Document"
+        required: true
+      x-codegen-request-body-name: document
+      responses:
+        201:
+          description: Document successfully created/indexed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+        404:
+          description: Collection not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+    delete:
+      tags:
+        - documents
+      summary: Delete a bunch of documents
+      description:
+        Delete a bunch of documents that match a specific filter condition.
+        Use the `batch_size` parameter to control the number of documents that
+        should deleted at a time. A larger value will speed up deletions, but will
+        impact performance of other operations running on the server.
+      operationId: deleteDocuments
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection to delete documents from
+          required: true
+          schema:
+            type: string
+        - name: filter_by
+          in: query
+          description:
+            Filter conditions for refining your documents to delete. Separate
+            multiple conditions with &&.
+          schema:
+            type: string
+            example: "num_employees:>100 && country: [USA, UK]"
+          required: true
+        - name: batch_size
+          in: query
+          description:
+            Batch size parameter controls the number of documents that should be deleted
+            at a time. A larger value will speed up deletions, but will impact performance
+            of other operations running on the server.
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Documents successfully deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  num_deleted:
+                    type: integer
+        404:
+          description: Collection not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+  /collections/{collectionName}/documents/search:
+    get:
+      tags:
+        - documents
+      summary: Search for documents in a collection
+      description: Search for documents in a collection that match the search criteria.
+      operationId: searchCollection
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection to search for the document under
+          required: true
+          schema:
+            type: string
+        - name: q
+          in: query
+          description: The query text to search for in the collection.
+            Use * as the search string to return all documents.
+            This is typically useful when used in conjunction with filter_by.
+          required: true
+          schema:
+            type: string
+        - name: query_by
+          in: query
+          description:
+            A list of `string` or `string[]` fields that should be queried
+            against. Multiple fields are separated with a comma.
+          required: true
+          style: form
+          schema:
+            type: array
+            items:
+              type: string
+        - name: max_hits
+          in: query
+          description: >
+            Maximum number of hits returned. Increasing this value might
+            increase search latency. Default: 500. Use `all` to return all hits found.
+          schema:
+            oneOf:
+              - type: integer
+                example: 500
+              - type: string
+                example: all
+                enum:
+                  - all
+        - name: prefix
+          in: query
+          description:
+            Boolean field to indicate that the last word in the query should
+            be treated as a prefix, and not as a whole word. This is used for building
+            autocomplete and instant search interfaces. Defaults to true.
+          schema:
+            type: boolean
+        - name: filter_by
+          in: query
+          description:
+            Filter conditions for refining your search results. Separate
+            multiple conditions with &&.
+          schema:
+            type: string
+            example: "num_employees:>100 && country: [USA, UK]"
+        - name: sort_by
+          in: query
+          description:
+            A list of numerical fields and their corresponding sort orders
+            that will be used for ordering your results.
+            Up to 3 sort fields can be specified.
+            The text similarity score is exposed as a special `_text_match` field that
+            you can use in the list of sorting fields.
+            If no `sort_by` parameter is specified, results are sorted by
+            `_text_match:desc,default_sorting_field:desc`
+          style: form
+          schema:
+            type: array
+            items:
+              type: string
+              example: num_employees:desc
+        - name: facet_by
+          in: query
+          description:
+            A list of fields that will be used for faceting your results
+            on. Separate multiple fields with a comma.
+          style: form
+          schema:
+            type: array
+            items:
+              type: string
+        - name: max_facet_values
+          in: query
+          description: Maximum number of facet values to be returned.
+          schema:
+            type: integer
+        - name: facet_query
+          in: query
+          description:
+            Facet values that are returned can now be filtered via this parameter.
+            The matching facet text is also highlighted. For example, when faceting
+            by `category`, you can set `facet_query=category:shoe` to return only
+            facet values that contain the prefix "shoe".
+          schema:
+            type: string
+        - name: num_typos
+          in: query
+          description: >
+            The number of typographical errors (1 or 2) that would be tolerated.
+            Default: 2
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: Results from this specific page number would be fetched.
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          description: "Number of results to fetch per page. Default: 10"
+          schema:
+            type: integer
+        - name: group_by
+          in: query
+          description:
+            You can aggregate search results into groups or buckets by specify
+            one or more `group_by` fields. Separate multiple fields with a comma.
+            To group on a particular field, it must be a faceted field.
+          style: form
+          schema:
+            type: array
+            items:
+              type: string
+        - name: group_limit
+          in: query
+          description: >
+            Maximum number of hits to be returned for every group. If the `group_limit` is
+            set as `K` then only the top K hits in each group are returned in the response.
+            Default: 3
+          schema:
+            type: integer
+        - name: include_fields
+          in: query
+          description: List of fields from the document to include in the search result
+          style: form
+          schema:
+            type: array
+            items:
+              type: string
+        - name: exclude_fields
+          in: query
+          description: List of fields from the document to exclude in the search result
+          style: form
+          schema:
+            type: array
+            items:
+              type: string
+        - name: highlight_full_fields
+          in: query
+          description: List of fields which should be highlighted fully without snippeting
+          style: form
+          schema:
+            type: array
+            items:
+              type: string
+        - name: highlight_affix_num_tokens
+          in: query
+          description: >
+            The number of tokens that should surround the highlighted text on each side.
+            Default: 4
+          schema:
+            type: integer
+        - name: highlight_start_tag
+          in: query
+          description: >
+            The start tag used for the highlighted snippets.
+            Default: `<mark>`
+          schema:
+            type: string
+        - name: highlight_end_tag
+          in: query
+          description: >
+            The end tag used for the highlighted snippets.
+            Default: `</mark>`
+          schema:
+            type: string
+        - name: snippet_threshold
+          in: query
+          description: >
+            Field values under this length will be fully highlighted, instead of showing
+            a snippet of relevant portion. Default: 30
+          schema:
+            type: integer
+        - name: drop_tokens_threshold
+          in: query
+          description: >
+            If the number of results found for a specific query is less than
+            this number, Typesense will attempt to drop the tokens in the query until
+            enough results are found. Tokens that have the least individual hits
+            are dropped first. Set to 0 to disable. Default: 10
+          schema:
+            type: integer
+        - name: typo_tokens_threshold
+          in: query
+          description: >
+            If the number of results found for a specific query is less than this number,
+            Typesense will attempt to look for tokens with more typos until
+            enough results are found. Default: 100
+          schema:
+            type: integer
+        - name: pinned_hits
+          in: query
+          description: >
+            A list of records to unconditionally include in the search results
+            at specific positions. An example use case would be to feature or promote
+            certain items on the top of search results.
+            A list of `record_id:hit_position`. Eg: to include a record with ID 123
+            at Position 1 and another record with ID 456 at Position 5,
+            you'd specify `123:1,456:5`.
+
+            You could also use the Overrides feature to override search results based
+            on rules. Overrides are applied first, followed by `pinned_hits` and 
+            finally `hidden_hits`.
+          style: form
+          schema:
+            type: array
+            items:
+              type: string
+        - name: hidden_hits
+          in: query
+          description: >
+            A list of records to unconditionally hide from search results.
+            A list of `record_id`s to hide. Eg: to hide records with IDs 123 and 456,
+            you'd specify `123,456`.
+
+            You could also use the Overrides feature to override search results based
+            on rules. Overrides are applied first, followed by `pinned_hits` and
+            finally `hidden_hits`.
+          style: form
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        200:
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  facet_counts:
+                    type: array
+                    items:
+                      type: integer
+                  found:
+                    type: integer
+                    description: The number of documents found
+                  search_time_ms:
+                    type: integer
+                    description: The number of milliseconds the search took
+                  page:
+                    type: integer
+                    description: The search result page number
+                  grouped_hits:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        group_key:
+                          type: array
+                          items:
+                            type: string
+                        hits:
+                          $ref: "#/components/schemas/SearchResultHits"
+                  hits:
+                    $ref: "#/components/schemas/SearchResultHits"
+        400:
+          description: Bad request, see error message for details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+        404:
+          description: The collection or field was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+  /collections/{collectionName}/overrides/{overrideId}:
+    put:
+      tags:
+        - documents
+        - promote
+      summary: Create or update an override to promote certain documents over others
+      description:
+        Create or update an override to promote certain documents over others.
+        Using overrides, you can include or exclude specific documents for a given query.
+      operationId: upsertSearchOverride
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection
+          required: true
+          schema:
+            type: string
+        - name: overrideId
+          in: path
+          description: The ID of the search override to create/update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The search override object to be created/updated
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchOverride"
+        required: true
+      x-codegen-request-body-name: override
+      responses:
+        200:
+          description: Created/updated search override
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchOverride"
+    delete:
+      tags:
+        - documents
+        - promote
+      summary: Delete an override associated with a collection
+      operationId: deleteSearchOverride
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection
+          required: true
+          schema:
+            type: string
+        - name: overrideId
+          in: path
+          description: The ID of the search override to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: The ID of the deleted search override
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+  /collections/{collectionName}/documents/export:
+    get:
+      tags:
+        - documents
+      summary: Export all documents in a collection
+      description: Export all documents in a collection in JSON lines format.
+      operationId: exportCollection
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Exports all the documents in a given collection.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                example: |
+                  {"id": "124", "company_name": "Stark Industries", "num_employees": 5215, "country": "US"}
+                  {"id": "125", "company_name": "Future Technology", "num_employees": 1232,"country": "UK"}
+                  {"id": "126", "company_name": "Random Corp.", "num_employees": 531,"country": "AU"}
+        404:
+          description: The collection was not found
+          content:
+            application/octet-stream:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+  /collections/{collectionName}/documents/import:
+    post:
+      tags:
+        - documents
+      summary: Import documents into a collection
+      description:
+        The documents to be imported must be formatted in a newline delimited
+        JSON structure. You can feed the output file from a Typesense export operation
+        directly as import.
+      operationId: importCollection
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection
+          required: true
+          schema:
+            type: string
+        - name: action
+          in: query
+          description:
+            Action mode. Allowed action modes are `create`, `upsert` and `update`.
+            `create` mode creates a new document. Fails if a document with the same id
+            already exists. `upsert` mode creates a new document or updates an existing
+            document if a document with the same id already exists.
+            `update` mode updates an existing document. Fails if a document with the
+            given id does not exist.
+          schema:
+            type: string
+            example: upsert
+            enum:
+              - create
+              - upsert
+              - update
+        - name: batch_size
+          in: query
+          description:
+            Batch size used for import. By default, Typesense ingests 40 documents at a time
+            into Typesense. To increase this value, use the `batch_size` parameter.
+            Larger batch sizes will consume larger transient memory during import.
+          schema:
+            type: integer
+      requestBody:
+        description: The JSONL file to import
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+        required: true
+      x-codegen-request-body-name: documentFile
+      responses:
+        200:
+          description:
+            Result of the import operation. Each line of the response indicates the result
+            of each document present in the request body (in the same order). If the import
+            of a single document fails, it does not affect the other documents.
+            If there is a failure, the response line will include a corresponding error
+            message and as well as the actual document content.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                example: |
+                  {"success": true}
+                  {"success": false, "error": "Bad JSON.", "document": "[bad doc"}
+        404:
+          description: The collection was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+  /collections/{collectionName}/documents/{documentId}:
+    get:
+      tags:
+        - documents
+      summary: Retreive a document
+      description: Fetch an individual document from a collection by using its ID.
+      operationId: getDocument
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection to search for the document under
+          required: true
+          schema:
+            type: string
+        - name: documentId
+          in: path
+          description: The Document ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: The document referenced by the ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+        404:
+          description: The document or collection was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+    patch:
+      tags:
+        - documents
+      summary: Update a document
+      description:
+        Update an individual document from a collection by using its ID.
+        The update can be partial.
+      operationId: updateDocument
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection to search for the document under
+          required: true
+          schema:
+            type: string
+        - name: documentId
+          in: path
+          description: The Document ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The document object with fields to be updated
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Document"
+        required: true
+      x-codegen-request-body-name: document
+      responses:
+        200:
+          description: The document referenced by the ID was updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+        404:
+          description: The document or collection was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+    delete:
+      tags:
+        - documents
+      summary: Delete a document
+      description: Delete an individual document from a collection by using its ID.
+      operationId: deleteDocument
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection to search for the document under
+          required: true
+          schema:
+            type: string
+        - name: documentId
+          in: path
+          description: The Document ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: The document referenced by the ID was deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+        404:
+          description: The document or collection was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+  /keys:
+    get:
+      tags:
+        - keys
+      summary: Retrieve (metadata about) all keys.
+      operationId: listKeys
+      responses:
+        200:
+          description: List of all keys
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  keys:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ApiKey"
+    post:
+      tags:
+        - keys
+      summary: Create an API Key
+      description:
+        Create an API Key with fine-grain access control. You can restrict access
+        on both a per-collection and per-action level.
+        The generated key is returned only during creation. You want to store
+        this key carefully in a secure place.
+      operationId: createKey
+      requestBody:
+        description: The object that describes API key scope
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiKey"
+      x-codegen-request-body-name: keyScope
+      responses:
+        200:
+          description: Created API key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKey"
+  /keys/{keyId}:
+    get:
+      tags:
+        - keys
+      summary: Retrieve (metadata about) a key
+      description:
+        Retrieve (metadata about) a key. Only the key prefix is returned
+        when you retrieve a key. Due to security reasons, only the create endpoint
+        returns the full API key.
+      operationId: getKey
+      parameters:
+        - name: keyId
+          in: path
+          description: The ID of the key to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: The key referenced by the ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKey"
+    delete:
+      tags:
+        - keys
+      summary: Delete an API key given its ID.
+      operationId: deleteKey
+      parameters:
+        - name: keyId
+          in: path
+          description: The ID of the key to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: The key referenced by the ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKey"
+  /aliases/{aliasName}:
+    put:
+      tags:
+        - collections
+      summary: Create or update a collection alias
+      description:
+        Create or update a collection alias. An alias is a virtual collection name that points
+        to a real collection. If you're familiar with symbolic links on Linux, it's very similar
+        to that. Aliases are useful when you want to reindex your data in the
+        background on a new collection and switch your application to it without any changes to
+        your code.
+      operationId: upsertAlias
+      parameters:
+        - name: aliasName
+          in: path
+          description: The name of the alias to create/update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Collection alias to be created/updated
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollectionAlias"
+      x-codegen-request-body-name: alias
+      responses:
+        200:
+          description: The collection alias was created/updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionAlias"
+    get:
+      tags:
+        - collections
+      summary: Retrieve an alias
+      description: Find out which collection an alias points to by fetching it
+      operationId: getAlias
+      parameters:
+        - name: aliasName
+          in: path
+          description: The name of the alias to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Collection alias fetched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionAlias"
+    delete:
+      tags:
+        - collections
+      summary: Delete an alias
+      operationId: deleteAlias
+      parameters:
+        - name: aliasName
+          in: path
+          description: The name of the alias to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Collection alias was deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionAlias"
+  /debug:
+    get:
+      tags:
+        - debug
+      summary: Print debugging information
+      description: Print debugging information
+      operationId: debug
+      responses:
+        200:
+          description: Debugging information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+  /health:
+    get:
+      tags:
+        - health
+      summary: Checks if Typesense server is ready to accept requests.
+      description: Checks if Typesense server is ready to accept requests.
+      operationId: health
+      responses:
+        200:
+          description: Search service is ready for requests.
+          content:
+            application/json:
+              schema:
+                type: object
+components:
+  schemas:
+    Collection:
+      required:
+        - name
+        - fields
+        - default_sorting_field
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the collection
+          example: companies
+        num_documents:
+          type: integer
+          description: Number of documents in the collection
+          format: int64
+          readOnly: true
+        fields:
+          type: array
+          description: A list of fields for querying, filtering and faceting
+          example:
+            - name: company_name
+              type: string
+              facet: false
+            - name: num_employees
+              type: int32
+              facet: false
+            - name: country
+              type: string
+              facet: true
+          items:
+            $ref: "#/components/schemas/Field"
+        default_sorting_field:
+          type: string
+          description:
+            The name of an int32 / float field that determines the order in which
+            the search results are ranked when a sort_by clause is not provided during
+            searching. This field must indicate some kind of popularity.
+          example: num_employees
+    Field:
+      required:
+        - name
+        - type
+      type: object
+      properties:
+        name:
+          type: string
+          example: company_name
+        type:
+          type: string
+          example: string
+          enum:
+            - string
+            - int32
+            - int64
+            - float
+            - bool
+            - string[]
+            - int32[]
+            - int64[]
+            - float[]
+            - bool[]
+        optional:
+          type: boolean
+          example: true
+          default: false
+        facet:
+          type: boolean
+          example: false
+          default: false
+    Document:
+      type: object
+      additionalProperties: true
+      description: Can be any key-value pair
+      example:
+        id: "124"
+        company_name: Stark Industries
+        num_employees: 5215
+        country: USA
+    CollectionAlias:
+      type: object
+      required:
+        - collection_name
+      properties:
+        name:
+          type: string
+          readOnly: true
+        collection_name:
+          type: string
+          description: Name of the collection you wish to map the alias to
+    SearchResultHits:
+      type: array
+      description: The documents that matched the search query
+      items:
+        $ref: "#/components/schemas/SearchResultHit"
+    SearchResultHit:
+      type: object
+      required:
+        - document
+      properties:
+        highlights:
+          type: array
+          description: Contains highlighted portions of the search fields
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: company_name
+              snippet:
+                type: string
+                description: Present only for (non-array) string fields
+                example: <mark>Stark</mark> Industries
+              snippets:
+                type: array
+                description: Present only for (array) string[] fields
+                example:
+                  - <mark>Stark</mark> Industries
+                  - <mark>Stark</mark> Corp
+                items:
+                  type: string
+              indices:
+                type: array
+                description:
+                  The indices property will be present only for string[]
+                  fields and will contain the corresponding indices of the snippets
+                  in the search field
+                example: 1
+                items:
+                  type: integer
+        document:
+          $ref: "#/components/schemas/Document"
+      example:
+        highlights:
+          company_name:
+            field: company_name
+            snippet: <mark>Stark</mark> Industries
+        document:
+          id: "124"
+          company_name: Stark Industries
+          num_employees: 5215
+          country: USA
+    SearchOverride:
+      type: object
+      required:
+        - rule
+      properties:
+        rule:
+          type: object
+          required:
+            - query
+            - match
+          properties:
+            id:
+              type: string
+              readOnly: true
+            query:
+              type: string
+              description: Indicates what search queries should be overridden
+            match:
+              type: string
+              description: >
+                Indicates whether the match on the query term should be `exact` or `contains`.
+                If we want to match all queries that contained
+                the word `apple`, we will use the `contains` match instead.
+              enum:
+                - exact
+                - contains
+        includes:
+          type: array
+          description:
+            List of document `id`s that should be included in the search results with their
+            corresponding `position`s.
+          items:
+            type: object
+            required:
+              - id
+              - position
+            properties:
+              id:
+                type: string
+                description: document id that should be included
+              position:
+                type: integer
+                description: position number where document should be included in the search results
+        excludes:
+          type: array
+          description: List of document `id`s that should be excluded from the search results.
+          items:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: string
+                description: document id that should be excluded from the search results.
+    ApiResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    ApiKey:
+      type: object
+      required:
+        - description
+        - actions
+        - collections
+      properties:
+        description:
+          type: string
+        actions:
+          type: array
+          items:
+            type: string
+        collections:
+          type: array
+          items:
+            type: string
+        id:
+          type: string
+          readOnly: true
+        value:
+          type: string
+          readOnly: true
+        value_prefix:
+          type: string
+          readOnly: true
+  securitySchemes:
+    api_key_header:
+      type: apiKey
+      name: X-TYPESENSE-API-KEY
+      in: header
