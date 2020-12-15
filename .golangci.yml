@@ -1,0 +1,30 @@
+linters:
+  enable:
+    - dogsled
+    - dupl
+    - exportloopref
+    - funlen
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - goimports
+    - golint
+    - gosec
+    - maligned
+    - misspell
+    - nestif
+    - prealloc
+    - unconvert
+    - unparam
+  disable:
+    - structcheck
+
+run:
+  timeout: 3m
+
+issues:
+  exclude-rules:
+    - linters:
+        - gosec
+      text: "G404"
