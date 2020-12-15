@@ -7,6 +7,15 @@ clone:
   depth: 1
 
 steps:
+  - name: lint
+    image: golangci/golangci-lint:v1.33-alpine
+    environment:
+      GO111MODULE: "on"
+    commands:
+      - golangci-lint run -v
+      - cd / && go get -u github.com/mgechev/revive@v1.0.2 && cd -
+      - revive -config .revive.toml -formatter friendly ./...
+
   - name: build
     image: golang:1.15-alpine
     commands:
