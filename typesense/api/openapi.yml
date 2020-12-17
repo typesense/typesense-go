@@ -48,12 +48,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  collections:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Collection"
+                $ref: "#/components/schemas/CollectionsResponse"
     post:
       tags:
         - collections
@@ -67,7 +62,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Collection"
+              $ref: "#/components/schemas/CollectionSchema"
         required: true
       x-codegen-request-body-name: collection
       responses:
@@ -985,7 +980,7 @@ paths:
                 type: object
 components:
   schemas:
-    Collection:
+    CollectionSchema:
       required:
         - name
         - fields
@@ -996,11 +991,6 @@ components:
           type: string
           description: Name of the collection
           example: companies
-        num_documents:
-          type: integer
-          description: Number of documents in the collection
-          format: int64
-          readOnly: true
         fields:
           type: array
           description: A list of fields for querying, filtering and faceting
@@ -1023,10 +1013,34 @@ components:
             the search results are ranked when a sort_by clause is not provided during
             searching. This field must indicate some kind of popularity.
           example: num_employees
+    Collection:
+      allOf:
+        - $ref: "#/components/schemas/CollectionSchema"
+        - type: object
+          required:
+            - num_documents
+          properties:
+            num_documents:
+              type: integer
+              description: Number of documents in the collection
+              format: int64
+              readOnly: true
+    CollectionsResponse:
+      type: object
+      required:
+        - collections
+      properties:
+        collections:
+          type: array
+          x-go-type: "[]*Collection"
+          items:
+            $ref: "#/components/schemas/Collection"
     Field:
       required:
         - name
         - type
+        - facet #only for codegen
+        - optional #only for codegen
       type: object
       properties:
         name:
@@ -1056,7 +1070,7 @@ components:
           default: false
     Document:
       type: object
-      additionalProperties: true
+      x-go-type: "interface{}"
       description: Can be any key-value pair
       example:
         id: "124"
