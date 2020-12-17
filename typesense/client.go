@@ -11,14 +11,16 @@ type Client struct {
 	Collections CollectionsInterface
 }
 
-// Collections('name') -> new object (or from map)
+// Collection('name') -> new object (or from map)
 // create internal map for collections
 // Documents <- struct field (interface)
 
-// client.Collections('name').Retrieve()
-// client.Collections('name').Delete()
-// client.Collections('name').Documents.Create(document)
-// client.Collections('name').Documents('124').Retrieve()
+// client.Collection('name').Documents.Create(document)
+// client.Collection('name').Document('124').Retrieve()
+
+func (c *Client) Collection(collectionName string) CollectionInterface {
+	return &collection{apiClient: c.apiClient, name: collectionName}
+}
 
 type httpError struct {
 	status int
