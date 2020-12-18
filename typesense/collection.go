@@ -13,6 +13,7 @@ import (
 type CollectionInterface interface {
 	Retrieve() (*api.Collection, error)
 	Delete() (*api.Collection, error)
+	Documents() DocumentsInterface
 }
 
 // collection is internal implementation of CollectionInterface
@@ -41,4 +42,8 @@ func (c *collection) Delete() (*api.Collection, error) {
 		return nil, &httpError{status: response.StatusCode(), body: response.Body}
 	}
 	return response.JSON200, nil
+}
+
+func (c *collection) Documents() DocumentsInterface {
+	return &documents{apiClient: c.apiClient, collectionName: c.name}
 }

@@ -162,7 +162,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Document"
+              type: object
+              description: Can be any key-value pair
+              x-go-type: "interface{}"
         required: true
       x-codegen-request-body-name: document
       responses:
@@ -171,7 +173,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Document"
+                type: object
+                description: Can be any key-value pair
         404:
           description: Collection not found
           content:
@@ -220,6 +223,8 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - num_deleted
                 properties:
                   num_deleted:
                     type: integer
@@ -1071,6 +1076,14 @@ components:
     Document:
       type: object
       x-go-type: "interface{}"
+      description: Can be any key-value pair
+      example:
+        id: "124"
+        company_name: Stark Industries
+        num_employees: 5215
+        country: USA
+    DocumentResponse:
+      type: object
       description: Can be any key-value pair
       example:
         id: "124"

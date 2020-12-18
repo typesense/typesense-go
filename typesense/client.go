@@ -8,15 +8,14 @@ import (
 
 type Client struct {
 	apiClient   api.ClientWithResponsesInterface
-	Collections CollectionsInterface
+	collections CollectionsInterface
 }
 
-// Collection('name') -> new object (or from map)
-// create internal map for collections
-// Documents <- struct field (interface)
-
-// client.Collection('name').Documents.Create(document)
 // client.Collection('name').Document('124').Retrieve()
+
+func (c *Client) Collections() CollectionsInterface {
+	return c.collections
+}
 
 func (c *Client) Collection(collectionName string) CollectionInterface {
 	return &collection{apiClient: c.apiClient, name: collectionName}
@@ -49,6 +48,6 @@ func NewClient(opts ...ClientOption) *Client {
 	for _, opt := range opts {
 		opt(c)
 	}
-	c.Collections = &collections{c.apiClient}
+	c.collections = &collections{c.apiClient}
 	return c
 }

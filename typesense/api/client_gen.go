@@ -2207,7 +2207,7 @@ type DeleteDocumentsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *struct {
-		NumDeleted *int `json:"num_deleted,omitempty"`
+		NumDeleted int `json:"num_deleted"`
 	}
 	JSON404 *ApiResponse
 }
@@ -2231,7 +2231,7 @@ func (r DeleteDocumentsResponse) StatusCode() int {
 type IndexDocumentResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *Document
+	JSON201      *map[string]interface{}
 	JSON404      *ApiResponse
 }
 
@@ -3063,7 +3063,7 @@ func ParseDeleteDocumentsResponse(rsp *http.Response) (*DeleteDocumentsResponse,
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
-			NumDeleted *int `json:"num_deleted,omitempty"`
+			NumDeleted int `json:"num_deleted"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3097,7 +3097,7 @@ func ParseIndexDocumentResponse(rsp *http.Response) (*IndexDocumentResponse, err
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest Document
+		var dest map[string]interface{}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

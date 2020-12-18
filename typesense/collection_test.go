@@ -16,6 +16,7 @@ func TestCollectionRetrieve(t *testing.T) {
 	expectedResult := createNewCollection("companies")
 
 	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 	mockedResult := &api.Collection{}
 	copier.Copy(mockedResult, expectedResult)
@@ -37,6 +38,7 @@ func TestCollectionRetrieve(t *testing.T) {
 func TestCollectionRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 
 	mockApiClient.EXPECT().
@@ -52,6 +54,7 @@ func TestCollectionRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 func TestCollectionRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 
 	mockApiClient.EXPECT().
@@ -73,6 +76,7 @@ func TestCollectionDelete(t *testing.T) {
 	expectedResult := createNewCollection("companies")
 
 	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 	mockedResult := &api.Collection{}
 	copier.Copy(mockedResult, expectedResult)
@@ -94,6 +98,7 @@ func TestCollectionDelete(t *testing.T) {
 func TestCollectionDeleteOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 
 	mockApiClient.EXPECT().
@@ -109,6 +114,7 @@ func TestCollectionDeleteOnApiClientErrorReturnsError(t *testing.T) {
 func TestCollectionDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 
 	mockApiClient.EXPECT().

@@ -136,7 +136,7 @@ type DeleteDocumentsParams struct {
 }
 
 // IndexDocumentJSONBody defines parameters for IndexDocument.
-type IndexDocumentJSONBody Document
+type IndexDocumentJSONBody interface{}
 
 // IndexDocumentParams defines parameters for IndexDocument.
 type IndexDocumentParams struct {
