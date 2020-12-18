@@ -16,6 +16,11 @@ steps:
       - cd / && go get -u github.com/mgechev/revive@v1.0.2 && cd -
       - revive -config .revive.toml -formatter friendly ./...
 
+  - name: test
+    image: golang:1.15-alpine
+    commands:
+      - go test ./... -cover
+
   - name: build
     image: golang:1.15-alpine
     commands:
