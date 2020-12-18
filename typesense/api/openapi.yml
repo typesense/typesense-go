@@ -714,7 +714,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Document"
+                type: object
+                description: Can be any key-value pair
         404:
           description: The document or collection was not found
           content:
@@ -747,7 +748,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Document"
+              type: object
+              description: Can be any key-value pair
+              x-go-type: "interface{}"
         required: true
       x-codegen-request-body-name: document
       responses:
@@ -756,7 +759,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Document"
+                type: object
+                description: Can be any key-value pair
         404:
           description: The document or collection was not found
           content:
@@ -788,7 +792,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Document"
+                type: object
+                description: Can be any key-value pair
         404:
           description: The document or collection was not found
           content:
@@ -1073,23 +1078,6 @@ components:
           type: boolean
           example: false
           default: false
-    Document:
-      type: object
-      x-go-type: "interface{}"
-      description: Can be any key-value pair
-      example:
-        id: "124"
-        company_name: Stark Industries
-        num_employees: 5215
-        country: USA
-    DocumentResponse:
-      type: object
-      description: Can be any key-value pair
-      example:
-        id: "124"
-        company_name: Stark Industries
-        num_employees: 5215
-        country: USA
     CollectionAlias:
       type: object
       required:
@@ -1142,7 +1130,8 @@ components:
                 items:
                   type: integer
         document:
-          $ref: "#/components/schemas/Document"
+          type: object
+          description: Can be any key-value pair
       example:
         highlights:
           company_name:

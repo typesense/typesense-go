@@ -6,7 +6,7 @@ import (
 	"github.com/v-byte-cpu/typesense-go/typesense/api"
 )
 
-var upsertAction string = "upsert"
+var upsertAction = "upsert"
 
 // DocumentsInterface is a type for Documents API operations
 type DocumentsInterface interface {

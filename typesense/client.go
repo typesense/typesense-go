@@ -32,7 +32,7 @@ func (e *httpError) Error() string {
 
 type ClientOption func(*Client)
 
-func WithApiClient(apiClient api.ClientWithResponsesInterface) ClientOption {
+func WithAPIClient(apiClient api.ClientWithResponsesInterface) ClientOption {
 	return func(c *Client) {
 		c.apiClient = apiClient
 	}
@@ -44,7 +44,7 @@ func WithApiClient(apiClient api.ClientWithResponsesInterface) ClientOption {
 
 func NewClient(opts ...ClientOption) *Client {
 	c := &Client{}
-	//implement option pattern
+	// implement option pattern
 	for _, opt := range opts {
 		opt(c)
 	}

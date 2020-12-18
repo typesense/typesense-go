@@ -14,6 +14,7 @@ type CollectionInterface interface {
 	Retrieve() (*api.Collection, error)
 	Delete() (*api.Collection, error)
 	Documents() DocumentsInterface
+	Document(documentID string) DocumentInterface
 }
 
 // collection is internal implementation of CollectionInterface
@@ -46,4 +47,8 @@ func (c *collection) Delete() (*api.Collection, error) {
 
 func (c *collection) Documents() DocumentsInterface {
 	return &documents{apiClient: c.apiClient, collectionName: c.name}
+}
+
+func (c *collection) Document(documentID string) DocumentInterface {
+	return &document{apiClient: c.apiClient, collectionName: c.name, documentID: documentID}
 }

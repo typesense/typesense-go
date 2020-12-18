@@ -36,25 +36,26 @@ func createNewDocumentResponse() map[string]interface{} {
 }
 
 func TestDocumentCreate(t *testing.T) {
-	newDocument := createNewDocument()
+	expectedDocument := createNewDocument()
 	expectedResult := createNewDocumentResponse()
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 	mockedResult := createNewDocumentResponse()
 
 	notNill := gomock.Not(gomock.Nil())
 	indexParams := &api.IndexDocumentParams{}
-	mockApiClient.EXPECT().
-		IndexDocumentWithResponse(notNill, "companies", indexParams, newDocument).
+	mockAPIClient.EXPECT().
+		IndexDocumentWithResponse(notNill, "companies", indexParams, expectedDocument).
 		Return(&api.IndexDocumentResponse{
 			JSON201: &mockedResult,
 		}, nil).
 		Times(1)
 
-	client := NewClient(WithApiClient(mockApiClient))
-	result, err := client.Collection("companies").Documents().Create(newDocument)
+	client := NewClient(WithAPIClient(mockAPIClient))
+	document := createNewDocument()
+	result, err := client.Collection("companies").Documents().Create(document)
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -65,16 +66,16 @@ func TestDocumentCreateOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 
 	notNill := gomock.Not(gomock.Nil())
 	indexParams := &api.IndexDocumentParams{}
-	mockApiClient.EXPECT().
+	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, newDocument).
 		Return(nil, errors.New("failed request")).
 		Times(1)
 
-	client := NewClient(WithApiClient(mockApiClient))
+	client := NewClient(WithAPIClient(mockAPIClient))
 	_, err := client.Collection("companies").Documents().Create(newDocument)
 	assert.NotNil(t, err)
 }
@@ -84,11 +85,11 @@ func TestDocumentCreateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 
 	notNill := gomock.Not(gomock.Nil())
 	indexParams := &api.IndexDocumentParams{}
-	mockApiClient.EXPECT().
+	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, newDocument).
 		Return(&api.IndexDocumentResponse{
 			HTTPResponse: &http.Response{
@@ -98,7 +99,7 @@ func TestDocumentCreateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		}, nil).
 		Times(1)
 
-	client := NewClient(WithApiClient(mockApiClient))
+	client := NewClient(WithAPIClient(mockAPIClient))
 	_, err := client.Collection("companies").Documents().Create(newDocument)
 	assert.NotNil(t, err)
 }
@@ -109,19 +110,19 @@ func TestDocumentUpsert(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 	mockedResult := createNewDocumentResponse()
 
 	notNill := gomock.Not(gomock.Nil())
 	indexParams := &api.IndexDocumentParams{Action: &upsertAction}
-	mockApiClient.EXPECT().
+	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, newDocument).
 		Return(&api.IndexDocumentResponse{
 			JSON201: &mockedResult,
 		}, nil).
 		Times(1)
 
-	client := NewClient(WithApiClient(mockApiClient))
+	client := NewClient(WithAPIClient(mockAPIClient))
 	result, err := client.Collection("companies").Documents().Upsert(newDocument)
 
 	assert.Nil(t, err)
@@ -133,16 +134,16 @@ func TestDocumentUpsertOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 
 	notNill := gomock.Not(gomock.Nil())
 	indexParams := &api.IndexDocumentParams{Action: &upsertAction}
-	mockApiClient.EXPECT().
+	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, newDocument).
 		Return(nil, errors.New("failed request")).
 		Times(1)
 
-	client := NewClient(WithApiClient(mockApiClient))
+	client := NewClient(WithAPIClient(mockAPIClient))
 	_, err := client.Collection("companies").Documents().Upsert(newDocument)
 	assert.NotNil(t, err)
 }
@@ -152,11 +153,11 @@ func TestDocumentUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 
 	notNill := gomock.Not(gomock.Nil())
 	indexParams := &api.IndexDocumentParams{Action: &upsertAction}
-	mockApiClient.EXPECT().
+	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, newDocument).
 		Return(&api.IndexDocumentResponse{
 			HTTPResponse: &http.Response{
@@ -166,7 +167,7 @@ func TestDocumentUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		}, nil).
 		Times(1)
 
-	client := NewClient(WithApiClient(mockApiClient))
+	client := NewClient(WithAPIClient(mockAPIClient))
 	_, err := client.Collection("companies").Documents().Upsert(newDocument)
 	assert.NotNil(t, err)
 }
@@ -175,21 +176,21 @@ func TestDocumentsDelete(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 	expectedFilter := &api.DeleteDocumentsParams{FilterBy: "num_employees:>100", BatchSize: 100}
 
 	mockedResult := struct {
 		NumDeleted int `json:"num_deleted"`
 	}{27}
 
-	mockApiClient.EXPECT().
+	mockAPIClient.EXPECT().
 		DeleteDocumentsWithResponse(gomock.Not(gomock.Nil()), "companies", expectedFilter).
 		Return(&api.DeleteDocumentsResponse{
 			JSON200: &mockedResult,
 		}, nil).
 		Times(1)
 
-	client := NewClient(WithApiClient(mockApiClient))
+	client := NewClient(WithAPIClient(mockAPIClient))
 	filter := &api.DeleteDocumentsParams{FilterBy: "num_employees:>100", BatchSize: 100}
 	result, err := client.Collection("companies").Documents().Delete(filter)
 
@@ -201,15 +202,15 @@ func TestDocumentsDeleteOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 	expectedFilter := &api.DeleteDocumentsParams{FilterBy: "num_employees:>100", BatchSize: 100}
 
-	mockApiClient.EXPECT().
+	mockAPIClient.EXPECT().
 		DeleteDocumentsWithResponse(gomock.Not(gomock.Nil()), "companies", expectedFilter).
 		Return(nil, errors.New("failed request")).
 		Times(1)
 
-	client := NewClient(WithApiClient(mockApiClient))
+	client := NewClient(WithAPIClient(mockAPIClient))
 	filter := &api.DeleteDocumentsParams{FilterBy: "num_employees:>100", BatchSize: 100}
 	_, err := client.Collection("companies").Documents().Delete(filter)
 	assert.NotNil(t, err)
@@ -219,10 +220,10 @@ func TestDocumentsDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 	expectedFilter := &api.DeleteDocumentsParams{FilterBy: "num_employees:>100", BatchSize: 100}
 
-	mockApiClient.EXPECT().
+	mockAPIClient.EXPECT().
 		DeleteDocumentsWithResponse(gomock.Not(gomock.Nil()), "companies", expectedFilter).
 		Return(&api.DeleteDocumentsResponse{
 			HTTPResponse: &http.Response{
@@ -232,7 +233,7 @@ func TestDocumentsDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		}, nil).
 		Times(1)
 
-	client := NewClient(WithApiClient(mockApiClient))
+	client := NewClient(WithAPIClient(mockAPIClient))
 	filter := &api.DeleteDocumentsParams{FilterBy: "num_employees:>100", BatchSize: 100}
 	_, err := client.Collection("companies").Documents().Delete(filter)
 	assert.NotNil(t, err)

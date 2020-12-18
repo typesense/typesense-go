@@ -54,9 +54,6 @@ type CollectionsResponse struct {
 	Collections []*Collection `json:"collections"`
 }
 
-// Document defines model for Document.
-type Document interface{}
-
 // Field defines model for Field.
 type Field struct {
 	Facet    bool   `json:"facet"`
@@ -99,7 +96,7 @@ type SearchOverride struct {
 type SearchResultHit struct {
 
 	// Can be any key-value pair
-	Document Document `json:"document"`
+	Document map[string]interface{} `json:"document"`
 
 	// Contains highlighted portions of the search fields
 	Highlights *[]struct {
@@ -237,7 +234,7 @@ type SearchCollectionParams struct {
 }
 
 // UpdateDocumentJSONBody defines parameters for UpdateDocument.
-type UpdateDocumentJSONBody Document
+type UpdateDocumentJSONBody interface{}
 
 // UpsertSearchOverrideJSONBody defines parameters for UpsertSearchOverride.
 type UpsertSearchOverrideJSONBody SearchOverride

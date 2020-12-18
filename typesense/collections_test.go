@@ -47,11 +47,10 @@ func TestCollectionCreate(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
-	mockedResult := &api.Collection{}
-	copier.Copy(mockedResult, expectedResult)
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockedResult := createNewCollection("companies")
 
-	mockApiClient.EXPECT().
+	mockAPIClient.EXPECT().
 		CreateCollectionWithResponse(gomock.Not(gomock.Nil()),
 			api.CreateCollectionJSONRequestBody(*newSchema)).
 		Return(&api.CreateCollectionResponse{
@@ -59,7 +58,7 @@ func TestCollectionCreate(t *testing.T) {
 		}, nil).
 		Times(1)
 
-	client := NewClient(WithApiClient(mockApiClient))
+	client := NewClient(WithAPIClient(mockAPIClient))
 	result, err := client.Collections().Create(newSchema)
 
 	assert.Nil(t, err)
@@ -71,15 +70,15 @@ func TestCollectionCreateOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 
-	mockApiClient.EXPECT().
+	mockAPIClient.EXPECT().
 		CreateCollectionWithResponse(gomock.Not(gomock.Nil()),
 			api.CreateCollectionJSONRequestBody(*newSchema)).
 		Return(nil, errors.New("failed request")).
 		Times(1)
 
-	client := NewClient(WithApiClient(mockApiClient))
+	client := NewClient(WithAPIClient(mockAPIClient))
 	_, err := client.Collections().Create(newSchema)
 	assert.NotNil(t, err)
 }
@@ -89,9 +88,9 @@ func TestCollectionCreateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 
-	mockApiClient.EXPECT().
+	mockAPIClient.EXPECT().
 		CreateCollectionWithResponse(gomock.Not(gomock.Nil()),
 			api.CreateCollectionJSONRequestBody(*newSchema)).
 		Return(&api.CreateCollectionResponse{
@@ -102,7 +101,7 @@ func TestCollectionCreateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		}, nil).
 		Times(1)
 
-	client := NewClient(WithApiClient(mockApiClient))
+	client := NewClient(WithAPIClient(mockAPIClient))
 	_, err := client.Collections().Create(newSchema)
 	assert.NotNil(t, err)
 }
@@ -116,11 +115,11 @@ func TestCollectionsRetrieve(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 	mockedResult := []*api.Collection{}
-	copier.Copy(&mockedResult, &expectedResult)
+	assert.Nil(t, copier.Copy(&mockedResult, &expectedResult))
 
-	mockApiClient.EXPECT().
+	mockAPIClient.EXPECT().
 		GetCollectionsWithResponse(gomock.Not(gomock.Nil())).
 		Return(&api.GetCollectionsResponse{
 			JSON200: &api.CollectionsResponse{
@@ -129,7 +128,7 @@ func TestCollectionsRetrieve(t *testing.T) {
 		}, nil).
 		Times(1)
 
-	client := NewClient(WithApiClient(mockApiClient))
+	client := NewClient(WithAPIClient(mockAPIClient))
 	result, err := client.Collections().Retrieve()
 
 	assert.Nil(t, err)
@@ -140,14 +139,14 @@ func TestCollectionsRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 
-	mockApiClient.EXPECT().
+	mockAPIClient.EXPECT().
 		GetCollectionsWithResponse(gomock.Not(gomock.Nil())).
 		Return(nil, errors.New("failed request")).
 		Times(1)
 
-	client := NewClient(WithApiClient(mockApiClient))
+	client := NewClient(WithAPIClient(mockAPIClient))
 	_, err := client.Collections().Retrieve()
 	assert.NotNil(t, err)
 }
@@ -156,9 +155,9 @@ func TestCollectionsRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockApiClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
 
-	mockApiClient.EXPECT().
+	mockAPIClient.EXPECT().
 		GetCollectionsWithResponse(gomock.Not(gomock.Nil())).
 		Return(&api.GetCollectionsResponse{
 			HTTPResponse: &http.Response{
@@ -168,7 +167,7 @@ func TestCollectionsRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		}, nil).
 		Times(1)
 
-	client := NewClient(WithApiClient(mockApiClient))
+	client := NewClient(WithAPIClient(mockAPIClient))
 	_, err := client.Collections().Retrieve()
 	assert.NotNil(t, err)
 }
