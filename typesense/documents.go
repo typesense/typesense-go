@@ -16,6 +16,8 @@ type DocumentsInterface interface {
 	Upsert(document interface{}) (map[string]interface{}, error)
 	// Delete returns number of deleted documents
 	Delete(filter *api.DeleteDocumentsParams) (int, error)
+	// Search performs document search in collection
+	Search(params *api.SearchCollectionParams) (*api.SearchResult, error)
 }
 
 // documents is internal implementation of DocumentsInterface
@@ -54,6 +56,18 @@ func (d *documents) Delete(filter *api.DeleteDocumentsParams) (int, error) {
 		return 0, &httpError{status: response.StatusCode(), body: response.Body}
 	}
 	return response.JSON200.NumDeleted, nil
+}
+
+func (d *documents) Search(params *api.SearchCollectionParams) (*api.SearchResult, error) {
+	response, err := d.apiClient.SearchCollectionWithResponse(context.Background(),
+		d.collectionName, params)
+	if err != nil {
+		return nil, err
+	}
+	if response.JSON200 == nil {
+		return nil, &httpError{status: response.StatusCode(), body: response.Body}
+	}
+	return response.JSON200, nil
 }
 
 // api.ActionMode

@@ -15,7 +15,7 @@ type ApiKey struct {
 
 // ApiResponse defines model for ApiResponse.
 type ApiResponse struct {
-	Message *string `json:"message,omitempty"`
+	Message string `json:"message"`
 }
 
 // Collection defines model for Collection.
@@ -62,6 +62,29 @@ type Field struct {
 	Type     string `json:"type"`
 }
 
+// SearchGroupedHit defines model for SearchGroupedHit.
+type SearchGroupedHit struct {
+	GroupKey []string `json:"group_key"`
+
+	// The documents that matched the search query
+	Hits []SearchResultHit `json:"hits"`
+}
+
+// SearchHighlight defines model for SearchHighlight.
+type SearchHighlight struct {
+	Field string `json:"field"`
+
+	// The indices property will be present only for string[] fields and will contain the corresponding indices of the snippets in the search field
+	Indices       []int    `json:"indices"`
+	MatchedTokens []string `json:"matched_tokens"`
+
+	// Present only for (non-array) string fields
+	Snippet string `json:"snippet"`
+
+	// Present only for (array) string[] fields
+	Snippets []string `json:"snippets"`
+}
+
 // SearchOverride defines model for SearchOverride.
 type SearchOverride struct {
 
@@ -92,6 +115,24 @@ type SearchOverride struct {
 	} `json:"rule"`
 }
 
+// SearchResult defines model for SearchResult.
+type SearchResult struct {
+	FacetCounts []int `json:"facet_counts"`
+
+	// The number of documents found
+	Found       int                `json:"found"`
+	GroupedHits []SearchGroupedHit `json:"grouped_hits"`
+
+	// The documents that matched the search query
+	Hits []SearchResultHit `json:"hits"`
+
+	// The search result page number
+	Page int `json:"page"`
+
+	// The number of milliseconds the search took
+	TookMs int `json:"took_ms"`
+}
+
 // SearchResultHit defines model for SearchResultHit.
 type SearchResultHit struct {
 
@@ -99,22 +140,8 @@ type SearchResultHit struct {
 	Document map[string]interface{} `json:"document"`
 
 	// Contains highlighted portions of the search fields
-	Highlights *[]struct {
-		Field *string `json:"field,omitempty"`
-
-		// The indices property will be present only for string[] fields and will contain the corresponding indices of the snippets in the search field
-		Indices *[]int `json:"indices,omitempty"`
-
-		// Present only for (non-array) string fields
-		Snippet *string `json:"snippet,omitempty"`
-
-		// Present only for (array) string[] fields
-		Snippets *[]string `json:"snippets,omitempty"`
-	} `json:"highlights,omitempty"`
+	Highlights []SearchHighlight `json:"highlights"`
 }
-
-// SearchResultHits defines model for SearchResultHits.
-type SearchResultHits []SearchResultHit
 
 // UpsertAliasJSONBody defines parameters for UpsertAlias.
 type UpsertAliasJSONBody CollectionAlias
@@ -158,7 +185,7 @@ type SearchCollectionParams struct {
 	// The query text to search for in the collection. Use * as the search string to return all documents. This is typically useful when used in conjunction with filter_by.
 	Q string `json:"q"`
 
-	// A list of `string` or `string[]` fields that should be queried against. Multiple fields are separated with a comma.
+	// A list of `string` fields that should be queried against. Multiple fields are separated with a comma.
 	QueryBy []string `json:"query_by"`
 
 	// Maximum number of hits returned. Increasing this value might increase search latency. Default: 500. Use `all` to return all hits found.

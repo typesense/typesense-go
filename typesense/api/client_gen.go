@@ -2297,29 +2297,9 @@ func (r ImportCollectionResponse) StatusCode() int {
 type SearchCollectionResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *struct {
-		FacetCounts *[]int `json:"facet_counts,omitempty"`
-
-		// The number of documents found
-		Found       *int `json:"found,omitempty"`
-		GroupedHits *[]struct {
-			GroupKey *[]string `json:"group_key,omitempty"`
-
-			// The documents that matched the search query
-			Hits *SearchResultHits `json:"hits,omitempty"`
-		} `json:"grouped_hits,omitempty"`
-
-		// The documents that matched the search query
-		Hits *SearchResultHits `json:"hits,omitempty"`
-
-		// The search result page number
-		Page *int `json:"page,omitempty"`
-
-		// The number of milliseconds the search took
-		SearchTimeMs *int `json:"search_time_ms,omitempty"`
-	}
-	JSON400 *ApiResponse
-	JSON404 *ApiResponse
+	JSON200      *SearchResult
+	JSON400      *ApiResponse
+	JSON404      *ApiResponse
 }
 
 // Status returns HTTPResponse.Status
@@ -3175,27 +3155,7 @@ func ParseSearchCollectionResponse(rsp *http.Response) (*SearchCollectionRespons
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest struct {
-			FacetCounts *[]int `json:"facet_counts,omitempty"`
-
-			// The number of documents found
-			Found       *int `json:"found,omitempty"`
-			GroupedHits *[]struct {
-				GroupKey *[]string `json:"group_key,omitempty"`
-
-				// The documents that matched the search query
-				Hits *SearchResultHits `json:"hits,omitempty"`
-			} `json:"grouped_hits,omitempty"`
-
-			// The documents that matched the search query
-			Hits *SearchResultHits `json:"hits,omitempty"`
-
-			// The search result page number
-			Page *int `json:"page,omitempty"`
-
-			// The number of milliseconds the search took
-			SearchTimeMs *int `json:"search_time_ms,omitempty"`
-		}
+		var dest SearchResult
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
