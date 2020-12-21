@@ -74,6 +74,21 @@ func (m *MockClientInterface) EXPECT() *MockClientInterfaceMockRecorder {
 	return m.recorder
 }
 
+// GetAliases mocks base method
+func (m *MockClientInterface) GetAliases(ctx context.Context) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAliases", ctx)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAliases indicates an expected call of GetAliases
+func (mr *MockClientInterfaceMockRecorder) GetAliases(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAliases", reflect.TypeOf((*MockClientInterface)(nil).GetAliases), ctx)
+}
+
 // DeleteAlias mocks base method
 func (m *MockClientInterface) DeleteAlias(ctx context.Context, aliasName string) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -530,6 +545,21 @@ func NewMockClientWithResponsesInterface(ctrl *gomock.Controller) *MockClientWit
 // EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockClientWithResponsesInterface) EXPECT() *MockClientWithResponsesInterfaceMockRecorder {
 	return m.recorder
+}
+
+// GetAliasesWithResponse mocks base method
+func (m *MockClientWithResponsesInterface) GetAliasesWithResponse(ctx context.Context) (*api.GetAliasesResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAliasesWithResponse", ctx)
+	ret0, _ := ret[0].(*api.GetAliasesResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAliasesWithResponse indicates an expected call of GetAliasesWithResponse
+func (mr *MockClientWithResponsesInterfaceMockRecorder) GetAliasesWithResponse(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAliasesWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).GetAliasesWithResponse), ctx)
 }
 
 // DeleteAliasWithResponse mocks base method

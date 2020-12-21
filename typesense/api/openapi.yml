@@ -857,6 +857,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiKey"
+  /aliases:
+    get:
+      tags:
+        - collections
+      summary: List all aliases
+      description: List all aliases and the corresponding collections that they map to.
+      operationId: getAliases
+      responses:
+        200:
+          description: List of all collection aliases
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionAliasesResponse"
   /aliases/{aliasName}:
     put:
       tags:
@@ -881,7 +895,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CollectionAlias"
+              $ref: "#/components/schemas/CollectionAliasSchema"
       x-codegen-request-body-name: alias
       responses:
         200:
@@ -1050,17 +1064,37 @@ components:
           type: boolean
           example: false
           default: false
-    CollectionAlias:
+    CollectionAliasSchema:
       type: object
       required:
         - collection_name
       properties:
-        name:
-          type: string
-          readOnly: true
         collection_name:
           type: string
           description: Name of the collection you wish to map the alias to
+    CollectionAlias:
+      type: object
+      required:
+        - collection_name
+        - name
+      properties:
+        name:
+          type: string
+          readOnly: true
+          description: Name of the collection alias
+        collection_name:
+          type: string
+          description: Name of the collection the alias mapped to
+    CollectionAliasesResponse:
+      type: object
+      required:
+        - aliases
+      properties:
+        aliases:
+          type: array
+          x-go-type: "[]*CollectionAlias"
+          items:
+            $ref: "#/components/schemas/CollectionAlias"
     SearchResult:
       type: object
       required:

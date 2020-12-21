@@ -31,9 +31,23 @@ type Collection struct {
 // CollectionAlias defines model for CollectionAlias.
 type CollectionAlias struct {
 
+	// Name of the collection the alias mapped to
+	CollectionName string `json:"collection_name"`
+
+	// Name of the collection alias
+	Name string `json:"name"`
+}
+
+// CollectionAliasSchema defines model for CollectionAliasSchema.
+type CollectionAliasSchema struct {
+
 	// Name of the collection you wish to map the alias to
-	CollectionName string  `json:"collection_name"`
-	Name           *string `json:"name,omitempty"`
+	CollectionName string `json:"collection_name"`
+}
+
+// CollectionAliasesResponse defines model for CollectionAliasesResponse.
+type CollectionAliasesResponse struct {
+	Aliases []*CollectionAlias `json:"aliases"`
 }
 
 // CollectionSchema defines model for CollectionSchema.
@@ -144,7 +158,7 @@ type SearchResultHit struct {
 }
 
 // UpsertAliasJSONBody defines parameters for UpsertAlias.
-type UpsertAliasJSONBody CollectionAlias
+type UpsertAliasJSONBody CollectionAliasSchema
 
 // CreateCollectionJSONBody defines parameters for CreateCollection.
 type CreateCollectionJSONBody CollectionSchema

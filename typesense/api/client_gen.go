@@ -90,6 +90,9 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// GetAliases request
+	GetAliases(ctx context.Context) (*http.Response, error)
+
 	// DeleteAlias request
 	DeleteAlias(ctx context.Context, aliasName string) (*http.Response, error)
 
@@ -170,6 +173,21 @@ type ClientInterface interface {
 
 	// GetKey request
 	GetKey(ctx context.Context, keyId string) (*http.Response, error)
+}
+
+func (c *Client) GetAliases(ctx context.Context) (*http.Response, error) {
+	req, err := NewGetAliasesRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if c.RequestEditor != nil {
+		err = c.RequestEditor(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return c.Client.Do(req)
 }
 
 func (c *Client) DeleteAlias(ctx context.Context, aliasName string) (*http.Response, error) {
@@ -605,6 +623,33 @@ func (c *Client) GetKey(ctx context.Context, keyId string) (*http.Response, erro
 		}
 	}
 	return c.Client.Do(req)
+}
+
+// NewGetAliasesRequest generates requests for GetAliases
+func NewGetAliasesRequest(server string) (*http.Request, error) {
+	var err error
+
+	queryUrl, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	basePath := fmt.Sprintf("/aliases")
+	if basePath[0] == '/' {
+		basePath = basePath[1:]
+	}
+
+	queryUrl, err = queryUrl.Parse(basePath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryUrl.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
 }
 
 // NewDeleteAliasRequest generates requests for DeleteAlias
@@ -1964,6 +2009,9 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// GetAliases request
+	GetAliasesWithResponse(ctx context.Context) (*GetAliasesResponse, error)
+
 	// DeleteAlias request
 	DeleteAliasWithResponse(ctx context.Context, aliasName string) (*DeleteAliasResponse, error)
 
@@ -2044,6 +2092,28 @@ type ClientWithResponsesInterface interface {
 
 	// GetKey request
 	GetKeyWithResponse(ctx context.Context, keyId string) (*GetKeyResponse, error)
+}
+
+type GetAliasesResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *CollectionAliasesResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r GetAliasesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetAliasesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
 }
 
 type DeleteAliasResponse struct {
@@ -2569,6 +2639,15 @@ func (r GetKeyResponse) StatusCode() int {
 	return 0
 }
 
+// GetAliasesWithResponse request returning *GetAliasesResponse
+func (c *ClientWithResponses) GetAliasesWithResponse(ctx context.Context) (*GetAliasesResponse, error) {
+	rsp, err := c.GetAliases(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetAliasesResponse(rsp)
+}
+
 // DeleteAliasWithResponse request returning *DeleteAliasResponse
 func (c *ClientWithResponses) DeleteAliasWithResponse(ctx context.Context, aliasName string) (*DeleteAliasResponse, error) {
 	rsp, err := c.DeleteAlias(ctx, aliasName)
@@ -2822,6 +2901,32 @@ func (c *ClientWithResponses) GetKeyWithResponse(ctx context.Context, keyId stri
 		return nil, err
 	}
 	return ParseGetKeyResponse(rsp)
+}
+
+// ParseGetAliasesResponse parses an HTTP response from a GetAliasesWithResponse call
+func ParseGetAliasesResponse(rsp *http.Response) (*GetAliasesResponse, error) {
+	bodyBytes, err := ioutil.ReadAll(rsp.Body)
+	defer rsp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetAliasesResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest CollectionAliasesResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
 }
 
 // ParseDeleteAliasResponse parses an HTTP response from a DeleteAliasWithResponse call

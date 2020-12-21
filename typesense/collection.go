@@ -6,9 +6,6 @@ import (
 	"github.com/v-byte-cpu/typesense-go/typesense/api"
 )
 
-// client.Collection('name').Retrieve()
-// client.Collection('name').Delete()
-
 // CollectionInterface is a type for Collection API operations
 type CollectionInterface interface {
 	Retrieve() (*api.Collection, error)
