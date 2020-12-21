@@ -39,9 +39,9 @@ func newSearchResult() *api.SearchResult {
 		TookMs:      1,
 		FacetCounts: []int{},
 		Hits: []api.SearchResultHit{
-			api.SearchResultHit{
+			{
 				Highlights: []api.SearchHighlight{
-					api.SearchHighlight{
+					{
 						Field:         "company_name",
 						Snippet:       "<mark>Stark</mark> Industries",
 						MatchedTokens: []string{"Stark"},
@@ -86,9 +86,9 @@ func TestSearchResultDeserialization(t *testing.T) {
 		TookMs:      1,
 		FacetCounts: []int{},
 		Hits: []api.SearchResultHit{
-			api.SearchResultHit{
+			{
 				Highlights: []api.SearchHighlight{
-					api.SearchHighlight{
+					{
 						Field:         "company_name",
 						Snippet:       "<mark>Stark</mark> Industries",
 						MatchedTokens: []string{"Stark"},

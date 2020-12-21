@@ -8,6 +8,7 @@ linters:
     - goconst
     - gocritic
     - gocyclo
+    - gofmt
     - goimports
     - golint
     - gosec

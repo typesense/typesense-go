@@ -16,15 +16,15 @@ func createNewSchema(collectionName string) *api.CollectionSchema {
 	return &api.CollectionSchema{
 		Name: collectionName,
 		Fields: []api.Field{
-			api.Field{
+			{
 				Name: "company_name",
 				Type: "string",
 			},
-			api.Field{
+			{
 				Name: "num_employees",
 				Type: "int32",
 			},
-			api.Field{
+			{
 				Name:  "country",
 				Type:  "string",
 				Facet: true,

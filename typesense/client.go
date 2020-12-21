@@ -9,9 +9,8 @@ import (
 type Client struct {
 	apiClient   api.ClientWithResponsesInterface
 	collections CollectionsInterface
+	aliases     AliasesInterface
 }
-
-// client.Collection('name').Document('124').Retrieve()
 
 func (c *Client) Collections() CollectionsInterface {
 	return c.collections
@@ -19,6 +18,14 @@ func (c *Client) Collections() CollectionsInterface {
 
 func (c *Client) Collection(collectionName string) CollectionInterface {
 	return &collection{apiClient: c.apiClient, name: collectionName}
+}
+
+func (c *Client) Aliases() AliasesInterface {
+	return c.aliases
+}
+
+func (c *Client) Alias(aliasName string) AliasInterface {
+	return &alias{apiClient: c.apiClient, name: aliasName}
 }
 
 type httpError struct {
@@ -49,5 +56,6 @@ func NewClient(opts ...ClientOption) *Client {
 		opt(c)
 	}
 	c.collections = &collections{c.apiClient}
+	c.aliases = &aliases{c.apiClient}
 	return c
 }
