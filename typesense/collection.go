@@ -12,6 +12,8 @@ type CollectionInterface interface {
 	Delete() (*api.Collection, error)
 	Documents() DocumentsInterface
 	Document(documentID string) DocumentInterface
+	Overrides() OverridesInterface
+	Override(overrideID string) OverrideInterface
 }
 
 // collection is internal implementation of CollectionInterface
@@ -48,4 +50,12 @@ func (c *collection) Documents() DocumentsInterface {
 
 func (c *collection) Document(documentID string) DocumentInterface {
 	return &document{apiClient: c.apiClient, collectionName: c.name, documentID: documentID}
+}
+
+func (c *collection) Overrides() OverridesInterface {
+	return &overrides{apiClient: c.apiClient, collectionName: c.name}
+}
+
+func (c *collection) Override(overrideID string) OverrideInterface {
+	return &override{apiClient: c.apiClient, collectionName: c.name, overrideID: overrideID}
 }
