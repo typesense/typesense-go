@@ -146,8 +146,14 @@ type ClientInterface interface {
 
 	UpdateDocument(ctx context.Context, collectionName string, documentId string, body UpdateDocumentJSONRequestBody) (*http.Response, error)
 
+	// GetSearchOverrides request
+	GetSearchOverrides(ctx context.Context, collectionName string) (*http.Response, error)
+
 	// DeleteSearchOverride request
 	DeleteSearchOverride(ctx context.Context, collectionName string, overrideId string) (*http.Response, error)
+
+	// GetSearchOverride request
+	GetSearchOverride(ctx context.Context, collectionName string, overrideId string) (*http.Response, error)
 
 	// UpsertSearchOverride request  with any body
 	UpsertSearchOverrideWithBody(ctx context.Context, collectionName string, overrideId string, contentType string, body io.Reader) (*http.Response, error)
@@ -475,8 +481,38 @@ func (c *Client) UpdateDocument(ctx context.Context, collectionName string, docu
 	return c.Client.Do(req)
 }
 
+func (c *Client) GetSearchOverrides(ctx context.Context, collectionName string) (*http.Response, error) {
+	req, err := NewGetSearchOverridesRequest(c.Server, collectionName)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if c.RequestEditor != nil {
+		err = c.RequestEditor(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) DeleteSearchOverride(ctx context.Context, collectionName string, overrideId string) (*http.Response, error) {
 	req, err := NewDeleteSearchOverrideRequest(c.Server, collectionName, overrideId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if c.RequestEditor != nil {
+		err = c.RequestEditor(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetSearchOverride(ctx context.Context, collectionName string, overrideId string) (*http.Response, error) {
+	req, err := NewGetSearchOverrideRequest(c.Server, collectionName, overrideId)
 	if err != nil {
 		return nil, err
 	}
@@ -1698,6 +1734,40 @@ func NewUpdateDocumentRequestWithBody(server string, collectionName string, docu
 	return req, nil
 }
 
+// NewGetSearchOverridesRequest generates requests for GetSearchOverrides
+func NewGetSearchOverridesRequest(server string, collectionName string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParam("simple", false, "collectionName", collectionName)
+	if err != nil {
+		return nil, err
+	}
+
+	queryUrl, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	basePath := fmt.Sprintf("/collections/%s/overrides", pathParam0)
+	if basePath[0] == '/' {
+		basePath = basePath[1:]
+	}
+
+	queryUrl, err = queryUrl.Parse(basePath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryUrl.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewDeleteSearchOverrideRequest generates requests for DeleteSearchOverride
 func NewDeleteSearchOverrideRequest(server string, collectionName string, overrideId string) (*http.Request, error) {
 	var err error
@@ -1732,6 +1802,47 @@ func NewDeleteSearchOverrideRequest(server string, collectionName string, overri
 	}
 
 	req, err := http.NewRequest("DELETE", queryUrl.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetSearchOverrideRequest generates requests for GetSearchOverride
+func NewGetSearchOverrideRequest(server string, collectionName string, overrideId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParam("simple", false, "collectionName", collectionName)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParam("simple", false, "overrideId", overrideId)
+	if err != nil {
+		return nil, err
+	}
+
+	queryUrl, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	basePath := fmt.Sprintf("/collections/%s/overrides/%s", pathParam0, pathParam1)
+	if basePath[0] == '/' {
+		basePath = basePath[1:]
+	}
+
+	queryUrl, err = queryUrl.Parse(basePath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryUrl.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -2065,8 +2176,14 @@ type ClientWithResponsesInterface interface {
 
 	UpdateDocumentWithResponse(ctx context.Context, collectionName string, documentId string, body UpdateDocumentJSONRequestBody) (*UpdateDocumentResponse, error)
 
+	// GetSearchOverrides request
+	GetSearchOverridesWithResponse(ctx context.Context, collectionName string) (*GetSearchOverridesResponse, error)
+
 	// DeleteSearchOverride request
 	DeleteSearchOverrideWithResponse(ctx context.Context, collectionName string, overrideId string) (*DeleteSearchOverrideResponse, error)
+
+	// GetSearchOverride request
+	GetSearchOverrideWithResponse(ctx context.Context, collectionName string, overrideId string) (*GetSearchOverrideResponse, error)
 
 	// UpsertSearchOverride request  with any body
 	UpsertSearchOverrideWithBodyWithResponse(ctx context.Context, collectionName string, overrideId string, contentType string, body io.Reader) (*UpsertSearchOverrideResponse, error)
@@ -2457,12 +2574,32 @@ func (r UpdateDocumentResponse) StatusCode() int {
 	return 0
 }
 
+type GetSearchOverridesResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *SearchOverridesResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSearchOverridesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSearchOverridesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type DeleteSearchOverrideResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *struct {
-		Id *string `json:"id,omitempty"`
-	}
+	JSON200      *SearchOverride
 }
 
 // Status returns HTTPResponse.Status
@@ -2475,6 +2612,28 @@ func (r DeleteSearchOverrideResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r DeleteSearchOverrideResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetSearchOverrideResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *SearchOverride
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSearchOverrideResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSearchOverrideResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2815,6 +2974,15 @@ func (c *ClientWithResponses) UpdateDocumentWithResponse(ctx context.Context, co
 	return ParseUpdateDocumentResponse(rsp)
 }
 
+// GetSearchOverridesWithResponse request returning *GetSearchOverridesResponse
+func (c *ClientWithResponses) GetSearchOverridesWithResponse(ctx context.Context, collectionName string) (*GetSearchOverridesResponse, error) {
+	rsp, err := c.GetSearchOverrides(ctx, collectionName)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSearchOverridesResponse(rsp)
+}
+
 // DeleteSearchOverrideWithResponse request returning *DeleteSearchOverrideResponse
 func (c *ClientWithResponses) DeleteSearchOverrideWithResponse(ctx context.Context, collectionName string, overrideId string) (*DeleteSearchOverrideResponse, error) {
 	rsp, err := c.DeleteSearchOverride(ctx, collectionName, overrideId)
@@ -2822,6 +2990,15 @@ func (c *ClientWithResponses) DeleteSearchOverrideWithResponse(ctx context.Conte
 		return nil, err
 	}
 	return ParseDeleteSearchOverrideResponse(rsp)
+}
+
+// GetSearchOverrideWithResponse request returning *GetSearchOverrideResponse
+func (c *ClientWithResponses) GetSearchOverrideWithResponse(ctx context.Context, collectionName string, overrideId string) (*GetSearchOverrideResponse, error) {
+	rsp, err := c.GetSearchOverride(ctx, collectionName, overrideId)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSearchOverrideResponse(rsp)
 }
 
 // UpsertSearchOverrideWithBodyWithResponse request with arbitrary body returning *UpsertSearchOverrideResponse
@@ -3384,6 +3561,32 @@ func ParseUpdateDocumentResponse(rsp *http.Response) (*UpdateDocumentResponse, e
 	return response, nil
 }
 
+// ParseGetSearchOverridesResponse parses an HTTP response from a GetSearchOverridesWithResponse call
+func ParseGetSearchOverridesResponse(rsp *http.Response) (*GetSearchOverridesResponse, error) {
+	bodyBytes, err := ioutil.ReadAll(rsp.Body)
+	defer rsp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSearchOverridesResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SearchOverridesResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseDeleteSearchOverrideResponse parses an HTTP response from a DeleteSearchOverrideWithResponse call
 func ParseDeleteSearchOverrideResponse(rsp *http.Response) (*DeleteSearchOverrideResponse, error) {
 	bodyBytes, err := ioutil.ReadAll(rsp.Body)
@@ -3399,9 +3602,33 @@ func ParseDeleteSearchOverrideResponse(rsp *http.Response) (*DeleteSearchOverrid
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest struct {
-			Id *string `json:"id,omitempty"`
+		var dest SearchOverride
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
 		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetSearchOverrideResponse parses an HTTP response from a GetSearchOverrideWithResponse call
+func ParseGetSearchOverrideResponse(rsp *http.Response) (*GetSearchOverrideResponse, error) {
+	bodyBytes, err := ioutil.ReadAll(rsp.Body)
+	defer rsp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSearchOverrideResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SearchOverride
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

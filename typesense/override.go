@@ -1,0 +1,44 @@
+package typesense
+
+import (
+	"context"
+
+	"github.com/v-byte-cpu/typesense-go/typesense/api"
+)
+
+// OverrideInterface is a type for Search Override API operations
+type OverrideInterface interface {
+	Retrieve() (*api.SearchOverride, error)
+	Delete() (*api.SearchOverride, error)
+}
+
+// override is internal implementation of OverrideInterface
+type override struct {
+	apiClient      api.ClientWithResponsesInterface
+	collectionName string
+	overrideID     string
+}
+
+func (o *override) Retrieve() (*api.SearchOverride, error) {
+	response, err := o.apiClient.GetSearchOverrideWithResponse(context.Background(),
+		o.collectionName, o.overrideID)
+	if err != nil {
+		return nil, err
+	}
+	if response.JSON200 == nil {
+		return nil, &httpError{status: response.StatusCode(), body: response.Body}
+	}
+	return response.JSON200, nil
+}
+
+func (o *override) Delete() (*api.SearchOverride, error) {
+	response, err := o.apiClient.DeleteSearchOverrideWithResponse(context.Background(),
+		o.collectionName, o.overrideID)
+	if err != nil {
+		return nil, err
+	}
+	if response.JSON200 == nil {
+		return nil, &httpError{status: response.StatusCode(), body: response.Body}
+	}
+	return response.JSON200, nil
+}

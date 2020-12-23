@@ -374,6 +374,21 @@ func (mr *MockClientInterfaceMockRecorder) UpdateDocument(ctx, collectionName, d
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDocument", reflect.TypeOf((*MockClientInterface)(nil).UpdateDocument), ctx, collectionName, documentId, body)
 }
 
+// GetSearchOverrides mocks base method
+func (m *MockClientInterface) GetSearchOverrides(ctx context.Context, collectionName string) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSearchOverrides", ctx, collectionName)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSearchOverrides indicates an expected call of GetSearchOverrides
+func (mr *MockClientInterfaceMockRecorder) GetSearchOverrides(ctx, collectionName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchOverrides", reflect.TypeOf((*MockClientInterface)(nil).GetSearchOverrides), ctx, collectionName)
+}
+
 // DeleteSearchOverride mocks base method
 func (m *MockClientInterface) DeleteSearchOverride(ctx context.Context, collectionName, overrideId string) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -387,6 +402,21 @@ func (m *MockClientInterface) DeleteSearchOverride(ctx context.Context, collecti
 func (mr *MockClientInterfaceMockRecorder) DeleteSearchOverride(ctx, collectionName, overrideId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSearchOverride", reflect.TypeOf((*MockClientInterface)(nil).DeleteSearchOverride), ctx, collectionName, overrideId)
+}
+
+// GetSearchOverride mocks base method
+func (m *MockClientInterface) GetSearchOverride(ctx context.Context, collectionName, overrideId string) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSearchOverride", ctx, collectionName, overrideId)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSearchOverride indicates an expected call of GetSearchOverride
+func (mr *MockClientInterfaceMockRecorder) GetSearchOverride(ctx, collectionName, overrideId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchOverride", reflect.TypeOf((*MockClientInterface)(nil).GetSearchOverride), ctx, collectionName, overrideId)
 }
 
 // UpsertSearchOverrideWithBody mocks base method
@@ -847,6 +877,21 @@ func (mr *MockClientWithResponsesInterfaceMockRecorder) UpdateDocumentWithRespon
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDocumentWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).UpdateDocumentWithResponse), ctx, collectionName, documentId, body)
 }
 
+// GetSearchOverridesWithResponse mocks base method
+func (m *MockClientWithResponsesInterface) GetSearchOverridesWithResponse(ctx context.Context, collectionName string) (*api.GetSearchOverridesResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSearchOverridesWithResponse", ctx, collectionName)
+	ret0, _ := ret[0].(*api.GetSearchOverridesResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSearchOverridesWithResponse indicates an expected call of GetSearchOverridesWithResponse
+func (mr *MockClientWithResponsesInterfaceMockRecorder) GetSearchOverridesWithResponse(ctx, collectionName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchOverridesWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).GetSearchOverridesWithResponse), ctx, collectionName)
+}
+
 // DeleteSearchOverrideWithResponse mocks base method
 func (m *MockClientWithResponsesInterface) DeleteSearchOverrideWithResponse(ctx context.Context, collectionName, overrideId string) (*api.DeleteSearchOverrideResponse, error) {
 	m.ctrl.T.Helper()
@@ -860,6 +905,21 @@ func (m *MockClientWithResponsesInterface) DeleteSearchOverrideWithResponse(ctx 
 func (mr *MockClientWithResponsesInterfaceMockRecorder) DeleteSearchOverrideWithResponse(ctx, collectionName, overrideId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSearchOverrideWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).DeleteSearchOverrideWithResponse), ctx, collectionName, overrideId)
+}
+
+// GetSearchOverrideWithResponse mocks base method
+func (m *MockClientWithResponsesInterface) GetSearchOverrideWithResponse(ctx context.Context, collectionName, overrideId string) (*api.GetSearchOverrideResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSearchOverrideWithResponse", ctx, collectionName, overrideId)
+	ret0, _ := ret[0].(*api.GetSearchOverrideResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSearchOverrideWithResponse indicates an expected call of GetSearchOverrideWithResponse
+func (mr *MockClientWithResponsesInterfaceMockRecorder) GetSearchOverrideWithResponse(ctx, collectionName, overrideId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchOverrideWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).GetSearchOverrideWithResponse), ctx, collectionName, overrideId)
 }
 
 // UpsertSearchOverrideWithBodyWithResponse mocks base method

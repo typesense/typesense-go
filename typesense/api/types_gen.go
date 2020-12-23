@@ -101,32 +101,53 @@ type SearchHighlight struct {
 
 // SearchOverride defines model for SearchOverride.
 type SearchOverride struct {
+	// Embedded struct due to allOf(#/components/schemas/SearchOverrideSchema)
+	SearchOverrideSchema
+	// Embedded fields due to inline allOf schema
+	Id string `json:"id"`
+}
+
+// SearchOverrideExclude defines model for SearchOverrideExclude.
+type SearchOverrideExclude struct {
+
+	// document id that should be excluded from the search results.
+	Id string `json:"id"`
+}
+
+// SearchOverrideInclude defines model for SearchOverrideInclude.
+type SearchOverrideInclude struct {
+
+	// document id that should be included
+	Id string `json:"id"`
+
+	// position number where document should be included in the search results
+	Position int `json:"position"`
+}
+
+// SearchOverrideRule defines model for SearchOverrideRule.
+type SearchOverrideRule struct {
+
+	// Indicates whether the match on the query term should be `exact` or `contains`. If we want to match all queries that contained the word `apple`, we will use the `contains` match instead.
+	Match string `json:"match"`
+
+	// Indicates what search queries should be overridden
+	Query string `json:"query"`
+}
+
+// SearchOverrideSchema defines model for SearchOverrideSchema.
+type SearchOverrideSchema struct {
 
 	// List of document `id`s that should be excluded from the search results.
-	Excludes *[]struct {
-
-		// document id that should be excluded from the search results.
-		Id string `json:"id"`
-	} `json:"excludes,omitempty"`
+	Excludes []SearchOverrideExclude `json:"excludes"`
 
 	// List of document `id`s that should be included in the search results with their corresponding `position`s.
-	Includes *[]struct {
+	Includes []SearchOverrideInclude `json:"includes"`
+	Rule     SearchOverrideRule      `json:"rule"`
+}
 
-		// document id that should be included
-		Id string `json:"id"`
-
-		// position number where document should be included in the search results
-		Position int `json:"position"`
-	} `json:"includes,omitempty"`
-	Rule struct {
-		Id *string `json:"id,omitempty"`
-
-		// Indicates whether the match on the query term should be `exact` or `contains`. If we want to match all queries that contained the word `apple`, we will use the `contains` match instead.
-		Match string `json:"match"`
-
-		// Indicates what search queries should be overridden
-		Query string `json:"query"`
-	} `json:"rule"`
+// SearchOverridesResponse defines model for SearchOverridesResponse.
+type SearchOverridesResponse struct {
+	Overrides []*SearchOverride `json:"overrides"`
 }
 
 // SearchResult defines model for SearchResult.
@@ -278,7 +299,7 @@ type SearchCollectionParams struct {
 type UpdateDocumentJSONBody interface{}
 
 // UpsertSearchOverrideJSONBody defines parameters for UpsertSearchOverride.
-type UpsertSearchOverrideJSONBody SearchOverride
+type UpsertSearchOverrideJSONBody SearchOverrideSchema
 
 // CreateKeyJSONBody defines parameters for CreateKey.
 type CreateKeyJSONBody ApiKey

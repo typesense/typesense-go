@@ -492,7 +492,55 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
+  /collections/{collectionName}/overrides:
+    get:
+      tags:
+        - documents
+        - promote
+      summary: List all collection overrides
+      operationId: getSearchOverrides
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of all search overrides
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchOverridesResponse"
   /collections/{collectionName}/overrides/{overrideId}:
+    get:
+      tags:
+        - documents
+        - override
+      summary: Retrieve a single search override
+      description: Retrieve the details of a search override, given its id.
+      operationId: getSearchOverride
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection
+          required: true
+          schema:
+            type: string
+        - name: overrideId
+          in: path
+          description: The id of the search override
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Search override fetched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchOverride"
     put:
       tags:
         - documents
@@ -520,7 +568,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SearchOverride"
+              $ref: "#/components/schemas/SearchOverrideSchema"
         required: true
       x-codegen-request-body-name: override
       responses:
@@ -555,10 +603,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
+                $ref: "#/components/schemas/SearchOverride"
   /collections/{collectionName}/documents/export:
     get:
       tags:
@@ -1202,60 +1247,85 @@ components:
           type: array
           items:
             type: string
-    SearchOverride:
+    SearchOverrideSchema:
       type: object
       required:
         - rule
+        - includes #only for codegen
+        - excludes #only for codegen
       properties:
         rule:
-          type: object
-          required:
-            - query
-            - match
-          properties:
-            id:
-              type: string
-              readOnly: true
-            query:
-              type: string
-              description: Indicates what search queries should be overridden
-            match:
-              type: string
-              description: >
-                Indicates whether the match on the query term should be `exact` or `contains`.
-                If we want to match all queries that contained
-                the word `apple`, we will use the `contains` match instead.
-              enum:
-                - exact
-                - contains
+          $ref: "#/components/schemas/SearchOverrideRule"
         includes:
           type: array
           description:
             List of document `id`s that should be included in the search results with their
             corresponding `position`s.
           items:
-            type: object
-            required:
-              - id
-              - position
-            properties:
-              id:
-                type: string
-                description: document id that should be included
-              position:
-                type: integer
-                description: position number where document should be included in the search results
+            $ref: "#/components/schemas/SearchOverrideInclude"
         excludes:
           type: array
           description: List of document `id`s that should be excluded from the search results.
           items:
-            type: object
-            required:
-              - id
-            properties:
-              id:
-                type: string
-                description: document id that should be excluded from the search results.
+            $ref: "#/components/schemas/SearchOverrideExclude"
+    SearchOverride:
+      allOf:
+        - $ref: "#/components/schemas/SearchOverrideSchema"
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+              readOnly: true
+    SearchOverrideRule:
+      type: object
+      required:
+        - query
+        - match
+      properties:
+        query:
+          type: string
+          description: Indicates what search queries should be overridden
+        match:
+          type: string
+          description: >
+            Indicates whether the match on the query term should be `exact` or `contains`.
+            If we want to match all queries that contained
+            the word `apple`, we will use the `contains` match instead.
+          enum:
+            - exact
+            - contains
+    SearchOverrideInclude:
+      type: object
+      required:
+        - id
+        - position
+      properties:
+        id:
+          type: string
+          description: document id that should be included
+        position:
+          type: integer
+          description: position number where document should be included in the search results
+    SearchOverrideExclude:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: document id that should be excluded from the search results.
+    SearchOverridesResponse:
+      type: object
+      required:
+        - overrides
+      properties:
+        overrides:
+          type: array
+          x-go-type: "[]*SearchOverride"
+          items:
+            $ref: "#/components/schemas/SearchOverride"
     ApiResponse:
       type: object
       required:
