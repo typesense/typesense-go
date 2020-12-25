@@ -1,7 +1,6 @@
 linters:
   enable:
     - dogsled
-    - dupl
     - exportloopref
     - funlen
     - gocognit
