@@ -166,8 +166,8 @@ type ClientInterface interface {
 	// Health request
 	Health(ctx context.Context) (*http.Response, error)
 
-	// ListKeys request
-	ListKeys(ctx context.Context) (*http.Response, error)
+	// GetKeys request
+	GetKeys(ctx context.Context) (*http.Response, error)
 
 	// CreateKey request  with any body
 	CreateKeyWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error)
@@ -175,10 +175,10 @@ type ClientInterface interface {
 	CreateKey(ctx context.Context, body CreateKeyJSONRequestBody) (*http.Response, error)
 
 	// DeleteKey request
-	DeleteKey(ctx context.Context, keyId string) (*http.Response, error)
+	DeleteKey(ctx context.Context, keyId int64) (*http.Response, error)
 
 	// GetKey request
-	GetKey(ctx context.Context, keyId string) (*http.Response, error)
+	GetKey(ctx context.Context, keyId int64) (*http.Response, error)
 }
 
 func (c *Client) GetAliases(ctx context.Context) (*http.Response, error) {
@@ -586,8 +586,8 @@ func (c *Client) Health(ctx context.Context) (*http.Response, error) {
 	return c.Client.Do(req)
 }
 
-func (c *Client) ListKeys(ctx context.Context) (*http.Response, error) {
-	req, err := NewListKeysRequest(c.Server)
+func (c *Client) GetKeys(ctx context.Context) (*http.Response, error) {
+	req, err := NewGetKeysRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -631,7 +631,7 @@ func (c *Client) CreateKey(ctx context.Context, body CreateKeyJSONRequestBody) (
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteKey(ctx context.Context, keyId string) (*http.Response, error) {
+func (c *Client) DeleteKey(ctx context.Context, keyId int64) (*http.Response, error) {
 	req, err := NewDeleteKeyRequest(c.Server, keyId)
 	if err != nil {
 		return nil, err
@@ -646,7 +646,7 @@ func (c *Client) DeleteKey(ctx context.Context, keyId string) (*http.Response, e
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetKey(ctx context.Context, keyId string) (*http.Response, error) {
+func (c *Client) GetKey(ctx context.Context, keyId int64) (*http.Response, error) {
 	req, err := NewGetKeyRequest(c.Server, keyId)
 	if err != nil {
 		return nil, err
@@ -1957,8 +1957,8 @@ func NewHealthRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
-// NewListKeysRequest generates requests for ListKeys
-func NewListKeysRequest(server string) (*http.Request, error) {
+// NewGetKeysRequest generates requests for GetKeys
+func NewGetKeysRequest(server string) (*http.Request, error) {
 	var err error
 
 	queryUrl, err := url.Parse(server)
@@ -2024,7 +2024,7 @@ func NewCreateKeyRequestWithBody(server string, contentType string, body io.Read
 }
 
 // NewDeleteKeyRequest generates requests for DeleteKey
-func NewDeleteKeyRequest(server string, keyId string) (*http.Request, error) {
+func NewDeleteKeyRequest(server string, keyId int64) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -2058,7 +2058,7 @@ func NewDeleteKeyRequest(server string, keyId string) (*http.Request, error) {
 }
 
 // NewGetKeyRequest generates requests for GetKey
-func NewGetKeyRequest(server string, keyId string) (*http.Request, error) {
+func NewGetKeyRequest(server string, keyId int64) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -2196,8 +2196,8 @@ type ClientWithResponsesInterface interface {
 	// Health request
 	HealthWithResponse(ctx context.Context) (*HealthResponse, error)
 
-	// ListKeys request
-	ListKeysWithResponse(ctx context.Context) (*ListKeysResponse, error)
+	// GetKeys request
+	GetKeysWithResponse(ctx context.Context) (*GetKeysResponse, error)
 
 	// CreateKey request  with any body
 	CreateKeyWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*CreateKeyResponse, error)
@@ -2205,10 +2205,10 @@ type ClientWithResponsesInterface interface {
 	CreateKeyWithResponse(ctx context.Context, body CreateKeyJSONRequestBody) (*CreateKeyResponse, error)
 
 	// DeleteKey request
-	DeleteKeyWithResponse(ctx context.Context, keyId string) (*DeleteKeyResponse, error)
+	DeleteKeyWithResponse(ctx context.Context, keyId int64) (*DeleteKeyResponse, error)
 
 	// GetKey request
-	GetKeyWithResponse(ctx context.Context, keyId string) (*GetKeyResponse, error)
+	GetKeyWithResponse(ctx context.Context, keyId int64) (*GetKeyResponse, error)
 }
 
 type GetAliasesResponse struct {
@@ -2708,16 +2708,14 @@ func (r HealthResponse) StatusCode() int {
 	return 0
 }
 
-type ListKeysResponse struct {
+type GetKeysResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *struct {
-		Keys *[]ApiKey `json:"keys,omitempty"`
-	}
+	JSON200      *ApiKeysResponse
 }
 
 // Status returns HTTPResponse.Status
-func (r ListKeysResponse) Status() string {
+func (r GetKeysResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2725,7 +2723,7 @@ func (r ListKeysResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ListKeysResponse) StatusCode() int {
+func (r GetKeysResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2735,7 +2733,7 @@ func (r ListKeysResponse) StatusCode() int {
 type CreateKeyResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *ApiKey
+	JSON201      *ApiKey
 }
 
 // Status returns HTTPResponse.Status
@@ -3036,13 +3034,13 @@ func (c *ClientWithResponses) HealthWithResponse(ctx context.Context) (*HealthRe
 	return ParseHealthResponse(rsp)
 }
 
-// ListKeysWithResponse request returning *ListKeysResponse
-func (c *ClientWithResponses) ListKeysWithResponse(ctx context.Context) (*ListKeysResponse, error) {
-	rsp, err := c.ListKeys(ctx)
+// GetKeysWithResponse request returning *GetKeysResponse
+func (c *ClientWithResponses) GetKeysWithResponse(ctx context.Context) (*GetKeysResponse, error) {
+	rsp, err := c.GetKeys(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return ParseListKeysResponse(rsp)
+	return ParseGetKeysResponse(rsp)
 }
 
 // CreateKeyWithBodyWithResponse request with arbitrary body returning *CreateKeyResponse
@@ -3063,7 +3061,7 @@ func (c *ClientWithResponses) CreateKeyWithResponse(ctx context.Context, body Cr
 }
 
 // DeleteKeyWithResponse request returning *DeleteKeyResponse
-func (c *ClientWithResponses) DeleteKeyWithResponse(ctx context.Context, keyId string) (*DeleteKeyResponse, error) {
+func (c *ClientWithResponses) DeleteKeyWithResponse(ctx context.Context, keyId int64) (*DeleteKeyResponse, error) {
 	rsp, err := c.DeleteKey(ctx, keyId)
 	if err != nil {
 		return nil, err
@@ -3072,7 +3070,7 @@ func (c *ClientWithResponses) DeleteKeyWithResponse(ctx context.Context, keyId s
 }
 
 // GetKeyWithResponse request returning *GetKeyResponse
-func (c *ClientWithResponses) GetKeyWithResponse(ctx context.Context, keyId string) (*GetKeyResponse, error) {
+func (c *ClientWithResponses) GetKeyWithResponse(ctx context.Context, keyId int64) (*GetKeyResponse, error) {
 	rsp, err := c.GetKey(ctx, keyId)
 	if err != nil {
 		return nil, err
@@ -3719,24 +3717,22 @@ func ParseHealthResponse(rsp *http.Response) (*HealthResponse, error) {
 	return response, nil
 }
 
-// ParseListKeysResponse parses an HTTP response from a ListKeysWithResponse call
-func ParseListKeysResponse(rsp *http.Response) (*ListKeysResponse, error) {
+// ParseGetKeysResponse parses an HTTP response from a GetKeysWithResponse call
+func ParseGetKeysResponse(rsp *http.Response) (*GetKeysResponse, error) {
 	bodyBytes, err := ioutil.ReadAll(rsp.Body)
 	defer rsp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ListKeysResponse{
+	response := &GetKeysResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest struct {
-			Keys *[]ApiKey `json:"keys,omitempty"`
-		}
+		var dest ApiKeysResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -3761,12 +3757,12 @@ func ParseCreateKeyResponse(rsp *http.Response) (*CreateKeyResponse, error) {
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
 		var dest ApiKey
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON200 = &dest
+		response.JSON201 = &dest
 
 	}
 

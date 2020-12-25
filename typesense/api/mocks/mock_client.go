@@ -479,19 +479,19 @@ func (mr *MockClientInterfaceMockRecorder) Health(ctx interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Health", reflect.TypeOf((*MockClientInterface)(nil).Health), ctx)
 }
 
-// ListKeys mocks base method
-func (m *MockClientInterface) ListKeys(ctx context.Context) (*http.Response, error) {
+// GetKeys mocks base method
+func (m *MockClientInterface) GetKeys(ctx context.Context) (*http.Response, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListKeys", ctx)
+	ret := m.ctrl.Call(m, "GetKeys", ctx)
 	ret0, _ := ret[0].(*http.Response)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListKeys indicates an expected call of ListKeys
-func (mr *MockClientInterfaceMockRecorder) ListKeys(ctx interface{}) *gomock.Call {
+// GetKeys indicates an expected call of GetKeys
+func (mr *MockClientInterfaceMockRecorder) GetKeys(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListKeys", reflect.TypeOf((*MockClientInterface)(nil).ListKeys), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKeys", reflect.TypeOf((*MockClientInterface)(nil).GetKeys), ctx)
 }
 
 // CreateKeyWithBody mocks base method
@@ -525,7 +525,7 @@ func (mr *MockClientInterfaceMockRecorder) CreateKey(ctx, body interface{}) *gom
 }
 
 // DeleteKey mocks base method
-func (m *MockClientInterface) DeleteKey(ctx context.Context, keyId string) (*http.Response, error) {
+func (m *MockClientInterface) DeleteKey(ctx context.Context, keyId int64) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteKey", ctx, keyId)
 	ret0, _ := ret[0].(*http.Response)
@@ -540,7 +540,7 @@ func (mr *MockClientInterfaceMockRecorder) DeleteKey(ctx, keyId interface{}) *go
 }
 
 // GetKey mocks base method
-func (m *MockClientInterface) GetKey(ctx context.Context, keyId string) (*http.Response, error) {
+func (m *MockClientInterface) GetKey(ctx context.Context, keyId int64) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetKey", ctx, keyId)
 	ret0, _ := ret[0].(*http.Response)
@@ -982,19 +982,19 @@ func (mr *MockClientWithResponsesInterfaceMockRecorder) HealthWithResponse(ctx i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).HealthWithResponse), ctx)
 }
 
-// ListKeysWithResponse mocks base method
-func (m *MockClientWithResponsesInterface) ListKeysWithResponse(ctx context.Context) (*api.ListKeysResponse, error) {
+// GetKeysWithResponse mocks base method
+func (m *MockClientWithResponsesInterface) GetKeysWithResponse(ctx context.Context) (*api.GetKeysResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListKeysWithResponse", ctx)
-	ret0, _ := ret[0].(*api.ListKeysResponse)
+	ret := m.ctrl.Call(m, "GetKeysWithResponse", ctx)
+	ret0, _ := ret[0].(*api.GetKeysResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListKeysWithResponse indicates an expected call of ListKeysWithResponse
-func (mr *MockClientWithResponsesInterfaceMockRecorder) ListKeysWithResponse(ctx interface{}) *gomock.Call {
+// GetKeysWithResponse indicates an expected call of GetKeysWithResponse
+func (mr *MockClientWithResponsesInterfaceMockRecorder) GetKeysWithResponse(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListKeysWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).ListKeysWithResponse), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKeysWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).GetKeysWithResponse), ctx)
 }
 
 // CreateKeyWithBodyWithResponse mocks base method
@@ -1028,7 +1028,7 @@ func (mr *MockClientWithResponsesInterfaceMockRecorder) CreateKeyWithResponse(ct
 }
 
 // DeleteKeyWithResponse mocks base method
-func (m *MockClientWithResponsesInterface) DeleteKeyWithResponse(ctx context.Context, keyId string) (*api.DeleteKeyResponse, error) {
+func (m *MockClientWithResponsesInterface) DeleteKeyWithResponse(ctx context.Context, keyId int64) (*api.DeleteKeyResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteKeyWithResponse", ctx, keyId)
 	ret0, _ := ret[0].(*api.DeleteKeyResponse)
@@ -1043,7 +1043,7 @@ func (mr *MockClientWithResponsesInterfaceMockRecorder) DeleteKeyWithResponse(ct
 }
 
 // GetKeyWithResponse mocks base method
-func (m *MockClientWithResponsesInterface) GetKeyWithResponse(ctx context.Context, keyId string) (*api.GetKeyResponse, error) {
+func (m *MockClientWithResponsesInterface) GetKeyWithResponse(ctx context.Context, keyId int64) (*api.GetKeyResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetKeyWithResponse", ctx, keyId)
 	ret0, _ := ret[0].(*api.GetKeyResponse)

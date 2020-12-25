@@ -1,0 +1,130 @@
+package typesense
+
+import (
+	"errors"
+	"net/http"
+	"testing"
+
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
+	"github.com/v-byte-cpu/typesense-go/typesense/api"
+	"github.com/v-byte-cpu/typesense-go/typesense/api/mocks"
+)
+
+func TestKeyRetrieve(t *testing.T) {
+	expectedResult := createNewKey(1)
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockedResult := createNewKey(1)
+
+	mockAPIClient.EXPECT().
+		GetKeyWithResponse(gomock.Not(gomock.Nil()), int64(1)).
+		Return(&api.GetKeyResponse{
+			JSON200: mockedResult,
+		}, nil).
+		Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	result, err := client.Key(1).Retrieve()
+
+	assert.Nil(t, err)
+	assert.Equal(t, expectedResult, result)
+}
+
+func TestKeyRetrieveOnApiClientErrorReturnsError(t *testing.T) {
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+
+	mockAPIClient.EXPECT().
+		GetKeyWithResponse(gomock.Not(gomock.Nil()), int64(1)).
+		Return(nil, errors.New("failed request")).
+		Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	_, err := client.Key(1).Retrieve()
+	assert.NotNil(t, err)
+}
+
+func TestKeyRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+
+	mockAPIClient.EXPECT().
+		GetKeyWithResponse(gomock.Not(gomock.Nil()), int64(1)).
+		Return(&api.GetKeyResponse{
+			HTTPResponse: &http.Response{
+				StatusCode: 500,
+			},
+			Body: []byte("Internal Server error"),
+		}, nil).
+		Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	_, err := client.Key(1).Retrieve()
+	assert.NotNil(t, err)
+}
+
+func TestKeyDelete(t *testing.T) {
+	expectedResult := &api.ApiKey{Id: 1}
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockedResult := &api.ApiKey{Id: 1}
+
+	mockAPIClient.EXPECT().
+		DeleteKeyWithResponse(gomock.Not(gomock.Nil()), int64(1)).
+		Return(&api.DeleteKeyResponse{
+			JSON200: mockedResult,
+		}, nil).
+		Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	result, err := client.Key(1).Delete()
+
+	assert.Nil(t, err)
+	assert.Equal(t, expectedResult, result)
+}
+
+func TestKeyDeleteOnApiClientErrorReturnsError(t *testing.T) {
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+
+	mockAPIClient.EXPECT().
+		DeleteKeyWithResponse(gomock.Not(gomock.Nil()), int64(1)).
+		Return(nil, errors.New("failed request")).
+		Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	_, err := client.Key(1).Delete()
+	assert.NotNil(t, err)
+}
+
+func TestKeyDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+
+	mockAPIClient.EXPECT().
+		DeleteKeyWithResponse(gomock.Not(gomock.Nil()), int64(1)).
+		Return(&api.DeleteKeyResponse{
+			HTTPResponse: &http.Response{
+				StatusCode: 500,
+			},
+			Body: []byte("Internal Server error"),
+		}, nil).
+		Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	_, err := client.Key(1).Delete()
+	assert.NotNil(t, err)
+}

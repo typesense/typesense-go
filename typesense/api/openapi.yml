@@ -822,19 +822,14 @@ paths:
       tags:
         - keys
       summary: Retrieve (metadata about) all keys.
-      operationId: listKeys
+      operationId: getKeys
       responses:
         200:
           description: List of all keys
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  keys:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/ApiKey"
+                $ref: "#/components/schemas/ApiKeysResponse"
     post:
       tags:
         - keys
@@ -850,10 +845,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ApiKey"
+              $ref: "#/components/schemas/ApiKeySchema"
       x-codegen-request-body-name: keyScope
       responses:
-        200:
+        201:
           description: Created API key
           content:
             application/json:
@@ -875,7 +870,8 @@ paths:
           description: The ID of the key to retrieve
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         200:
           description: The key referenced by the ID
@@ -894,7 +890,8 @@ paths:
           description: The ID of the key to delete
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         200:
           description: The key referenced by the ID
@@ -1333,7 +1330,7 @@ components:
       properties:
         message:
           type: string
-    ApiKey:
+    ApiKeySchema:
       type: object
       required:
         - description
@@ -1350,15 +1347,35 @@ components:
           type: array
           items:
             type: string
-        id:
-          type: string
-          readOnly: true
-        value:
-          type: string
-          readOnly: true
-        value_prefix:
-          type: string
-          readOnly: true
+    ApiKey:
+      allOf:
+        - $ref: "#/components/schemas/ApiKeySchema"
+        - type: object
+          required:
+            - id
+            - value
+            - value_prefix
+          properties:
+            id:
+              type: integer
+              format: int64
+              readOnly: true
+            value:
+              type: string
+              readOnly: true
+            value_prefix:
+              type: string
+              readOnly: true
+    ApiKeysResponse:
+      type: object
+      required:
+        - keys
+      properties:
+        keys:
+          type: array
+          x-go-type: "[]*ApiKey"
+          items:
+            $ref: "#/components/schemas/ApiKey"
   securitySchemes:
     api_key_header:
       type: apiKey

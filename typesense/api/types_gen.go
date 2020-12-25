@@ -5,12 +5,24 @@ package api
 
 // ApiKey defines model for ApiKey.
 type ApiKey struct {
+	// Embedded struct due to allOf(#/components/schemas/ApiKeySchema)
+	ApiKeySchema
+	// Embedded fields due to inline allOf schema
+	Id          int64  `json:"id"`
+	Value       string `json:"value"`
+	ValuePrefix string `json:"value_prefix"`
+}
+
+// ApiKeySchema defines model for ApiKeySchema.
+type ApiKeySchema struct {
 	Actions     []string `json:"actions"`
 	Collections []string `json:"collections"`
 	Description string   `json:"description"`
-	Id          *string  `json:"id,omitempty"`
-	Value       *string  `json:"value,omitempty"`
-	ValuePrefix *string  `json:"value_prefix,omitempty"`
+}
+
+// ApiKeysResponse defines model for ApiKeysResponse.
+type ApiKeysResponse struct {
+	Keys []*ApiKey `json:"keys"`
 }
 
 // ApiResponse defines model for ApiResponse.
@@ -302,7 +314,7 @@ type UpdateDocumentJSONBody interface{}
 type UpsertSearchOverrideJSONBody SearchOverrideSchema
 
 // CreateKeyJSONBody defines parameters for CreateKey.
-type CreateKeyJSONBody ApiKey
+type CreateKeyJSONBody ApiKeySchema
 
 // UpsertAliasRequestBody defines body for UpsertAlias for application/json ContentType.
 type UpsertAliasJSONRequestBody UpsertAliasJSONBody

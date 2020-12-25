@@ -28,6 +28,14 @@ func (c *Client) Alias(aliasName string) AliasInterface {
 	return &alias{apiClient: c.apiClient, name: aliasName}
 }
 
+func (c *Client) Keys() KeysInterface {
+	return &keys{apiClient: c.apiClient}
+}
+
+func (c *Client) Key(keyID int64) KeyInterface {
+	return &key{apiClient: c.apiClient, keyID: keyID}
+}
+
 type httpError struct {
 	status int
 	body   []byte
