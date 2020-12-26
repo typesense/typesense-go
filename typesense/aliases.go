@@ -14,7 +14,7 @@ type AliasesInterface interface {
 
 // aliases is internal implementation of AliasesInterface
 type aliases struct {
-	apiClient api.ClientWithResponsesInterface
+	apiClient APIClientInterface
 }
 
 func (a *aliases) Upsert(aliasName string, aliasSchema *api.CollectionAliasSchema) (*api.CollectionAlias, error) {

@@ -14,7 +14,7 @@ type OverrideInterface interface {
 
 // override is internal implementation of OverrideInterface
 type override struct {
-	apiClient      api.ClientWithResponsesInterface
+	apiClient      APIClientInterface
 	collectionName string
 	overrideID     string
 }

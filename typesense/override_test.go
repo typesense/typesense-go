@@ -8,7 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/v-byte-cpu/typesense-go/typesense/api"
-	"github.com/v-byte-cpu/typesense-go/typesense/api/mocks"
+	"github.com/v-byte-cpu/typesense-go/typesense/mocks"
 )
 
 func TestSearchOverrideRetrieve(t *testing.T) {
@@ -16,7 +16,7 @@ func TestSearchOverrideRetrieve(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	mockedResult := createNewSearchOverride("customize-apple")
 
 	mockAPIClient.EXPECT().
@@ -37,7 +37,7 @@ func TestSearchOverrideRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		GetSearchOverrideWithResponse(gomock.Not(gomock.Nil()), "companies", "customize-apple").
@@ -53,7 +53,7 @@ func TestSearchOverrideRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		GetSearchOverrideWithResponse(gomock.Not(gomock.Nil()), "companies", "customize-apple").
@@ -75,7 +75,7 @@ func TestSearchOverrideDelete(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	mockedResult := &api.SearchOverride{Id: "customize-apple"}
 
 	mockAPIClient.EXPECT().
@@ -96,7 +96,7 @@ func TestSearchOverrideDeleteOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		DeleteSearchOverrideWithResponse(gomock.Not(gomock.Nil()), "companies", "customize-apple").
@@ -112,7 +112,7 @@ func TestSearchOverrideDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		DeleteSearchOverrideWithResponse(gomock.Not(gomock.Nil()), "companies", "customize-apple").

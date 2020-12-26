@@ -2,8 +2,6 @@ package typesense
 
 import (
 	"context"
-
-	"github.com/v-byte-cpu/typesense-go/typesense/api"
 )
 
 type DocumentInterface interface {
@@ -13,7 +11,7 @@ type DocumentInterface interface {
 }
 
 type document struct {
-	apiClient      api.ClientWithResponsesInterface
+	apiClient      APIClientInterface
 	collectionName string
 	documentID     string
 }

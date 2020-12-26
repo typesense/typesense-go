@@ -2,6 +2,9 @@ package typesense
 
 import (
 	"context"
+	"io"
+	"io/ioutil"
+	"net/http"
 
 	"github.com/v-byte-cpu/typesense-go/typesense/api"
 )
@@ -18,11 +21,13 @@ type DocumentsInterface interface {
 	Delete(filter *api.DeleteDocumentsParams) (int, error)
 	// Search performs document search in collection
 	Search(params *api.SearchCollectionParams) (*api.SearchResult, error)
+	// Export returns all documents from index in jsonl format
+	Export() (io.ReadCloser, error)
 }
 
 // documents is internal implementation of DocumentsInterface
 type documents struct {
-	apiClient      api.ClientWithResponsesInterface
+	apiClient      APIClientInterface
 	collectionName string
 }
 
@@ -70,10 +75,21 @@ func (d *documents) Search(params *api.SearchCollectionParams) (*api.SearchResul
 	return response.JSON200, nil
 }
 
+func (d *documents) Export() (io.ReadCloser, error) {
+	response, err := d.apiClient.ExportDocuments(context.Background(), d.collectionName)
+	if err != nil {
+		return nil, err
+	}
+	if response.StatusCode != http.StatusOK {
+		body, _ := ioutil.ReadAll(response.Body)
+		return nil, &httpError{status: response.StatusCode, body: body}
+	}
+	return response.Body, nil
+}
+
 // api.ActionMode
 // api.CreateAction
 // api.UpsertAction
 
 // TODO client.Collection('name').Documents().Import(documents, WithAction(api.CreateAction))
 // TODO client.Collection('name').Documents().ImportJsonlFile(body io.Reader, WithAction(api.UpsertAction))
-// TODO client.Collection('name').Documents().ExportJsonlFile() io.Reader

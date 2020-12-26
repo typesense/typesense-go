@@ -8,7 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/v-byte-cpu/typesense-go/typesense/api"
-	"github.com/v-byte-cpu/typesense-go/typesense/api/mocks"
+	"github.com/v-byte-cpu/typesense-go/typesense/mocks"
 )
 
 func TestCollectionRetrieve(t *testing.T) {
@@ -16,7 +16,7 @@ func TestCollectionRetrieve(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	mockedResult := createNewCollection("companies")
 
 	mockAPIClient.EXPECT().
@@ -37,7 +37,7 @@ func TestCollectionRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		GetCollectionWithResponse(gomock.Not(gomock.Nil()), "companies").
@@ -53,7 +53,7 @@ func TestCollectionRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		GetCollectionWithResponse(gomock.Not(gomock.Nil()), "companies").
@@ -75,7 +75,7 @@ func TestCollectionDelete(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	mockedResult := createNewCollection("companies")
 
 	mockAPIClient.EXPECT().
@@ -96,7 +96,7 @@ func TestCollectionDeleteOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		DeleteCollectionWithResponse(gomock.Not(gomock.Nil()), "companies").
@@ -112,7 +112,7 @@ func TestCollectionDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		DeleteCollectionWithResponse(gomock.Not(gomock.Nil()), "companies").

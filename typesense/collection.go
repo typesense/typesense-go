@@ -18,7 +18,7 @@ type CollectionInterface interface {
 
 // collection is internal implementation of CollectionInterface
 type collection struct {
-	apiClient api.ClientWithResponsesInterface
+	apiClient APIClientInterface
 	name      string
 }
 

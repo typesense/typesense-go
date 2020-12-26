@@ -610,7 +610,7 @@ paths:
         - documents
       summary: Export all documents in a collection
       description: Export all documents in a collection in JSON lines format.
-      operationId: exportCollection
+      operationId: exportDocuments
       parameters:
         - name: collectionName
           in: path
@@ -644,7 +644,7 @@ paths:
         The documents to be imported must be formatted in a newline delimited
         JSON structure. You can feed the output file from a Typesense export operation
         directly as import.
-      operationId: importCollection
+      operationId: importDocumentsJsonl
       parameters:
         - name: collectionName
           in: path

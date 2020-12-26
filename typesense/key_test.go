@@ -8,7 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/v-byte-cpu/typesense-go/typesense/api"
-	"github.com/v-byte-cpu/typesense-go/typesense/api/mocks"
+	"github.com/v-byte-cpu/typesense-go/typesense/mocks"
 )
 
 func TestKeyRetrieve(t *testing.T) {
@@ -16,7 +16,7 @@ func TestKeyRetrieve(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	mockedResult := createNewKey(1)
 
 	mockAPIClient.EXPECT().
@@ -37,7 +37,7 @@ func TestKeyRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		GetKeyWithResponse(gomock.Not(gomock.Nil()), int64(1)).
@@ -53,7 +53,7 @@ func TestKeyRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		GetKeyWithResponse(gomock.Not(gomock.Nil()), int64(1)).
@@ -75,7 +75,7 @@ func TestKeyDelete(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	mockedResult := &api.ApiKey{Id: 1}
 
 	mockAPIClient.EXPECT().
@@ -96,7 +96,7 @@ func TestKeyDeleteOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		DeleteKeyWithResponse(gomock.Not(gomock.Nil()), int64(1)).
@@ -112,7 +112,7 @@ func TestKeyDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		DeleteKeyWithResponse(gomock.Not(gomock.Nil()), int64(1)).

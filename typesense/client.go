@@ -1,3 +1,5 @@
+//go:generate mockgen -destination=mocks/mock_client.go -package=mocks -source client.go
+
 package typesense
 
 import (
@@ -6,8 +8,13 @@ import (
 	"github.com/v-byte-cpu/typesense-go/typesense/api"
 )
 
+type APIClientInterface interface {
+	api.ClientWithResponsesInterface
+	api.ClientInterface
+}
+
 type Client struct {
-	apiClient   api.ClientWithResponsesInterface
+	apiClient   APIClientInterface
 	collections CollectionsInterface
 	aliases     AliasesInterface
 }
@@ -47,7 +54,7 @@ func (e *httpError) Error() string {
 
 type ClientOption func(*Client)
 
-func WithAPIClient(apiClient api.ClientWithResponsesInterface) ClientOption {
+func WithAPIClient(apiClient APIClientInterface) ClientOption {
 	return func(c *Client) {
 		c.apiClient = apiClient
 	}

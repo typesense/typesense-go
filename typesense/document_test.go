@@ -8,7 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/v-byte-cpu/typesense-go/typesense/api"
-	"github.com/v-byte-cpu/typesense-go/typesense/api/mocks"
+	"github.com/v-byte-cpu/typesense-go/typesense/mocks"
 )
 
 func TestDocumentRetrieve(t *testing.T) {
@@ -16,7 +16,7 @@ func TestDocumentRetrieve(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	mockedResult := createNewDocumentResponse()
 
 	mockAPIClient.EXPECT().
@@ -37,7 +37,7 @@ func TestDocumentRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		GetDocumentWithResponse(gomock.Not(gomock.Nil()), "companies", "123").
@@ -53,7 +53,7 @@ func TestDocumentRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		GetDocumentWithResponse(gomock.Not(gomock.Nil()), "companies", "123").
@@ -76,7 +76,7 @@ func TestDocumentUpdate(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	mockedResult := createNewDocumentResponse()
 
 	notNill := gomock.Not(gomock.Nil())
@@ -100,7 +100,7 @@ func TestDocumentUpdateOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	notNill := gomock.Not(gomock.Nil())
 	mockAPIClient.EXPECT().
@@ -119,7 +119,7 @@ func TestDocumentUpdateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	notNill := gomock.Not(gomock.Nil())
 	mockAPIClient.EXPECT().
@@ -143,7 +143,7 @@ func TestDocumentDelete(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	mockedResult := createNewDocumentResponse()
 
 	mockAPIClient.EXPECT().
@@ -164,7 +164,7 @@ func TestDocumentDeleteOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		DeleteDocumentWithResponse(gomock.Not(gomock.Nil()), "companies", "123").
@@ -180,7 +180,7 @@ func TestDocumentDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		DeleteDocumentWithResponse(gomock.Not(gomock.Nil()), "companies", "123").
