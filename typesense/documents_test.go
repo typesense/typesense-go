@@ -2,13 +2,16 @@ package typesense
 
 import (
 	"errors"
+	"io"
+	"io/ioutil"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/v-byte-cpu/typesense-go/typesense/api"
-	"github.com/v-byte-cpu/typesense-go/typesense/api/mocks"
+	"github.com/v-byte-cpu/typesense-go/typesense/mocks"
 )
 
 func createNewDocument() interface{} {
@@ -41,7 +44,7 @@ func TestDocumentCreate(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	mockedResult := createNewDocumentResponse()
 
 	notNill := gomock.Not(gomock.Nil())
@@ -66,7 +69,7 @@ func TestDocumentCreateOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	notNill := gomock.Not(gomock.Nil())
 	indexParams := &api.IndexDocumentParams{}
@@ -85,7 +88,7 @@ func TestDocumentCreateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	notNill := gomock.Not(gomock.Nil())
 	indexParams := &api.IndexDocumentParams{}
@@ -110,7 +113,7 @@ func TestDocumentUpsert(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	mockedResult := createNewDocumentResponse()
 
 	notNill := gomock.Not(gomock.Nil())
@@ -134,7 +137,7 @@ func TestDocumentUpsertOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	notNill := gomock.Not(gomock.Nil())
 	indexParams := &api.IndexDocumentParams{Action: &upsertAction}
@@ -153,7 +156,7 @@ func TestDocumentUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	notNill := gomock.Not(gomock.Nil())
 	indexParams := &api.IndexDocumentParams{Action: &upsertAction}
@@ -176,7 +179,7 @@ func TestDocumentsDelete(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	expectedFilter := &api.DeleteDocumentsParams{FilterBy: "num_employees:>100", BatchSize: 100}
 
 	mockedResult := struct {
@@ -202,7 +205,7 @@ func TestDocumentsDeleteOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	expectedFilter := &api.DeleteDocumentsParams{FilterBy: "num_employees:>100", BatchSize: 100}
 
 	mockAPIClient.EXPECT().
@@ -220,7 +223,7 @@ func TestDocumentsDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	expectedFilter := &api.DeleteDocumentsParams{FilterBy: "num_employees:>100", BatchSize: 100}
 
 	mockAPIClient.EXPECT().
@@ -236,5 +239,74 @@ func TestDocumentsDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	client := NewClient(WithAPIClient(mockAPIClient))
 	filter := &api.DeleteDocumentsParams{FilterBy: "num_employees:>100", BatchSize: 100}
 	_, err := client.Collection("companies").Documents().Delete(filter)
+	assert.NotNil(t, err)
+}
+
+func createExportedDocuments() io.ReadCloser {
+	return ioutil.NopCloser(strings.NewReader(`{"id": "125","company_name":"Future Technology",\
+"num_employees":1232,"country":"UK"}`))
+}
+
+func TestDocumentsExport(t *testing.T) {
+	expectedBytes, err := ioutil.ReadAll(createExportedDocuments())
+	assert.Nil(t, err)
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+	mockedResult := createExportedDocuments()
+
+	notNill := gomock.Not(gomock.Nil())
+	mockAPIClient.EXPECT().
+		ExportDocuments(notNill, "companies").
+		Return(&http.Response{
+			StatusCode: http.StatusOK,
+			Body:       mockedResult,
+		}, nil).
+		Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	result, err := client.Collection("companies").Documents().Export()
+	assert.Nil(t, err)
+
+	resultBytes, err := ioutil.ReadAll(result)
+	assert.Nil(t, err)
+	assert.Equal(t, string(expectedBytes), string(resultBytes))
+}
+
+func TestDocumentsExportOnApiClientErrorReturnsError(t *testing.T) {
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+
+	notNill := gomock.Not(gomock.Nil())
+	mockAPIClient.EXPECT().
+		ExportDocuments(notNill, "companies").
+		Return(nil, errors.New("failed request")).
+		Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	_, err := client.Collection("companies").Documents().Export()
+	assert.NotNil(t, err)
+}
+
+func TestDocumentsExportOnHttpStatusErrorCodeReturnsError(t *testing.T) {
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+
+	notNill := gomock.Not(gomock.Nil())
+	mockAPIClient.EXPECT().
+		ExportDocuments(notNill, "companies").
+		Return(&http.Response{
+			StatusCode: 500,
+			Body:       ioutil.NopCloser(strings.NewReader("Internal server error")),
+		}, nil).
+		Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	_, err := client.Collection("companies").Documents().Export()
 	assert.NotNil(t, err)
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/stretchr/testify/assert"
 	"github.com/v-byte-cpu/typesense-go/typesense/api"
-	"github.com/v-byte-cpu/typesense-go/typesense/api/mocks"
+	"github.com/v-byte-cpu/typesense-go/typesense/mocks"
 )
 
 func createNewCollectionAlias(collectionName string, name string) *api.CollectionAlias {
@@ -26,7 +26,7 @@ func TestCollectionAliasUpsert(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	mockedResult := createNewCollectionAlias("companies", "companies_alias")
 
 	mockAPIClient.EXPECT().
@@ -50,7 +50,7 @@ func TestCollectionAliasUpsertOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		UpsertAliasWithResponse(gomock.Not(gomock.Nil()), "companies_alias", newSchema).
@@ -69,7 +69,7 @@ func TestCollectionAliasUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		UpsertAliasWithResponse(gomock.Not(gomock.Nil()), "companies_alias", newSchema).
@@ -96,7 +96,7 @@ func TestCollectionAliasesRetrieve(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	mockedResult := []*api.CollectionAlias{}
 	assert.Nil(t, copier.Copy(&mockedResult, &expectedResult))
 
@@ -120,7 +120,7 @@ func TestCollectionAliasesRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		GetAliasesWithResponse(gomock.Not(gomock.Nil())).
@@ -136,7 +136,7 @@ func TestCollectionAliasesRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		GetAliasesWithResponse(gomock.Not(gomock.Nil())).

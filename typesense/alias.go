@@ -13,7 +13,7 @@ type AliasInterface interface {
 }
 
 type alias struct {
-	apiClient api.ClientWithResponsesInterface
+	apiClient APIClientInterface
 	name      string
 }
 

@@ -12,7 +12,7 @@ type KeysInterface interface {
 }
 
 type keys struct {
-	apiClient api.ClientWithResponsesInterface
+	apiClient APIClientInterface
 }
 
 func (k *keys) Create(key *api.ApiKeySchema) (*api.ApiKey, error) {

@@ -216,8 +216,8 @@ type IndexDocumentParams struct {
 	Action *string `json:"action,omitempty"`
 }
 
-// ImportCollectionParams defines parameters for ImportCollection.
-type ImportCollectionParams struct {
+// ImportDocumentsJsonlParams defines parameters for ImportDocumentsJsonl.
+type ImportDocumentsJsonlParams struct {
 
 	// Action mode. Allowed action modes are `create`, `upsert` and `update`. `create` mode creates a new document. Fails if a document with the same id already exists. `upsert` mode creates a new document or updates an existing document if a document with the same id already exists. `update` mode updates an existing document. Fails if a document with the given id does not exist.
 	Action *string `json:"action,omitempty"`

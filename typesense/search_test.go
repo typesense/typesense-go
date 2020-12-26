@@ -9,8 +9,8 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/v-byte-cpu/typesense-go/typesense/api"
-	"github.com/v-byte-cpu/typesense-go/typesense/api/mocks"
 	"github.com/v-byte-cpu/typesense-go/typesense/api/pointer"
+	"github.com/v-byte-cpu/typesense-go/typesense/mocks"
 )
 
 func newSearchParams() *api.SearchCollectionParams {
@@ -116,7 +116,7 @@ func TestCollectionSearch(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	mockedResult := newSearchResult()
 
 	mockAPIClient.EXPECT().
@@ -139,7 +139,7 @@ func TestCollectionSearchOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		SearchCollectionWithResponse(gomock.Not(gomock.Nil()), "companies", expectedParams).
@@ -157,7 +157,7 @@ func TestCollectionSearchOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		SearchCollectionWithResponse(gomock.Not(gomock.Nil()), "companies", expectedParams).

@@ -12,7 +12,7 @@ type KeyInterface interface {
 }
 
 type key struct {
-	apiClient api.ClientWithResponsesInterface
+	apiClient APIClientInterface
 	keyID     int64
 }
 

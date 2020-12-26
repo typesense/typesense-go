@@ -9,7 +9,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/stretchr/testify/assert"
 	"github.com/v-byte-cpu/typesense-go/typesense/api"
-	"github.com/v-byte-cpu/typesense-go/typesense/api/mocks"
+	"github.com/v-byte-cpu/typesense-go/typesense/mocks"
 )
 
 func createNewSearchOverrideSchema() *api.SearchOverrideSchema {
@@ -50,7 +50,7 @@ func TestSearchOverrideUpsert(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	mockedResult := createNewSearchOverride("customize-apple")
 
 	mockAPIClient.EXPECT().
@@ -75,7 +75,7 @@ func TestSearchOverrideUpsertOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		UpsertSearchOverrideWithResponse(gomock.Not(gomock.Nil()),
@@ -95,7 +95,7 @@ func TestSearchOverrideUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		UpsertSearchOverrideWithResponse(gomock.Not(gomock.Nil()),
@@ -123,7 +123,7 @@ func TestSearchOverridesRetrieve(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 	mockedResult := []*api.SearchOverride{}
 	assert.Nil(t, copier.Copy(&mockedResult, &expectedResult))
 
@@ -147,7 +147,7 @@ func TestSearchOverridesRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		GetSearchOverridesWithResponse(gomock.Not(gomock.Nil()), "companies").
@@ -163,7 +163,7 @@ func TestSearchOverridesRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) 
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockClientWithResponsesInterface(ctrl)
+	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		GetSearchOverridesWithResponse(gomock.Not(gomock.Nil()), "companies").

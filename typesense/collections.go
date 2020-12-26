@@ -14,7 +14,7 @@ type CollectionsInterface interface {
 
 // collections is internal implementation of CollectionsInterface
 type collections struct {
-	apiClient api.ClientWithResponsesInterface
+	apiClient APIClientInterface
 }
 
 func (c *collections) Create(schema *api.CollectionSchema) (*api.Collection, error) {
