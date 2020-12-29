@@ -16,7 +16,7 @@ func TestCollectionRetrieve(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 	mockedResult := createNewCollection("companies")
 
 	mockAPIClient.EXPECT().
@@ -37,7 +37,7 @@ func TestCollectionRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		GetCollectionWithResponse(gomock.Not(gomock.Nil()), "companies").
@@ -53,7 +53,7 @@ func TestCollectionRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		GetCollectionWithResponse(gomock.Not(gomock.Nil()), "companies").
@@ -75,7 +75,7 @@ func TestCollectionDelete(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 	mockedResult := createNewCollection("companies")
 
 	mockAPIClient.EXPECT().
@@ -96,7 +96,7 @@ func TestCollectionDeleteOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		DeleteCollectionWithResponse(gomock.Not(gomock.Nil()), "companies").
@@ -112,7 +112,7 @@ func TestCollectionDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		DeleteCollectionWithResponse(gomock.Not(gomock.Nil()), "companies").

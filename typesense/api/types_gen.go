@@ -216,14 +216,14 @@ type IndexDocumentParams struct {
 	Action *string `json:"action,omitempty"`
 }
 
-// ImportDocumentsJsonlParams defines parameters for ImportDocumentsJsonl.
-type ImportDocumentsJsonlParams struct {
+// ImportDocumentsParams defines parameters for ImportDocuments.
+type ImportDocumentsParams struct {
 
 	// Action mode. Allowed action modes are `create`, `upsert` and `update`. `create` mode creates a new document. Fails if a document with the same id already exists. `upsert` mode creates a new document or updates an existing document if a document with the same id already exists. `update` mode updates an existing document. Fails if a document with the given id does not exist.
-	Action *string `json:"action,omitempty"`
+	Action string `json:"action"`
 
 	// Batch size used for import. By default, Typesense ingests 40 documents at a time into Typesense. To increase this value, use the `batch_size` parameter. Larger batch sizes will consume larger transient memory during import.
-	BatchSize *int `json:"batch_size,omitempty"`
+	BatchSize int `json:"batch_size"`
 }
 
 // SearchCollectionParams defines parameters for SearchCollection.

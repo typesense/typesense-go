@@ -116,7 +116,7 @@ func TestCollectionSearch(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 	mockedResult := newSearchResult()
 
 	mockAPIClient.EXPECT().
@@ -139,7 +139,7 @@ func TestCollectionSearchOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		SearchCollectionWithResponse(gomock.Not(gomock.Nil()), "companies", expectedParams).
@@ -157,7 +157,7 @@ func TestCollectionSearchOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		SearchCollectionWithResponse(gomock.Not(gomock.Nil()), "companies", expectedParams).

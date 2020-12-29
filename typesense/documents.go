@@ -1,7 +1,10 @@
 package typesense
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -10,6 +13,11 @@ import (
 )
 
 var upsertAction = "upsert"
+
+const (
+	defaultImportBatchSize = 40
+	defaultImportAction    = "create"
+)
 
 // DocumentsInterface is a type for Documents API operations
 type DocumentsInterface interface {
@@ -23,6 +31,13 @@ type DocumentsInterface interface {
 	Search(params *api.SearchCollectionParams) (*api.SearchResult, error)
 	// Export returns all documents from index in jsonl format
 	Export() (io.ReadCloser, error)
+	// Import returns json array. Each item of the response indicates
+	// the result of each document present in the request body (in the same order).
+	Import(documents []interface{}, params *api.ImportDocumentsParams) ([]*api.ImportDocumentResponse, error)
+	// ImportJsonl accepts documents and returns result in jsonl format. Each line of the
+	// response indicates the result of each document present in the
+	// request body (in the same order).
+	ImportJsonl(body io.Reader, params *api.ImportDocumentsParams) (io.ReadCloser, error)
 }
 
 // documents is internal implementation of DocumentsInterface
@@ -81,15 +96,64 @@ func (d *documents) Export() (io.ReadCloser, error) {
 		return nil, err
 	}
 	if response.StatusCode != http.StatusOK {
+		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
 		return nil, &httpError{status: response.StatusCode, body: body}
 	}
 	return response.Body, nil
 }
 
-// api.ActionMode
-// api.CreateAction
-// api.UpsertAction
+func initImportParams(params *api.ImportDocumentsParams) {
+	if params.BatchSize == 0 {
+		params.BatchSize = defaultImportBatchSize
+	}
+	if len(params.Action) == 0 {
+		params.Action = defaultImportAction
+	}
+}
 
-// TODO client.Collection('name').Documents().Import(documents, WithAction(api.CreateAction))
-// TODO client.Collection('name').Documents().ImportJsonlFile(body io.Reader, WithAction(api.UpsertAction))
+func (d *documents) Import(documents []interface{}, params *api.ImportDocumentsParams) ([]*api.ImportDocumentResponse, error) {
+	if len(documents) == 0 {
+		return nil, errors.New("documents list is empty")
+	}
+
+	var buf bytes.Buffer
+	jsonEncoder := json.NewEncoder(&buf)
+	for _, doc := range documents {
+		if err := jsonEncoder.Encode(doc); err != nil {
+			return nil, err
+		}
+	}
+
+	response, err := d.ImportJsonl(&buf, params)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*api.ImportDocumentResponse
+	jsonDecoder := json.NewDecoder(response)
+	for jsonDecoder.More() {
+		var docResult *api.ImportDocumentResponse
+		if err := jsonDecoder.Decode(&docResult); err != nil {
+			return result, errors.New("failed to decode result")
+		}
+		result = append(result, docResult)
+	}
+
+	return result, nil
+}
+
+func (d *documents) ImportJsonl(body io.Reader, params *api.ImportDocumentsParams) (io.ReadCloser, error) {
+	initImportParams(params)
+	response, err := d.apiClient.ImportDocumentsWithBody(context.Background(),
+		d.collectionName, params, "application/octet-stream", body)
+	if err != nil {
+		return nil, err
+	}
+	if response.StatusCode != http.StatusOK {
+		defer response.Body.Close()
+		body, _ := ioutil.ReadAll(response.Body)
+		return nil, &httpError{status: response.StatusCode, body: body}
+	}
+	return response.Body, nil
+}

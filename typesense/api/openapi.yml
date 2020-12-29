@@ -64,7 +64,6 @@ paths:
             schema:
               $ref: "#/components/schemas/CollectionSchema"
         required: true
-      x-codegen-request-body-name: collection
       responses:
         201:
           description: Collection successfully created
@@ -166,7 +165,6 @@ paths:
               description: Can be any key-value pair
               x-go-type: "interface{}"
         required: true
-      x-codegen-request-body-name: document
       responses:
         201:
           description: Document successfully created/indexed
@@ -570,7 +568,6 @@ paths:
             schema:
               $ref: "#/components/schemas/SearchOverrideSchema"
         required: true
-      x-codegen-request-body-name: override
       responses:
         200:
           description: Created/updated search override
@@ -644,7 +641,7 @@ paths:
         The documents to be imported must be formatted in a newline delimited
         JSON structure. You can feed the output file from a Typesense export operation
         directly as import.
-      operationId: importDocumentsJsonl
+      operationId: importDocuments
       parameters:
         - name: collectionName
           in: path
@@ -661,6 +658,7 @@ paths:
             document if a document with the same id already exists.
             `update` mode updates an existing document. Fails if a document with the
             given id does not exist.
+          required: true #only for codegen
           schema:
             type: string
             example: upsert
@@ -674,16 +672,17 @@ paths:
             Batch size used for import. By default, Typesense ingests 40 documents at a time
             into Typesense. To increase this value, use the `batch_size` parameter.
             Larger batch sizes will consume larger transient memory during import.
+          required: true #only for codegen
           schema:
             type: integer
       requestBody:
-        description: The JSONL file to import
+        description: The json array of documents or the JSONL file to import
         content:
           application/octet-stream:
             schema:
               type: string
+              description: The JSONL file to import
         required: true
-      x-codegen-request-body-name: documentFile
       responses:
         200:
           description:
@@ -769,7 +768,6 @@ paths:
               description: Can be any key-value pair
               x-go-type: "interface{}"
         required: true
-      x-codegen-request-body-name: document
       responses:
         200:
           description: The document referenced by the ID was updated
@@ -846,7 +844,6 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/ApiKeySchema"
-      x-codegen-request-body-name: keyScope
       responses:
         201:
           description: Created API key
@@ -938,7 +935,6 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CollectionAliasSchema"
-      x-codegen-request-body-name: alias
       responses:
         200:
           description: The collection alias was created/updated

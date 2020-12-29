@@ -16,7 +16,7 @@ func TestCollectionAliasRetrieve(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 	mockedResult := createNewCollectionAlias("collection", "collection_alias")
 
 	mockAPIClient.EXPECT().
@@ -37,7 +37,7 @@ func TestCollectionAliasRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		GetAliasWithResponse(gomock.Not(gomock.Nil()), "collection_alias").
@@ -53,7 +53,7 @@ func TestCollectionAliasRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) 
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		GetAliasWithResponse(gomock.Not(gomock.Nil()), "collection_alias").
@@ -75,7 +75,7 @@ func TestCollectionAliasDelete(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 	mockedResult := createNewCollectionAlias("collection", "collection_alias")
 
 	mockAPIClient.EXPECT().
@@ -96,7 +96,7 @@ func TestCollectionAliasDeleteOnApiClientErrorReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		DeleteAliasWithResponse(gomock.Not(gomock.Nil()), "collection_alias").
@@ -112,7 +112,7 @@ func TestCollectionAliasDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockAPIClient := mocks.NewMockApiClientInterface(ctrl)
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
 		DeleteAliasWithResponse(gomock.Not(gomock.Nil()), "collection_alias").
