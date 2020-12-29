@@ -129,8 +129,8 @@ type ClientInterface interface {
 	// ExportDocuments request
 	ExportDocuments(ctx context.Context, collectionName string) (*http.Response, error)
 
-	// ImportDocumentsJsonl request  with any body
-	ImportDocumentsJsonlWithBody(ctx context.Context, collectionName string, params *ImportDocumentsJsonlParams, contentType string, body io.Reader) (*http.Response, error)
+	// ImportDocuments request  with any body
+	ImportDocumentsWithBody(ctx context.Context, collectionName string, params *ImportDocumentsParams, contentType string, body io.Reader) (*http.Response, error)
 
 	// SearchCollection request
 	SearchCollection(ctx context.Context, collectionName string, params *SearchCollectionParams) (*http.Response, error)
@@ -391,8 +391,8 @@ func (c *Client) ExportDocuments(ctx context.Context, collectionName string) (*h
 	return c.Client.Do(req)
 }
 
-func (c *Client) ImportDocumentsJsonlWithBody(ctx context.Context, collectionName string, params *ImportDocumentsJsonlParams, contentType string, body io.Reader) (*http.Response, error) {
-	req, err := NewImportDocumentsJsonlRequestWithBody(c.Server, collectionName, params, contentType, body)
+func (c *Client) ImportDocumentsWithBody(ctx context.Context, collectionName string, params *ImportDocumentsParams, contentType string, body io.Reader) (*http.Response, error) {
+	req, err := NewImportDocumentsRequestWithBody(c.Server, collectionName, params, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1098,8 +1098,8 @@ func NewExportDocumentsRequest(server string, collectionName string) (*http.Requ
 	return req, nil
 }
 
-// NewImportDocumentsJsonlRequestWithBody generates requests for ImportDocumentsJsonl with any type of body
-func NewImportDocumentsJsonlRequestWithBody(server string, collectionName string, params *ImportDocumentsJsonlParams, contentType string, body io.Reader) (*http.Request, error) {
+// NewImportDocumentsRequestWithBody generates requests for ImportDocuments with any type of body
+func NewImportDocumentsRequestWithBody(server string, collectionName string, params *ImportDocumentsParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1126,36 +1126,28 @@ func NewImportDocumentsJsonlRequestWithBody(server string, collectionName string
 
 	queryValues := queryUrl.Query()
 
-	if params.Action != nil {
-
-		if queryFrag, err := runtime.StyleParam("form", true, "action", *params.Action); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
+	if queryFrag, err := runtime.StyleParam("form", true, "action", params.Action); err != nil {
+		return nil, err
+	} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+		return nil, err
+	} else {
+		for k, v := range parsed {
+			for _, v2 := range v {
+				queryValues.Add(k, v2)
 			}
 		}
-
 	}
 
-	if params.BatchSize != nil {
-
-		if queryFrag, err := runtime.StyleParam("form", true, "batch_size", *params.BatchSize); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
+	if queryFrag, err := runtime.StyleParam("form", true, "batch_size", params.BatchSize); err != nil {
+		return nil, err
+	} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+		return nil, err
+	} else {
+		for k, v := range parsed {
+			for _, v2 := range v {
+				queryValues.Add(k, v2)
 			}
 		}
-
 	}
 
 	queryUrl.RawQuery = queryValues.Encode()
@@ -2159,8 +2151,8 @@ type ClientWithResponsesInterface interface {
 	// ExportDocuments request
 	ExportDocumentsWithResponse(ctx context.Context, collectionName string) (*ExportDocumentsResponse, error)
 
-	// ImportDocumentsJsonl request  with any body
-	ImportDocumentsJsonlWithBodyWithResponse(ctx context.Context, collectionName string, params *ImportDocumentsJsonlParams, contentType string, body io.Reader) (*ImportDocumentsJsonlResponse, error)
+	// ImportDocuments request  with any body
+	ImportDocumentsWithBodyWithResponse(ctx context.Context, collectionName string, params *ImportDocumentsParams, contentType string, body io.Reader) (*ImportDocumentsResponse, error)
 
 	// SearchCollection request
 	SearchCollectionWithResponse(ctx context.Context, collectionName string, params *SearchCollectionParams) (*SearchCollectionResponse, error)
@@ -2459,14 +2451,14 @@ func (r ExportDocumentsResponse) StatusCode() int {
 	return 0
 }
 
-type ImportDocumentsJsonlResponse struct {
+type ImportDocumentsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON404      *ApiResponse
 }
 
 // Status returns HTTPResponse.Status
-func (r ImportDocumentsJsonlResponse) Status() string {
+func (r ImportDocumentsResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2474,7 +2466,7 @@ func (r ImportDocumentsJsonlResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ImportDocumentsJsonlResponse) StatusCode() int {
+func (r ImportDocumentsResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2919,13 +2911,13 @@ func (c *ClientWithResponses) ExportDocumentsWithResponse(ctx context.Context, c
 	return ParseExportDocumentsResponse(rsp)
 }
 
-// ImportDocumentsJsonlWithBodyWithResponse request with arbitrary body returning *ImportDocumentsJsonlResponse
-func (c *ClientWithResponses) ImportDocumentsJsonlWithBodyWithResponse(ctx context.Context, collectionName string, params *ImportDocumentsJsonlParams, contentType string, body io.Reader) (*ImportDocumentsJsonlResponse, error) {
-	rsp, err := c.ImportDocumentsJsonlWithBody(ctx, collectionName, params, contentType, body)
+// ImportDocumentsWithBodyWithResponse request with arbitrary body returning *ImportDocumentsResponse
+func (c *ClientWithResponses) ImportDocumentsWithBodyWithResponse(ctx context.Context, collectionName string, params *ImportDocumentsParams, contentType string, body io.Reader) (*ImportDocumentsResponse, error) {
+	rsp, err := c.ImportDocumentsWithBody(ctx, collectionName, params, contentType, body)
 	if err != nil {
 		return nil, err
 	}
-	return ParseImportDocumentsJsonlResponse(rsp)
+	return ParseImportDocumentsResponse(rsp)
 }
 
 // SearchCollectionWithResponse request returning *SearchCollectionResponse
@@ -3394,15 +3386,15 @@ func ParseExportDocumentsResponse(rsp *http.Response) (*ExportDocumentsResponse,
 	return response, nil
 }
 
-// ParseImportDocumentsJsonlResponse parses an HTTP response from a ImportDocumentsJsonlWithResponse call
-func ParseImportDocumentsJsonlResponse(rsp *http.Response) (*ImportDocumentsJsonlResponse, error) {
+// ParseImportDocumentsResponse parses an HTTP response from a ImportDocumentsWithResponse call
+func ParseImportDocumentsResponse(rsp *http.Response) (*ImportDocumentsResponse, error) {
 	bodyBytes, err := ioutil.ReadAll(rsp.Body)
 	defer rsp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ImportDocumentsJsonlResponse{
+	response := &ImportDocumentsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

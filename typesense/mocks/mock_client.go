@@ -13,31 +13,31 @@ import (
 	reflect "reflect"
 )
 
-// MockApiClientInterface is a mock of ApiClientInterface interface
-type MockApiClientInterface struct {
+// MockAPIClientInterface is a mock of APIClientInterface interface
+type MockAPIClientInterface struct {
 	ctrl     *gomock.Controller
-	recorder *MockApiClientInterfaceMockRecorder
+	recorder *MockAPIClientInterfaceMockRecorder
 }
 
-// MockApiClientInterfaceMockRecorder is the mock recorder for MockApiClientInterface
-type MockApiClientInterfaceMockRecorder struct {
-	mock *MockApiClientInterface
+// MockAPIClientInterfaceMockRecorder is the mock recorder for MockAPIClientInterface
+type MockAPIClientInterfaceMockRecorder struct {
+	mock *MockAPIClientInterface
 }
 
-// NewMockApiClientInterface creates a new mock instance
-func NewMockApiClientInterface(ctrl *gomock.Controller) *MockApiClientInterface {
-	mock := &MockApiClientInterface{ctrl: ctrl}
-	mock.recorder = &MockApiClientInterfaceMockRecorder{mock}
+// NewMockAPIClientInterface creates a new mock instance
+func NewMockAPIClientInterface(ctrl *gomock.Controller) *MockAPIClientInterface {
+	mock := &MockAPIClientInterface{ctrl: ctrl}
+	mock.recorder = &MockAPIClientInterfaceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockApiClientInterface) EXPECT() *MockApiClientInterfaceMockRecorder {
+func (m *MockAPIClientInterface) EXPECT() *MockAPIClientInterfaceMockRecorder {
 	return m.recorder
 }
 
 // GetAliasesWithResponse mocks base method
-func (m *MockApiClientInterface) GetAliasesWithResponse(ctx context.Context) (*api.GetAliasesResponse, error) {
+func (m *MockAPIClientInterface) GetAliasesWithResponse(ctx context.Context) (*api.GetAliasesResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAliasesWithResponse", ctx)
 	ret0, _ := ret[0].(*api.GetAliasesResponse)
@@ -46,13 +46,13 @@ func (m *MockApiClientInterface) GetAliasesWithResponse(ctx context.Context) (*a
 }
 
 // GetAliasesWithResponse indicates an expected call of GetAliasesWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) GetAliasesWithResponse(ctx interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetAliasesWithResponse(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAliasesWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).GetAliasesWithResponse), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAliasesWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetAliasesWithResponse), ctx)
 }
 
 // DeleteAliasWithResponse mocks base method
-func (m *MockApiClientInterface) DeleteAliasWithResponse(ctx context.Context, aliasName string) (*api.DeleteAliasResponse, error) {
+func (m *MockAPIClientInterface) DeleteAliasWithResponse(ctx context.Context, aliasName string) (*api.DeleteAliasResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteAliasWithResponse", ctx, aliasName)
 	ret0, _ := ret[0].(*api.DeleteAliasResponse)
@@ -61,13 +61,13 @@ func (m *MockApiClientInterface) DeleteAliasWithResponse(ctx context.Context, al
 }
 
 // DeleteAliasWithResponse indicates an expected call of DeleteAliasWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) DeleteAliasWithResponse(ctx, aliasName interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteAliasWithResponse(ctx, aliasName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAliasWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).DeleteAliasWithResponse), ctx, aliasName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAliasWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteAliasWithResponse), ctx, aliasName)
 }
 
 // GetAliasWithResponse mocks base method
-func (m *MockApiClientInterface) GetAliasWithResponse(ctx context.Context, aliasName string) (*api.GetAliasResponse, error) {
+func (m *MockAPIClientInterface) GetAliasWithResponse(ctx context.Context, aliasName string) (*api.GetAliasResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAliasWithResponse", ctx, aliasName)
 	ret0, _ := ret[0].(*api.GetAliasResponse)
@@ -76,13 +76,13 @@ func (m *MockApiClientInterface) GetAliasWithResponse(ctx context.Context, alias
 }
 
 // GetAliasWithResponse indicates an expected call of GetAliasWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) GetAliasWithResponse(ctx, aliasName interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetAliasWithResponse(ctx, aliasName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAliasWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).GetAliasWithResponse), ctx, aliasName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAliasWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetAliasWithResponse), ctx, aliasName)
 }
 
 // UpsertAliasWithBodyWithResponse mocks base method
-func (m *MockApiClientInterface) UpsertAliasWithBodyWithResponse(ctx context.Context, aliasName, contentType string, body io.Reader) (*api.UpsertAliasResponse, error) {
+func (m *MockAPIClientInterface) UpsertAliasWithBodyWithResponse(ctx context.Context, aliasName, contentType string, body io.Reader) (*api.UpsertAliasResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpsertAliasWithBodyWithResponse", ctx, aliasName, contentType, body)
 	ret0, _ := ret[0].(*api.UpsertAliasResponse)
@@ -91,13 +91,13 @@ func (m *MockApiClientInterface) UpsertAliasWithBodyWithResponse(ctx context.Con
 }
 
 // UpsertAliasWithBodyWithResponse indicates an expected call of UpsertAliasWithBodyWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) UpsertAliasWithBodyWithResponse(ctx, aliasName, contentType, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertAliasWithBodyWithResponse(ctx, aliasName, contentType, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertAliasWithBodyWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).UpsertAliasWithBodyWithResponse), ctx, aliasName, contentType, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertAliasWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertAliasWithBodyWithResponse), ctx, aliasName, contentType, body)
 }
 
 // UpsertAliasWithResponse mocks base method
-func (m *MockApiClientInterface) UpsertAliasWithResponse(ctx context.Context, aliasName string, body api.UpsertAliasJSONRequestBody) (*api.UpsertAliasResponse, error) {
+func (m *MockAPIClientInterface) UpsertAliasWithResponse(ctx context.Context, aliasName string, body api.UpsertAliasJSONRequestBody) (*api.UpsertAliasResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpsertAliasWithResponse", ctx, aliasName, body)
 	ret0, _ := ret[0].(*api.UpsertAliasResponse)
@@ -106,13 +106,13 @@ func (m *MockApiClientInterface) UpsertAliasWithResponse(ctx context.Context, al
 }
 
 // UpsertAliasWithResponse indicates an expected call of UpsertAliasWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) UpsertAliasWithResponse(ctx, aliasName, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertAliasWithResponse(ctx, aliasName, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertAliasWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).UpsertAliasWithResponse), ctx, aliasName, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertAliasWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertAliasWithResponse), ctx, aliasName, body)
 }
 
 // GetCollectionsWithResponse mocks base method
-func (m *MockApiClientInterface) GetCollectionsWithResponse(ctx context.Context) (*api.GetCollectionsResponse, error) {
+func (m *MockAPIClientInterface) GetCollectionsWithResponse(ctx context.Context) (*api.GetCollectionsResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCollectionsWithResponse", ctx)
 	ret0, _ := ret[0].(*api.GetCollectionsResponse)
@@ -121,13 +121,13 @@ func (m *MockApiClientInterface) GetCollectionsWithResponse(ctx context.Context)
 }
 
 // GetCollectionsWithResponse indicates an expected call of GetCollectionsWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) GetCollectionsWithResponse(ctx interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetCollectionsWithResponse(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCollectionsWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).GetCollectionsWithResponse), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCollectionsWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetCollectionsWithResponse), ctx)
 }
 
 // CreateCollectionWithBodyWithResponse mocks base method
-func (m *MockApiClientInterface) CreateCollectionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*api.CreateCollectionResponse, error) {
+func (m *MockAPIClientInterface) CreateCollectionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*api.CreateCollectionResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateCollectionWithBodyWithResponse", ctx, contentType, body)
 	ret0, _ := ret[0].(*api.CreateCollectionResponse)
@@ -136,13 +136,13 @@ func (m *MockApiClientInterface) CreateCollectionWithBodyWithResponse(ctx contex
 }
 
 // CreateCollectionWithBodyWithResponse indicates an expected call of CreateCollectionWithBodyWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) CreateCollectionWithBodyWithResponse(ctx, contentType, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) CreateCollectionWithBodyWithResponse(ctx, contentType, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCollectionWithBodyWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).CreateCollectionWithBodyWithResponse), ctx, contentType, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCollectionWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).CreateCollectionWithBodyWithResponse), ctx, contentType, body)
 }
 
 // CreateCollectionWithResponse mocks base method
-func (m *MockApiClientInterface) CreateCollectionWithResponse(ctx context.Context, body api.CreateCollectionJSONRequestBody) (*api.CreateCollectionResponse, error) {
+func (m *MockAPIClientInterface) CreateCollectionWithResponse(ctx context.Context, body api.CreateCollectionJSONRequestBody) (*api.CreateCollectionResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateCollectionWithResponse", ctx, body)
 	ret0, _ := ret[0].(*api.CreateCollectionResponse)
@@ -151,13 +151,13 @@ func (m *MockApiClientInterface) CreateCollectionWithResponse(ctx context.Contex
 }
 
 // CreateCollectionWithResponse indicates an expected call of CreateCollectionWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) CreateCollectionWithResponse(ctx, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) CreateCollectionWithResponse(ctx, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCollectionWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).CreateCollectionWithResponse), ctx, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCollectionWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).CreateCollectionWithResponse), ctx, body)
 }
 
 // DeleteCollectionWithResponse mocks base method
-func (m *MockApiClientInterface) DeleteCollectionWithResponse(ctx context.Context, collectionName string) (*api.DeleteCollectionResponse, error) {
+func (m *MockAPIClientInterface) DeleteCollectionWithResponse(ctx context.Context, collectionName string) (*api.DeleteCollectionResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCollectionWithResponse", ctx, collectionName)
 	ret0, _ := ret[0].(*api.DeleteCollectionResponse)
@@ -166,13 +166,13 @@ func (m *MockApiClientInterface) DeleteCollectionWithResponse(ctx context.Contex
 }
 
 // DeleteCollectionWithResponse indicates an expected call of DeleteCollectionWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) DeleteCollectionWithResponse(ctx, collectionName interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteCollectionWithResponse(ctx, collectionName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCollectionWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).DeleteCollectionWithResponse), ctx, collectionName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCollectionWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteCollectionWithResponse), ctx, collectionName)
 }
 
 // GetCollectionWithResponse mocks base method
-func (m *MockApiClientInterface) GetCollectionWithResponse(ctx context.Context, collectionName string) (*api.GetCollectionResponse, error) {
+func (m *MockAPIClientInterface) GetCollectionWithResponse(ctx context.Context, collectionName string) (*api.GetCollectionResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCollectionWithResponse", ctx, collectionName)
 	ret0, _ := ret[0].(*api.GetCollectionResponse)
@@ -181,13 +181,13 @@ func (m *MockApiClientInterface) GetCollectionWithResponse(ctx context.Context, 
 }
 
 // GetCollectionWithResponse indicates an expected call of GetCollectionWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) GetCollectionWithResponse(ctx, collectionName interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetCollectionWithResponse(ctx, collectionName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCollectionWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).GetCollectionWithResponse), ctx, collectionName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCollectionWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetCollectionWithResponse), ctx, collectionName)
 }
 
 // DeleteDocumentsWithResponse mocks base method
-func (m *MockApiClientInterface) DeleteDocumentsWithResponse(ctx context.Context, collectionName string, params *api.DeleteDocumentsParams) (*api.DeleteDocumentsResponse, error) {
+func (m *MockAPIClientInterface) DeleteDocumentsWithResponse(ctx context.Context, collectionName string, params *api.DeleteDocumentsParams) (*api.DeleteDocumentsResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteDocumentsWithResponse", ctx, collectionName, params)
 	ret0, _ := ret[0].(*api.DeleteDocumentsResponse)
@@ -196,13 +196,13 @@ func (m *MockApiClientInterface) DeleteDocumentsWithResponse(ctx context.Context
 }
 
 // DeleteDocumentsWithResponse indicates an expected call of DeleteDocumentsWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) DeleteDocumentsWithResponse(ctx, collectionName, params interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteDocumentsWithResponse(ctx, collectionName, params interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDocumentsWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).DeleteDocumentsWithResponse), ctx, collectionName, params)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDocumentsWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteDocumentsWithResponse), ctx, collectionName, params)
 }
 
 // IndexDocumentWithBodyWithResponse mocks base method
-func (m *MockApiClientInterface) IndexDocumentWithBodyWithResponse(ctx context.Context, collectionName string, params *api.IndexDocumentParams, contentType string, body io.Reader) (*api.IndexDocumentResponse, error) {
+func (m *MockAPIClientInterface) IndexDocumentWithBodyWithResponse(ctx context.Context, collectionName string, params *api.IndexDocumentParams, contentType string, body io.Reader) (*api.IndexDocumentResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IndexDocumentWithBodyWithResponse", ctx, collectionName, params, contentType, body)
 	ret0, _ := ret[0].(*api.IndexDocumentResponse)
@@ -211,13 +211,13 @@ func (m *MockApiClientInterface) IndexDocumentWithBodyWithResponse(ctx context.C
 }
 
 // IndexDocumentWithBodyWithResponse indicates an expected call of IndexDocumentWithBodyWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) IndexDocumentWithBodyWithResponse(ctx, collectionName, params, contentType, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) IndexDocumentWithBodyWithResponse(ctx, collectionName, params, contentType, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IndexDocumentWithBodyWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).IndexDocumentWithBodyWithResponse), ctx, collectionName, params, contentType, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IndexDocumentWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).IndexDocumentWithBodyWithResponse), ctx, collectionName, params, contentType, body)
 }
 
 // IndexDocumentWithResponse mocks base method
-func (m *MockApiClientInterface) IndexDocumentWithResponse(ctx context.Context, collectionName string, params *api.IndexDocumentParams, body api.IndexDocumentJSONRequestBody) (*api.IndexDocumentResponse, error) {
+func (m *MockAPIClientInterface) IndexDocumentWithResponse(ctx context.Context, collectionName string, params *api.IndexDocumentParams, body api.IndexDocumentJSONRequestBody) (*api.IndexDocumentResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IndexDocumentWithResponse", ctx, collectionName, params, body)
 	ret0, _ := ret[0].(*api.IndexDocumentResponse)
@@ -226,13 +226,13 @@ func (m *MockApiClientInterface) IndexDocumentWithResponse(ctx context.Context, 
 }
 
 // IndexDocumentWithResponse indicates an expected call of IndexDocumentWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) IndexDocumentWithResponse(ctx, collectionName, params, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) IndexDocumentWithResponse(ctx, collectionName, params, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IndexDocumentWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).IndexDocumentWithResponse), ctx, collectionName, params, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IndexDocumentWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).IndexDocumentWithResponse), ctx, collectionName, params, body)
 }
 
 // ExportDocumentsWithResponse mocks base method
-func (m *MockApiClientInterface) ExportDocumentsWithResponse(ctx context.Context, collectionName string) (*api.ExportDocumentsResponse, error) {
+func (m *MockAPIClientInterface) ExportDocumentsWithResponse(ctx context.Context, collectionName string) (*api.ExportDocumentsResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ExportDocumentsWithResponse", ctx, collectionName)
 	ret0, _ := ret[0].(*api.ExportDocumentsResponse)
@@ -241,28 +241,28 @@ func (m *MockApiClientInterface) ExportDocumentsWithResponse(ctx context.Context
 }
 
 // ExportDocumentsWithResponse indicates an expected call of ExportDocumentsWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) ExportDocumentsWithResponse(ctx, collectionName interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) ExportDocumentsWithResponse(ctx, collectionName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExportDocumentsWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).ExportDocumentsWithResponse), ctx, collectionName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExportDocumentsWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).ExportDocumentsWithResponse), ctx, collectionName)
 }
 
-// ImportDocumentsJsonlWithBodyWithResponse mocks base method
-func (m *MockApiClientInterface) ImportDocumentsJsonlWithBodyWithResponse(ctx context.Context, collectionName string, params *api.ImportDocumentsJsonlParams, contentType string, body io.Reader) (*api.ImportDocumentsJsonlResponse, error) {
+// ImportDocumentsWithBodyWithResponse mocks base method
+func (m *MockAPIClientInterface) ImportDocumentsWithBodyWithResponse(ctx context.Context, collectionName string, params *api.ImportDocumentsParams, contentType string, body io.Reader) (*api.ImportDocumentsResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ImportDocumentsJsonlWithBodyWithResponse", ctx, collectionName, params, contentType, body)
-	ret0, _ := ret[0].(*api.ImportDocumentsJsonlResponse)
+	ret := m.ctrl.Call(m, "ImportDocumentsWithBodyWithResponse", ctx, collectionName, params, contentType, body)
+	ret0, _ := ret[0].(*api.ImportDocumentsResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ImportDocumentsJsonlWithBodyWithResponse indicates an expected call of ImportDocumentsJsonlWithBodyWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) ImportDocumentsJsonlWithBodyWithResponse(ctx, collectionName, params, contentType, body interface{}) *gomock.Call {
+// ImportDocumentsWithBodyWithResponse indicates an expected call of ImportDocumentsWithBodyWithResponse
+func (mr *MockAPIClientInterfaceMockRecorder) ImportDocumentsWithBodyWithResponse(ctx, collectionName, params, contentType, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ImportDocumentsJsonlWithBodyWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).ImportDocumentsJsonlWithBodyWithResponse), ctx, collectionName, params, contentType, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ImportDocumentsWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).ImportDocumentsWithBodyWithResponse), ctx, collectionName, params, contentType, body)
 }
 
 // SearchCollectionWithResponse mocks base method
-func (m *MockApiClientInterface) SearchCollectionWithResponse(ctx context.Context, collectionName string, params *api.SearchCollectionParams) (*api.SearchCollectionResponse, error) {
+func (m *MockAPIClientInterface) SearchCollectionWithResponse(ctx context.Context, collectionName string, params *api.SearchCollectionParams) (*api.SearchCollectionResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SearchCollectionWithResponse", ctx, collectionName, params)
 	ret0, _ := ret[0].(*api.SearchCollectionResponse)
@@ -271,13 +271,13 @@ func (m *MockApiClientInterface) SearchCollectionWithResponse(ctx context.Contex
 }
 
 // SearchCollectionWithResponse indicates an expected call of SearchCollectionWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) SearchCollectionWithResponse(ctx, collectionName, params interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) SearchCollectionWithResponse(ctx, collectionName, params interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchCollectionWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).SearchCollectionWithResponse), ctx, collectionName, params)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchCollectionWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).SearchCollectionWithResponse), ctx, collectionName, params)
 }
 
 // DeleteDocumentWithResponse mocks base method
-func (m *MockApiClientInterface) DeleteDocumentWithResponse(ctx context.Context, collectionName, documentId string) (*api.DeleteDocumentResponse, error) {
+func (m *MockAPIClientInterface) DeleteDocumentWithResponse(ctx context.Context, collectionName, documentId string) (*api.DeleteDocumentResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteDocumentWithResponse", ctx, collectionName, documentId)
 	ret0, _ := ret[0].(*api.DeleteDocumentResponse)
@@ -286,13 +286,13 @@ func (m *MockApiClientInterface) DeleteDocumentWithResponse(ctx context.Context,
 }
 
 // DeleteDocumentWithResponse indicates an expected call of DeleteDocumentWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) DeleteDocumentWithResponse(ctx, collectionName, documentId interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteDocumentWithResponse(ctx, collectionName, documentId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDocumentWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).DeleteDocumentWithResponse), ctx, collectionName, documentId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDocumentWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteDocumentWithResponse), ctx, collectionName, documentId)
 }
 
 // GetDocumentWithResponse mocks base method
-func (m *MockApiClientInterface) GetDocumentWithResponse(ctx context.Context, collectionName, documentId string) (*api.GetDocumentResponse, error) {
+func (m *MockAPIClientInterface) GetDocumentWithResponse(ctx context.Context, collectionName, documentId string) (*api.GetDocumentResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetDocumentWithResponse", ctx, collectionName, documentId)
 	ret0, _ := ret[0].(*api.GetDocumentResponse)
@@ -301,13 +301,13 @@ func (m *MockApiClientInterface) GetDocumentWithResponse(ctx context.Context, co
 }
 
 // GetDocumentWithResponse indicates an expected call of GetDocumentWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) GetDocumentWithResponse(ctx, collectionName, documentId interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetDocumentWithResponse(ctx, collectionName, documentId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDocumentWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).GetDocumentWithResponse), ctx, collectionName, documentId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDocumentWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetDocumentWithResponse), ctx, collectionName, documentId)
 }
 
 // UpdateDocumentWithBodyWithResponse mocks base method
-func (m *MockApiClientInterface) UpdateDocumentWithBodyWithResponse(ctx context.Context, collectionName, documentId, contentType string, body io.Reader) (*api.UpdateDocumentResponse, error) {
+func (m *MockAPIClientInterface) UpdateDocumentWithBodyWithResponse(ctx context.Context, collectionName, documentId, contentType string, body io.Reader) (*api.UpdateDocumentResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateDocumentWithBodyWithResponse", ctx, collectionName, documentId, contentType, body)
 	ret0, _ := ret[0].(*api.UpdateDocumentResponse)
@@ -316,13 +316,13 @@ func (m *MockApiClientInterface) UpdateDocumentWithBodyWithResponse(ctx context.
 }
 
 // UpdateDocumentWithBodyWithResponse indicates an expected call of UpdateDocumentWithBodyWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) UpdateDocumentWithBodyWithResponse(ctx, collectionName, documentId, contentType, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) UpdateDocumentWithBodyWithResponse(ctx, collectionName, documentId, contentType, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDocumentWithBodyWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).UpdateDocumentWithBodyWithResponse), ctx, collectionName, documentId, contentType, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDocumentWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpdateDocumentWithBodyWithResponse), ctx, collectionName, documentId, contentType, body)
 }
 
 // UpdateDocumentWithResponse mocks base method
-func (m *MockApiClientInterface) UpdateDocumentWithResponse(ctx context.Context, collectionName, documentId string, body api.UpdateDocumentJSONRequestBody) (*api.UpdateDocumentResponse, error) {
+func (m *MockAPIClientInterface) UpdateDocumentWithResponse(ctx context.Context, collectionName, documentId string, body api.UpdateDocumentJSONRequestBody) (*api.UpdateDocumentResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateDocumentWithResponse", ctx, collectionName, documentId, body)
 	ret0, _ := ret[0].(*api.UpdateDocumentResponse)
@@ -331,13 +331,13 @@ func (m *MockApiClientInterface) UpdateDocumentWithResponse(ctx context.Context,
 }
 
 // UpdateDocumentWithResponse indicates an expected call of UpdateDocumentWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) UpdateDocumentWithResponse(ctx, collectionName, documentId, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) UpdateDocumentWithResponse(ctx, collectionName, documentId, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDocumentWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).UpdateDocumentWithResponse), ctx, collectionName, documentId, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDocumentWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpdateDocumentWithResponse), ctx, collectionName, documentId, body)
 }
 
 // GetSearchOverridesWithResponse mocks base method
-func (m *MockApiClientInterface) GetSearchOverridesWithResponse(ctx context.Context, collectionName string) (*api.GetSearchOverridesResponse, error) {
+func (m *MockAPIClientInterface) GetSearchOverridesWithResponse(ctx context.Context, collectionName string) (*api.GetSearchOverridesResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSearchOverridesWithResponse", ctx, collectionName)
 	ret0, _ := ret[0].(*api.GetSearchOverridesResponse)
@@ -346,13 +346,13 @@ func (m *MockApiClientInterface) GetSearchOverridesWithResponse(ctx context.Cont
 }
 
 // GetSearchOverridesWithResponse indicates an expected call of GetSearchOverridesWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) GetSearchOverridesWithResponse(ctx, collectionName interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetSearchOverridesWithResponse(ctx, collectionName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchOverridesWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).GetSearchOverridesWithResponse), ctx, collectionName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchOverridesWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetSearchOverridesWithResponse), ctx, collectionName)
 }
 
 // DeleteSearchOverrideWithResponse mocks base method
-func (m *MockApiClientInterface) DeleteSearchOverrideWithResponse(ctx context.Context, collectionName, overrideId string) (*api.DeleteSearchOverrideResponse, error) {
+func (m *MockAPIClientInterface) DeleteSearchOverrideWithResponse(ctx context.Context, collectionName, overrideId string) (*api.DeleteSearchOverrideResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteSearchOverrideWithResponse", ctx, collectionName, overrideId)
 	ret0, _ := ret[0].(*api.DeleteSearchOverrideResponse)
@@ -361,13 +361,13 @@ func (m *MockApiClientInterface) DeleteSearchOverrideWithResponse(ctx context.Co
 }
 
 // DeleteSearchOverrideWithResponse indicates an expected call of DeleteSearchOverrideWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) DeleteSearchOverrideWithResponse(ctx, collectionName, overrideId interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteSearchOverrideWithResponse(ctx, collectionName, overrideId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSearchOverrideWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).DeleteSearchOverrideWithResponse), ctx, collectionName, overrideId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSearchOverrideWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteSearchOverrideWithResponse), ctx, collectionName, overrideId)
 }
 
 // GetSearchOverrideWithResponse mocks base method
-func (m *MockApiClientInterface) GetSearchOverrideWithResponse(ctx context.Context, collectionName, overrideId string) (*api.GetSearchOverrideResponse, error) {
+func (m *MockAPIClientInterface) GetSearchOverrideWithResponse(ctx context.Context, collectionName, overrideId string) (*api.GetSearchOverrideResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSearchOverrideWithResponse", ctx, collectionName, overrideId)
 	ret0, _ := ret[0].(*api.GetSearchOverrideResponse)
@@ -376,13 +376,13 @@ func (m *MockApiClientInterface) GetSearchOverrideWithResponse(ctx context.Conte
 }
 
 // GetSearchOverrideWithResponse indicates an expected call of GetSearchOverrideWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) GetSearchOverrideWithResponse(ctx, collectionName, overrideId interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetSearchOverrideWithResponse(ctx, collectionName, overrideId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchOverrideWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).GetSearchOverrideWithResponse), ctx, collectionName, overrideId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchOverrideWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetSearchOverrideWithResponse), ctx, collectionName, overrideId)
 }
 
 // UpsertSearchOverrideWithBodyWithResponse mocks base method
-func (m *MockApiClientInterface) UpsertSearchOverrideWithBodyWithResponse(ctx context.Context, collectionName, overrideId, contentType string, body io.Reader) (*api.UpsertSearchOverrideResponse, error) {
+func (m *MockAPIClientInterface) UpsertSearchOverrideWithBodyWithResponse(ctx context.Context, collectionName, overrideId, contentType string, body io.Reader) (*api.UpsertSearchOverrideResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpsertSearchOverrideWithBodyWithResponse", ctx, collectionName, overrideId, contentType, body)
 	ret0, _ := ret[0].(*api.UpsertSearchOverrideResponse)
@@ -391,13 +391,13 @@ func (m *MockApiClientInterface) UpsertSearchOverrideWithBodyWithResponse(ctx co
 }
 
 // UpsertSearchOverrideWithBodyWithResponse indicates an expected call of UpsertSearchOverrideWithBodyWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) UpsertSearchOverrideWithBodyWithResponse(ctx, collectionName, overrideId, contentType, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertSearchOverrideWithBodyWithResponse(ctx, collectionName, overrideId, contentType, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchOverrideWithBodyWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).UpsertSearchOverrideWithBodyWithResponse), ctx, collectionName, overrideId, contentType, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchOverrideWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSearchOverrideWithBodyWithResponse), ctx, collectionName, overrideId, contentType, body)
 }
 
 // UpsertSearchOverrideWithResponse mocks base method
-func (m *MockApiClientInterface) UpsertSearchOverrideWithResponse(ctx context.Context, collectionName, overrideId string, body api.UpsertSearchOverrideJSONRequestBody) (*api.UpsertSearchOverrideResponse, error) {
+func (m *MockAPIClientInterface) UpsertSearchOverrideWithResponse(ctx context.Context, collectionName, overrideId string, body api.UpsertSearchOverrideJSONRequestBody) (*api.UpsertSearchOverrideResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpsertSearchOverrideWithResponse", ctx, collectionName, overrideId, body)
 	ret0, _ := ret[0].(*api.UpsertSearchOverrideResponse)
@@ -406,13 +406,13 @@ func (m *MockApiClientInterface) UpsertSearchOverrideWithResponse(ctx context.Co
 }
 
 // UpsertSearchOverrideWithResponse indicates an expected call of UpsertSearchOverrideWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) UpsertSearchOverrideWithResponse(ctx, collectionName, overrideId, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertSearchOverrideWithResponse(ctx, collectionName, overrideId, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchOverrideWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).UpsertSearchOverrideWithResponse), ctx, collectionName, overrideId, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchOverrideWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSearchOverrideWithResponse), ctx, collectionName, overrideId, body)
 }
 
 // DebugWithResponse mocks base method
-func (m *MockApiClientInterface) DebugWithResponse(ctx context.Context) (*api.DebugResponse, error) {
+func (m *MockAPIClientInterface) DebugWithResponse(ctx context.Context) (*api.DebugResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DebugWithResponse", ctx)
 	ret0, _ := ret[0].(*api.DebugResponse)
@@ -421,13 +421,13 @@ func (m *MockApiClientInterface) DebugWithResponse(ctx context.Context) (*api.De
 }
 
 // DebugWithResponse indicates an expected call of DebugWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) DebugWithResponse(ctx interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) DebugWithResponse(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DebugWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).DebugWithResponse), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DebugWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).DebugWithResponse), ctx)
 }
 
 // HealthWithResponse mocks base method
-func (m *MockApiClientInterface) HealthWithResponse(ctx context.Context) (*api.HealthResponse, error) {
+func (m *MockAPIClientInterface) HealthWithResponse(ctx context.Context) (*api.HealthResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "HealthWithResponse", ctx)
 	ret0, _ := ret[0].(*api.HealthResponse)
@@ -436,13 +436,13 @@ func (m *MockApiClientInterface) HealthWithResponse(ctx context.Context) (*api.H
 }
 
 // HealthWithResponse indicates an expected call of HealthWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) HealthWithResponse(ctx interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) HealthWithResponse(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).HealthWithResponse), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).HealthWithResponse), ctx)
 }
 
 // GetKeysWithResponse mocks base method
-func (m *MockApiClientInterface) GetKeysWithResponse(ctx context.Context) (*api.GetKeysResponse, error) {
+func (m *MockAPIClientInterface) GetKeysWithResponse(ctx context.Context) (*api.GetKeysResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetKeysWithResponse", ctx)
 	ret0, _ := ret[0].(*api.GetKeysResponse)
@@ -451,13 +451,13 @@ func (m *MockApiClientInterface) GetKeysWithResponse(ctx context.Context) (*api.
 }
 
 // GetKeysWithResponse indicates an expected call of GetKeysWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) GetKeysWithResponse(ctx interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetKeysWithResponse(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKeysWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).GetKeysWithResponse), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKeysWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetKeysWithResponse), ctx)
 }
 
 // CreateKeyWithBodyWithResponse mocks base method
-func (m *MockApiClientInterface) CreateKeyWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*api.CreateKeyResponse, error) {
+func (m *MockAPIClientInterface) CreateKeyWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader) (*api.CreateKeyResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateKeyWithBodyWithResponse", ctx, contentType, body)
 	ret0, _ := ret[0].(*api.CreateKeyResponse)
@@ -466,13 +466,13 @@ func (m *MockApiClientInterface) CreateKeyWithBodyWithResponse(ctx context.Conte
 }
 
 // CreateKeyWithBodyWithResponse indicates an expected call of CreateKeyWithBodyWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) CreateKeyWithBodyWithResponse(ctx, contentType, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) CreateKeyWithBodyWithResponse(ctx, contentType, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateKeyWithBodyWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).CreateKeyWithBodyWithResponse), ctx, contentType, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateKeyWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).CreateKeyWithBodyWithResponse), ctx, contentType, body)
 }
 
 // CreateKeyWithResponse mocks base method
-func (m *MockApiClientInterface) CreateKeyWithResponse(ctx context.Context, body api.CreateKeyJSONRequestBody) (*api.CreateKeyResponse, error) {
+func (m *MockAPIClientInterface) CreateKeyWithResponse(ctx context.Context, body api.CreateKeyJSONRequestBody) (*api.CreateKeyResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateKeyWithResponse", ctx, body)
 	ret0, _ := ret[0].(*api.CreateKeyResponse)
@@ -481,13 +481,13 @@ func (m *MockApiClientInterface) CreateKeyWithResponse(ctx context.Context, body
 }
 
 // CreateKeyWithResponse indicates an expected call of CreateKeyWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) CreateKeyWithResponse(ctx, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) CreateKeyWithResponse(ctx, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateKeyWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).CreateKeyWithResponse), ctx, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateKeyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).CreateKeyWithResponse), ctx, body)
 }
 
 // DeleteKeyWithResponse mocks base method
-func (m *MockApiClientInterface) DeleteKeyWithResponse(ctx context.Context, keyId int64) (*api.DeleteKeyResponse, error) {
+func (m *MockAPIClientInterface) DeleteKeyWithResponse(ctx context.Context, keyId int64) (*api.DeleteKeyResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteKeyWithResponse", ctx, keyId)
 	ret0, _ := ret[0].(*api.DeleteKeyResponse)
@@ -496,13 +496,13 @@ func (m *MockApiClientInterface) DeleteKeyWithResponse(ctx context.Context, keyI
 }
 
 // DeleteKeyWithResponse indicates an expected call of DeleteKeyWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) DeleteKeyWithResponse(ctx, keyId interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteKeyWithResponse(ctx, keyId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteKeyWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).DeleteKeyWithResponse), ctx, keyId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteKeyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteKeyWithResponse), ctx, keyId)
 }
 
 // GetKeyWithResponse mocks base method
-func (m *MockApiClientInterface) GetKeyWithResponse(ctx context.Context, keyId int64) (*api.GetKeyResponse, error) {
+func (m *MockAPIClientInterface) GetKeyWithResponse(ctx context.Context, keyId int64) (*api.GetKeyResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetKeyWithResponse", ctx, keyId)
 	ret0, _ := ret[0].(*api.GetKeyResponse)
@@ -511,13 +511,13 @@ func (m *MockApiClientInterface) GetKeyWithResponse(ctx context.Context, keyId i
 }
 
 // GetKeyWithResponse indicates an expected call of GetKeyWithResponse
-func (mr *MockApiClientInterfaceMockRecorder) GetKeyWithResponse(ctx, keyId interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetKeyWithResponse(ctx, keyId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKeyWithResponse", reflect.TypeOf((*MockApiClientInterface)(nil).GetKeyWithResponse), ctx, keyId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKeyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetKeyWithResponse), ctx, keyId)
 }
 
 // GetAliases mocks base method
-func (m *MockApiClientInterface) GetAliases(ctx context.Context) (*http.Response, error) {
+func (m *MockAPIClientInterface) GetAliases(ctx context.Context) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAliases", ctx)
 	ret0, _ := ret[0].(*http.Response)
@@ -526,13 +526,13 @@ func (m *MockApiClientInterface) GetAliases(ctx context.Context) (*http.Response
 }
 
 // GetAliases indicates an expected call of GetAliases
-func (mr *MockApiClientInterfaceMockRecorder) GetAliases(ctx interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetAliases(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAliases", reflect.TypeOf((*MockApiClientInterface)(nil).GetAliases), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAliases", reflect.TypeOf((*MockAPIClientInterface)(nil).GetAliases), ctx)
 }
 
 // DeleteAlias mocks base method
-func (m *MockApiClientInterface) DeleteAlias(ctx context.Context, aliasName string) (*http.Response, error) {
+func (m *MockAPIClientInterface) DeleteAlias(ctx context.Context, aliasName string) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteAlias", ctx, aliasName)
 	ret0, _ := ret[0].(*http.Response)
@@ -541,13 +541,13 @@ func (m *MockApiClientInterface) DeleteAlias(ctx context.Context, aliasName stri
 }
 
 // DeleteAlias indicates an expected call of DeleteAlias
-func (mr *MockApiClientInterfaceMockRecorder) DeleteAlias(ctx, aliasName interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteAlias(ctx, aliasName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAlias", reflect.TypeOf((*MockApiClientInterface)(nil).DeleteAlias), ctx, aliasName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAlias", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteAlias), ctx, aliasName)
 }
 
 // GetAlias mocks base method
-func (m *MockApiClientInterface) GetAlias(ctx context.Context, aliasName string) (*http.Response, error) {
+func (m *MockAPIClientInterface) GetAlias(ctx context.Context, aliasName string) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAlias", ctx, aliasName)
 	ret0, _ := ret[0].(*http.Response)
@@ -556,13 +556,13 @@ func (m *MockApiClientInterface) GetAlias(ctx context.Context, aliasName string)
 }
 
 // GetAlias indicates an expected call of GetAlias
-func (mr *MockApiClientInterfaceMockRecorder) GetAlias(ctx, aliasName interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetAlias(ctx, aliasName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAlias", reflect.TypeOf((*MockApiClientInterface)(nil).GetAlias), ctx, aliasName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAlias", reflect.TypeOf((*MockAPIClientInterface)(nil).GetAlias), ctx, aliasName)
 }
 
 // UpsertAliasWithBody mocks base method
-func (m *MockApiClientInterface) UpsertAliasWithBody(ctx context.Context, aliasName, contentType string, body io.Reader) (*http.Response, error) {
+func (m *MockAPIClientInterface) UpsertAliasWithBody(ctx context.Context, aliasName, contentType string, body io.Reader) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpsertAliasWithBody", ctx, aliasName, contentType, body)
 	ret0, _ := ret[0].(*http.Response)
@@ -571,13 +571,13 @@ func (m *MockApiClientInterface) UpsertAliasWithBody(ctx context.Context, aliasN
 }
 
 // UpsertAliasWithBody indicates an expected call of UpsertAliasWithBody
-func (mr *MockApiClientInterfaceMockRecorder) UpsertAliasWithBody(ctx, aliasName, contentType, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertAliasWithBody(ctx, aliasName, contentType, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertAliasWithBody", reflect.TypeOf((*MockApiClientInterface)(nil).UpsertAliasWithBody), ctx, aliasName, contentType, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertAliasWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertAliasWithBody), ctx, aliasName, contentType, body)
 }
 
 // UpsertAlias mocks base method
-func (m *MockApiClientInterface) UpsertAlias(ctx context.Context, aliasName string, body api.UpsertAliasJSONRequestBody) (*http.Response, error) {
+func (m *MockAPIClientInterface) UpsertAlias(ctx context.Context, aliasName string, body api.UpsertAliasJSONRequestBody) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpsertAlias", ctx, aliasName, body)
 	ret0, _ := ret[0].(*http.Response)
@@ -586,13 +586,13 @@ func (m *MockApiClientInterface) UpsertAlias(ctx context.Context, aliasName stri
 }
 
 // UpsertAlias indicates an expected call of UpsertAlias
-func (mr *MockApiClientInterfaceMockRecorder) UpsertAlias(ctx, aliasName, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertAlias(ctx, aliasName, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertAlias", reflect.TypeOf((*MockApiClientInterface)(nil).UpsertAlias), ctx, aliasName, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertAlias", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertAlias), ctx, aliasName, body)
 }
 
 // GetCollections mocks base method
-func (m *MockApiClientInterface) GetCollections(ctx context.Context) (*http.Response, error) {
+func (m *MockAPIClientInterface) GetCollections(ctx context.Context) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCollections", ctx)
 	ret0, _ := ret[0].(*http.Response)
@@ -601,13 +601,13 @@ func (m *MockApiClientInterface) GetCollections(ctx context.Context) (*http.Resp
 }
 
 // GetCollections indicates an expected call of GetCollections
-func (mr *MockApiClientInterfaceMockRecorder) GetCollections(ctx interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetCollections(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCollections", reflect.TypeOf((*MockApiClientInterface)(nil).GetCollections), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCollections", reflect.TypeOf((*MockAPIClientInterface)(nil).GetCollections), ctx)
 }
 
 // CreateCollectionWithBody mocks base method
-func (m *MockApiClientInterface) CreateCollectionWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error) {
+func (m *MockAPIClientInterface) CreateCollectionWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateCollectionWithBody", ctx, contentType, body)
 	ret0, _ := ret[0].(*http.Response)
@@ -616,13 +616,13 @@ func (m *MockApiClientInterface) CreateCollectionWithBody(ctx context.Context, c
 }
 
 // CreateCollectionWithBody indicates an expected call of CreateCollectionWithBody
-func (mr *MockApiClientInterfaceMockRecorder) CreateCollectionWithBody(ctx, contentType, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) CreateCollectionWithBody(ctx, contentType, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCollectionWithBody", reflect.TypeOf((*MockApiClientInterface)(nil).CreateCollectionWithBody), ctx, contentType, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCollectionWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).CreateCollectionWithBody), ctx, contentType, body)
 }
 
 // CreateCollection mocks base method
-func (m *MockApiClientInterface) CreateCollection(ctx context.Context, body api.CreateCollectionJSONRequestBody) (*http.Response, error) {
+func (m *MockAPIClientInterface) CreateCollection(ctx context.Context, body api.CreateCollectionJSONRequestBody) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateCollection", ctx, body)
 	ret0, _ := ret[0].(*http.Response)
@@ -631,13 +631,13 @@ func (m *MockApiClientInterface) CreateCollection(ctx context.Context, body api.
 }
 
 // CreateCollection indicates an expected call of CreateCollection
-func (mr *MockApiClientInterfaceMockRecorder) CreateCollection(ctx, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) CreateCollection(ctx, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCollection", reflect.TypeOf((*MockApiClientInterface)(nil).CreateCollection), ctx, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCollection", reflect.TypeOf((*MockAPIClientInterface)(nil).CreateCollection), ctx, body)
 }
 
 // DeleteCollection mocks base method
-func (m *MockApiClientInterface) DeleteCollection(ctx context.Context, collectionName string) (*http.Response, error) {
+func (m *MockAPIClientInterface) DeleteCollection(ctx context.Context, collectionName string) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCollection", ctx, collectionName)
 	ret0, _ := ret[0].(*http.Response)
@@ -646,13 +646,13 @@ func (m *MockApiClientInterface) DeleteCollection(ctx context.Context, collectio
 }
 
 // DeleteCollection indicates an expected call of DeleteCollection
-func (mr *MockApiClientInterfaceMockRecorder) DeleteCollection(ctx, collectionName interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteCollection(ctx, collectionName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCollection", reflect.TypeOf((*MockApiClientInterface)(nil).DeleteCollection), ctx, collectionName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCollection", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteCollection), ctx, collectionName)
 }
 
 // GetCollection mocks base method
-func (m *MockApiClientInterface) GetCollection(ctx context.Context, collectionName string) (*http.Response, error) {
+func (m *MockAPIClientInterface) GetCollection(ctx context.Context, collectionName string) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCollection", ctx, collectionName)
 	ret0, _ := ret[0].(*http.Response)
@@ -661,13 +661,13 @@ func (m *MockApiClientInterface) GetCollection(ctx context.Context, collectionNa
 }
 
 // GetCollection indicates an expected call of GetCollection
-func (mr *MockApiClientInterfaceMockRecorder) GetCollection(ctx, collectionName interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetCollection(ctx, collectionName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCollection", reflect.TypeOf((*MockApiClientInterface)(nil).GetCollection), ctx, collectionName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCollection", reflect.TypeOf((*MockAPIClientInterface)(nil).GetCollection), ctx, collectionName)
 }
 
 // DeleteDocuments mocks base method
-func (m *MockApiClientInterface) DeleteDocuments(ctx context.Context, collectionName string, params *api.DeleteDocumentsParams) (*http.Response, error) {
+func (m *MockAPIClientInterface) DeleteDocuments(ctx context.Context, collectionName string, params *api.DeleteDocumentsParams) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteDocuments", ctx, collectionName, params)
 	ret0, _ := ret[0].(*http.Response)
@@ -676,13 +676,13 @@ func (m *MockApiClientInterface) DeleteDocuments(ctx context.Context, collection
 }
 
 // DeleteDocuments indicates an expected call of DeleteDocuments
-func (mr *MockApiClientInterfaceMockRecorder) DeleteDocuments(ctx, collectionName, params interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteDocuments(ctx, collectionName, params interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDocuments", reflect.TypeOf((*MockApiClientInterface)(nil).DeleteDocuments), ctx, collectionName, params)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDocuments", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteDocuments), ctx, collectionName, params)
 }
 
 // IndexDocumentWithBody mocks base method
-func (m *MockApiClientInterface) IndexDocumentWithBody(ctx context.Context, collectionName string, params *api.IndexDocumentParams, contentType string, body io.Reader) (*http.Response, error) {
+func (m *MockAPIClientInterface) IndexDocumentWithBody(ctx context.Context, collectionName string, params *api.IndexDocumentParams, contentType string, body io.Reader) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IndexDocumentWithBody", ctx, collectionName, params, contentType, body)
 	ret0, _ := ret[0].(*http.Response)
@@ -691,13 +691,13 @@ func (m *MockApiClientInterface) IndexDocumentWithBody(ctx context.Context, coll
 }
 
 // IndexDocumentWithBody indicates an expected call of IndexDocumentWithBody
-func (mr *MockApiClientInterfaceMockRecorder) IndexDocumentWithBody(ctx, collectionName, params, contentType, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) IndexDocumentWithBody(ctx, collectionName, params, contentType, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IndexDocumentWithBody", reflect.TypeOf((*MockApiClientInterface)(nil).IndexDocumentWithBody), ctx, collectionName, params, contentType, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IndexDocumentWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).IndexDocumentWithBody), ctx, collectionName, params, contentType, body)
 }
 
 // IndexDocument mocks base method
-func (m *MockApiClientInterface) IndexDocument(ctx context.Context, collectionName string, params *api.IndexDocumentParams, body api.IndexDocumentJSONRequestBody) (*http.Response, error) {
+func (m *MockAPIClientInterface) IndexDocument(ctx context.Context, collectionName string, params *api.IndexDocumentParams, body api.IndexDocumentJSONRequestBody) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IndexDocument", ctx, collectionName, params, body)
 	ret0, _ := ret[0].(*http.Response)
@@ -706,13 +706,13 @@ func (m *MockApiClientInterface) IndexDocument(ctx context.Context, collectionNa
 }
 
 // IndexDocument indicates an expected call of IndexDocument
-func (mr *MockApiClientInterfaceMockRecorder) IndexDocument(ctx, collectionName, params, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) IndexDocument(ctx, collectionName, params, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IndexDocument", reflect.TypeOf((*MockApiClientInterface)(nil).IndexDocument), ctx, collectionName, params, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IndexDocument", reflect.TypeOf((*MockAPIClientInterface)(nil).IndexDocument), ctx, collectionName, params, body)
 }
 
 // ExportDocuments mocks base method
-func (m *MockApiClientInterface) ExportDocuments(ctx context.Context, collectionName string) (*http.Response, error) {
+func (m *MockAPIClientInterface) ExportDocuments(ctx context.Context, collectionName string) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ExportDocuments", ctx, collectionName)
 	ret0, _ := ret[0].(*http.Response)
@@ -721,28 +721,28 @@ func (m *MockApiClientInterface) ExportDocuments(ctx context.Context, collection
 }
 
 // ExportDocuments indicates an expected call of ExportDocuments
-func (mr *MockApiClientInterfaceMockRecorder) ExportDocuments(ctx, collectionName interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) ExportDocuments(ctx, collectionName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExportDocuments", reflect.TypeOf((*MockApiClientInterface)(nil).ExportDocuments), ctx, collectionName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExportDocuments", reflect.TypeOf((*MockAPIClientInterface)(nil).ExportDocuments), ctx, collectionName)
 }
 
-// ImportDocumentsJsonlWithBody mocks base method
-func (m *MockApiClientInterface) ImportDocumentsJsonlWithBody(ctx context.Context, collectionName string, params *api.ImportDocumentsJsonlParams, contentType string, body io.Reader) (*http.Response, error) {
+// ImportDocumentsWithBody mocks base method
+func (m *MockAPIClientInterface) ImportDocumentsWithBody(ctx context.Context, collectionName string, params *api.ImportDocumentsParams, contentType string, body io.Reader) (*http.Response, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ImportDocumentsJsonlWithBody", ctx, collectionName, params, contentType, body)
+	ret := m.ctrl.Call(m, "ImportDocumentsWithBody", ctx, collectionName, params, contentType, body)
 	ret0, _ := ret[0].(*http.Response)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ImportDocumentsJsonlWithBody indicates an expected call of ImportDocumentsJsonlWithBody
-func (mr *MockApiClientInterfaceMockRecorder) ImportDocumentsJsonlWithBody(ctx, collectionName, params, contentType, body interface{}) *gomock.Call {
+// ImportDocumentsWithBody indicates an expected call of ImportDocumentsWithBody
+func (mr *MockAPIClientInterfaceMockRecorder) ImportDocumentsWithBody(ctx, collectionName, params, contentType, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ImportDocumentsJsonlWithBody", reflect.TypeOf((*MockApiClientInterface)(nil).ImportDocumentsJsonlWithBody), ctx, collectionName, params, contentType, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ImportDocumentsWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).ImportDocumentsWithBody), ctx, collectionName, params, contentType, body)
 }
 
 // SearchCollection mocks base method
-func (m *MockApiClientInterface) SearchCollection(ctx context.Context, collectionName string, params *api.SearchCollectionParams) (*http.Response, error) {
+func (m *MockAPIClientInterface) SearchCollection(ctx context.Context, collectionName string, params *api.SearchCollectionParams) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SearchCollection", ctx, collectionName, params)
 	ret0, _ := ret[0].(*http.Response)
@@ -751,13 +751,13 @@ func (m *MockApiClientInterface) SearchCollection(ctx context.Context, collectio
 }
 
 // SearchCollection indicates an expected call of SearchCollection
-func (mr *MockApiClientInterfaceMockRecorder) SearchCollection(ctx, collectionName, params interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) SearchCollection(ctx, collectionName, params interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchCollection", reflect.TypeOf((*MockApiClientInterface)(nil).SearchCollection), ctx, collectionName, params)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchCollection", reflect.TypeOf((*MockAPIClientInterface)(nil).SearchCollection), ctx, collectionName, params)
 }
 
 // DeleteDocument mocks base method
-func (m *MockApiClientInterface) DeleteDocument(ctx context.Context, collectionName, documentId string) (*http.Response, error) {
+func (m *MockAPIClientInterface) DeleteDocument(ctx context.Context, collectionName, documentId string) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteDocument", ctx, collectionName, documentId)
 	ret0, _ := ret[0].(*http.Response)
@@ -766,13 +766,13 @@ func (m *MockApiClientInterface) DeleteDocument(ctx context.Context, collectionN
 }
 
 // DeleteDocument indicates an expected call of DeleteDocument
-func (mr *MockApiClientInterfaceMockRecorder) DeleteDocument(ctx, collectionName, documentId interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteDocument(ctx, collectionName, documentId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDocument", reflect.TypeOf((*MockApiClientInterface)(nil).DeleteDocument), ctx, collectionName, documentId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDocument", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteDocument), ctx, collectionName, documentId)
 }
 
 // GetDocument mocks base method
-func (m *MockApiClientInterface) GetDocument(ctx context.Context, collectionName, documentId string) (*http.Response, error) {
+func (m *MockAPIClientInterface) GetDocument(ctx context.Context, collectionName, documentId string) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetDocument", ctx, collectionName, documentId)
 	ret0, _ := ret[0].(*http.Response)
@@ -781,13 +781,13 @@ func (m *MockApiClientInterface) GetDocument(ctx context.Context, collectionName
 }
 
 // GetDocument indicates an expected call of GetDocument
-func (mr *MockApiClientInterfaceMockRecorder) GetDocument(ctx, collectionName, documentId interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetDocument(ctx, collectionName, documentId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDocument", reflect.TypeOf((*MockApiClientInterface)(nil).GetDocument), ctx, collectionName, documentId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDocument", reflect.TypeOf((*MockAPIClientInterface)(nil).GetDocument), ctx, collectionName, documentId)
 }
 
 // UpdateDocumentWithBody mocks base method
-func (m *MockApiClientInterface) UpdateDocumentWithBody(ctx context.Context, collectionName, documentId, contentType string, body io.Reader) (*http.Response, error) {
+func (m *MockAPIClientInterface) UpdateDocumentWithBody(ctx context.Context, collectionName, documentId, contentType string, body io.Reader) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateDocumentWithBody", ctx, collectionName, documentId, contentType, body)
 	ret0, _ := ret[0].(*http.Response)
@@ -796,13 +796,13 @@ func (m *MockApiClientInterface) UpdateDocumentWithBody(ctx context.Context, col
 }
 
 // UpdateDocumentWithBody indicates an expected call of UpdateDocumentWithBody
-func (mr *MockApiClientInterfaceMockRecorder) UpdateDocumentWithBody(ctx, collectionName, documentId, contentType, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) UpdateDocumentWithBody(ctx, collectionName, documentId, contentType, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDocumentWithBody", reflect.TypeOf((*MockApiClientInterface)(nil).UpdateDocumentWithBody), ctx, collectionName, documentId, contentType, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDocumentWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).UpdateDocumentWithBody), ctx, collectionName, documentId, contentType, body)
 }
 
 // UpdateDocument mocks base method
-func (m *MockApiClientInterface) UpdateDocument(ctx context.Context, collectionName, documentId string, body api.UpdateDocumentJSONRequestBody) (*http.Response, error) {
+func (m *MockAPIClientInterface) UpdateDocument(ctx context.Context, collectionName, documentId string, body api.UpdateDocumentJSONRequestBody) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateDocument", ctx, collectionName, documentId, body)
 	ret0, _ := ret[0].(*http.Response)
@@ -811,13 +811,13 @@ func (m *MockApiClientInterface) UpdateDocument(ctx context.Context, collectionN
 }
 
 // UpdateDocument indicates an expected call of UpdateDocument
-func (mr *MockApiClientInterfaceMockRecorder) UpdateDocument(ctx, collectionName, documentId, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) UpdateDocument(ctx, collectionName, documentId, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDocument", reflect.TypeOf((*MockApiClientInterface)(nil).UpdateDocument), ctx, collectionName, documentId, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDocument", reflect.TypeOf((*MockAPIClientInterface)(nil).UpdateDocument), ctx, collectionName, documentId, body)
 }
 
 // GetSearchOverrides mocks base method
-func (m *MockApiClientInterface) GetSearchOverrides(ctx context.Context, collectionName string) (*http.Response, error) {
+func (m *MockAPIClientInterface) GetSearchOverrides(ctx context.Context, collectionName string) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSearchOverrides", ctx, collectionName)
 	ret0, _ := ret[0].(*http.Response)
@@ -826,13 +826,13 @@ func (m *MockApiClientInterface) GetSearchOverrides(ctx context.Context, collect
 }
 
 // GetSearchOverrides indicates an expected call of GetSearchOverrides
-func (mr *MockApiClientInterfaceMockRecorder) GetSearchOverrides(ctx, collectionName interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetSearchOverrides(ctx, collectionName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchOverrides", reflect.TypeOf((*MockApiClientInterface)(nil).GetSearchOverrides), ctx, collectionName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchOverrides", reflect.TypeOf((*MockAPIClientInterface)(nil).GetSearchOverrides), ctx, collectionName)
 }
 
 // DeleteSearchOverride mocks base method
-func (m *MockApiClientInterface) DeleteSearchOverride(ctx context.Context, collectionName, overrideId string) (*http.Response, error) {
+func (m *MockAPIClientInterface) DeleteSearchOverride(ctx context.Context, collectionName, overrideId string) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteSearchOverride", ctx, collectionName, overrideId)
 	ret0, _ := ret[0].(*http.Response)
@@ -841,13 +841,13 @@ func (m *MockApiClientInterface) DeleteSearchOverride(ctx context.Context, colle
 }
 
 // DeleteSearchOverride indicates an expected call of DeleteSearchOverride
-func (mr *MockApiClientInterfaceMockRecorder) DeleteSearchOverride(ctx, collectionName, overrideId interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteSearchOverride(ctx, collectionName, overrideId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSearchOverride", reflect.TypeOf((*MockApiClientInterface)(nil).DeleteSearchOverride), ctx, collectionName, overrideId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSearchOverride", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteSearchOverride), ctx, collectionName, overrideId)
 }
 
 // GetSearchOverride mocks base method
-func (m *MockApiClientInterface) GetSearchOverride(ctx context.Context, collectionName, overrideId string) (*http.Response, error) {
+func (m *MockAPIClientInterface) GetSearchOverride(ctx context.Context, collectionName, overrideId string) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSearchOverride", ctx, collectionName, overrideId)
 	ret0, _ := ret[0].(*http.Response)
@@ -856,13 +856,13 @@ func (m *MockApiClientInterface) GetSearchOverride(ctx context.Context, collecti
 }
 
 // GetSearchOverride indicates an expected call of GetSearchOverride
-func (mr *MockApiClientInterfaceMockRecorder) GetSearchOverride(ctx, collectionName, overrideId interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetSearchOverride(ctx, collectionName, overrideId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchOverride", reflect.TypeOf((*MockApiClientInterface)(nil).GetSearchOverride), ctx, collectionName, overrideId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchOverride", reflect.TypeOf((*MockAPIClientInterface)(nil).GetSearchOverride), ctx, collectionName, overrideId)
 }
 
 // UpsertSearchOverrideWithBody mocks base method
-func (m *MockApiClientInterface) UpsertSearchOverrideWithBody(ctx context.Context, collectionName, overrideId, contentType string, body io.Reader) (*http.Response, error) {
+func (m *MockAPIClientInterface) UpsertSearchOverrideWithBody(ctx context.Context, collectionName, overrideId, contentType string, body io.Reader) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpsertSearchOverrideWithBody", ctx, collectionName, overrideId, contentType, body)
 	ret0, _ := ret[0].(*http.Response)
@@ -871,13 +871,13 @@ func (m *MockApiClientInterface) UpsertSearchOverrideWithBody(ctx context.Contex
 }
 
 // UpsertSearchOverrideWithBody indicates an expected call of UpsertSearchOverrideWithBody
-func (mr *MockApiClientInterfaceMockRecorder) UpsertSearchOverrideWithBody(ctx, collectionName, overrideId, contentType, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertSearchOverrideWithBody(ctx, collectionName, overrideId, contentType, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchOverrideWithBody", reflect.TypeOf((*MockApiClientInterface)(nil).UpsertSearchOverrideWithBody), ctx, collectionName, overrideId, contentType, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchOverrideWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSearchOverrideWithBody), ctx, collectionName, overrideId, contentType, body)
 }
 
 // UpsertSearchOverride mocks base method
-func (m *MockApiClientInterface) UpsertSearchOverride(ctx context.Context, collectionName, overrideId string, body api.UpsertSearchOverrideJSONRequestBody) (*http.Response, error) {
+func (m *MockAPIClientInterface) UpsertSearchOverride(ctx context.Context, collectionName, overrideId string, body api.UpsertSearchOverrideJSONRequestBody) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpsertSearchOverride", ctx, collectionName, overrideId, body)
 	ret0, _ := ret[0].(*http.Response)
@@ -886,13 +886,13 @@ func (m *MockApiClientInterface) UpsertSearchOverride(ctx context.Context, colle
 }
 
 // UpsertSearchOverride indicates an expected call of UpsertSearchOverride
-func (mr *MockApiClientInterfaceMockRecorder) UpsertSearchOverride(ctx, collectionName, overrideId, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertSearchOverride(ctx, collectionName, overrideId, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchOverride", reflect.TypeOf((*MockApiClientInterface)(nil).UpsertSearchOverride), ctx, collectionName, overrideId, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchOverride", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSearchOverride), ctx, collectionName, overrideId, body)
 }
 
 // Debug mocks base method
-func (m *MockApiClientInterface) Debug(ctx context.Context) (*http.Response, error) {
+func (m *MockAPIClientInterface) Debug(ctx context.Context) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Debug", ctx)
 	ret0, _ := ret[0].(*http.Response)
@@ -901,13 +901,13 @@ func (m *MockApiClientInterface) Debug(ctx context.Context) (*http.Response, err
 }
 
 // Debug indicates an expected call of Debug
-func (mr *MockApiClientInterfaceMockRecorder) Debug(ctx interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) Debug(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Debug", reflect.TypeOf((*MockApiClientInterface)(nil).Debug), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Debug", reflect.TypeOf((*MockAPIClientInterface)(nil).Debug), ctx)
 }
 
 // Health mocks base method
-func (m *MockApiClientInterface) Health(ctx context.Context) (*http.Response, error) {
+func (m *MockAPIClientInterface) Health(ctx context.Context) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Health", ctx)
 	ret0, _ := ret[0].(*http.Response)
@@ -916,13 +916,13 @@ func (m *MockApiClientInterface) Health(ctx context.Context) (*http.Response, er
 }
 
 // Health indicates an expected call of Health
-func (mr *MockApiClientInterfaceMockRecorder) Health(ctx interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) Health(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Health", reflect.TypeOf((*MockApiClientInterface)(nil).Health), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Health", reflect.TypeOf((*MockAPIClientInterface)(nil).Health), ctx)
 }
 
 // GetKeys mocks base method
-func (m *MockApiClientInterface) GetKeys(ctx context.Context) (*http.Response, error) {
+func (m *MockAPIClientInterface) GetKeys(ctx context.Context) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetKeys", ctx)
 	ret0, _ := ret[0].(*http.Response)
@@ -931,13 +931,13 @@ func (m *MockApiClientInterface) GetKeys(ctx context.Context) (*http.Response, e
 }
 
 // GetKeys indicates an expected call of GetKeys
-func (mr *MockApiClientInterfaceMockRecorder) GetKeys(ctx interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetKeys(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKeys", reflect.TypeOf((*MockApiClientInterface)(nil).GetKeys), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKeys", reflect.TypeOf((*MockAPIClientInterface)(nil).GetKeys), ctx)
 }
 
 // CreateKeyWithBody mocks base method
-func (m *MockApiClientInterface) CreateKeyWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error) {
+func (m *MockAPIClientInterface) CreateKeyWithBody(ctx context.Context, contentType string, body io.Reader) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateKeyWithBody", ctx, contentType, body)
 	ret0, _ := ret[0].(*http.Response)
@@ -946,13 +946,13 @@ func (m *MockApiClientInterface) CreateKeyWithBody(ctx context.Context, contentT
 }
 
 // CreateKeyWithBody indicates an expected call of CreateKeyWithBody
-func (mr *MockApiClientInterfaceMockRecorder) CreateKeyWithBody(ctx, contentType, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) CreateKeyWithBody(ctx, contentType, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateKeyWithBody", reflect.TypeOf((*MockApiClientInterface)(nil).CreateKeyWithBody), ctx, contentType, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateKeyWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).CreateKeyWithBody), ctx, contentType, body)
 }
 
 // CreateKey mocks base method
-func (m *MockApiClientInterface) CreateKey(ctx context.Context, body api.CreateKeyJSONRequestBody) (*http.Response, error) {
+func (m *MockAPIClientInterface) CreateKey(ctx context.Context, body api.CreateKeyJSONRequestBody) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateKey", ctx, body)
 	ret0, _ := ret[0].(*http.Response)
@@ -961,13 +961,13 @@ func (m *MockApiClientInterface) CreateKey(ctx context.Context, body api.CreateK
 }
 
 // CreateKey indicates an expected call of CreateKey
-func (mr *MockApiClientInterfaceMockRecorder) CreateKey(ctx, body interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) CreateKey(ctx, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateKey", reflect.TypeOf((*MockApiClientInterface)(nil).CreateKey), ctx, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateKey", reflect.TypeOf((*MockAPIClientInterface)(nil).CreateKey), ctx, body)
 }
 
 // DeleteKey mocks base method
-func (m *MockApiClientInterface) DeleteKey(ctx context.Context, keyId int64) (*http.Response, error) {
+func (m *MockAPIClientInterface) DeleteKey(ctx context.Context, keyId int64) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteKey", ctx, keyId)
 	ret0, _ := ret[0].(*http.Response)
@@ -976,13 +976,13 @@ func (m *MockApiClientInterface) DeleteKey(ctx context.Context, keyId int64) (*h
 }
 
 // DeleteKey indicates an expected call of DeleteKey
-func (mr *MockApiClientInterfaceMockRecorder) DeleteKey(ctx, keyId interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteKey(ctx, keyId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteKey", reflect.TypeOf((*MockApiClientInterface)(nil).DeleteKey), ctx, keyId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteKey", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteKey), ctx, keyId)
 }
 
 // GetKey mocks base method
-func (m *MockApiClientInterface) GetKey(ctx context.Context, keyId int64) (*http.Response, error) {
+func (m *MockAPIClientInterface) GetKey(ctx context.Context, keyId int64) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetKey", ctx, keyId)
 	ret0, _ := ret[0].(*http.Response)
@@ -991,7 +991,7 @@ func (m *MockApiClientInterface) GetKey(ctx context.Context, keyId int64) (*http
 }
 
 // GetKey indicates an expected call of GetKey
-func (mr *MockApiClientInterfaceMockRecorder) GetKey(ctx, keyId interface{}) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) GetKey(ctx, keyId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKey", reflect.TypeOf((*MockApiClientInterface)(nil).GetKey), ctx, keyId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKey", reflect.TypeOf((*MockAPIClientInterface)(nil).GetKey), ctx, keyId)
 }
