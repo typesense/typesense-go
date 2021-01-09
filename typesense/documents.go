@@ -9,7 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/v-byte-cpu/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/typesense/api"
 )
 
 var upsertAction = "upsert"

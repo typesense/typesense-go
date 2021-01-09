@@ -7,7 +7,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"github.com/v-byte-cpu/typesense-go/typesense/api/circuit/mocks"
+	"github.com/typesense/typesense-go/typesense/api/circuit/mocks"
 )
 
 func newHTTPRequest(t *testing.T) *http.Request {

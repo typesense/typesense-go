@@ -3,7 +3,7 @@ package typesense
 import (
 	"context"
 
-	"github.com/v-byte-cpu/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/typesense/api"
 )
 
 // CollectionInterface is a type for Collection API operations

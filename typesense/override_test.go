@@ -7,8 +7,8 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"github.com/v-byte-cpu/typesense-go/typesense/api"
-	"github.com/v-byte-cpu/typesense-go/typesense/mocks"
+	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/typesense/mocks"
 )
 
 func TestSearchOverrideRetrieve(t *testing.T) {
