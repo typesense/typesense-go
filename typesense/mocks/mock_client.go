@@ -7,7 +7,7 @@ package mocks
 import (
 	context "context"
 	gomock "github.com/golang/mock/gomock"
-	api "github.com/v-byte-cpu/typesense-go/typesense/api"
+	api "github.com/typesense/typesense-go/typesense/api"
 	io "io"
 	http "net/http"
 	reflect "reflect"
