@@ -11,11 +11,11 @@ import (
 )
 
 func TestCollectionCreate(t *testing.T) {
-	collectionName := getNewCollectionName("companies")
-	newSchema := createNewSchema(collectionName)
+	collectionName := newCollectionName("companies")
+	schema := newSchema(collectionName)
 	expectedResult := expectedNewCollection(collectionName)
 
-	result, err := typesenseClient.Collections().Create(newSchema)
+	result, err := typesenseClient.Collections().Create(schema)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedResult, result)
@@ -25,19 +25,19 @@ func TestCollectionsRetrieve(t *testing.T) {
 	total := 3
 	collectionNames := make([]string, total)
 	for i := 0; i < total; i++ {
-		collectionNames[i] = getNewCollectionName("companies")
+		collectionNames[i] = newCollectionName("companies")
 	}
-	newSchemas := make([]*api.CollectionSchema, total)
+	schemas := make([]*api.CollectionSchema, total)
 	for i := 0; i < total; i++ {
-		newSchemas[i] = createNewSchema(collectionNames[i])
+		schemas[i] = newSchema(collectionNames[i])
 	}
 	expectedResult := map[string]*api.Collection{}
 	for i := 0; i < total; i++ {
 		expectedResult[collectionNames[i]] = expectedNewCollection(collectionNames[i])
 	}
 
-	for _, newSchema := range newSchemas {
-		_, err := typesenseClient.Collections().Create(newSchema)
+	for _, schema := range schemas {
+		_, err := typesenseClient.Collections().Create(schema)
 		assert.NoError(t, err)
 	}
 

@@ -13,7 +13,7 @@ func (c *Client) Health(timeout time.Duration) (bool, error) {
 		return false, err
 	}
 	if response.JSON200 == nil {
-		return false, &httpError{status: response.StatusCode(), body: response.Body}
+		return false, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return response.JSON200.Ok, nil
 }

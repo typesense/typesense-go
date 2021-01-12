@@ -12,7 +12,7 @@ import (
 )
 
 func TestHttpError(t *testing.T) {
-	err := &httpError{status: 200, body: []byte("error message body")}
+	err := &HTTPError{Status: 200, Body: []byte("error message body")}
 	assert.Equal(t, "status: 200 response: error message body", err.Error())
 }
 

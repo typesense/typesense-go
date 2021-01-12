@@ -25,7 +25,7 @@ func (o *overrides) Upsert(overrideID string, overrideSchema *api.SearchOverride
 		return nil, err
 	}
 	if response.JSON200 == nil {
-		return nil, &httpError{status: response.StatusCode(), body: response.Body}
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return response.JSON200, nil
 }
@@ -36,7 +36,7 @@ func (o *overrides) Retrieve() ([]*api.SearchOverride, error) {
 		return nil, err
 	}
 	if response.JSON200 == nil {
-		return nil, &httpError{status: response.StatusCode(), body: response.Body}
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return response.JSON200.Overrides, nil
 }
