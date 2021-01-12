@@ -1,5 +1,4 @@
-//go:generate mockgen -destination=mocks/mock_doer.go -package=mocks . HttpRequestDoer
-//go:generate mockgen -destination=mocks/mock_breaker.go -package=mocks . CircuitBreaker
+//go:generate mockgen -source=http_client.go -destination=mocks/mock_circuit.go -package=mocks
 
 package circuit
 

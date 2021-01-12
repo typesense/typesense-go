@@ -48,7 +48,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CollectionsResponse"
+                type: array
+                x-go-type: "[]*Collection"
+                items:
+                  $ref: "#/components/schemas/Collection"
     post:
       tags:
         - collections
@@ -1011,7 +1014,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: "#/components/schemas/HealthStatus"
 components:
   schemas:
     CollectionSchema:
@@ -1059,16 +1062,6 @@ components:
               description: Number of documents in the collection
               format: int64
               readOnly: true
-    CollectionsResponse:
-      type: object
-      required:
-        - collections
-      properties:
-        collections:
-          type: array
-          x-go-type: "[]*Collection"
-          items:
-            $ref: "#/components/schemas/Collection"
     Field:
       required:
         - name
@@ -1319,6 +1312,13 @@ components:
           x-go-type: "[]*SearchOverride"
           items:
             $ref: "#/components/schemas/SearchOverride"
+    HealthStatus:
+      type: object
+      required:
+        - ok
+      properties:
+        ok:
+          type: boolean
     ApiResponse:
       type: object
       required:

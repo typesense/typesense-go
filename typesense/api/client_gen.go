@@ -2294,7 +2294,7 @@ func (r UpsertAliasResponse) StatusCode() int {
 type GetCollectionsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *CollectionsResponse
+	JSON200      *[]*Collection
 }
 
 // Status returns HTTPResponse.Status
@@ -2681,7 +2681,7 @@ func (r DebugResponse) StatusCode() int {
 type HealthResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *map[string]interface{}
+	JSON200      *HealthStatus
 }
 
 // Status returns HTTPResponse.Status
@@ -3189,7 +3189,7 @@ func ParseGetCollectionsResponse(rsp *http.Response) (*GetCollectionsResponse, e
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest CollectionsResponse
+		var dest []*Collection
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -3698,7 +3698,7 @@ func ParseHealthResponse(rsp *http.Response) (*HealthResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest map[string]interface{}
+		var dest HealthStatus
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

@@ -37,5 +37,5 @@ func (c *collections) Retrieve() ([]*api.Collection, error) {
 	if response.JSON200 == nil {
 		return nil, &httpError{status: response.StatusCode(), body: response.Body}
 	}
-	return response.JSON200.Collections, nil
+	return *response.JSON200, nil
 }
