@@ -22,7 +22,7 @@ func (k *key) Retrieve() (*api.ApiKey, error) {
 		return nil, err
 	}
 	if response.JSON200 == nil {
-		return nil, &httpError{status: response.StatusCode(), body: response.Body}
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return response.JSON200, nil
 }
@@ -33,7 +33,7 @@ func (k *key) Delete() (*api.ApiKey, error) {
 		return nil, err
 	}
 	if response.JSON200 == nil {
-		return nil, &httpError{status: response.StatusCode(), body: response.Body}
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return response.JSON200, nil
 }

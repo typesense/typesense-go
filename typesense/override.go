@@ -26,7 +26,7 @@ func (o *override) Retrieve() (*api.SearchOverride, error) {
 		return nil, err
 	}
 	if response.JSON200 == nil {
-		return nil, &httpError{status: response.StatusCode(), body: response.Body}
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return response.JSON200, nil
 }
@@ -38,7 +38,7 @@ func (o *override) Delete() (*api.SearchOverride, error) {
 		return nil, err
 	}
 	if response.JSON200 == nil {
-		return nil, &httpError{status: response.StatusCode(), body: response.Body}
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return response.JSON200, nil
 }

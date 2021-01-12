@@ -53,7 +53,7 @@ func (d *documents) indexDocument(document interface{}, params *api.IndexDocumen
 		return nil, err
 	}
 	if response.JSON201 == nil {
-		return nil, &httpError{status: response.StatusCode(), body: response.Body}
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return *response.JSON201, nil
 }
@@ -73,7 +73,7 @@ func (d *documents) Delete(filter *api.DeleteDocumentsParams) (int, error) {
 		return 0, err
 	}
 	if response.JSON200 == nil {
-		return 0, &httpError{status: response.StatusCode(), body: response.Body}
+		return 0, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return response.JSON200.NumDeleted, nil
 }
@@ -85,7 +85,7 @@ func (d *documents) Search(params *api.SearchCollectionParams) (*api.SearchResul
 		return nil, err
 	}
 	if response.JSON200 == nil {
-		return nil, &httpError{status: response.StatusCode(), body: response.Body}
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return response.JSON200, nil
 }
@@ -98,7 +98,7 @@ func (d *documents) Export() (io.ReadCloser, error) {
 	if response.StatusCode != http.StatusOK {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return nil, &httpError{status: response.StatusCode, body: body}
+		return nil, &HTTPError{Status: response.StatusCode, Body: body}
 	}
 	return response.Body, nil
 }
@@ -153,7 +153,7 @@ func (d *documents) ImportJsonl(body io.Reader, params *api.ImportDocumentsParam
 	if response.StatusCode != http.StatusOK {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return nil, &httpError{status: response.StatusCode, body: body}
+		return nil, &HTTPError{Status: response.StatusCode, Body: body}
 	}
 	return response.Body, nil
 }

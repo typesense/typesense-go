@@ -47,13 +47,13 @@ func (c *Client) Key(keyID int64) KeyInterface {
 	return &key{apiClient: c.apiClient, keyID: keyID}
 }
 
-type httpError struct {
-	status int
-	body   []byte
+type HTTPError struct {
+	Status int
+	Body   []byte
 }
 
-func (e *httpError) Error() string {
-	return fmt.Sprintf("status: %v response: %s", e.status, string(e.body))
+func (e *HTTPError) Error() string {
+	return fmt.Sprintf("status: %v response: %s", e.Status, string(e.Body))
 }
 
 const (

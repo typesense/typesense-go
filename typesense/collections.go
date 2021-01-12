@@ -24,7 +24,7 @@ func (c *collections) Create(schema *api.CollectionSchema) (*api.Collection, err
 		return nil, err
 	}
 	if response.JSON201 == nil {
-		return nil, &httpError{status: response.StatusCode(), body: response.Body}
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return response.JSON201, nil
 }
@@ -35,7 +35,7 @@ func (c *collections) Retrieve() ([]*api.Collection, error) {
 		return nil, err
 	}
 	if response.JSON200 == nil {
-		return nil, &httpError{status: response.StatusCode(), body: response.Body}
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return *response.JSON200, nil
 }

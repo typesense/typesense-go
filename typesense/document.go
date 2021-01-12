@@ -23,7 +23,7 @@ func (d *document) Retrieve() (map[string]interface{}, error) {
 		return nil, err
 	}
 	if response.JSON200 == nil {
-		return nil, &httpError{status: response.StatusCode(), body: response.Body}
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return *response.JSON200, nil
 }
@@ -35,7 +35,7 @@ func (d *document) Update(document interface{}) (map[string]interface{}, error) 
 		return nil, err
 	}
 	if response.JSON200 == nil {
-		return nil, &httpError{status: response.StatusCode(), body: response.Body}
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return *response.JSON200, nil
 }
@@ -47,7 +47,7 @@ func (d *document) Delete() (map[string]interface{}, error) {
 		return nil, err
 	}
 	if response.JSON200 == nil {
-		return nil, &httpError{status: response.StatusCode(), body: response.Body}
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return *response.JSON200, nil
 }

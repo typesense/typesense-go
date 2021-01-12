@@ -9,12 +9,8 @@ import (
 )
 
 func TestCollectionRetrieve(t *testing.T) {
-	collectionName := getNewCollectionName("companies")
-	newSchema := createNewSchema(collectionName)
+	collectionName := createNewCollection(t, "companies")
 	expectedResult := expectedNewCollection(collectionName)
-
-	_, err := typesenseClient.Collections().Create(newSchema)
-	require.NoError(t, err)
 
 	result, err := typesenseClient.Collection(collectionName).Retrieve()
 
@@ -23,12 +19,8 @@ func TestCollectionRetrieve(t *testing.T) {
 }
 
 func TestCollectionDelete(t *testing.T) {
-	collectionName := getNewCollectionName("companies")
-	newSchema := createNewSchema(collectionName)
+	collectionName := createNewCollection(t, "companies")
 	expectedResult := expectedNewCollection(collectionName)
-
-	_, err := typesenseClient.Collections().Create(newSchema)
-	require.NoError(t, err)
 
 	result, err := typesenseClient.Collection(collectionName).Delete()
 	require.NoError(t, err)
