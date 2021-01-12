@@ -30,8 +30,8 @@ func applyFunc(f func() error) error {
 func TestClientDoOnCircuitBreakerErrorReturnsError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockCircuitBreaker := mocks.NewMockCircuitBreaker(ctrl)
-	mockRequestDoer := mocks.NewMockHttpRequestDoer(ctrl)
+	mockCircuitBreaker := mocks.NewMockBreaker(ctrl)
+	mockRequestDoer := mocks.NewMockHTTPRequestDoer(ctrl)
 
 	mockCircuitBreaker.EXPECT().Execute(gomock.Not(gomock.Nil())).
 		Return(errors.New("circuit breaker error"))
@@ -48,8 +48,8 @@ func TestClientDoOnCircuitBreakerErrorReturnsError(t *testing.T) {
 func TestClientDoOnHttpClientErrorReturnsError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockCircuitBreaker := mocks.NewMockCircuitBreaker(ctrl)
-	mockRequestDoer := mocks.NewMockHttpRequestDoer(ctrl)
+	mockCircuitBreaker := mocks.NewMockBreaker(ctrl)
+	mockRequestDoer := mocks.NewMockHTTPRequestDoer(ctrl)
 
 	gomock.InOrder(
 		mockCircuitBreaker.EXPECT().Execute(gomock.Not(gomock.Nil())).
@@ -70,8 +70,8 @@ func TestClientDoOnHttpClientErrorReturnsError(t *testing.T) {
 func TestClientDoReturnsResponse(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockCircuitBreaker := mocks.NewMockCircuitBreaker(ctrl)
-	mockRequestDoer := mocks.NewMockHttpRequestDoer(ctrl)
+	mockCircuitBreaker := mocks.NewMockBreaker(ctrl)
+	mockRequestDoer := mocks.NewMockHTTPRequestDoer(ctrl)
 
 	gomock.InOrder(
 		mockCircuitBreaker.EXPECT().Execute(gomock.Not(gomock.Nil())).
@@ -93,8 +93,8 @@ func TestClientDoReturnsResponse(t *testing.T) {
 func TestClientDoOn5xxStatusErrorSuccess(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockCircuitBreaker := mocks.NewMockCircuitBreaker(ctrl)
-	mockRequestDoer := mocks.NewMockHttpRequestDoer(ctrl)
+	mockCircuitBreaker := mocks.NewMockBreaker(ctrl)
+	mockRequestDoer := mocks.NewMockHTTPRequestDoer(ctrl)
 
 	gomock.InOrder(
 		mockCircuitBreaker.EXPECT().Execute(gomock.Not(gomock.Nil())).

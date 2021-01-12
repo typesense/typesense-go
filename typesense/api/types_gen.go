@@ -75,17 +75,17 @@ type CollectionSchema struct {
 	Name string `json:"name"`
 }
 
-// CollectionsResponse defines model for CollectionsResponse.
-type CollectionsResponse struct {
-	Collections []*Collection `json:"collections"`
-}
-
 // Field defines model for Field.
 type Field struct {
 	Facet    bool   `json:"facet"`
 	Name     string `json:"name"`
 	Optional bool   `json:"optional"`
 	Type     string `json:"type"`
+}
+
+// HealthStatus defines model for HealthStatus.
+type HealthStatus struct {
+	Ok bool `json:"ok"`
 }
 
 // SearchGroupedHit defines model for SearchGroupedHit.
