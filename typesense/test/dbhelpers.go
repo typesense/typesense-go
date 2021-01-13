@@ -79,3 +79,10 @@ func createNewCollection(t *testing.T, namePrefix string) string {
 	require.NoError(t, err)
 	return collectionName
 }
+
+func createNewDocument(t *testing.T, collectionName string, docID string) *testDocument {
+	document := newDocument(docID)
+	_, err := typesenseClient.Collection(collectionName).Documents().Create(document)
+	require.NoError(t, err)
+	return document
+}
