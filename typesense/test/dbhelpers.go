@@ -52,21 +52,44 @@ type testDocument struct {
 	Country      string `json:"country"`
 }
 
-func newDocument(docID string) *testDocument {
-	return &testDocument{
+type newDocumentOption func(doc *testDocument)
+
+func withCompanyName(companyName string) newDocumentOption {
+	return func(doc *testDocument) {
+		doc.CompanyName = companyName
+	}
+}
+
+func newDocument(docID string, opts ...newDocumentOption) *testDocument {
+	doc := &testDocument{
 		ID:           docID,
 		CompanyName:  "Stark Industries",
 		NumEmployees: 5215,
 		Country:      "USA",
 	}
+	for _, opt := range opts {
+		opt(doc)
+	}
+	return doc
 }
 
-func newDocumentResponse(docID string) map[string]interface{} {
+type newDocumentResponseOption func(doc map[string]interface{})
+
+func withResponseCompanyName(companyName string) newDocumentResponseOption {
+	return func(doc map[string]interface{}) {
+		doc["company_name"] = companyName
+	}
+}
+
+func newDocumentResponse(docID string, opts ...newDocumentResponseOption) map[string]interface{} {
 	document := map[string]interface{}{}
 	document["id"] = docID
 	document["company_name"] = "Stark Industries"
 	document["num_employees"] = float64(5215)
 	document["country"] = "USA"
+	for _, opt := range opts {
+		opt(document)
+	}
 	return document
 }
 
@@ -80,9 +103,7 @@ func createNewCollection(t *testing.T, namePrefix string) string {
 	return collectionName
 }
 
-func createNewDocument(t *testing.T, collectionName string, docID string) *testDocument {
-	document := newDocument(docID)
+func createDocument(t *testing.T, collectionName string, document *testDocument) {
 	_, err := typesenseClient.Collection(collectionName).Documents().Create(document)
 	require.NoError(t, err)
-	return document
 }

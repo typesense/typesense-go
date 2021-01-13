@@ -3,6 +3,8 @@
 package test
 
 import (
+	"encoding/json"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -43,9 +45,8 @@ func TestDocumentUpsertNewDocument(t *testing.T) {
 
 func TestDocumentUpsertExistingDocument(t *testing.T) {
 	collectionName := createNewCollection(t, "companies")
-	expectedResult := newDocumentResponse("123")
 	newCompanyName := "HighTech Inc."
-	expectedResult["company_name"] = newCompanyName
+	expectedResult := newDocumentResponse("123", withResponseCompanyName(newCompanyName))
 
 	document := newDocument("123")
 	_, err := typesenseClient.Collection(collectionName).Documents().Create(document)
@@ -87,4 +88,42 @@ func TestDocumentsDelete(t *testing.T) {
 	require.NoError(t, err)
 	_, err = typesenseClient.Collection(collectionName).Document("124").Retrieve()
 	require.Error(t, err)
+}
+
+func TestDocumentsExport(t *testing.T) {
+	collectionName := createNewCollection(t, "companies")
+	doc1 := newDocument("123")
+	doc2 := newDocument("125", withCompanyName("Company2"))
+	doc3 := newDocument("127", withCompanyName("Company3"))
+
+	expectedResult1 := newDocumentResponse("123")
+	expectedResult2 := newDocumentResponse("125", withResponseCompanyName("Company2"))
+	expectedResult3 := newDocumentResponse("127", withResponseCompanyName("Company3"))
+	expectedResults := []map[string]interface{}{
+		expectedResult1, expectedResult2, expectedResult3}
+
+	createDocument(t, collectionName, doc1)
+	createDocument(t, collectionName, doc2)
+	createDocument(t, collectionName, doc3)
+
+	body, err := typesenseClient.Collection(collectionName).Documents().Export()
+	require.NoError(t, err)
+	defer body.Close()
+
+	jd := json.NewDecoder(body)
+	results := make([]map[string]interface{}, 3)
+	for i := 0; i < 3; i++ {
+		require.True(t, jd.More(), "no json element")
+		doc := map[string]interface{}{}
+		err = jd.Decode(&doc)
+		require.NoError(t, err)
+		results[i] = doc
+	}
+	sort.Slice(results, func(i, j int) bool {
+		id1 := results[i]["id"].(string)
+		id2 := results[j]["id"].(string)
+		return id1 < id2
+	})
+
+	require.Equal(t, expectedResults, results)
 }
