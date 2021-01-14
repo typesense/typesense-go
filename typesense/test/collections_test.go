@@ -11,7 +11,7 @@ import (
 )
 
 func TestCollectionCreate(t *testing.T) {
-	collectionName := newCollectionName("companies")
+	collectionName := newUUIDName("companies")
 	schema := newSchema(collectionName)
 	expectedResult := expectedNewCollection(collectionName)
 
@@ -25,7 +25,7 @@ func TestCollectionsRetrieve(t *testing.T) {
 	total := 3
 	collectionNames := make([]string, total)
 	for i := 0; i < total; i++ {
-		collectionNames[i] = newCollectionName("companies")
+		collectionNames[i] = newUUIDName("companies")
 	}
 	schemas := make([]*api.CollectionSchema, total)
 	for i := 0; i < total; i++ {
@@ -38,7 +38,7 @@ func TestCollectionsRetrieve(t *testing.T) {
 
 	for _, schema := range schemas {
 		_, err := typesenseClient.Collections().Create(schema)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 	}
 
 	result, err := typesenseClient.Collections().Retrieve()
