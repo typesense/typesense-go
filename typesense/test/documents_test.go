@@ -92,19 +92,16 @@ func TestDocumentsDelete(t *testing.T) {
 
 func TestDocumentsExport(t *testing.T) {
 	collectionName := createNewCollection(t, "companies")
-	doc1 := newDocument("123")
-	doc2 := newDocument("125", withCompanyName("Company2"))
-	doc3 := newDocument("127", withCompanyName("Company3"))
 
-	expectedResult1 := newDocumentResponse("123")
-	expectedResult2 := newDocumentResponse("125", withResponseCompanyName("Company2"))
-	expectedResult3 := newDocumentResponse("127", withResponseCompanyName("Company3"))
 	expectedResults := []map[string]interface{}{
-		expectedResult1, expectedResult2, expectedResult3}
+		newDocumentResponse("123"),
+		newDocumentResponse("125", withResponseCompanyName("Company2")),
+		newDocumentResponse("127", withResponseCompanyName("Company3")),
+	}
 
-	createDocument(t, collectionName, doc1)
-	createDocument(t, collectionName, doc2)
-	createDocument(t, collectionName, doc3)
+	createDocument(t, collectionName, newDocument("123"))
+	createDocument(t, collectionName, newDocument("125", withCompanyName("Company2")))
+	createDocument(t, collectionName, newDocument("127", withCompanyName("Company3")))
 
 	body, err := typesenseClient.Collection(collectionName).Documents().Export()
 	require.NoError(t, err)
@@ -115,8 +112,7 @@ func TestDocumentsExport(t *testing.T) {
 	for i := 0; i < 3; i++ {
 		require.True(t, jd.More(), "no json element")
 		doc := map[string]interface{}{}
-		err = jd.Decode(&doc)
-		require.NoError(t, err)
+		require.NoError(t, jd.Decode(&doc))
 		results[i] = doc
 	}
 	sort.Slice(results, func(i, j int) bool {

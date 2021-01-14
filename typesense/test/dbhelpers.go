@@ -170,15 +170,27 @@ func createNewCollection(t *testing.T, namePrefix string) string {
 }
 
 func createDocument(t *testing.T, collectionName string, document *testDocument) {
+	t.Helper()
 	_, err := typesenseClient.Collection(collectionName).Documents().Create(document)
 	require.NoError(t, err)
 }
 
 func createNewKey(t *testing.T) *api.ApiKey {
+	t.Helper()
 	keySchema := newKeySchema()
 
 	result, err := typesenseClient.Keys().Create(keySchema)
 
 	require.NoError(t, err)
 	return result
+}
+
+func retrieveDocuments(t *testing.T, collectionName string, docIDs ...string) []map[string]interface{} {
+	results := make([]map[string]interface{}, len(docIDs))
+	for i, docID := range docIDs {
+		doc, err := typesenseClient.Collection(collectionName).Document(docID).Retrieve()
+		require.NoError(t, err)
+		results[i] = doc
+	}
+	return results
 }
