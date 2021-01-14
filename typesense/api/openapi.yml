@@ -1332,6 +1332,7 @@ components:
         - description
         - actions
         - collections
+        - expires_at
       properties:
         description:
           type: string
@@ -1343,6 +1344,9 @@ components:
           type: array
           items:
             type: string
+        expires_at:
+          type: integer
+          format: int64
     ApiKey:
       allOf:
         - $ref: "#/components/schemas/ApiKeySchema"

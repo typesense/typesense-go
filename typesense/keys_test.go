@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/jinzhu/copier"
@@ -17,6 +18,7 @@ func createNewKeySchema() *api.ApiKeySchema {
 		Description: "Search-only key.",
 		Actions:     []string{"documents:search"},
 		Collections: []string{"companies"},
+		ExpiresAt:   time.Date(2222, 0, 1, 0, 0, 0, 0, time.UTC).Unix(),
 	}
 }
 
