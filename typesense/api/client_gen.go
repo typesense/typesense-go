@@ -1201,7 +1201,7 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 		}
 	}
 
-	if queryFrag, err := runtime.StyleParam("form", true, "query_by", params.QueryBy); err != nil {
+	if queryFrag, err := runtime.StyleParam("form", false, "query_by", params.QueryBy); err != nil {
 		return nil, err
 	} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 		return nil, err
@@ -1211,6 +1211,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 				queryValues.Add(k, v2)
 			}
 		}
+	}
+
+	if params.QueryByWeights != nil {
+
+		if queryFrag, err := runtime.StyleParam("form", false, "query_by_weights", *params.QueryByWeights); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
 	}
 
 	if params.MaxHits != nil {
@@ -1263,7 +1279,7 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 	if params.SortBy != nil {
 
-		if queryFrag, err := runtime.StyleParam("form", true, "sort_by", *params.SortBy); err != nil {
+		if queryFrag, err := runtime.StyleParam("form", false, "sort_by", *params.SortBy); err != nil {
 			return nil, err
 		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 			return nil, err
@@ -1279,7 +1295,7 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 	if params.FacetBy != nil {
 
-		if queryFrag, err := runtime.StyleParam("form", true, "facet_by", *params.FacetBy); err != nil {
+		if queryFrag, err := runtime.StyleParam("form", false, "facet_by", *params.FacetBy); err != nil {
 			return nil, err
 		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 			return nil, err
@@ -1375,7 +1391,7 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 	if params.GroupBy != nil {
 
-		if queryFrag, err := runtime.StyleParam("form", true, "group_by", *params.GroupBy); err != nil {
+		if queryFrag, err := runtime.StyleParam("form", false, "group_by", *params.GroupBy); err != nil {
 			return nil, err
 		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 			return nil, err
@@ -1407,7 +1423,7 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 	if params.IncludeFields != nil {
 
-		if queryFrag, err := runtime.StyleParam("form", true, "include_fields", *params.IncludeFields); err != nil {
+		if queryFrag, err := runtime.StyleParam("form", false, "include_fields", *params.IncludeFields); err != nil {
 			return nil, err
 		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 			return nil, err
@@ -1423,7 +1439,7 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 	if params.ExcludeFields != nil {
 
-		if queryFrag, err := runtime.StyleParam("form", true, "exclude_fields", *params.ExcludeFields); err != nil {
+		if queryFrag, err := runtime.StyleParam("form", false, "exclude_fields", *params.ExcludeFields); err != nil {
 			return nil, err
 		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 			return nil, err
@@ -1439,7 +1455,7 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 	if params.HighlightFullFields != nil {
 
-		if queryFrag, err := runtime.StyleParam("form", true, "highlight_full_fields", *params.HighlightFullFields); err != nil {
+		if queryFrag, err := runtime.StyleParam("form", false, "highlight_full_fields", *params.HighlightFullFields); err != nil {
 			return nil, err
 		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 			return nil, err
@@ -1551,7 +1567,7 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 	if params.PinnedHits != nil {
 
-		if queryFrag, err := runtime.StyleParam("form", true, "pinned_hits", *params.PinnedHits); err != nil {
+		if queryFrag, err := runtime.StyleParam("form", false, "pinned_hits", *params.PinnedHits); err != nil {
 			return nil, err
 		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 			return nil, err
@@ -1567,7 +1583,7 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 	if params.HiddenHits != nil {
 
-		if queryFrag, err := runtime.StyleParam("form", true, "hidden_hits", *params.HiddenHits); err != nil {
+		if queryFrag, err := runtime.StyleParam("form", false, "hidden_hits", *params.HiddenHits); err != nil {
 			return nil, err
 		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 			return nil, err
