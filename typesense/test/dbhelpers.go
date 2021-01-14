@@ -12,7 +12,7 @@ import (
 	"github.com/typesense/typesense-go/typesense/api"
 )
 
-func newCollectionName(namePrefix string) string {
+func newUUIDName(namePrefix string) string {
 	nameUUID := uuid.New()
 	return fmt.Sprintf("%s_%s", namePrefix, nameUUID.String())
 }
@@ -109,9 +109,52 @@ func newKey() *api.ApiKey {
 	}
 }
 
+type newSearchOverrideSchemaOption func(*api.SearchOverrideSchema)
+
+func withOverrideRuleMatch(match string) newSearchOverrideSchemaOption {
+	return func(o *api.SearchOverrideSchema) {
+		o.Rule.Match = match
+	}
+}
+
+func newSearchOverrideSchema(opts ...newSearchOverrideSchemaOption) *api.SearchOverrideSchema {
+	schema := &api.SearchOverrideSchema{
+		Rule: api.SearchOverrideRule{
+			Query: "apple",
+			Match: "exact",
+		},
+		Includes: []api.SearchOverrideInclude{
+			{
+				Id:       "422",
+				Position: 1,
+			},
+			{
+				Id:       "54",
+				Position: 2,
+			},
+		},
+		Excludes: []api.SearchOverrideExclude{
+			{
+				Id: "287",
+			},
+		},
+	}
+	for _, opt := range opts {
+		opt(schema)
+	}
+	return schema
+}
+
+func newSearchOverride(overrideID string, opts ...newSearchOverrideSchemaOption) *api.SearchOverride {
+	return &api.SearchOverride{
+		SearchOverrideSchema: *newSearchOverrideSchema(opts...),
+		Id:                   overrideID,
+	}
+}
+
 func createNewCollection(t *testing.T, namePrefix string) string {
 	t.Helper()
-	collectionName := newCollectionName(namePrefix)
+	collectionName := newUUIDName(namePrefix)
 	schema := newSchema(collectionName)
 
 	_, err := typesenseClient.Collections().Create(schema)
