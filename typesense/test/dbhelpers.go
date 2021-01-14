@@ -5,6 +5,7 @@ package test
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
@@ -52,7 +53,7 @@ type testDocument struct {
 	Country      string `json:"country"`
 }
 
-type newDocumentOption func(doc *testDocument)
+type newDocumentOption func(*testDocument)
 
 func withCompanyName(companyName string) newDocumentOption {
 	return func(doc *testDocument) {
@@ -73,7 +74,7 @@ func newDocument(docID string, opts ...newDocumentOption) *testDocument {
 	return doc
 }
 
-type newDocumentResponseOption func(doc map[string]interface{})
+type newDocumentResponseOption func(map[string]interface{})
 
 func withResponseCompanyName(companyName string) newDocumentResponseOption {
 	return func(doc map[string]interface{}) {
@@ -93,6 +94,21 @@ func newDocumentResponse(docID string, opts ...newDocumentResponseOption) map[st
 	return document
 }
 
+func newKeySchema() *api.ApiKeySchema {
+	return &api.ApiKeySchema{
+		Description: "Search-only key.",
+		Actions:     []string{"documents:search"},
+		Collections: []string{"*"},
+		ExpiresAt:   time.Now().Add(1 * time.Hour).Unix(),
+	}
+}
+
+func newKey() *api.ApiKey {
+	return &api.ApiKey{
+		ApiKeySchema: *newKeySchema(),
+	}
+}
+
 func createNewCollection(t *testing.T, namePrefix string) string {
 	t.Helper()
 	collectionName := newCollectionName(namePrefix)
@@ -106,4 +122,13 @@ func createNewCollection(t *testing.T, namePrefix string) string {
 func createDocument(t *testing.T, collectionName string, document *testDocument) {
 	_, err := typesenseClient.Collection(collectionName).Documents().Create(document)
 	require.NoError(t, err)
+}
+
+func createNewKey(t *testing.T) *api.ApiKey {
+	keySchema := newKeySchema()
+
+	result, err := typesenseClient.Keys().Create(keySchema)
+
+	require.NoError(t, err)
+	return result
 }

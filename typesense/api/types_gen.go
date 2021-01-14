@@ -18,6 +18,7 @@ type ApiKeySchema struct {
 	Actions     []string `json:"actions"`
 	Collections []string `json:"collections"`
 	Description string   `json:"description"`
+	ExpiresAt   int64    `json:"expires_at"`
 }
 
 // ApiKeysResponse defines model for ApiKeysResponse.
