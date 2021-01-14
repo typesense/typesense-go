@@ -152,6 +152,13 @@ func newSearchOverride(overrideID string, opts ...newSearchOverrideSchemaOption)
 	}
 }
 
+func newCollectionAlias(collectionName string, name string) *api.CollectionAlias {
+	return &api.CollectionAlias{
+		CollectionName: collectionName,
+		Name:           name,
+	}
+}
+
 func createNewCollection(t *testing.T, namePrefix string) string {
 	t.Helper()
 	collectionName := newUUIDName(namePrefix)
