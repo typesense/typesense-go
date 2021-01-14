@@ -263,6 +263,19 @@ paths:
             against. Multiple fields are separated with a comma.
           required: true
           style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: query_by_weights
+          in: query
+          description:
+            The relative weight to give each `query_by` field when ranking results.
+            This can be used to boost fields in priority, when looking for matches.
+            Multiple fields are separated with a comma.
+          style: form
+          explode: false
           schema:
             type: array
             items:
@@ -307,6 +320,7 @@ paths:
             If no `sort_by` parameter is specified, results are sorted by
             `_text_match:desc,default_sorting_field:desc`
           style: form
+          explode: false
           schema:
             type: array
             items:
@@ -318,6 +332,7 @@ paths:
             A list of fields that will be used for faceting your results
             on. Separate multiple fields with a comma.
           style: form
+          explode: false
           schema:
             type: array
             items:
@@ -360,6 +375,7 @@ paths:
             one or more `group_by` fields. Separate multiple fields with a comma.
             To group on a particular field, it must be a faceted field.
           style: form
+          explode: false
           schema:
             type: array
             items:
@@ -376,6 +392,7 @@ paths:
           in: query
           description: List of fields from the document to include in the search result
           style: form
+          explode: false
           schema:
             type: array
             items:
@@ -384,6 +401,7 @@ paths:
           in: query
           description: List of fields from the document to exclude in the search result
           style: form
+          explode: false
           schema:
             type: array
             items:
@@ -392,6 +410,7 @@ paths:
           in: query
           description: List of fields which should be highlighted fully without snippeting
           style: form
+          explode: false
           schema:
             type: array
             items:
@@ -455,6 +474,7 @@ paths:
             on rules. Overrides are applied first, followed by `pinned_hits` and 
             finally `hidden_hits`.
           style: form
+          explode: false
           schema:
             type: array
             items:
@@ -470,6 +490,7 @@ paths:
             on rules. Overrides are applied first, followed by `pinned_hits` and
             finally `hidden_hits`.
           style: form
+          explode: false
           schema:
             type: array
             items:

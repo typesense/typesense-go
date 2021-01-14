@@ -61,6 +61,12 @@ func withCompanyName(companyName string) newDocumentOption {
 	}
 }
 
+func withNumEmployees(numEmployees int) newDocumentOption {
+	return func(doc *testDocument) {
+		doc.NumEmployees = numEmployees
+	}
+}
+
 func newDocument(docID string, opts ...newDocumentOption) *testDocument {
 	doc := &testDocument{
 		ID:           docID,
@@ -79,6 +85,12 @@ type newDocumentResponseOption func(map[string]interface{})
 func withResponseCompanyName(companyName string) newDocumentResponseOption {
 	return func(doc map[string]interface{}) {
 		doc["company_name"] = companyName
+	}
+}
+
+func withResponseNumEmployees(numEmployees int) newDocumentResponseOption {
+	return func(doc map[string]interface{}) {
+		doc["num_employees"] = float64(numEmployees)
 	}
 }
 
