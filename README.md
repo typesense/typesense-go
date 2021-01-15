@@ -214,6 +214,102 @@ client.Collections().Retrieve()
 client.Collection("companies").Delete()
 ```
 
+### Create an API Key
+
+```go
+	keySchema := &api.ApiKeySchema{
+		Description: "Search-only key.",
+		Actions:     []string{"documents:search"},
+		Collections: []string{"companies"},
+		ExpiresAt:   time.Now().AddDate(0, 6, 0).Unix(),
+	}
+
+	client.Keys().Create(keySchema)
+```
+
+### Retrieve an API Key
+
+```go
+client.Key(1).Retrieve()
+```
+
+### List all keys
+
+```go
+client.Keys().Retrieve()
+```
+
+### Delete API Key
+
+```go
+client.Key(1).Delete()
+```
+
+### Create or update an override
+
+```go
+	override := &api.SearchOverrideSchema{
+		Rule: api.SearchOverrideRule{
+			Query: "apple",
+			Match: "exact",
+		},
+		Includes: []api.SearchOverrideInclude{
+			{
+				Id:       "422",
+				Position: 1,
+			},
+			{
+				Id:       "54",
+				Position: 2,
+			},
+		},
+		Excludes: []api.SearchOverrideExclude{
+			{
+				Id: "287",
+			},
+		},
+	}
+
+	client.Collection("companies").Overrides().Upsert("customize-apple", override)
+```
+
+### List all overrides
+
+```go
+client.Collection("companies").Overrides().Retrieve()
+```
+
+### Delete an override
+
+```go
+client.Collection("companies").Override("customize-apple").Delete()
+```
+
+### Create or Update an alias
+
+```go
+	body := &api.CollectionAliasSchema{CollectionName: "companies_june11"}
+	client.Aliases().Upsert("companies", body)
+```
+
+### Retrieve an alias
+
+```go
+client.Alias("companies").Retrieve()
+```
+
+### List all aliases
+
+```go
+client.Aliases().Retrieve()
+```
+
+### Delete an alias
+
+```go
+client.Alias("companies").Delete()
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/typesense/typesense-go.
