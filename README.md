@@ -4,7 +4,7 @@
 [![GoReportCard Status](https://goreportcard.com/badge/github.com/typesense/typesense-go)](https://goreportcard.com/report/github.com/typesense/typesense-go)
 [![Go Reference](https://pkg.go.dev/badge/github.com/typesense/typesense-go.svg)](https://pkg.go.dev/github.com/typesense/typesense-go)
 [![GitHub release](https://img.shields.io/github/v/release/typesense/typesense-go)](https://github.com/typesense/typesense-go/releases/latest)
-[![Gitter](https://badges.gitter.im/typesense-go/community.svg)](https://gitter.im/typesense-go/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Gitter](https://badges.gitter.im/typesense-go/community.svg)](https://gitter.im/typesense-go/community)
 
 
 Go client for the Typesense API: https://github.com/typesense/typesense
