@@ -44,7 +44,7 @@ func newSearchResult() *api.SearchResult {
 					{
 						Field:         "company_name",
 						Snippet:       "<mark>Stark</mark> Industries",
-						MatchedTokens: []string{"Stark"},
+						MatchedTokens: []interface{}{"Stark"},
 					},
 				},
 				Document: map[string]interface{}{
@@ -91,7 +91,7 @@ func TestSearchResultDeserialization(t *testing.T) {
 					{
 						Field:         "company_name",
 						Snippet:       "<mark>Stark</mark> Industries",
-						MatchedTokens: []string{"Stark"},
+						MatchedTokens: []interface{}{"Stark"},
 					},
 				},
 				Document: map[string]interface{}{

@@ -102,8 +102,8 @@ type SearchHighlight struct {
 	Field string `json:"field"`
 
 	// The indices property will be present only for string[] fields and will contain the corresponding indices of the snippets in the search field
-	Indices       []int    `json:"indices"`
-	MatchedTokens []string `json:"matched_tokens"`
+	Indices       []int         `json:"indices"`
+	MatchedTokens []interface{} `json:"matched_tokens"`
 
 	// Present only for (non-array) string fields
 	Snippet string `json:"snippet"`

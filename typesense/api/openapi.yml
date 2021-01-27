@@ -1253,7 +1253,8 @@ components:
         matched_tokens:
           type: array
           items:
-            type: string
+            type: object
+            x-go-type: "interface{}"
     SearchOverrideSchema:
       type: object
       required:
