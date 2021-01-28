@@ -310,6 +310,55 @@ client.Aliases().Retrieve()
 client.Alias("companies").Delete()
 ```
 
+### Create or update a multi-way synonym
+
+```go
+	synonym := &api.SearchSynonymSchema{
+		Synonyms: []string{"blazer", "coat", "jacket"},
+	}
+	client.Collection("products").Synonyms().Upsert("coat-synonyms", synonym)
+```
+
+### Create or update a one-way synonym
+
+```go
+	synonym := &api.SearchSynonymSchema{
+		Root:     "blazer",
+		Synonyms: []string{"blazer", "coat", "jacket"},
+	}
+	client.Collection("products").Synonyms().Upsert("coat-synonyms", synonym)
+```
+
+### Retrieve a synonym
+
+```go
+client.Collection("products").Synonym("coat-synonyms").Retrieve()
+```
+
+### List all synonyms
+
+```go
+client.Collection("products").Synonyms().Retrieve()
+```
+
+### Delete a synonym
+
+```go
+client.Collection("products").Synonym("coat-synonyms").Delete()
+```
+
+### Create snapshot (for backups)
+
+```go
+client.Operations().Snapshot("/tmp/typesense-data-snapshot")
+```
+
+### Re-elect Leader
+
+```go
+client.Operations().Vote()
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/typesense/typesense-go.
