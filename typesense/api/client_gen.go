@@ -193,6 +193,12 @@ type ClientInterface interface {
 
 	// GetKey request
 	GetKey(ctx context.Context, keyId int64) (*http.Response, error)
+
+	// TakeSnapshot request
+	TakeSnapshot(ctx context.Context, params *TakeSnapshotParams) (*http.Response, error)
+
+	// Vote request
+	Vote(ctx context.Context) (*http.Response, error)
 }
 
 func (c *Client) GetAliases(ctx context.Context) (*http.Response, error) {
@@ -737,6 +743,36 @@ func (c *Client) DeleteKey(ctx context.Context, keyId int64) (*http.Response, er
 
 func (c *Client) GetKey(ctx context.Context, keyId int64) (*http.Response, error) {
 	req, err := NewGetKeyRequest(c.Server, keyId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if c.RequestEditor != nil {
+		err = c.RequestEditor(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) TakeSnapshot(ctx context.Context, params *TakeSnapshotParams) (*http.Response, error) {
+	req, err := NewTakeSnapshotRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if c.RequestEditor != nil {
+		err = c.RequestEditor(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) Vote(ctx context.Context) (*http.Response, error) {
+	req, err := NewVoteRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -2357,6 +2393,76 @@ func NewGetKeyRequest(server string, keyId int64) (*http.Request, error) {
 	return req, nil
 }
 
+// NewTakeSnapshotRequest generates requests for TakeSnapshot
+func NewTakeSnapshotRequest(server string, params *TakeSnapshotParams) (*http.Request, error) {
+	var err error
+
+	queryUrl, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	basePath := fmt.Sprintf("/operations/snapshot")
+	if basePath[0] == '/' {
+		basePath = basePath[1:]
+	}
+
+	queryUrl, err = queryUrl.Parse(basePath)
+	if err != nil {
+		return nil, err
+	}
+
+	queryValues := queryUrl.Query()
+
+	if queryFrag, err := runtime.StyleParam("form", true, "snapshot_path", params.SnapshotPath); err != nil {
+		return nil, err
+	} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+		return nil, err
+	} else {
+		for k, v := range parsed {
+			for _, v2 := range v {
+				queryValues.Add(k, v2)
+			}
+		}
+	}
+
+	queryUrl.RawQuery = queryValues.Encode()
+
+	req, err := http.NewRequest("POST", queryUrl.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewVoteRequest generates requests for Vote
+func NewVoteRequest(server string) (*http.Request, error) {
+	var err error
+
+	queryUrl, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	basePath := fmt.Sprintf("/operations/vote")
+	if basePath[0] == '/' {
+		basePath = basePath[1:]
+	}
+
+	queryUrl, err = queryUrl.Parse(basePath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryUrl.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // ClientWithResponses builds on ClientInterface to offer response payloads
 type ClientWithResponses struct {
 	ClientInterface
@@ -2489,6 +2595,12 @@ type ClientWithResponsesInterface interface {
 
 	// GetKey request
 	GetKeyWithResponse(ctx context.Context, keyId int64) (*GetKeyResponse, error)
+
+	// TakeSnapshot request
+	TakeSnapshotWithResponse(ctx context.Context, params *TakeSnapshotParams) (*TakeSnapshotResponse, error)
+
+	// Vote request
+	VoteWithResponse(ctx context.Context) (*VoteResponse, error)
 }
 
 type GetAliasesResponse struct {
@@ -3164,6 +3276,50 @@ func (r GetKeyResponse) StatusCode() int {
 	return 0
 }
 
+type TakeSnapshotResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *SuccessStatus
+}
+
+// Status returns HTTPResponse.Status
+func (r TakeSnapshotResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r TakeSnapshotResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type VoteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *SuccessStatus
+}
+
+// Status returns HTTPResponse.Status
+func (r VoteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r VoteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 // GetAliasesWithResponse request returning *GetAliasesResponse
 func (c *ClientWithResponses) GetAliasesWithResponse(ctx context.Context) (*GetAliasesResponse, error) {
 	rsp, err := c.GetAliases(ctx)
@@ -3488,6 +3644,24 @@ func (c *ClientWithResponses) GetKeyWithResponse(ctx context.Context, keyId int6
 		return nil, err
 	}
 	return ParseGetKeyResponse(rsp)
+}
+
+// TakeSnapshotWithResponse request returning *TakeSnapshotResponse
+func (c *ClientWithResponses) TakeSnapshotWithResponse(ctx context.Context, params *TakeSnapshotParams) (*TakeSnapshotResponse, error) {
+	rsp, err := c.TakeSnapshot(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+	return ParseTakeSnapshotResponse(rsp)
+}
+
+// VoteWithResponse request returning *VoteResponse
+func (c *ClientWithResponses) VoteWithResponse(ctx context.Context) (*VoteResponse, error) {
+	rsp, err := c.Vote(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return ParseVoteResponse(rsp)
 }
 
 // ParseGetAliasesResponse parses an HTTP response from a GetAliasesWithResponse call
@@ -4327,6 +4501,58 @@ func ParseGetKeyResponse(rsp *http.Response) (*GetKeyResponse, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest ApiKey
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseTakeSnapshotResponse parses an HTTP response from a TakeSnapshotWithResponse call
+func ParseTakeSnapshotResponse(rsp *http.Response) (*TakeSnapshotResponse, error) {
+	bodyBytes, err := ioutil.ReadAll(rsp.Body)
+	defer rsp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &TakeSnapshotResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest SuccessStatus
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseVoteResponse parses an HTTP response from a VoteWithResponse call
+func ParseVoteResponse(rsp *http.Response) (*VoteResponse, error) {
+	bodyBytes, err := ioutil.ReadAll(rsp.Body)
+	defer rsp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &VoteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SuccessStatus
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
