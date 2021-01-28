@@ -14,6 +14,8 @@ type CollectionInterface interface {
 	Document(documentID string) DocumentInterface
 	Overrides() OverridesInterface
 	Override(overrideID string) OverrideInterface
+	Synonyms() SynonymsInterface
+	Synonym(synonymID string) SynonymInterface
 }
 
 // collection is internal implementation of CollectionInterface
@@ -58,4 +60,12 @@ func (c *collection) Overrides() OverridesInterface {
 
 func (c *collection) Override(overrideID string) OverrideInterface {
 	return &override{apiClient: c.apiClient, collectionName: c.name, overrideID: overrideID}
+}
+
+func (c *collection) Synonyms() SynonymsInterface {
+	return &synonyms{apiClient: c.apiClient, collectionName: c.name}
+}
+
+func (c *collection) Synonym(synonymID string) SynonymInterface {
+	return &synonym{apiClient: c.apiClient, collectionName: c.name, synonymID: synonymID}
 }
