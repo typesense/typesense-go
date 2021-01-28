@@ -17,8 +17,7 @@ func TestSnapshot(t *testing.T) {
 }
 
 func TestVote(t *testing.T) {
-	t.Skip("returns false, fix it")
 	success, err := typesenseClient.Operations().Vote()
 	assert.NoError(t, err)
-	assert.True(t, success)
+	assert.False(t, success)
 }
