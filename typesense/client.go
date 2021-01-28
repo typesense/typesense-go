@@ -47,6 +47,10 @@ func (c *Client) Key(keyID int64) KeyInterface {
 	return &key{apiClient: c.apiClient, keyID: keyID}
 }
 
+func (c *Client) Operations() OperationsInterface {
+	return &operations{apiClient: c.apiClient}
+}
+
 type HTTPError struct {
 	Status int
 	Body   []byte

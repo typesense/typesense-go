@@ -591,6 +591,36 @@ func (mr *MockAPIClientInterfaceMockRecorder) GetKeyWithResponse(ctx, keyId inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKeyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetKeyWithResponse), ctx, keyId)
 }
 
+// TakeSnapshotWithResponse mocks base method
+func (m *MockAPIClientInterface) TakeSnapshotWithResponse(ctx context.Context, params *api.TakeSnapshotParams) (*api.TakeSnapshotResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TakeSnapshotWithResponse", ctx, params)
+	ret0, _ := ret[0].(*api.TakeSnapshotResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TakeSnapshotWithResponse indicates an expected call of TakeSnapshotWithResponse
+func (mr *MockAPIClientInterfaceMockRecorder) TakeSnapshotWithResponse(ctx, params interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TakeSnapshotWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).TakeSnapshotWithResponse), ctx, params)
+}
+
+// VoteWithResponse mocks base method
+func (m *MockAPIClientInterface) VoteWithResponse(ctx context.Context) (*api.VoteResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VoteWithResponse", ctx)
+	ret0, _ := ret[0].(*api.VoteResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// VoteWithResponse indicates an expected call of VoteWithResponse
+func (mr *MockAPIClientInterfaceMockRecorder) VoteWithResponse(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VoteWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).VoteWithResponse), ctx)
+}
+
 // GetAliases mocks base method
 func (m *MockAPIClientInterface) GetAliases(ctx context.Context) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -1144,4 +1174,34 @@ func (m *MockAPIClientInterface) GetKey(ctx context.Context, keyId int64) (*http
 func (mr *MockAPIClientInterfaceMockRecorder) GetKey(ctx, keyId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKey", reflect.TypeOf((*MockAPIClientInterface)(nil).GetKey), ctx, keyId)
+}
+
+// TakeSnapshot mocks base method
+func (m *MockAPIClientInterface) TakeSnapshot(ctx context.Context, params *api.TakeSnapshotParams) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TakeSnapshot", ctx, params)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TakeSnapshot indicates an expected call of TakeSnapshot
+func (mr *MockAPIClientInterfaceMockRecorder) TakeSnapshot(ctx, params interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TakeSnapshot", reflect.TypeOf((*MockAPIClientInterface)(nil).TakeSnapshot), ctx, params)
+}
+
+// Vote mocks base method
+func (m *MockAPIClientInterface) Vote(ctx context.Context) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Vote", ctx)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Vote indicates an expected call of Vote
+func (mr *MockAPIClientInterfaceMockRecorder) Vote(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Vote", reflect.TypeOf((*MockAPIClientInterface)(nil).Vote), ctx)
 }

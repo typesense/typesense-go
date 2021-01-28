@@ -214,6 +214,11 @@ type SearchSynonymsResponse struct {
 	Synonyms []*SearchSynonym `json:"synonyms"`
 }
 
+// SuccessStatus defines model for SuccessStatus.
+type SuccessStatus struct {
+	Success bool `json:"success"`
+}
+
 // UpsertAliasJSONBody defines parameters for UpsertAlias.
 type UpsertAliasJSONBody CollectionAliasSchema
 
@@ -345,6 +350,13 @@ type UpsertSearchSynonymJSONBody SearchSynonymSchema
 
 // CreateKeyJSONBody defines parameters for CreateKey.
 type CreateKeyJSONBody ApiKeySchema
+
+// TakeSnapshotParams defines parameters for TakeSnapshot.
+type TakeSnapshotParams struct {
+
+	// The directory on the server where the snapshot should be saved.
+	SnapshotPath string `json:"snapshot_path"`
+}
 
 // UpsertAliasRequestBody defines body for UpsertAlias for application/json ContentType.
 type UpsertAliasJSONRequestBody UpsertAliasJSONBody

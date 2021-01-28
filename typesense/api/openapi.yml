@@ -23,14 +23,20 @@ tags:
     description: Promote certain documents over others
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/0.17.0/api/#curation
+      url: https://typesense.org/docs/0.18.0/api/#curation
   - name: keys
     description: Manage API Keys with fine-grain access control
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/0.17.0/api/#api-keys
+      url: https://typesense.org/docs/0.18.0/api/#api-keys
   - name: debug
     description: Debugging information
+  - name: operations
+    description: Manage Typesense cluster
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/docs/0.18.0/api/#cluster-operations
+
 paths:
   /collections:
     get:
@@ -1141,6 +1147,47 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /operations/snapshot:
+    post:
+      tags:
+        - operations
+      summary: Creates a point-in-time snapshot of a Typesense node's state and data in the specified directory.
+      description:
+        Creates a point-in-time snapshot of a Typesense node's state and data in the specified directory.
+        You can then backup the snapshot directory that gets created and later restore it
+        as a data directory, as needed.
+      operationId: takeSnapshot
+      parameters:
+        - name: snapshot_path
+          in: query
+          description: The directory on the server where the snapshot should be saved.
+          required: true
+          schema:
+            type: string
+      responses:
+        201:
+          description: Snapshot is created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessStatus"
+  /operations/vote:
+    post:
+      tags:
+        - operations
+      summary: Triggers a follower node to initiate the raft voting process, which triggers leader re-election.
+      description:
+        Triggers a follower node to initiate the raft voting process, which triggers leader re-election.
+        The follower node that you run this operation against will become the new leader,
+        once this command succeeds.
+      operationId: vote
+      responses:
+        200:
+          description: Re-election is performed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessStatus"
 components:
   schemas:
     CollectionSchema:
@@ -1479,6 +1526,13 @@ components:
         - ok
       properties:
         ok:
+          type: boolean
+    SuccessStatus:
+      type: object
+      required:
+        - success
+      properties:
+        success:
           type: boolean
     ApiResponse:
       type: object
