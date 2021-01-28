@@ -411,6 +411,81 @@ func (mr *MockAPIClientInterfaceMockRecorder) UpsertSearchOverrideWithResponse(c
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchOverrideWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSearchOverrideWithResponse), ctx, collectionName, overrideId, body)
 }
 
+// GetSearchSynonymsWithResponse mocks base method
+func (m *MockAPIClientInterface) GetSearchSynonymsWithResponse(ctx context.Context, collectionName string) (*api.GetSearchSynonymsResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSearchSynonymsWithResponse", ctx, collectionName)
+	ret0, _ := ret[0].(*api.GetSearchSynonymsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSearchSynonymsWithResponse indicates an expected call of GetSearchSynonymsWithResponse
+func (mr *MockAPIClientInterfaceMockRecorder) GetSearchSynonymsWithResponse(ctx, collectionName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchSynonymsWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetSearchSynonymsWithResponse), ctx, collectionName)
+}
+
+// DeleteSearchSynonymWithResponse mocks base method
+func (m *MockAPIClientInterface) DeleteSearchSynonymWithResponse(ctx context.Context, collectionName, synonymId string) (*api.DeleteSearchSynonymResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteSearchSynonymWithResponse", ctx, collectionName, synonymId)
+	ret0, _ := ret[0].(*api.DeleteSearchSynonymResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteSearchSynonymWithResponse indicates an expected call of DeleteSearchSynonymWithResponse
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteSearchSynonymWithResponse(ctx, collectionName, synonymId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSearchSynonymWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteSearchSynonymWithResponse), ctx, collectionName, synonymId)
+}
+
+// GetSearchSynonymWithResponse mocks base method
+func (m *MockAPIClientInterface) GetSearchSynonymWithResponse(ctx context.Context, collectionName, synonymId string) (*api.GetSearchSynonymResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSearchSynonymWithResponse", ctx, collectionName, synonymId)
+	ret0, _ := ret[0].(*api.GetSearchSynonymResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSearchSynonymWithResponse indicates an expected call of GetSearchSynonymWithResponse
+func (mr *MockAPIClientInterfaceMockRecorder) GetSearchSynonymWithResponse(ctx, collectionName, synonymId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchSynonymWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetSearchSynonymWithResponse), ctx, collectionName, synonymId)
+}
+
+// UpsertSearchSynonymWithBodyWithResponse mocks base method
+func (m *MockAPIClientInterface) UpsertSearchSynonymWithBodyWithResponse(ctx context.Context, collectionName, synonymId, contentType string, body io.Reader) (*api.UpsertSearchSynonymResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpsertSearchSynonymWithBodyWithResponse", ctx, collectionName, synonymId, contentType, body)
+	ret0, _ := ret[0].(*api.UpsertSearchSynonymResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpsertSearchSynonymWithBodyWithResponse indicates an expected call of UpsertSearchSynonymWithBodyWithResponse
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertSearchSynonymWithBodyWithResponse(ctx, collectionName, synonymId, contentType, body interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchSynonymWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSearchSynonymWithBodyWithResponse), ctx, collectionName, synonymId, contentType, body)
+}
+
+// UpsertSearchSynonymWithResponse mocks base method
+func (m *MockAPIClientInterface) UpsertSearchSynonymWithResponse(ctx context.Context, collectionName, synonymId string, body api.UpsertSearchSynonymJSONRequestBody) (*api.UpsertSearchSynonymResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpsertSearchSynonymWithResponse", ctx, collectionName, synonymId, body)
+	ret0, _ := ret[0].(*api.UpsertSearchSynonymResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpsertSearchSynonymWithResponse indicates an expected call of UpsertSearchSynonymWithResponse
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertSearchSynonymWithResponse(ctx, collectionName, synonymId, body interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchSynonymWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSearchSynonymWithResponse), ctx, collectionName, synonymId, body)
+}
+
 // DebugWithResponse mocks base method
 func (m *MockAPIClientInterface) DebugWithResponse(ctx context.Context) (*api.DebugResponse, error) {
 	m.ctrl.T.Helper()
@@ -889,6 +964,81 @@ func (m *MockAPIClientInterface) UpsertSearchOverride(ctx context.Context, colle
 func (mr *MockAPIClientInterfaceMockRecorder) UpsertSearchOverride(ctx, collectionName, overrideId, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchOverride", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSearchOverride), ctx, collectionName, overrideId, body)
+}
+
+// GetSearchSynonyms mocks base method
+func (m *MockAPIClientInterface) GetSearchSynonyms(ctx context.Context, collectionName string) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSearchSynonyms", ctx, collectionName)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSearchSynonyms indicates an expected call of GetSearchSynonyms
+func (mr *MockAPIClientInterfaceMockRecorder) GetSearchSynonyms(ctx, collectionName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchSynonyms", reflect.TypeOf((*MockAPIClientInterface)(nil).GetSearchSynonyms), ctx, collectionName)
+}
+
+// DeleteSearchSynonym mocks base method
+func (m *MockAPIClientInterface) DeleteSearchSynonym(ctx context.Context, collectionName, synonymId string) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteSearchSynonym", ctx, collectionName, synonymId)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteSearchSynonym indicates an expected call of DeleteSearchSynonym
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteSearchSynonym(ctx, collectionName, synonymId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSearchSynonym", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteSearchSynonym), ctx, collectionName, synonymId)
+}
+
+// GetSearchSynonym mocks base method
+func (m *MockAPIClientInterface) GetSearchSynonym(ctx context.Context, collectionName, synonymId string) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSearchSynonym", ctx, collectionName, synonymId)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSearchSynonym indicates an expected call of GetSearchSynonym
+func (mr *MockAPIClientInterfaceMockRecorder) GetSearchSynonym(ctx, collectionName, synonymId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchSynonym", reflect.TypeOf((*MockAPIClientInterface)(nil).GetSearchSynonym), ctx, collectionName, synonymId)
+}
+
+// UpsertSearchSynonymWithBody mocks base method
+func (m *MockAPIClientInterface) UpsertSearchSynonymWithBody(ctx context.Context, collectionName, synonymId, contentType string, body io.Reader) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpsertSearchSynonymWithBody", ctx, collectionName, synonymId, contentType, body)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpsertSearchSynonymWithBody indicates an expected call of UpsertSearchSynonymWithBody
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertSearchSynonymWithBody(ctx, collectionName, synonymId, contentType, body interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchSynonymWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSearchSynonymWithBody), ctx, collectionName, synonymId, contentType, body)
+}
+
+// UpsertSearchSynonym mocks base method
+func (m *MockAPIClientInterface) UpsertSearchSynonym(ctx context.Context, collectionName, synonymId string, body api.UpsertSearchSynonymJSONRequestBody) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpsertSearchSynonym", ctx, collectionName, synonymId, body)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpsertSearchSynonym indicates an expected call of UpsertSearchSynonym
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertSearchSynonym(ctx, collectionName, synonymId, body interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchSynonym", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSearchSynonym), ctx, collectionName, synonymId, body)
 }
 
 // Debug mocks base method

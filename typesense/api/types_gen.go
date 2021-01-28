@@ -191,6 +191,29 @@ type SearchResultHit struct {
 	Highlights []SearchHighlight `json:"highlights"`
 }
 
+// SearchSynonym defines model for SearchSynonym.
+type SearchSynonym struct {
+	// Embedded struct due to allOf(#/components/schemas/SearchSynonymSchema)
+	SearchSynonymSchema
+	// Embedded fields due to inline allOf schema
+	Id string `json:"id"`
+}
+
+// SearchSynonymSchema defines model for SearchSynonymSchema.
+type SearchSynonymSchema struct {
+
+	// For 1-way synonyms, indicates the root word that words in the `synonyms` parameter map to.
+	Root string `json:"root"`
+
+	// Array of words that should be considered as synonyms.
+	Synonyms []string `json:"synonyms"`
+}
+
+// SearchSynonymsResponse defines model for SearchSynonymsResponse.
+type SearchSynonymsResponse struct {
+	Synonyms []*SearchSynonym `json:"synonyms"`
+}
+
 // UpsertAliasJSONBody defines parameters for UpsertAlias.
 type UpsertAliasJSONBody CollectionAliasSchema
 
@@ -317,6 +340,9 @@ type UpdateDocumentJSONBody interface{}
 // UpsertSearchOverrideJSONBody defines parameters for UpsertSearchOverride.
 type UpsertSearchOverrideJSONBody SearchOverrideSchema
 
+// UpsertSearchSynonymJSONBody defines parameters for UpsertSearchSynonym.
+type UpsertSearchSynonymJSONBody SearchSynonymSchema
+
 // CreateKeyJSONBody defines parameters for CreateKey.
 type CreateKeyJSONBody ApiKeySchema
 
@@ -334,6 +360,9 @@ type UpdateDocumentJSONRequestBody UpdateDocumentJSONBody
 
 // UpsertSearchOverrideRequestBody defines body for UpsertSearchOverride for application/json ContentType.
 type UpsertSearchOverrideJSONRequestBody UpsertSearchOverrideJSONBody
+
+// UpsertSearchSynonymRequestBody defines body for UpsertSearchSynonym for application/json ContentType.
+type UpsertSearchSynonymJSONRequestBody UpsertSearchSynonymJSONBody
 
 // CreateKeyRequestBody defines body for CreateKey for application/json ContentType.
 type CreateKeyJSONRequestBody CreateKeyJSONBody

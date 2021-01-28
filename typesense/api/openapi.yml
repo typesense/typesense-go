@@ -625,6 +625,111 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SearchOverride"
+  /collections/{collectionName}/synonyms:
+    get:
+      tags:
+        - documents
+      summary: List all collection synonyms
+      operationId: getSearchSynonyms
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of all search synonyms
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchSynonymsResponse"
+  /collections/{collectionName}/synonyms/{synonymId}:
+    get:
+      tags:
+        - documents
+      summary: Retrieve a single search synonym
+      description: Retrieve the details of a search synonym, given its id.
+      operationId: getSearchSynonym
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection
+          required: true
+          schema:
+            type: string
+        - name: synonymId
+          in: path
+          description: The id of the search synonym
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Search synonym fetched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchSynonym"
+    put:
+      tags:
+        - documents
+      summary: Create or update a synonym
+      description: Create or update a synonym  to define search terms that should be considered equivalent.
+      operationId: upsertSearchSynonym
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection
+          required: true
+          schema:
+            type: string
+        - name: synonymId
+          in: path
+          description: The ID of the search synonym to create/update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The search synonym object to be created/updated
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchSynonymSchema"
+        required: true
+      responses:
+        200:
+          description: Created/updated search synonym
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchSynonym"
+    delete:
+      tags:
+        - documents
+      summary: Delete a synonym associated with a collection
+      operationId: deleteSearchSynonym
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection
+          required: true
+          schema:
+            type: string
+        - name: synonymId
+          in: path
+          description: The ID of the search synonym to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: The ID of the deleted search synonym
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchSynonym"
   /collections/{collectionName}/documents/export:
     get:
       tags:
@@ -1334,6 +1439,40 @@ components:
           x-go-type: "[]*SearchOverride"
           items:
             $ref: "#/components/schemas/SearchOverride"
+    SearchSynonymSchema:
+      type: object
+      required:
+        - root #only for codegen
+        - synonyms
+      properties:
+        root:
+          type: string
+          description: For 1-way synonyms, indicates the root word that words in the `synonyms` parameter map to.
+        synonyms:
+          type: array
+          description: Array of words that should be considered as synonyms.
+          items:
+            type: string
+    SearchSynonym:
+      allOf:
+        - $ref: "#/components/schemas/SearchSynonymSchema"
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+              readOnly: true
+    SearchSynonymsResponse:
+      type: object
+      required:
+        - synonyms
+      properties:
+        synonyms:
+          type: array
+          x-go-type: "[]*SearchSynonym"
+          items:
+            $ref: "#/components/schemas/SearchSynonym"
     HealthStatus:
       type: object
       required:

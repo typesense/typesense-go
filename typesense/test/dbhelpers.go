@@ -164,6 +164,31 @@ func newSearchOverride(overrideID string, opts ...newSearchOverrideSchemaOption)
 	}
 }
 
+type newSynonymOption func(*api.SearchSynonymSchema)
+
+func withSynonyms(synonyms ...string) newSynonymOption {
+	return func(s *api.SearchSynonymSchema) {
+		s.Synonyms = synonyms
+	}
+}
+
+func newSearchSynonymSchema(opts ...newSynonymOption) *api.SearchSynonymSchema {
+	schema := &api.SearchSynonymSchema{
+		Synonyms: []string{"blazer", "coat", "jacket"},
+	}
+	for _, opt := range opts {
+		opt(schema)
+	}
+	return schema
+}
+
+func newSearchSynonym(synonymID string, opts ...newSynonymOption) *api.SearchSynonym {
+	return &api.SearchSynonym{
+		SearchSynonymSchema: *newSearchSynonymSchema(opts...),
+		Id:                  synonymID,
+	}
+}
+
 func newCollectionAlias(collectionName string, name string) *api.CollectionAlias {
 	return &api.CollectionAlias{
 		CollectionName: collectionName,
