@@ -6,7 +6,7 @@ require (
 	github.com/deepmap/oapi-codegen v1.5.1
 	github.com/golang/mock v1.5.0
 	github.com/google/uuid v1.2.0
-	github.com/jinzhu/copier v0.1.0
+	github.com/jinzhu/copier v0.2.5
 	github.com/kr/text v0.2.0 // indirect
 	github.com/sony/gobreaker v0.4.1
 	github.com/stretchr/testify v1.7.0
