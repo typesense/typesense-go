@@ -16,7 +16,7 @@ steps:
       - cd / && go get -u github.com/mgechev/revive@v1.0.2 && cd -
       - revive -config .revive.toml -formatter friendly ./...
 
-  - name: test
+  - name: test & build
     image: golang:1.15-alpine
     environment:
       CGO_ENABLED: "0"
@@ -24,15 +24,11 @@ steps:
       TYPESENSE_API_KEY: "test_key"
     commands:
       - go test ./... -tags=integration -v -cover
-
-  - name: build
-    image: golang:1.15-alpine
-    commands:
       - go build ./...
 
 services:
   - name: db
-    image: typesense/typesense:0.18.0
+    image: typesense/typesense:0.20.0
     commands:
       - /opt/typesense-server --data-dir=/tmp --api-key=test_key
 
