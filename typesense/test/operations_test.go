@@ -9,7 +9,6 @@ import (
 )
 
 func TestSnapshot(t *testing.T) {
-	t.Skip("snapshot blocks other write operations, fix it")
 	snapshotPath := newUUIDName("/tmp/typesense-data-snapshot")
 	success, err := typesenseClient.Operations().Snapshot(snapshotPath)
 	assert.NoError(t, err)

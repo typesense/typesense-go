@@ -5,35 +5,36 @@
 package mocks
 
 import (
-	gomock "github.com/golang/mock/gomock"
 	http "net/http"
 	reflect "reflect"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
-// MockHTTPRequestDoer is a mock of HTTPRequestDoer interface
+// MockHTTPRequestDoer is a mock of HTTPRequestDoer interface.
 type MockHTTPRequestDoer struct {
 	ctrl     *gomock.Controller
 	recorder *MockHTTPRequestDoerMockRecorder
 }
 
-// MockHTTPRequestDoerMockRecorder is the mock recorder for MockHTTPRequestDoer
+// MockHTTPRequestDoerMockRecorder is the mock recorder for MockHTTPRequestDoer.
 type MockHTTPRequestDoerMockRecorder struct {
 	mock *MockHTTPRequestDoer
 }
 
-// NewMockHTTPRequestDoer creates a new mock instance
+// NewMockHTTPRequestDoer creates a new mock instance.
 func NewMockHTTPRequestDoer(ctrl *gomock.Controller) *MockHTTPRequestDoer {
 	mock := &MockHTTPRequestDoer{ctrl: ctrl}
 	mock.recorder = &MockHTTPRequestDoerMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockHTTPRequestDoer) EXPECT() *MockHTTPRequestDoerMockRecorder {
 	return m.recorder
 }
 
-// Do mocks base method
+// Do mocks base method.
 func (m *MockHTTPRequestDoer) Do(req *http.Request) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Do", req)
@@ -42,36 +43,36 @@ func (m *MockHTTPRequestDoer) Do(req *http.Request) (*http.Response, error) {
 	return ret0, ret1
 }
 
-// Do indicates an expected call of Do
+// Do indicates an expected call of Do.
 func (mr *MockHTTPRequestDoerMockRecorder) Do(req interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockHTTPRequestDoer)(nil).Do), req)
 }
 
-// MockBreaker is a mock of Breaker interface
+// MockBreaker is a mock of Breaker interface.
 type MockBreaker struct {
 	ctrl     *gomock.Controller
 	recorder *MockBreakerMockRecorder
 }
 
-// MockBreakerMockRecorder is the mock recorder for MockBreaker
+// MockBreakerMockRecorder is the mock recorder for MockBreaker.
 type MockBreakerMockRecorder struct {
 	mock *MockBreaker
 }
 
-// NewMockBreaker creates a new mock instance
+// NewMockBreaker creates a new mock instance.
 func NewMockBreaker(ctrl *gomock.Controller) *MockBreaker {
 	mock := &MockBreaker{ctrl: ctrl}
 	mock.recorder = &MockBreakerMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockBreaker) EXPECT() *MockBreakerMockRecorder {
 	return m.recorder
 }
 
-// Execute mocks base method
+// Execute mocks base method.
 func (m *MockBreaker) Execute(req func() error) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Execute", req)
@@ -79,7 +80,7 @@ func (m *MockBreaker) Execute(req func() error) error {
 	return ret0
 }
 
-// Execute indicates an expected call of Execute
+// Execute indicates an expected call of Execute.
 func (mr *MockBreakerMockRecorder) Execute(req interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Execute", reflect.TypeOf((*MockBreaker)(nil).Execute), req)
