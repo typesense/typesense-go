@@ -9,6 +9,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/stretchr/testify/assert"
 	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"github.com/typesense/typesense-go/typesense/mocks"
 )
 
@@ -17,17 +18,25 @@ func createNewSchema(collectionName string) *api.CollectionSchema {
 		Name: collectionName,
 		Fields: []api.Field{
 			{
-				Name: "company_name",
-				Type: "string",
+				Name:  "company_name",
+				Type:  "string",
+				Index: pointer.True(),
 			},
 			{
-				Name: "num_employees",
-				Type: "int32",
+				Name:  "num_employees",
+				Type:  "int32",
+				Index: pointer.True(),
 			},
 			{
 				Name:  "country",
 				Type:  "string",
 				Facet: true,
+				Index: pointer.True(),
+			},
+			{
+				Name:  "url",
+				Type:  "string",
+				Index: pointer.False(),
 			},
 		},
 		DefaultSortingField: "num_employees",

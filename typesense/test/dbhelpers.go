@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 )
 
 func newUUIDName(namePrefix string) string {
@@ -22,17 +23,20 @@ func newSchema(collectionName string) *api.CollectionSchema {
 		Name: collectionName,
 		Fields: []api.Field{
 			{
-				Name: "company_name",
-				Type: "string",
+				Name:  "company_name",
+				Type:  "string",
+				Index: pointer.True(),
 			},
 			{
-				Name: "num_employees",
-				Type: "int32",
+				Name:  "num_employees",
+				Type:  "int32",
+				Index: pointer.True(),
 			},
 			{
 				Name:  "country",
 				Type:  "string",
 				Facet: true,
+				Index: pointer.True(),
 			},
 		},
 		DefaultSortingField: "num_employees",
