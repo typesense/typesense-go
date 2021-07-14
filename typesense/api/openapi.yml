@@ -1268,6 +1268,9 @@ components:
           type: boolean
           example: false
           default: false
+        index:
+          type: boolean
+          example: false
     CollectionAliasSchema:
       type: object
       required:
