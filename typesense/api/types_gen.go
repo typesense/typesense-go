@@ -183,7 +183,7 @@ type SearchResult struct {
 	Page int `json:"page"`
 
 	// The number of milliseconds the search took
-	TookMs int `json:"took_ms"`
+	SearchTimeMs int `json:"search_time_ms"`
 }
 
 // SearchResultHit defines model for SearchResultHit.
@@ -194,6 +194,8 @@ type SearchResultHit struct {
 
 	// Contains highlighted portions of the search fields
 	Highlights []SearchHighlight `json:"highlights"`
+
+	TextMatch int64 `json:"text_match"`
 }
 
 // SearchSynonym defines model for SearchSynonym.

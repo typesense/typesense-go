@@ -28,7 +28,7 @@ steps:
 
 services:
   - name: db
-    image: typesense/typesense:0.20.0
+    image: typesense/typesense:0.21.0
     commands:
       - /opt/typesense-server --data-dir=/tmp --api-key=test_key
 

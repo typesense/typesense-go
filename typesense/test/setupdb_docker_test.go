@@ -25,7 +25,7 @@ func setupDB() (client *typesense.Client, err error) {
 
 	testAPIKey := "abcdef"
 	req := testcontainers.ContainerRequest{
-		Image:        "typesense/typesense:0.20.0",
+		Image:        "typesense/typesense:0.21.0",
 		ExposedPorts: []string{"8108/tcp"},
 		AutoRemove:   false,
 		Cmd: []string{"--data-dir", "/tmp",
