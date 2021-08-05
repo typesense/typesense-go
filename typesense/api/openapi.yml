@@ -1309,7 +1309,7 @@ components:
         - grouped_hits
         - hits
         - found
-        - took_ms
+        - search_time_ms
         - page
       properties:
         facet_counts:
@@ -1319,7 +1319,7 @@ components:
         found:
           type: integer
           description: The number of documents found
-        took_ms:
+        search_time_ms:
           type: integer
           description: The number of milliseconds the search took
         page:
