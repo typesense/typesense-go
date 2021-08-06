@@ -35,9 +35,9 @@ func newSearchParams() *api.SearchCollectionParams {
 
 func newSearchResult() *api.SearchResult {
 	return &api.SearchResult{
-		Found:       1,
-		TookMs:      1,
-		FacetCounts: []int{},
+		Found:        1,
+		SearchTimeMs: 1,
+		FacetCounts:  []int{},
 		Hits: []api.SearchResultHit{
 			{
 				Highlights: []api.SearchHighlight{
@@ -62,7 +62,7 @@ func TestSearchResultDeserialization(t *testing.T) {
 	inputJSON := `{
 		"facet_counts": [],
 		"found": 1,
-		"took_ms": 1,
+		"search_time_ms": 1,
 		"hits": [
 		  {
 			"highlights": [
@@ -82,9 +82,9 @@ func TestSearchResultDeserialization(t *testing.T) {
 		]
 	  }`
 	expected := &api.SearchResult{
-		Found:       1,
-		TookMs:      1,
-		FacetCounts: []int{},
+		Found:        1,
+		SearchTimeMs: 1,
+		FacetCounts:  []int{},
 		Hits: []api.SearchResultHit{
 			{
 				Highlights: []api.SearchHighlight{
