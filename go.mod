@@ -3,7 +3,7 @@ module github.com/typesense/typesense-go
 go 1.15
 
 require (
-	github.com/deepmap/oapi-codegen v1.7.1
+	github.com/deepmap/oapi-codegen v1.8.2
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.0
 	github.com/jinzhu/copier v0.3.2
