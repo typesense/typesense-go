@@ -1354,6 +1354,7 @@ components:
       required:
         - document
         - highlights
+        - text_match
       properties:
         highlights:
           type: array
@@ -1363,6 +1364,10 @@ components:
         document:
           type: object
           description: Can be any key-value pair
+        text_match:
+          type: integer
+          format: int64
+          description: text_match score
       example:
         highlights:
           company_name:
