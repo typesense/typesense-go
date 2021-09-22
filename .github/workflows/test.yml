@@ -1,0 +1,31 @@
+name: Test
+
+on: [push, pull_request]
+
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    container: golangci/golangci-lint:v1.33-alpine
+    env:
+      GO111MODULE: "on"
+    steps:
+      - uses: actions/checkout@v2
+      - name: lint
+        run: |
+          golangci-lint run -v \
+          cd / && go get -u github.com/mgechev/revive@v1.0.2 && cd - \
+          revive -config .revive.toml -formatter friendly ./...
+  test:
+    runs-on: ubuntu-latest
+    container: golangci/golangci-lint:v1.35-alpine
+    env:
+      CGO_ENABLED: "0"
+      TYPESENSE_URL: "http://db:8108"
+      TYPESENSE_API_KEY: "test_key"
+    steps:
+      - uses: actions/checkout@v2
+      - name: lint
+        run: |
+          go test ./... -tags=integration -v -cover \
+          go build ./...
