@@ -115,8 +115,7 @@ func TestCollectionSearch(t *testing.T) {
 	expectedParams := newSearchParams()
 	expectedParams.Q = url.QueryEscape(expectedParams.Q)
 	if expectedParams.FilterBy != nil {
-		escapedFilterBy := url.QueryEscape(*expectedParams.FilterBy)
-		expectedParams.FilterBy = &escapedFilterBy
+		expectedParams.FilterBy = pointer.String(url.QueryEscape(*expectedParams.FilterBy))
 	}
 	expectedResult := newSearchResult()
 
@@ -144,8 +143,7 @@ func TestCollectionSearchOnApiClientErrorReturnsError(t *testing.T) {
 	expectedParams := newSearchParams()
 	expectedParams.Q = url.QueryEscape(expectedParams.Q)
 	if expectedParams.FilterBy != nil {
-		escapedFilterBy := url.QueryEscape(*expectedParams.FilterBy)
-		expectedParams.FilterBy = &escapedFilterBy
+		expectedParams.FilterBy = pointer.String(url.QueryEscape(*expectedParams.FilterBy))
 	}
 
 	ctrl := gomock.NewController(t)
@@ -167,8 +165,7 @@ func TestCollectionSearchOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	expectedParams := newSearchParams()
 	expectedParams.Q = url.QueryEscape(expectedParams.Q)
 	if expectedParams.FilterBy != nil {
-		escapedFilterBy := url.QueryEscape(*expectedParams.FilterBy)
-		expectedParams.FilterBy = &escapedFilterBy
+		expectedParams.FilterBy = pointer.String(url.QueryEscape(*expectedParams.FilterBy))
 	}
 
 	ctrl := gomock.NewController(t)
