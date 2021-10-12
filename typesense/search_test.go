@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -112,6 +113,11 @@ func TestSearchResultDeserialization(t *testing.T) {
 
 func TestCollectionSearch(t *testing.T) {
 	expectedParams := newSearchParams()
+	expectedParams.Q = url.QueryEscape(expectedParams.Q)
+	if expectedParams.FilterBy != nil {
+		escapedFilterBy := url.QueryEscape(*expectedParams.FilterBy)
+		expectedParams.FilterBy = &escapedFilterBy
+	}
 	expectedResult := newSearchResult()
 
 	ctrl := gomock.NewController(t)
@@ -136,6 +142,11 @@ func TestCollectionSearch(t *testing.T) {
 
 func TestCollectionSearchOnApiClientErrorReturnsError(t *testing.T) {
 	expectedParams := newSearchParams()
+	expectedParams.Q = url.QueryEscape(expectedParams.Q)
+	if expectedParams.FilterBy != nil {
+		escapedFilterBy := url.QueryEscape(*expectedParams.FilterBy)
+		expectedParams.FilterBy = &escapedFilterBy
+	}
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -154,6 +165,11 @@ func TestCollectionSearchOnApiClientErrorReturnsError(t *testing.T) {
 
 func TestCollectionSearchOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	expectedParams := newSearchParams()
+	expectedParams.Q = url.QueryEscape(expectedParams.Q)
+	if expectedParams.FilterBy != nil {
+		escapedFilterBy := url.QueryEscape(*expectedParams.FilterBy)
+		expectedParams.FilterBy = &escapedFilterBy
+	}
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
