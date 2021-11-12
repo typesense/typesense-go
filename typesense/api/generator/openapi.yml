@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Typesense API
   description: "An open source search engine for building delightful search experiences."
-  version: 0.17.0
+  version: 0.21.0
 externalDocs:
   description: Find out more about Typsesense
   url: https://typesense.org
@@ -23,19 +23,19 @@ tags:
     description: Promote certain documents over others
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/0.18.0/api/#curation
+      url: https://typesense.org/docs/0.21.0/api/#curation
   - name: keys
     description: Manage API Keys with fine-grain access control
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/0.18.0/api/#api-keys
+      url: https://typesense.org/docs/0.21.0/api/#api-keys
   - name: debug
     description: Debugging information
   - name: operations
     description: Manage Typesense cluster
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/0.18.0/api/#cluster-operations
+      url: https://typesense.org/docs/0.21.0/api/#cluster-operations
 
 paths:
   /collections:
@@ -55,9 +55,9 @@ paths:
             application/json:
               schema:
                 type: array
-                x-go-type: "[]*Collection"
+                x-go-type: "[]*CollectionResponse"
                 items:
-                  $ref: "#/components/schemas/Collection"
+                  $ref: "#/components/schemas/CollectionResponse"
     post:
       tags:
         - collections
@@ -79,7 +79,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Collection"
+                $ref: "#/components/schemas/CollectionResponse"
         409:
           description: Collection already exists
           content:
@@ -106,7 +106,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Collection"
+                $ref: "#/components/schemas/CollectionResponse"
         404:
           description: Collection not found
           content:
@@ -134,7 +134,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Collection"
+                $ref: "#/components/schemas/CollectionResponse"
         404:
           description: Collection not found
           content:
@@ -205,24 +205,20 @@ paths:
           required: true
           schema:
             type: string
-        - name: filter_by
+        - name: deleteDocumentsParameters
           in: query
-          description:
-            Filter conditions for refining your documents to delete. Separate
-            multiple conditions with &&.
           schema:
-            type: string
-            example: "num_employees:>100 && country: [USA, UK]"
-          required: true
-        - name: batch_size
-          in: query
-          description:
-            Batch size parameter controls the number of documents that should be deleted
-            at a time. A larger value will speed up deletions, but will impact performance
-            of other operations running on the server.
-          required: true
-          schema:
-            type: integer
+            type: object
+            properties:
+              filter_by:
+                type: string
+                example: "num_employees:>100 && country: [USA, UK]"
+              batch_size:
+                description:
+                  Batch size parameter controls the number of documents that should be deleted
+                  at a time. A larger value will speed up deletions, but will impact performance
+                  of other operations running on the server.
+                type: integer
       responses:
         200:
           description: Documents successfully deleted
@@ -255,252 +251,297 @@ paths:
           required: true
           schema:
             type: string
-        - name: q
-          in: query
-          description: The query text to search for in the collection.
-            Use * as the search string to return all documents.
-            This is typically useful when used in conjunction with filter_by.
+        - name: searchParameters
           required: true
-          schema:
-            type: string
-        - name: query_by
           in: query
-          description: A list of `string` fields that should be queried
-            against. Multiple fields are separated with a comma.
-          required: true
-          style: form
-          explode: false
           schema:
-            type: array
-            items:
-              type: string
-        - name: query_by_weights
-          in: query
-          description:
-            The relative weight to give each `query_by` field when ranking results.
-            This can be used to boost fields in priority, when looking for matches.
-            Multiple fields are separated with a comma.
-          style: form
-          explode: false
-          schema:
-            type: array
-            items:
-              type: string
-        - name: max_hits
-          in: query
-          description: >
-            Maximum number of hits returned. Increasing this value might
-            increase search latency. Default: 500. Use `all` to return all hits found.
-          schema:
-            oneOf:
-              - type: integer
-                example: 500
-              - type: string
-                example: all
-                enum:
-                  - all
-        - name: prefix
-          in: query
-          description:
-            Boolean field to indicate that the last word in the query should
-            be treated as a prefix, and not as a whole word. This is used for building
-            autocomplete and instant search interfaces. Defaults to true.
-          schema:
-            type: boolean
-        - name: filter_by
-          in: query
-          description:
-            Filter conditions for refining your search results. Separate
-            multiple conditions with &&.
-          schema:
-            type: string
-            example: "num_employees:>100 && country: [USA, UK]"
-        - name: sort_by
-          in: query
-          description:
-            A list of numerical fields and their corresponding sort orders
-            that will be used for ordering your results.
-            Up to 3 sort fields can be specified.
-            The text similarity score is exposed as a special `_text_match` field that
-            you can use in the list of sorting fields.
-            If no `sort_by` parameter is specified, results are sorted by
-            `_text_match:desc,default_sorting_field:desc`
-          style: form
-          explode: false
-          schema:
-            type: array
-            items:
-              type: string
-              example: num_employees:desc
-        - name: facet_by
-          in: query
-          description:
-            A list of fields that will be used for faceting your results
-            on. Separate multiple fields with a comma.
-          style: form
-          explode: false
-          schema:
-            type: array
-            items:
-              type: string
-        - name: max_facet_values
-          in: query
-          description: Maximum number of facet values to be returned.
-          schema:
-            type: integer
-        - name: facet_query
-          in: query
-          description:
-            Facet values that are returned can now be filtered via this parameter.
-            The matching facet text is also highlighted. For example, when faceting
-            by `category`, you can set `facet_query=category:shoe` to return only
-            facet values that contain the prefix "shoe".
-          schema:
-            type: string
-        - name: num_typos
-          in: query
-          description: >
-            The number of typographical errors (1 or 2) that would be tolerated.
-            Default: 2
-          schema:
-            type: integer
-        - name: page
-          in: query
-          description: Results from this specific page number would be fetched.
-          schema:
-            type: integer
-        - name: per_page
-          in: query
-          description: "Number of results to fetch per page. Default: 10"
-          schema:
-            type: integer
-        - name: group_by
-          in: query
-          description:
-            You can aggregate search results into groups or buckets by specify
-            one or more `group_by` fields. Separate multiple fields with a comma.
-            To group on a particular field, it must be a faceted field.
-          style: form
-          explode: false
-          schema:
-            type: array
-            items:
-              type: string
-        - name: group_limit
-          in: query
-          description: >
-            Maximum number of hits to be returned for every group. If the `group_limit` is
-            set as `K` then only the top K hits in each group are returned in the response.
-            Default: 3
-          schema:
-            type: integer
-        - name: include_fields
-          in: query
-          description: List of fields from the document to include in the search result
-          style: form
-          explode: false
-          schema:
-            type: array
-            items:
-              type: string
-        - name: exclude_fields
-          in: query
-          description: List of fields from the document to exclude in the search result
-          style: form
-          explode: false
-          schema:
-            type: array
-            items:
-              type: string
-        - name: highlight_full_fields
-          in: query
-          description: List of fields which should be highlighted fully without snippeting
-          style: form
-          explode: false
-          schema:
-            type: array
-            items:
-              type: string
-        - name: highlight_affix_num_tokens
-          in: query
-          description: >
-            The number of tokens that should surround the highlighted text on each side.
-            Default: 4
-          schema:
-            type: integer
-        - name: highlight_start_tag
-          in: query
-          description: >
-            The start tag used for the highlighted snippets.
-            Default: `<mark>`
-          schema:
-            type: string
-        - name: highlight_end_tag
-          in: query
-          description: >
-            The end tag used for the highlighted snippets.
-            Default: `</mark>`
-          schema:
-            type: string
-        - name: snippet_threshold
-          in: query
-          description: >
-            Field values under this length will be fully highlighted, instead of showing
-            a snippet of relevant portion. Default: 30
-          schema:
-            type: integer
-        - name: drop_tokens_threshold
-          in: query
-          description: >
-            If the number of results found for a specific query is less than
-            this number, Typesense will attempt to drop the tokens in the query until
-            enough results are found. Tokens that have the least individual hits
-            are dropped first. Set to 0 to disable. Default: 10
-          schema:
-            type: integer
-        - name: typo_tokens_threshold
-          in: query
-          description: >
-            If the number of results found for a specific query is less than this number,
-            Typesense will attempt to look for tokens with more typos until
-            enough results are found. Default: 100
-          schema:
-            type: integer
-        - name: pinned_hits
-          in: query
-          description: >
-            A list of records to unconditionally include in the search results
-            at specific positions. An example use case would be to feature or promote
-            certain items on the top of search results.
-            A list of `record_id:hit_position`. Eg: to include a record with ID 123
-            at Position 1 and another record with ID 456 at Position 5,
-            you'd specify `123:1,456:5`.
+            type: object
+            required:
+              - q
+              - query_by
+              - query_by_weights # only for codegen
+              - sort_by # only for codegen
+              - facet_by # only for codegen
+              - group_by # only for codegen
+              - include_fields # only for codegen
+              - exclude_fields # only for codegen
+              - hidden_hits # only for codegen
+              - highlight_full_fields # only for codegen
+              - pinned_hits # only for codegen
+              - prefix # only for codegen
+              
+            properties:
+              q:
+                description: The query text to search for in the collection.
+                  Use * as the search string to return all documents.
+                  This is typically useful when used in conjunction with filter_by.
+                type: string
+                
+                
+              query_by:
+                description: A list of `string` fields that should be queried
+                  against. Multiple fields are separated with a comma.
+                type: array
+                items:
+                  type: string
+                default: []
+                
+                
+              query_by_weights:
+                description:
+                  The relative weight to give each `query_by` field when ranking results.
+                  This can be used to boost fields in priority, when looking for matches.
+                  Multiple fields are separated with a comma.
+                type: array
+                items:
+                  type: string
+                default: []
+                
+              max_hits:
+                description: >
+                  Maximum number of hits returned. Increasing this value might
+                  increase search latency. Default: 500. Use `all` to return all hits found.
+                oneOf:
+                  - type: integer
+                    example: 500
+                  - type: string
+                    example: all
+                    enum:
+                      - all
+                      
+              prefix:
+                description:
+                  Boolean field to indicate that the last word in the query should
+                  be treated as a prefix, and not as a whole word. This is used for building
+                  autocomplete and instant search interfaces. Defaults to true.
+                type: array
+                items:
+                  type: boolean
+                default: []
+                
+              filter_by:
+                description:
+                  Filter conditions for refining your search results. Separate
+                  multiple conditions with &&.
+                type: string
+                example: "num_employees:>100 && country: [USA, UK]"
+                
+              sort_by:
+                description:
+                  A list of numerical fields and their corresponding sort orders
+                  that will be used for ordering your results.
+                  Up to 3 sort fields can be specified.
+                  The text similarity score is exposed as a special `_text_match` field that
+                  you can use in the list of sorting fields.
+                  If no `sort_by` parameter is specified, results are sorted by
+                  `_text_match:desc,default_sorting_field:desc`
+                type: array
+                items:
+                  type: string
+                  example: num_employees:desc
+                default: []
+                
+              facet_by:
+                description:
+                  A list of fields that will be used for faceting your results
+                  on. Separate multiple fields with a comma.
+                type: array
+                items:
+                  type: string
+                default: []
+                
+              max_facet_values:
+                description: Maximum number of facet values to be returned.
+                type: integer
+                
+              facet_query:
+                description:
+                  Facet values that are returned can now be filtered via this parameter.
+                  The matching facet text is also highlighted. For example, when faceting
+                  by `category`, you can set `facet_query=category:shoe` to return only
+                  facet values that contain the prefix "shoe".
+                type: string
+                
+              num_typos:
+                description: >
+                  The number of typographical errors (1 or 2) that would be tolerated.
+                  Default: 2
+                type: integer
+                
+              page:
+                description: Results from this specific page number would be fetched.
+                type: integer
+                
+              per_page:
+                description: "Number of results to fetch per page. Default: 10"
+                type: integer
+                
+              group_by:
+                description:
+                  You can aggregate search results into groups or buckets by specify
+                  one or more `group_by` fields. Separate multiple fields with a comma.
+                  To group on a particular field, it must be a faceted field.
+                type: array
+                items:
+                  type: string
+                default: []
+              
+              group_limit:
+                description: >
+                  Maximum number of hits to be returned for every group. If the `group_limit` is
+                  set as `K` then only the top K hits in each group are returned in the response.
+                  Default: 3
+                type: integer
+              
+              include_fields:
+                description: List of fields from the document to include in the search result
+                type: array
+                items:
+                  type: string
+                default: []
+                
+              exclude_fields:
+                description: List of fields from the document to exclude in the search result
+                type: array
+                items:
+                  type: string
+                default: []
+                
+              highlight_full_fields:
+                description: List of fields which should be highlighted fully without snippeting
+                type: array
+                items:
+                  type: string
+                default: []
+                
+              highlight_affix_num_tokens:
+                description: >
+                  The number of tokens that should surround the highlighted text on each side.
+                  Default: 4
+                type: integer
+                
+              highlight_start_tag:
+                description: >
+                  The start tag used for the highlighted snippets.
+                  Default: `<mark>`
+                type: string
+              highlight_end_tag:
+                description: >
+                  The end tag used for the highlighted snippets.
+                  Default: `</mark>`
+                type: string
+                
+              snippet_threshold:
+                description: >
+                  Field values under this length will be fully highlighted, instead of showing
+                  a snippet of relevant portion. Default: 30
+                type: integer
+                
+              drop_tokens_threshold:
+                description: >
+                  If the number of results found for a specific query is less than
+                  this number, Typesense will attempt to drop the tokens in the query until
+                  enough results are found. Tokens that have the least individual hits
+                  are dropped first. Set to 0 to disable. Default: 10
+                type: integer
+              typo_tokens_threshold:
+                description: >
+                  If the number of results found for a specific query is less than this number,
+                  Typesense will attempt to look for tokens with more typos until
+                  enough results are found. Default: 100
+                type: integer
+                
+              pinned_hits:
+                description: >
+                  A list of records to unconditionally include in the search results
+                  at specific positions. An example use case would be to feature or promote
+                  certain items on the top of search results.
+                  A list of `record_id:hit_position`. Eg: to include a record with ID 123
+                  at Position 1 and another record with ID 456 at Position 5,
+                  you'd specify `123:1,456:5`.
 
-            You could also use the Overrides feature to override search results based
-            on rules. Overrides are applied first, followed by `pinned_hits` and 
-            finally `hidden_hits`.
-          style: form
-          explode: false
-          schema:
-            type: array
-            items:
-              type: string
-        - name: hidden_hits
-          in: query
-          description: >
-            A list of records to unconditionally hide from search results.
-            A list of `record_id`s to hide. Eg: to hide records with IDs 123 and 456,
-            you'd specify `123,456`.
+                  You could also use the Overrides feature to override search results based
+                  on rules. Overrides are applied first, followed by `pinned_hits` and 
+                  finally `hidden_hits`.
+                type: array
+                items:
+                  type: string
+                default: []
+                
+              hidden_hits:
+                description: >
+                  A list of records to unconditionally hide from search results.
+                  A list of `record_id`s to hide. Eg: to hide records with IDs 123 and 456,
+                  you'd specify `123,456`.
 
-            You could also use the Overrides feature to override search results based
-            on rules. Overrides are applied first, followed by `pinned_hits` and
-            finally `hidden_hits`.
-          style: form
-          explode: false
-          schema:
-            type: array
-            items:
-              type: string
+                  You could also use the Overrides feature to override search results based
+                  on rules. Overrides are applied first, followed by `pinned_hits` and
+                  finally `hidden_hits`.
+                type: array
+                items:
+                  type: string
+                default: []
+                
+              highlight_fields:
+                description: >
+                  A list of custom fields that must be highlighted even if you don't query 
+                  for them
+                type: array
+                items:
+                  type: string
+                default: []
+                
+              pre_segmented_query:
+                description: >
+                  You can index content from any logographic language into Typesense if you
+                  are able to segment / split the text into space-separated words yourself 
+                  before indexing and querying.
+
+                  Set this parameter to tre to do the same
+                type: boolean
+                
+              enable_overrides:
+                description: >
+                  If you have some overrides defined but want to disable all of them during
+                  query time, you can do that by setting this parameter to false
+                type: boolean
+                
+              prioritize_exact_match:
+                description: >
+                  Set this parameter to true to ensure that an exact match is ranked above
+                  the others
+                type: boolean
+              exhaustive_search:
+                description: >
+                  Setting this to true will make Typesense consider all prefixes and typo 
+                  corrections of the words in the query without stopping early when enough results are found 
+                  (drop_tokens_threshold and typo_tokens_threshold configurations are ignored).
+                type: boolean
+              search_cutoff_ms:
+                description: >
+                  Typesense will attempt to return results early if the cutoff time has elapsed. 
+                  This is not a strict guarantee and facet computation is not bound by this parameter.
+                type: integer
+              use_cache:
+                description: >
+                  Enable server side caching of search query results. By default, caching is disabled.
+                type: boolean
+              cache_ttl:
+                description: >
+                  The duration (in seconds) that determines how long the search query is cached. 
+                  This value can be set on a per-query basis. Default: 60.
+                type: integer
+              min_len_1typo:
+                description: >
+                  Minimum word length for 1-typo correction to be applied. 
+                  The value of num_typos is still treated as the maximum allowed typos.
+                type: integer
+              min_len_2typo:
+                description: >
+                  Minimum word length for 2-typo correction to be applied. 
+                  The value of num_typos is still treated as the maximum allowed typos.
+                type: integer
+
       responses:
         200:
           description: Search results
@@ -750,6 +791,29 @@ paths:
           required: true
           schema:
             type: string
+        - name: exportDocumentsParameters
+          in: query
+          schema:
+            type: object
+            required:
+              - include_fields
+              - exclude_fields
+            properties:
+              filter_by:
+                description:
+                  Filter conditions for refining your search results. Separate
+                  multiple conditions with &&.
+                type: string
+              include_fields:
+                description: List of fields from the document to include in the search result
+                type: array
+                items:
+                  type: string
+              exclude_fields:
+                description: List of fields from the document to exclude in the search result
+                type: array
+                items:
+                  type: string
       responses:
         200:
           description: Exports all the documents in a given collection.
@@ -784,32 +848,22 @@ paths:
           required: true
           schema:
             type: string
-        - name: action
+        - name: importDocumentsParameters
           in: query
-          description:
-            Action mode. Allowed action modes are `create`, `upsert` and `update`.
-            `create` mode creates a new document. Fails if a document with the same id
-            already exists. `upsert` mode creates a new document or updates an existing
-            document if a document with the same id already exists.
-            `update` mode updates an existing document. Fails if a document with the
-            given id does not exist.
-          required: true #only for codegen
           schema:
-            type: string
-            example: upsert
-            enum:
-              - create
-              - upsert
-              - update
-        - name: batch_size
-          in: query
-          description:
-            Batch size used for import. By default, Typesense ingests 40 documents at a time
-            into Typesense. To increase this value, use the `batch_size` parameter.
-            Larger batch sizes will consume larger transient memory during import.
-          required: true #only for codegen
-          schema:
-            type: integer
+            type: object
+            properties:
+              action:
+                type: string
+              batch_size:
+                type: integer
+              dirty_values:
+                type: string
+                enum:
+                  - coerce_or_reject
+                  - coerce_or_drop
+                  - drop
+                  - reject
       requestBody:
         description: The json array of documents or the JSONL file to import
         content:
@@ -1194,7 +1248,8 @@ components:
       required:
         - name
         - fields
-        - default_sorting_field
+        - token_separators # only for codegen
+        - symbols_to_index # only for codegen
       type: object
       properties:
         name:
@@ -1223,24 +1278,50 @@ components:
             the search results are ranked when a sort_by clause is not provided during
             searching. This field must indicate some kind of popularity.
           example: num_employees
-    Collection:
+          default: ""
+        token_separators:
+          type: array
+          description: >
+            List of symbols or special characters to be used for 
+            splitting the text into individual words in addition to space and new-line characters.
+          items:
+            type: string # characters only
+          default: []
+        
+        symbols_to_index:
+          type: array
+          description: >
+            List of symbols or special characters to be indexed.
+          items:
+            type: string # characters only
+          default: []
+    CollectionResponse:
       allOf:
         - $ref: "#/components/schemas/CollectionSchema"
         - type: object
           required:
             - num_documents
+            - created_at
+            - num_memory_shards
           properties:
             num_documents:
               type: integer
               description: Number of documents in the collection
               format: int64
               readOnly: true
+            created_at:
+              type: integer
+              description: Timestamp of when the collection was created
+              format: int64
+              readOnly: true
+            num_memory_shards:
+              type: integer
+              format: int64
+              readOnly: true
     Field:
       required:
         - name
         - type
-        - facet #only for codegen
-        - optional #only for codegen
       type: object
       properties:
         name:
@@ -1260,6 +1341,7 @@ components:
             - int64[]
             - float[]
             - bool[]
+            - auto
         optional:
           type: boolean
           example: true
@@ -1270,7 +1352,8 @@ components:
           default: false
         index:
           type: boolean
-          example: false
+          example: true
+          default: true
     CollectionAliasSchema:
       type: object
       required:
@@ -1311,6 +1394,7 @@ components:
         - found
         - search_time_ms
         - page
+        - request_params
       properties:
         facet_counts:
           type: array
@@ -1334,6 +1418,20 @@ components:
           description: The documents that matched the search query
           items:
             $ref: "#/components/schemas/SearchResultHit"
+        request_params:
+          type: object
+          required:
+            - collection_name
+            - q
+            - per_page
+          properties:
+            collection_name:
+              type: string
+            q:
+              type: string
+            per_page:
+              type: integer
+          
     SearchGroupedHit:
       type: object
       required:
@@ -1354,7 +1452,6 @@ components:
       required:
         - document
         - highlights
-        - text_match
       properties:
         highlights:
           type: array
@@ -1364,10 +1461,8 @@ components:
         document:
           type: object
           description: Can be any key-value pair
-        text_match:
-          type: integer
-          format: int64
-          description: text_match score
+          additionalProperties:
+            type: object
       example:
         highlights:
           company_name:
@@ -1436,6 +1531,14 @@ components:
           description: List of document `id`s that should be excluded from the search results.
           items:
             $ref: "#/components/schemas/SearchOverrideExclude"
+        filter_by:
+            type: string
+            description: >
+              A filter by clause that is applied to any search query that matches the override rule.
+        remove_matched_tokens:
+          type: boolean
+          description: >
+            Indicates whether search query tokens that exist in the override's rule should be removed from the search query.
     SearchOverride:
       allOf:
         - $ref: "#/components/schemas/SearchOverrideSchema"
@@ -1555,7 +1658,6 @@ components:
         - description
         - actions
         - collections
-        - expires_at
       properties:
         description:
           type: string
@@ -1599,6 +1701,30 @@ components:
           x-go-type: "[]*ApiKey"
           items:
             $ref: "#/components/schemas/ApiKey"
+    ScopedKeyParameters:
+      type: object
+      properties:
+        filter_by:
+          type: string
+        expires_at:
+          type: number
+    SnapshotParameters:
+      type: object
+      properties:
+        snapshot_path:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    MultiSearchResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchResult"
   securitySchemes:
     api_key_header:
       type: apiKey
