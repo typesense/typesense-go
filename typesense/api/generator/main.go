@@ -27,6 +27,8 @@ func main() {
 	// Unwrapping import and export parameters
 	unwrapImportDocuments(&m)
 	unwrapExportDocuments(&m)
+	// Remove additionalProperties from SearchResultHit -> document
+	searchResultHit(&m)
 
 	generatorFile, err := os.Create("./generator.yml")
 	if err != nil {
@@ -40,6 +42,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
+}
+
+func searchResultHit(m *map[string]interface{}) {
+	properties := (*m)["components"].(map[string]interface{})["schemas"].(map[string]interface{})["SearchResultHit"].(map[string]interface{})["properties"].(map[string]interface{})
+	document := properties["document"].(map[string]interface{})
+	delete(document, "additionalProperties")
 }
 
 func unwrapExportDocuments(m *map[string]interface{}) {

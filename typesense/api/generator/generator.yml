@@ -410,8 +410,6 @@ components:
             snippet: <mark>Stark</mark> Industries
       properties:
         document:
-          additionalProperties:
-            type: object
           description: Can be any key-value pair
           type: object
         highlights:
@@ -867,17 +865,17 @@ paths:
           schema:
             type: string
         - in: query
-          name: exclude_fields
-          schema:
-            items:
-              type: string
-            type: array
-        - in: query
           name: filter_by
           schema:
             type: string
         - in: query
           name: include_fields
+          schema:
+            items:
+              type: string
+            type: array
+        - in: query
+          name: exclude_fields
           schema:
             items:
               type: string
@@ -969,54 +967,20 @@ paths:
           schema:
             type: string
         - in: query
-          name: per_page
+          name: page
           schema:
             type: integer
-        - in: query
-          name: highlight_end_tag
-          schema:
-            type: string
-        - in: query
-          name: typo_tokens_threshold
-          schema:
-            type: integer
-        - in: query
-          name: exhaustive_search
-          schema:
-            type: boolean
-        - in: query
-          name: use_cache
-          schema:
-            type: boolean
         - in: query
           name: q
           required: true
           schema:
             type: string
         - in: query
-          name: facet_query
-          schema:
-            type: string
-        - in: query
-          name: highlight_full_fields
+          name: query_by_weights
           schema:
             items:
               type: string
             type: array
-        - in: query
-          name: highlight_fields
-          schema:
-            items:
-              type: string
-            type: array
-        - in: query
-          name: prioritize_exact_match
-          schema:
-            type: boolean
-        - in: query
-          name: min_len_1typo
-          schema:
-            type: integer
         - in: query
           name: prefix
           schema:
@@ -1024,7 +988,7 @@ paths:
               type: boolean
             type: array
         - in: query
-          name: drop_tokens_threshold
+          name: num_typos
           schema:
             type: integer
         - in: query
@@ -1034,22 +998,23 @@ paths:
               type: string
             type: array
         - in: query
+          name: prioritize_exact_match
+          schema:
+            type: boolean
+        - in: query
+          name: highlight_affix_num_tokens
+          schema:
+            type: integer
+        - in: query
           name: highlight_start_tag
           schema:
             type: string
         - in: query
-          name: pre_segmented_query
+          name: drop_tokens_threshold
           schema:
-            type: boolean
+            type: integer
         - in: query
-          name: query_by
-          required: true
-          schema:
-            items:
-              type: string
-            type: array
-        - in: query
-          name: query_by_weights
+          name: hidden_hits
           schema:
             items:
               type: string
@@ -1065,43 +1030,15 @@ paths:
                 example: all
                 type: string
         - in: query
-          name: facet_by
-          schema:
-            items:
-              type: string
-            type: array
-        - in: query
-          name: max_facet_values
-          schema:
-            type: integer
-        - in: query
-          name: highlight_affix_num_tokens
-          schema:
-            type: integer
-        - in: query
-          name: page
-          schema:
-            type: integer
-        - in: query
-          name: group_limit
-          schema:
-            type: integer
-        - in: query
-          name: cache_ttl
-          schema:
-            type: integer
-        - in: query
-          name: min_len_2typo
-          schema:
-            type: integer
-        - in: query
           name: filter_by
           schema:
             type: string
         - in: query
-          name: num_typos
+          name: exclude_fields
           schema:
-            type: integer
+            items:
+              type: string
+            type: array
         - in: query
           name: group_by
           schema:
@@ -1109,7 +1046,69 @@ paths:
               type: string
             type: array
         - in: query
-          name: include_fields
+          name: highlight_fields
+          schema:
+            items:
+              type: string
+            type: array
+        - in: query
+          name: search_cutoff_ms
+          schema:
+            type: integer
+        - in: query
+          name: use_cache
+          schema:
+            type: boolean
+        - in: query
+          name: sort_by
+          schema:
+            items:
+              example: num_employees:desc
+              type: string
+            type: array
+        - in: query
+          name: max_facet_values
+          schema:
+            type: integer
+        - in: query
+          name: facet_query
+          schema:
+            type: string
+        - in: query
+          name: facet_by
+          schema:
+            items:
+              type: string
+            type: array
+        - in: query
+          name: exhaustive_search
+          schema:
+            type: boolean
+        - in: query
+          name: min_len_2typo
+          schema:
+            type: integer
+        - in: query
+          name: highlight_end_tag
+          schema:
+            type: string
+        - in: query
+          name: cache_ttl
+          schema:
+            type: integer
+        - in: query
+          name: query_by
+          required: true
+          schema:
+            items:
+              type: string
+            type: array
+        - in: query
+          name: group_limit
+          schema:
+            type: integer
+        - in: query
+          name: highlight_full_fields
           schema:
             items:
               type: string
@@ -1119,32 +1118,31 @@ paths:
           schema:
             type: integer
         - in: query
-          name: search_cutoff_ms
-          schema:
-            type: integer
-        - in: query
-          name: sort_by
-          schema:
-            items:
-              example: num_employees:desc
-              type: string
-            type: array
-        - in: query
-          name: exclude_fields
-          schema:
-            items:
-              type: string
-            type: array
-        - in: query
-          name: hidden_hits
-          schema:
-            items:
-              type: string
-            type: array
-        - in: query
           name: enable_overrides
           schema:
             type: boolean
+        - in: query
+          name: min_len_1typo
+          schema:
+            type: integer
+        - in: query
+          name: pre_segmented_query
+          schema:
+            type: boolean
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+        - in: query
+          name: include_fields
+          schema:
+            items:
+              type: string
+            type: array
+        - in: query
+          name: typo_tokens_threshold
+          schema:
+            type: integer
       responses:
         200:
           content:
