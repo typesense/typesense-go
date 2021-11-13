@@ -24,8 +24,8 @@ func main() {
 
 	// Unwrapping the searchPaths
 	unwrapSearchParameters(&m)
+	unwrapImportDocuments(&m)
 
-	// fmt.Printf("%v", m["paths"].(map[string]interface{})["/collections/{collectionName}/documents/search"].(map[string]interface{})["get"].(map[string]interface{})["parameters"])
 	generatorFile, err := os.Create("./generator.yml")
 	if err != nil {
 		log.Fatalf("Unable to open config file: %s", err.Error())
@@ -38,6 +38,25 @@ func main() {
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
+}
+
+func unwrapImportDocuments(m *map[string]interface{}) {
+	parameters := (*m)["paths"].(map[string]interface{})["/collections/{collectionName}/documents/import"].(map[string]interface{})["post"].(map[string]interface{})["parameters"].([]interface{})
+	importParameters := parameters[1].(map[string]interface{})["schema"].(map[string]interface{})["properties"].(map[string]interface{})
+
+	for k, v := range importParameters {
+		newMap := make(map[string]interface{})
+		newMap["name"] = k
+		newMap["in"] = "query"
+		newMap["schema"] = make(map[string]interface{})
+		newMap["schema"].(map[string]interface{})["type"] = v.(map[string]interface{})["type"].(string)
+		if v.(map[string]interface{})["enum"] != nil {
+			newMap["schema"].(map[string]interface{})["enum"] = v.(map[string]interface{})["enum"]
+		}
+		parameters = append(parameters, newMap)
+	}
+	parameters = append(parameters[:1], parameters[2:]...)
+	(*m)["paths"].(map[string]interface{})["/collections/{collectionName}/documents/import"].(map[string]interface{})["post"].(map[string]interface{})["parameters"] = parameters
 }
 
 func unwrapSearchParameters(m *map[string]interface{}) {
