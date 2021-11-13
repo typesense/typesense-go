@@ -22,9 +22,11 @@ func main() {
 		log.Fatalf("error: %v", err)
 	}
 
-	// Unwrapping the searchPaths
+	// Unwrapping the search parameters
 	unwrapSearchParameters(&m)
+	// Unwrapping import and export parameters
 	unwrapImportDocuments(&m)
+	unwrapExportDocuments(&m)
 
 	generatorFile, err := os.Create("./generator.yml")
 	if err != nil {
@@ -38,6 +40,26 @@ func main() {
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
+}
+
+func unwrapExportDocuments(m *map[string]interface{}) {
+	parameters := (*m)["paths"].(map[string]interface{})["/collections/{collectionName}/documents/export"].(map[string]interface{})["get"].(map[string]interface{})["parameters"].([]interface{})
+	exportParameters := parameters[1].(map[string]interface{})["schema"].(map[string]interface{})["properties"].(map[string]interface{})
+	for k, v := range exportParameters {
+		newMap := make(map[string]interface{})
+		newMap["name"] = k
+		newMap["in"] = "query"
+		newMap["schema"] = make(map[string]interface{})
+		if v.(map[string]interface{})["type"].(string) == "array" {
+			newMap["schema"].(map[string]interface{})["type"] = "array"
+			newMap["schema"].(map[string]interface{})["items"] = v.(map[string]interface{})["items"]
+		} else {
+			newMap["schema"].(map[string]interface{})["type"] = v.(map[string]interface{})["type"].(string)
+		}
+		parameters = append(parameters, newMap)
+	}
+	parameters = append(parameters[:1], parameters[2:]...)
+	(*m)["paths"].(map[string]interface{})["/collections/{collectionName}/documents/export"].(map[string]interface{})["get"].(map[string]interface{})["parameters"] = parameters
 }
 
 func unwrapImportDocuments(m *map[string]interface{}) {
