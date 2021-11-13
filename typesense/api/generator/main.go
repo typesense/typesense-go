@@ -7,8 +7,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type yml map[string]interface{}
+
 func main() {
-	m := make(map[string]interface{})
+	m := make(yml)
 
 	configFile, err := os.Open("./openapi.yml")
 	if err != nil {
@@ -27,6 +29,8 @@ func main() {
 	// Unwrapping import and export parameters
 	unwrapImportDocuments(&m)
 	unwrapExportDocuments(&m)
+	// Unwrapping delete document parameters
+	unwrapDeleteDocument(&m)
 	// Remove additionalProperties from SearchResultHit -> document
 	searchResultHit(&m)
 
@@ -44,76 +48,91 @@ func main() {
 	}
 }
 
-func searchResultHit(m *map[string]interface{}) {
-	properties := (*m)["components"].(map[string]interface{})["schemas"].(map[string]interface{})["SearchResultHit"].(map[string]interface{})["properties"].(map[string]interface{})
-	document := properties["document"].(map[string]interface{})
+func searchResultHit(m *yml) {
+	properties := (*m)["components"].(yml)["schemas"].(yml)["SearchResultHit"].(yml)["properties"].(yml)
+	document := properties["document"].(yml)
 	delete(document, "additionalProperties")
 }
 
-func unwrapExportDocuments(m *map[string]interface{}) {
-	parameters := (*m)["paths"].(map[string]interface{})["/collections/{collectionName}/documents/export"].(map[string]interface{})["get"].(map[string]interface{})["parameters"].([]interface{})
-	exportParameters := parameters[1].(map[string]interface{})["schema"].(map[string]interface{})["properties"].(map[string]interface{})
-	for k, v := range exportParameters {
-		newMap := make(map[string]interface{})
+func unwrapDeleteDocument(m *yml) {
+	parameters := (*m)["paths"].(yml)["/collections/{collectionName}/documents"].(yml)["delete"].(yml)["parameters"].([]interface{})
+	deleteParameters := parameters[1].(yml)["schema"].(yml)["properties"].(yml)
+	for k, v := range deleteParameters {
+		newMap := make(yml)
 		newMap["name"] = k
 		newMap["in"] = "query"
-		newMap["schema"] = make(map[string]interface{})
-		if v.(map[string]interface{})["type"].(string) == "array" {
-			newMap["schema"].(map[string]interface{})["type"] = "array"
-			newMap["schema"].(map[string]interface{})["items"] = v.(map[string]interface{})["items"]
+		newMap["schema"] = make(yml)
+		newMap["schema"].(yml)["type"] = v.(yml)["type"].(string)
+		parameters = append(parameters, newMap)
+	}
+	parameters = append(parameters[:1], parameters[2:]...)
+	(*m)["paths"].(yml)["/collections/{collectionName}/documents"].(yml)["delete"].(yml)["parameters"] = parameters
+}
+
+func unwrapExportDocuments(m *yml) {
+	parameters := (*m)["paths"].(yml)["/collections/{collectionName}/documents/export"].(yml)["get"].(yml)["parameters"].([]interface{})
+	exportParameters := parameters[1].(yml)["schema"].(yml)["properties"].(yml)
+	for k, v := range exportParameters {
+		newMap := make(yml)
+		newMap["name"] = k
+		newMap["in"] = "query"
+		newMap["schema"] = make(yml)
+		if v.(yml)["type"].(string) == "array" {
+			newMap["schema"].(yml)["type"] = "array"
+			newMap["schema"].(yml)["items"] = v.(yml)["items"]
 		} else {
-			newMap["schema"].(map[string]interface{})["type"] = v.(map[string]interface{})["type"].(string)
+			newMap["schema"].(yml)["type"] = v.(yml)["type"].(string)
 		}
 		parameters = append(parameters, newMap)
 	}
 	parameters = append(parameters[:1], parameters[2:]...)
-	(*m)["paths"].(map[string]interface{})["/collections/{collectionName}/documents/export"].(map[string]interface{})["get"].(map[string]interface{})["parameters"] = parameters
+	(*m)["paths"].(yml)["/collections/{collectionName}/documents/export"].(yml)["get"].(yml)["parameters"] = parameters
 }
 
-func unwrapImportDocuments(m *map[string]interface{}) {
-	parameters := (*m)["paths"].(map[string]interface{})["/collections/{collectionName}/documents/import"].(map[string]interface{})["post"].(map[string]interface{})["parameters"].([]interface{})
-	importParameters := parameters[1].(map[string]interface{})["schema"].(map[string]interface{})["properties"].(map[string]interface{})
+func unwrapImportDocuments(m *yml) {
+	parameters := (*m)["paths"].(yml)["/collections/{collectionName}/documents/import"].(yml)["post"].(yml)["parameters"].([]interface{})
+	importParameters := parameters[1].(yml)["schema"].(yml)["properties"].(yml)
 
 	for k, v := range importParameters {
-		newMap := make(map[string]interface{})
+		newMap := make(yml)
 		newMap["name"] = k
 		newMap["in"] = "query"
-		newMap["schema"] = make(map[string]interface{})
-		newMap["schema"].(map[string]interface{})["type"] = v.(map[string]interface{})["type"].(string)
-		if v.(map[string]interface{})["enum"] != nil {
-			newMap["schema"].(map[string]interface{})["enum"] = v.(map[string]interface{})["enum"]
+		newMap["schema"] = make(yml)
+		newMap["schema"].(yml)["type"] = v.(yml)["type"].(string)
+		if v.(yml)["enum"] != nil {
+			newMap["schema"].(yml)["enum"] = v.(yml)["enum"]
 		}
 		parameters = append(parameters, newMap)
 	}
 	parameters = append(parameters[:1], parameters[2:]...)
-	(*m)["paths"].(map[string]interface{})["/collections/{collectionName}/documents/import"].(map[string]interface{})["post"].(map[string]interface{})["parameters"] = parameters
+	(*m)["paths"].(yml)["/collections/{collectionName}/documents/import"].(yml)["post"].(yml)["parameters"] = parameters
 }
 
-func unwrapSearchParameters(m *map[string]interface{}) {
-	parameters := (*m)["paths"].(map[string]interface{})["/collections/{collectionName}/documents/search"].(map[string]interface{})["get"].(map[string]interface{})["parameters"].([]interface{})
-	searchParameters := parameters[1].(map[string]interface{})["schema"].(map[string]interface{})["properties"].(map[string]interface{})
+func unwrapSearchParameters(m *yml) {
+	parameters := (*m)["paths"].(yml)["/collections/{collectionName}/documents/search"].(yml)["get"].(yml)["parameters"].([]interface{})
+	searchParameters := parameters[1].(yml)["schema"].(yml)["properties"].(yml)
 
 	for k, v := range searchParameters {
-		newMap := make(map[string]interface{})
+		newMap := make(yml)
 		newMap["name"] = k
 		if k == "q" || k == "query_by" {
 			newMap["required"] = true
 		}
 		newMap["in"] = "query"
-		newMap["schema"] = make(map[string]interface{})
-		if v.(map[string]interface{})["oneOf"] == nil {
-			if v.(map[string]interface{})["type"].(string) == "array" {
-				newMap["schema"].(map[string]interface{})["type"] = "array"
-				newMap["schema"].(map[string]interface{})["items"] = v.(map[string]interface{})["items"]
+		newMap["schema"] = make(yml)
+		if v.(yml)["oneOf"] == nil {
+			if v.(yml)["type"].(string) == "array" {
+				newMap["schema"].(yml)["type"] = "array"
+				newMap["schema"].(yml)["items"] = v.(yml)["items"]
 			} else {
-				newMap["schema"].(map[string]interface{})["type"] = v.(map[string]interface{})["type"].(string)
+				newMap["schema"].(yml)["type"] = v.(yml)["type"].(string)
 			}
 		} else {
-			newMap["schema"].(map[string]interface{})["oneOf"] = v.(map[string]interface{})["oneOf"]
+			newMap["schema"].(yml)["oneOf"] = v.(yml)["oneOf"]
 		}
 		parameters = append(parameters, newMap)
 	}
 
 	parameters = append(parameters[:1], parameters[2:]...)
-	(*m)["paths"].(map[string]interface{})["/collections/{collectionName}/documents/search"].(map[string]interface{})["get"].(map[string]interface{})["parameters"] = parameters
+	(*m)["paths"].(yml)["/collections/{collectionName}/documents/search"].(yml)["get"].(yml)["parameters"] = parameters
 }
