@@ -13,7 +13,6 @@ import (
 )
 
 func TestHealthStatus(t *testing.T) {
-
 	tests := []struct {
 		ok bool
 	}{
@@ -46,7 +45,6 @@ func TestHealthStatus(t *testing.T) {
 }
 
 func TestHealthStatusOnApiClientErrorReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
@@ -63,7 +61,6 @@ func TestHealthStatusOnApiClientErrorReturnsError(t *testing.T) {
 }
 
 func TestHealthStatusOnHttpStatusErrorCodeReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)

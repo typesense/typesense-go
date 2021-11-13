@@ -13,6 +13,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"github.com/typesense/typesense-go/typesense/mocks"
 )
 
@@ -46,8 +47,8 @@ func (m *eqReaderMatcher) String() string {
 
 func TestDocumentsImportWithOneDocument(t *testing.T) {
 	expectedParams := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 40,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(40),
 	}
 	expectedBody := strings.NewReader(`{"id":"123","companyName":"Stark Industries","numEmployees":5215,"country":"USA"}` + "\n")
 	expectedResultString := `{"success": true}`
@@ -73,8 +74,8 @@ func TestDocumentsImportWithOneDocument(t *testing.T) {
 		createNewDocument(),
 	}
 	params := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 40,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(40),
 	}
 	result, err := client.Collection("companies").Documents().Import(documents, params)
 
@@ -89,8 +90,8 @@ func TestDocumentsImportWithEmptyListReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 40,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(40),
 	}
 	documents := []interface{}{}
 	_, err := client.Collection("companies").Documents().Import(documents, params)
@@ -99,8 +100,8 @@ func TestDocumentsImportWithEmptyListReturnsError(t *testing.T) {
 
 func TestDocumentsImportWithOneDocumentAndInvalidResultJsonReturnsError(t *testing.T) {
 	expectedParams := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 40,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(40),
 	}
 	expectedBody := strings.NewReader(`{"id":"123","companyName":"Stark Industries","numEmployees":5215,"country":"USA"}` + "\n")
 	expectedResultString := `{"success": invalid_json,}`
@@ -123,8 +124,8 @@ func TestDocumentsImportWithOneDocumentAndInvalidResultJsonReturnsError(t *testi
 		createNewDocument(),
 	}
 	params := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 40,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(40),
 	}
 	_, err := client.Collection("companies").Documents().Import(documents, params)
 	assert.NotNil(t, err)
@@ -137,8 +138,8 @@ func TestDocumentsImportWithInvalidInputDataReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 40,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(40),
 	}
 	documents := []interface{}{
 		func() {},
@@ -160,8 +161,8 @@ func TestDocumentsImportOnApiClientErrorReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 40,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(40),
 	}
 	documents := []interface{}{
 		createNewDocument(),
@@ -186,8 +187,8 @@ func TestDocumentsImportOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 40,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(40),
 	}
 	documents := []interface{}{
 		createNewDocument(),
@@ -198,8 +199,8 @@ func TestDocumentsImportOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 func TestDocumentsImportWithTwoDocuments(t *testing.T) {
 	expectedParams := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 40,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(40),
 	}
 	expectedBody := strings.NewReader(`{"id":"123","companyName":"Stark Industries","numEmployees":5215,"country":"USA"}` +
 		"\n" + `{"id":"125","companyName":"Stark Industries","numEmployees":5215,"country":"USA"}` + "\n")
@@ -228,8 +229,8 @@ func TestDocumentsImportWithTwoDocuments(t *testing.T) {
 		createNewDocument("125"),
 	}
 	params := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 40,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(40),
 	}
 	result, err := client.Collection("companies").Documents().Import(documents, params)
 
@@ -239,8 +240,8 @@ func TestDocumentsImportWithTwoDocuments(t *testing.T) {
 
 func TestDocumentsImportWithActionOnly(t *testing.T) {
 	expectedParams := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: defaultImportBatchSize,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(defaultImportBatchSize),
 	}
 
 	ctrl := gomock.NewController(t)
@@ -261,7 +262,7 @@ func TestDocumentsImportWithActionOnly(t *testing.T) {
 		createNewDocument(),
 	}
 	params := &api.ImportDocumentsParams{
-		Action: "create",
+		Action: pointer.String("create"),
 	}
 	_, err := client.Collection("companies").Documents().Import(documents, params)
 	assert.Nil(t, err)
@@ -269,8 +270,8 @@ func TestDocumentsImportWithActionOnly(t *testing.T) {
 
 func TestDocumentsImportWithBatchSizeOnly(t *testing.T) {
 	expectedParams := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 10,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(10),
 	}
 
 	ctrl := gomock.NewController(t)
@@ -291,7 +292,7 @@ func TestDocumentsImportWithBatchSizeOnly(t *testing.T) {
 		createNewDocument(),
 	}
 	params := &api.ImportDocumentsParams{
-		BatchSize: 10,
+		BatchSize: pointer.Int(10),
 	}
 	_, err := client.Collection("companies").Documents().Import(documents, params)
 	assert.Nil(t, err)
@@ -300,8 +301,8 @@ func TestDocumentsImportWithBatchSizeOnly(t *testing.T) {
 func TestDocumentsImportJsonl(t *testing.T) {
 	expectedBytes := []byte(`{"success": true}`)
 	expectedParams := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 40,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(40),
 	}
 	expectedBody := createDocumentStream()
 
@@ -320,8 +321,8 @@ func TestDocumentsImportJsonl(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 40,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(40),
 	}
 	importBody := createDocumentStream()
 	result, err := client.Collection("companies").Documents().ImportJsonl(importBody, params)
@@ -333,7 +334,6 @@ func TestDocumentsImportJsonl(t *testing.T) {
 }
 
 func TestDocumentsImportJsonlOnApiClientErrorReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
@@ -346,8 +346,8 @@ func TestDocumentsImportJsonlOnApiClientErrorReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 40,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(40),
 	}
 	importBody := createDocumentStream()
 	_, err := client.Collection("companies").Documents().ImportJsonl(importBody, params)
@@ -355,7 +355,6 @@ func TestDocumentsImportJsonlOnApiClientErrorReturnsError(t *testing.T) {
 }
 
 func TestDocumentsImportJsonlOnHttpStatusErrorCodeReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
@@ -371,8 +370,8 @@ func TestDocumentsImportJsonlOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 40,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(40),
 	}
 	importBody := createDocumentStream()
 	_, err := client.Collection("companies").Documents().ImportJsonl(importBody, params)
@@ -381,8 +380,8 @@ func TestDocumentsImportJsonlOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 func TestDocumentsImportJsonlWithActionOnly(t *testing.T) {
 	expectedParams := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: defaultImportBatchSize,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(defaultImportBatchSize),
 	}
 
 	ctrl := gomock.NewController(t)
@@ -400,7 +399,7 @@ func TestDocumentsImportJsonlWithActionOnly(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := &api.ImportDocumentsParams{
-		Action: "create",
+		Action: pointer.String("create"),
 	}
 	importBody := createDocumentStream()
 	_, err := client.Collection("companies").Documents().ImportJsonl(importBody, params)
@@ -409,8 +408,8 @@ func TestDocumentsImportJsonlWithActionOnly(t *testing.T) {
 
 func TestDocumentsImportJsonlWithBatchSizeOnly(t *testing.T) {
 	expectedParams := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 10,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(10),
 	}
 
 	ctrl := gomock.NewController(t)
@@ -428,7 +427,7 @@ func TestDocumentsImportJsonlWithBatchSizeOnly(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := &api.ImportDocumentsParams{
-		BatchSize: 10,
+		BatchSize: pointer.Int(10),
 	}
 	importBody := createDocumentStream()
 	_, err := client.Collection("companies").Documents().ImportJsonl(importBody, params)

@@ -30,7 +30,7 @@ func createNewSchema(collectionName string) *api.CollectionSchema {
 			{
 				Name:  "country",
 				Type:  "string",
-				Facet: true,
+				Facet: pointer.True(),
 				Index: pointer.True(),
 			},
 			{
@@ -39,12 +39,12 @@ func createNewSchema(collectionName string) *api.CollectionSchema {
 				Index: pointer.False(),
 			},
 		},
-		DefaultSortingField: "num_employees",
+		DefaultSortingField: pointer.String("num_employees"),
 	}
 }
 
-func createNewCollection(name string) *api.Collection {
-	return &api.Collection{
+func createNewCollection(name string) *api.CollectionResponse {
+	return &api.CollectionResponse{
 		CollectionSchema: *createNewSchema(name),
 		NumDocuments:     0,
 	}
@@ -116,7 +116,7 @@ func TestCollectionCreateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 }
 
 func TestCollectionsRetrieve(t *testing.T) {
-	expectedResult := []*api.Collection{
+	expectedResult := []*api.CollectionResponse{
 		createNewCollection("collection1"),
 		createNewCollection("collection2"),
 		createNewCollection("collection3"),
@@ -125,7 +125,7 @@ func TestCollectionsRetrieve(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
-	mockedResult := []*api.Collection{}
+	mockedResult := []*api.CollectionResponse{}
 	assert.Nil(t, copier.Copy(&mockedResult, &expectedResult))
 
 	mockAPIClient.EXPECT().
@@ -143,7 +143,6 @@ func TestCollectionsRetrieve(t *testing.T) {
 }
 
 func TestCollectionsRetrieveOnApiClientErrorReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
@@ -159,7 +158,6 @@ func TestCollectionsRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 }
 
 func TestCollectionsRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)

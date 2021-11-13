@@ -19,7 +19,7 @@ func newSearchParams() *api.SearchCollectionParams {
 		Q:              "text",
 		QueryBy:        []string{"company_name"},
 		MaxHits:        pointer.Interface("all"),
-		Prefix:         pointer.True(),
+		Prefix:         &[]bool{true},
 		FilterBy:       pointer.String("num_employees:=100"),
 		SortBy:         &([]string{"num_employees:desc"}),
 		FacetBy:        &([]string{"year_started"}),

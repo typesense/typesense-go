@@ -34,7 +34,6 @@ func TestCollectionAliasRetrieve(t *testing.T) {
 }
 
 func TestCollectionAliasRetrieveOnApiClientErrorReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
@@ -50,7 +49,6 @@ func TestCollectionAliasRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 }
 
 func TestCollectionAliasRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
@@ -93,7 +91,6 @@ func TestCollectionAliasDelete(t *testing.T) {
 }
 
 func TestCollectionAliasDeleteOnApiClientErrorReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
@@ -109,7 +106,6 @@ func TestCollectionAliasDeleteOnApiClientErrorReturnsError(t *testing.T) {
 }
 
 func TestCollectionAliasDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
