@@ -1330,18 +1330,6 @@ components:
         type:
           type: string
           example: string
-          enum:
-            - string
-            - int32
-            - int64
-            - float
-            - bool
-            - string[]
-            - int32[]
-            - int64[]
-            - float[]
-            - bool[]
-            - auto
         optional:
           type: boolean
           example: true
