@@ -110,10 +110,12 @@ func (d *documents) Export() (io.ReadCloser, error) {
 }
 
 func initImportParams(params *api.ImportDocumentsParams) {
-	if *params.BatchSize == 0 {
+	if params.BatchSize == nil {
+		params.BatchSize = new(int)
 		*params.BatchSize = defaultImportBatchSize
 	}
-	if len(*params.Action) == 0 {
+	if params.Action == nil {
+		params.Action = new(string)
 		*params.Action = defaultImportAction
 	}
 }
