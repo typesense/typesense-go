@@ -9,6 +9,11 @@ import (
 
 type yml map[string]interface{}
 
+const (
+	query = "query"
+	array = "array"
+)
+
 func main() {
 	m := make(yml)
 
@@ -60,7 +65,7 @@ func unwrapDeleteDocument(m *yml) {
 	for k, v := range deleteParameters {
 		newMap := make(yml)
 		newMap["name"] = k
-		newMap["in"] = "query"
+		newMap["in"] = query
 		newMap["schema"] = make(yml)
 		newMap["schema"].(yml)["type"] = v.(yml)["type"].(string)
 		parameters = append(parameters, newMap)
@@ -75,10 +80,10 @@ func unwrapExportDocuments(m *yml) {
 	for k, v := range exportParameters {
 		newMap := make(yml)
 		newMap["name"] = k
-		newMap["in"] = "query"
+		newMap["in"] = query
 		newMap["schema"] = make(yml)
-		if v.(yml)["type"].(string) == "array" {
-			newMap["schema"].(yml)["type"] = "array"
+		if v.(yml)["type"].(string) == array {
+			newMap["schema"].(yml)["type"] = array
 			newMap["schema"].(yml)["items"] = v.(yml)["items"]
 		} else {
 			newMap["schema"].(yml)["type"] = v.(yml)["type"].(string)
@@ -96,7 +101,7 @@ func unwrapImportDocuments(m *yml) {
 	for k, v := range importParameters {
 		newMap := make(yml)
 		newMap["name"] = k
-		newMap["in"] = "query"
+		newMap["in"] = query
 		newMap["schema"] = make(yml)
 		newMap["schema"].(yml)["type"] = v.(yml)["type"].(string)
 		if v.(yml)["enum"] != nil {
@@ -118,11 +123,11 @@ func unwrapSearchParameters(m *yml) {
 		if k == "q" || k == "query_by" {
 			newMap["required"] = true
 		}
-		newMap["in"] = "query"
+		newMap["in"] = query
 		newMap["schema"] = make(yml)
 		if v.(yml)["oneOf"] == nil {
-			if v.(yml)["type"].(string) == "array" {
-				newMap["schema"].(yml)["type"] = "array"
+			if v.(yml)["type"].(string) == array {
+				newMap["schema"].(yml)["type"] = array
 				newMap["schema"].(yml)["items"] = v.(yml)["items"]
 			} else {
 				newMap["schema"].(yml)["type"] = v.(yml)["type"].(string)
