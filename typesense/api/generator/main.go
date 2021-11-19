@@ -20,7 +20,8 @@ const (
 func main() {
 	m := make(yml)
 
-	configFile, err := os.Open("./openapi.yml")
+	log.Println("Fetching openapi.yml from typesense api spec")
+	configFile, err := os.Open("./typesense/api/generator/openapi.yml")
 	if err != nil {
 		log.Fatalf("Unable to open config file: %s", err.Error())
 		return
@@ -33,16 +34,22 @@ func main() {
 	}
 
 	// Unwrapping the search parameters
+	log.Println("Unwrapping search parameters")
 	unwrapSearchParameters(&m)
 	// Unwrapping import and export parameters
+	log.Println("Unwrapping documents import parameters")
 	unwrapImportDocuments(&m)
+	log.Println("Unwrapping documents export parameters")
 	unwrapExportDocuments(&m)
 	// Unwrapping delete document parameters
+	log.Println("Unwrapping documents delete parameters")
 	unwrapDeleteDocument(&m)
 	// Remove additionalProperties from SearchResultHit -> document
+	log.Println("Removing additionalProperties from SearchResultHit")
 	searchResultHit(&m)
 
-	generatorFile, err := os.Create("./generator.yml")
+	log.Println("Writing updated spec to generator.yml")
+	generatorFile, err := os.Create("./typesense/api/generator/generator.yml")
 	if err != nil {
 		log.Fatalf("Unable to open config file: %s", err.Error())
 		return
