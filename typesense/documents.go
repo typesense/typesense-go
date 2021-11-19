@@ -79,12 +79,6 @@ func (d *documents) Delete(filter *api.DeleteDocumentsParams) (int, error) {
 }
 
 func (d *documents) Search(params *api.SearchCollectionParams) (*api.SearchResult, error) {
-	// params.Q = url.QueryEscape(params.Q)
-	// if params.FilterBy != nil {
-	// 	escapedFilterBy := url.QueryEscape(*params.FilterBy)
-	// 	fmt.Println(escapedFilterBy)
-	// 	params.FilterBy = &escapedFilterBy
-	// }
 	response, err := d.apiClient.SearchCollectionWithResponse(context.Background(),
 		d.collectionName, params)
 	if err != nil {
