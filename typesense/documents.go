@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -94,7 +93,6 @@ func (d *documents) Search(params *api.SearchCollectionParams) (*api.SearchResul
 	if response.JSON200 == nil {
 		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
-	fmt.Println(response.JSON200)
 	return response.JSON200, nil
 }
 
