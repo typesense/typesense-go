@@ -13,6 +13,7 @@ func TestCollectionRetrieve(t *testing.T) {
 	expectedResult := expectedNewCollection(collectionName)
 
 	result, err := typesenseClient.Collection(collectionName).Retrieve()
+	result.CreatedAt = 0
 
 	require.NoError(t, err)
 	require.Equal(t, expectedResult, result)
@@ -23,6 +24,7 @@ func TestCollectionDelete(t *testing.T) {
 	expectedResult := expectedNewCollection(collectionName)
 
 	result, err := typesenseClient.Collection(collectionName).Delete()
+	result.CreatedAt = 0
 	require.NoError(t, err)
 	require.Equal(t, expectedResult, result)
 

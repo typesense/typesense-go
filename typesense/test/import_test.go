@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 )
 
 func TestDocumentsImport(t *testing.T) {
@@ -26,7 +27,7 @@ func TestDocumentsImport(t *testing.T) {
 		newDocument("127", withCompanyName("Company3")),
 	}
 
-	params := &api.ImportDocumentsParams{Action: "create"}
+	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
 	responses, err := typesenseClient.Collection(collectionName).Documents().Import(documents, params)
 
 	require.NoError(t, err)
@@ -55,7 +56,7 @@ func TestDocumentsImportJsonl(t *testing.T) {
 	require.NoError(t, buffer.WriteByte('\n'))
 	require.NoError(t, je.Encode(newDocument("127", withCompanyName("Company3"))))
 
-	params := &api.ImportDocumentsParams{Action: "create"}
+	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
 	responses, err := typesenseClient.Collection(collectionName).Documents().ImportJsonl(&buffer, params)
 
 	require.NoError(t, err)

@@ -5,10 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 
 	"github.com/typesense/typesense-go/typesense/api"
 )
@@ -80,11 +80,12 @@ func (d *documents) Delete(filter *api.DeleteDocumentsParams) (int, error) {
 }
 
 func (d *documents) Search(params *api.SearchCollectionParams) (*api.SearchResult, error) {
-	params.Q = url.QueryEscape(params.Q)
-	if params.FilterBy != nil {
-		escapedFilterBy := url.QueryEscape(*params.FilterBy)
-		params.FilterBy = &escapedFilterBy
-	}
+	// params.Q = url.QueryEscape(params.Q)
+	// if params.FilterBy != nil {
+	// 	escapedFilterBy := url.QueryEscape(*params.FilterBy)
+	// 	fmt.Println(escapedFilterBy)
+	// 	params.FilterBy = &escapedFilterBy
+	// }
 	response, err := d.apiClient.SearchCollectionWithResponse(context.Background(),
 		d.collectionName, params)
 	if err != nil {
@@ -93,6 +94,7 @@ func (d *documents) Search(params *api.SearchCollectionParams) (*api.SearchResul
 	if response.JSON200 == nil {
 		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
+	fmt.Println(response.JSON200)
 	return response.JSON200, nil
 }
 

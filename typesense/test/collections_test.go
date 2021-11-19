@@ -16,6 +16,7 @@ func TestCollectionCreate(t *testing.T) {
 	expectedResult := expectedNewCollection(collectionName)
 
 	result, err := typesenseClient.Collections().Create(schema)
+	result.CreatedAt = 0
 
 	require.NoError(t, err)
 	require.Equal(t, expectedResult, result)
@@ -31,7 +32,7 @@ func TestCollectionsRetrieve(t *testing.T) {
 	for i := 0; i < total; i++ {
 		schemas[i] = newSchema(collectionNames[i])
 	}
-	expectedResult := map[string]*api.Collection{}
+	expectedResult := map[string]*api.CollectionResponse{}
 	for i := 0; i < total; i++ {
 		expectedResult[collectionNames[i]] = expectedNewCollection(collectionNames[i])
 	}
@@ -46,9 +47,10 @@ func TestCollectionsRetrieve(t *testing.T) {
 	require.NoError(t, err)
 	require.True(t, len(result) >= total, "number of collections is invalid")
 
-	resultMap := map[string]*api.Collection{}
+	resultMap := map[string]*api.CollectionResponse{}
 	for _, collection := range result {
 		resultMap[collection.Name] = collection
+		resultMap[collection.Name].CreatedAt = 0
 	}
 
 	for k, v := range expectedResult {
