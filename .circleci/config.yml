@@ -65,9 +65,11 @@ jobs:
           path: /tmp/test-reports
 
 workflows:
-  test-and-build:
+  lint:
     jobs:
       - lint
+  test-and-build:
+    jobs:
       - test:
           requires:
             - lint
