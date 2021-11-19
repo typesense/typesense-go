@@ -31,7 +31,7 @@ jobs:
       - run:
           name: revive
           command: revive -config .revive.toml -formatter friendly ./...
-  build:
+  test:
     docker:
       - image: circleci/golang:1.15.8
       - name: db
