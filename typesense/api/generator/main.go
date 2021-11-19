@@ -1,7 +1,9 @@
 package main
 
 import (
+	"io"
 	"log"
+	"net/http"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -21,6 +23,11 @@ func main() {
 	m := make(yml)
 
 	log.Println("Fetching openapi.yml from typesense api spec")
+	err := fetchOpenAPISpec()
+	if err != nil {
+		log.Fatalf("Aboring: %s", err.Error())
+	}
+
 	configFile, err := os.Open("./typesense/api/generator/openapi.yml")
 	if err != nil {
 		log.Fatalf("Unable to open config file: %s", err.Error())
@@ -61,6 +68,30 @@ func main() {
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
+}
+
+func fetchOpenAPISpec() error {
+	url := "https://raw.githubusercontent.com/typesense/typesense-api-spec/master/openapi.yml"
+
+	// Fetch the spec
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Printf("Unable to fetch spec: %s", err.Error())
+		return nil
+	}
+	defer resp.Body.Close()
+
+	// Write the spec to openapi.yml file
+	openapiFile, err := os.Create("./typesense/api/generator/openapi.yml")
+	if err != nil {
+		log.Printf("Unable to write openapi.yml file: %s", err.Error())
+		return nil
+	}
+	defer openapiFile.Close()
+
+	// Write the body to openapi.yml file
+	_, err = io.Copy(openapiFile, resp.Body)
+	return err
 }
 
 func searchResultHit(m *yml) {
