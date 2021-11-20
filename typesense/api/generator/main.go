@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -68,6 +70,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
+
+	// Use generator.yml to generate client_gen.go and types_gen.go
+	log.Println("Generating client")
+	oAPICodeGen()
 }
 
 func fetchOpenAPISpec() error {
@@ -89,7 +95,7 @@ func fetchOpenAPISpec() error {
 	}
 	defer openapiFile.Close()
 
-	// Write the body to openapi.yml file
+	// Write the body to generator.yml file
 	_, err = io.Copy(openapiFile, resp.Body)
 	return err
 }
@@ -181,4 +187,21 @@ func unwrapSearchParameters(m *yml) {
 
 	parameters = append(parameters[:1], parameters[2:]...)
 	(*m)["paths"].(yml)["/collections/{collectionName}/documents/search"].(yml)["get"].(yml)["parameters"] = parameters
+}
+
+func oAPICodeGen() {
+	cmd := exec.Command("pwd")
+	stdout, err := cmd.Output()
+	if err != nil {
+		log.Printf("Unable to get current directory: %s", err.Error())
+	}
+	currentDir := strings.TrimSpace(string(stdout))
+	log.Printf("Current directory: %s", currentDir)
+	log.Println("Generating client_gen.go and types_gen.go")
+
+	// Generate client_gen.go and types_gen.go
+	err = exec.Command("sh", "./generator.sh").Run()
+	if err != nil {
+		log.Printf("Error generating client_gen.go and types_gen.go: %s", err.Error())
+	}
 }

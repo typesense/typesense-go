@@ -288,42 +288,42 @@ type ImportDocumentsParamsDirtyValues string
 
 // SearchCollectionParams defines parameters for SearchCollection.
 type SearchCollectionParams struct {
-	HighlightFields         *[]string    `json:"highlight_fields,omitempty"`
-	Q                       string       `json:"q"`
-	MaxHits                 *interface{} `json:"max_hits,omitempty"`
 	MaxFacetValues          *int         `json:"max_facet_values,omitempty"`
-	FacetQuery              *string      `json:"facet_query,omitempty"`
-	PinnedHits              *[]string    `json:"pinned_hits,omitempty"`
-	SearchCutoffMs          *int         `json:"search_cutoff_ms,omitempty"`
-	CacheTtl                *int         `json:"cache_ttl,omitempty"`
-	MinLen2typo             *int         `json:"min_len_2typo,omitempty"`
-	QueryBy                 []string     `json:"query_by"`
-	QueryByWeights          *[]string    `json:"query_by_weights,omitempty"`
-	FacetBy                 *[]string    `json:"facet_by,omitempty"`
-	PerPage                 *int         `json:"per_page,omitempty"`
-	HighlightEndTag         *string      `json:"highlight_end_tag,omitempty"`
+	HighlightStartTag       *string      `json:"highlight_start_tag,omitempty"`
 	DropTokensThreshold     *int         `json:"drop_tokens_threshold,omitempty"`
-	ExcludeFields           *[]string    `json:"exclude_fields,omitempty"`
+	MaxHits                 *interface{} `json:"max_hits,omitempty"`
+	Prefix                  *[]bool      `json:"prefix,omitempty"`
+	GroupLimit              *int         `json:"group_limit,omitempty"`
 	HighlightFullFields     *[]string    `json:"highlight_full_fields,omitempty"`
 	HighlightAffixNumTokens *int         `json:"highlight_affix_num_tokens,omitempty"`
-	SnippetThreshold        *int         `json:"snippet_threshold,omitempty"`
-	HiddenHits              *[]string    `json:"hidden_hits,omitempty"`
-	Prefix                  *[]bool      `json:"prefix,omitempty"`
+	PrioritizeExactMatch    *bool        `json:"prioritize_exact_match,omitempty"`
+	QueryBy                 []string     `json:"query_by"`
 	SortBy                  *[]string    `json:"sort_by,omitempty"`
-	Page                    *int         `json:"page,omitempty"`
-	GroupBy                 *[]string    `json:"group_by,omitempty"`
-	GroupLimit              *int         `json:"group_limit,omitempty"`
-	ExhaustiveSearch        *bool        `json:"exhaustive_search,omitempty"`
-	MinLen1typo             *int         `json:"min_len_1typo,omitempty"`
+	FacetQuery              *string      `json:"facet_query,omitempty"`
+	PerPage                 *int         `json:"per_page,omitempty"`
 	TypoTokensThreshold     *int         `json:"typo_tokens_threshold,omitempty"`
-	UseCache                *bool        `json:"use_cache,omitempty"`
+	SearchCutoffMs          *int         `json:"search_cutoff_ms,omitempty"`
+	MinLen2typo             *int         `json:"min_len_2typo,omitempty"`
+	Q                       string       `json:"q"`
+	GroupBy                 *[]string    `json:"group_by,omitempty"`
+	HighlightEndTag         *string      `json:"highlight_end_tag,omitempty"`
+	EnableOverrides         *bool        `json:"enable_overrides,omitempty"`
+	CacheTtl                *int         `json:"cache_ttl,omitempty"`
+	FacetBy                 *[]string    `json:"facet_by,omitempty"`
+	FilterBy                *string      `json:"filter_by,omitempty"`
 	NumTypos                *int         `json:"num_typos,omitempty"`
 	IncludeFields           *[]string    `json:"include_fields,omitempty"`
+	QueryByWeights          *[]string    `json:"query_by_weights,omitempty"`
+	SnippetThreshold        *int         `json:"snippet_threshold,omitempty"`
+	HiddenHits              *[]string    `json:"hidden_hits,omitempty"`
 	PreSegmentedQuery       *bool        `json:"pre_segmented_query,omitempty"`
-	EnableOverrides         *bool        `json:"enable_overrides,omitempty"`
-	PrioritizeExactMatch    *bool        `json:"prioritize_exact_match,omitempty"`
-	FilterBy                *string      `json:"filter_by,omitempty"`
-	HighlightStartTag       *string      `json:"highlight_start_tag,omitempty"`
+	UseCache                *bool        `json:"use_cache,omitempty"`
+	Page                    *int         `json:"page,omitempty"`
+	PinnedHits              *[]string    `json:"pinned_hits,omitempty"`
+	ExhaustiveSearch        *bool        `json:"exhaustive_search,omitempty"`
+	MinLen1typo             *int         `json:"min_len_1typo,omitempty"`
+	ExcludeFields           *[]string    `json:"exclude_fields,omitempty"`
+	HighlightFields         *[]string    `json:"highlight_fields,omitempty"`
 }
 
 // UpdateDocumentJSONBody defines parameters for UpdateDocument.
