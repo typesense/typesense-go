@@ -363,6 +363,19 @@ client.Operations().Vote()
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/typesense/typesense-go.
 
+#### Development Workflow Setup
+
+Install dependencies,
+```bash
+go mod download
+```
+Update the generated files,
+```bash
+go generate
+```
+
+> NOTE: Make sure you have `GOBIN` in environment variables
+
 ## License
 
 `typesense-go` is distributed under the Apache 2 license.

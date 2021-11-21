@@ -8,8 +8,8 @@ import (
 
 // CollectionInterface is a type for Collection API operations
 type CollectionInterface interface {
-	Retrieve() (*api.Collection, error)
-	Delete() (*api.Collection, error)
+	Retrieve() (*api.CollectionResponse, error)
+	Delete() (*api.CollectionResponse, error)
 	Documents() DocumentsInterface
 	Document(documentID string) DocumentInterface
 	Overrides() OverridesInterface
@@ -24,7 +24,7 @@ type collection struct {
 	name      string
 }
 
-func (c *collection) Retrieve() (*api.Collection, error) {
+func (c *collection) Retrieve() (*api.CollectionResponse, error) {
 	response, err := c.apiClient.GetCollectionWithResponse(context.Background(), c.name)
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func (c *collection) Retrieve() (*api.Collection, error) {
 	return response.JSON200, nil
 }
 
-func (c *collection) Delete() (*api.Collection, error) {
+func (c *collection) Delete() (*api.CollectionResponse, error) {
 	response, err := c.apiClient.DeleteCollectionWithResponse(context.Background(), c.name)
 	if err != nil {
 		return nil, err

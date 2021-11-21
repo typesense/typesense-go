@@ -9,10 +9,10 @@ const APIKeyHeader = "X-TYPESENSE-API-KEY"
 
 func WithAPIKey(apiKey string) ClientOption {
 	return func(c *Client) error {
-		c.RequestEditor = func(ctx context.Context, req *http.Request) error {
+		c.RequestEditors = []RequestEditorFn{func(ctx context.Context, req *http.Request) error {
 			req.Header.Add(APIKeyHeader, apiKey)
 			return nil
-		}
+		}}
 		return nil
 	}
 }

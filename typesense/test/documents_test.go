@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 )
 
 func TestDocumentCreate(t *testing.T) {
@@ -78,7 +79,7 @@ func TestDocumentsDelete(t *testing.T) {
 	_, err = typesenseClient.Collection(collectionName).Documents().Create(document)
 	require.NoError(t, err)
 
-	filter := &api.DeleteDocumentsParams{FilterBy: "num_employees:>6500", BatchSize: 100}
+	filter := &api.DeleteDocumentsParams{FilterBy: pointer.String("num_employees:>6500"), BatchSize: pointer.Int(100)}
 	result, err := typesenseClient.Collection(collectionName).Documents().Delete(filter)
 
 	require.NoError(t, err)

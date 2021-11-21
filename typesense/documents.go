@@ -8,12 +8,11 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 
 	"github.com/typesense/typesense-go/typesense/api"
 )
 
-var upsertAction = "upsert"
+var upsertAction api.IndexDocumentParamsAction = "upsert"
 
 const (
 	defaultImportBatchSize = 40
@@ -80,11 +79,6 @@ func (d *documents) Delete(filter *api.DeleteDocumentsParams) (int, error) {
 }
 
 func (d *documents) Search(params *api.SearchCollectionParams) (*api.SearchResult, error) {
-	params.Q = url.QueryEscape(params.Q)
-	if params.FilterBy != nil {
-		escapedFilterBy := url.QueryEscape(*params.FilterBy)
-		params.FilterBy = &escapedFilterBy
-	}
 	response, err := d.apiClient.SearchCollectionWithResponse(context.Background(),
 		d.collectionName, params)
 	if err != nil {
@@ -97,7 +91,7 @@ func (d *documents) Search(params *api.SearchCollectionParams) (*api.SearchResul
 }
 
 func (d *documents) Export() (io.ReadCloser, error) {
-	response, err := d.apiClient.ExportDocuments(context.Background(), d.collectionName)
+	response, err := d.apiClient.ExportDocuments(context.Background(), d.collectionName, &api.ExportDocumentsParams{})
 	if err != nil {
 		return nil, err
 	}
@@ -110,11 +104,13 @@ func (d *documents) Export() (io.ReadCloser, error) {
 }
 
 func initImportParams(params *api.ImportDocumentsParams) {
-	if params.BatchSize == 0 {
-		params.BatchSize = defaultImportBatchSize
+	if params.BatchSize == nil {
+		params.BatchSize = new(int)
+		*params.BatchSize = defaultImportBatchSize
 	}
-	if len(params.Action) == 0 {
-		params.Action = defaultImportAction
+	if params.Action == nil {
+		params.Action = new(string)
+		*params.Action = defaultImportAction
 	}
 }
 

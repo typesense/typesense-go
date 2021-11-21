@@ -8,8 +8,8 @@ import (
 
 // CollectionsInterface is a type for Collections API operations
 type CollectionsInterface interface {
-	Create(schema *api.CollectionSchema) (*api.Collection, error)
-	Retrieve() ([]*api.Collection, error)
+	Create(schema *api.CollectionSchema) (*api.CollectionResponse, error)
+	Retrieve() ([]*api.CollectionResponse, error)
 }
 
 // collections is internal implementation of CollectionsInterface
@@ -17,7 +17,7 @@ type collections struct {
 	apiClient APIClientInterface
 }
 
-func (c *collections) Create(schema *api.CollectionSchema) (*api.Collection, error) {
+func (c *collections) Create(schema *api.CollectionSchema) (*api.CollectionResponse, error) {
 	response, err := c.apiClient.CreateCollectionWithResponse(context.Background(),
 		api.CreateCollectionJSONRequestBody(*schema))
 	if err != nil {
@@ -29,7 +29,7 @@ func (c *collections) Create(schema *api.CollectionSchema) (*api.Collection, err
 	return response.JSON201, nil
 }
 
-func (c *collections) Retrieve() ([]*api.Collection, error) {
+func (c *collections) Retrieve() ([]*api.CollectionResponse, error) {
 	response, err := c.apiClient.GetCollectionsWithResponse(context.Background())
 	if err != nil {
 		return nil, err

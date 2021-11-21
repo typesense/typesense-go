@@ -10,6 +10,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/stretchr/testify/assert"
 	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"github.com/typesense/typesense-go/typesense/mocks"
 )
 
@@ -18,7 +19,7 @@ func createNewKeySchema() *api.ApiKeySchema {
 		Description: "Search-only key.",
 		Actions:     []string{"documents:search"},
 		Collections: []string{"companies"},
-		ExpiresAt:   time.Date(2222, 0, 1, 0, 0, 0, 0, time.UTC).Unix(),
+		ExpiresAt:   pointer.Int64(time.Date(2222, 0, 1, 0, 0, 0, 0, time.UTC).Unix()),
 	}
 }
 
@@ -130,7 +131,6 @@ func TestKeysRetrieve(t *testing.T) {
 }
 
 func TestKeysRetrieveOnApiClientErrorReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
@@ -146,7 +146,6 @@ func TestKeysRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 }
 
 func TestKeysRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)

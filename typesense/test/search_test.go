@@ -20,13 +20,13 @@ func TestCollectionSearch(t *testing.T) {
 		newDocument("131", withCompanyName("Stark Industries 5"), withNumEmployees(1000)),
 	}
 
-	params := &api.ImportDocumentsParams{Action: "create"}
+	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
 	_, err := typesenseClient.Collection(collectionName).Documents().Import(documents, params)
 	require.NoError(t, err)
 
 	searchParams := &api.SearchCollectionParams{
 		Q:              "Company",
-		QueryBy:        []string{"company_name", "country"},
+		QueryBy:        []string{"company_name"},
 		QueryByWeights: &([]string{"2", "1"}),
 		MaxHits:        pointer.Interface("all"),
 		FilterBy:       pointer.String("num_employees:>=100"),
@@ -66,16 +66,17 @@ func TestCollectionSearchRange(t *testing.T) {
 		newDocument("129", withCompanyName("Stark Industries 4"), withNumEmployees(500)),
 	}
 
-	params := &api.ImportDocumentsParams{Action: "create"}
+	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
 	_, err := typesenseClient.Collection(collectionName).Documents().Import(documents, params)
 	require.NoError(t, err)
 
 	searchParams := &api.SearchCollectionParams{
 		Q:        "*",
-		FilterBy: pointer.String("num_employees:>=100 && num_employees:<=300"),
+		FilterBy: pointer.String("num_employees:>=100&&num_employees:<=300"),
 		SortBy:   &([]string{"num_employees:asc"}),
 		Page:     pointer.Int(1),
 		PerPage:  pointer.Int(10),
+		QueryBy:  []string{"company_name", "country"},
 	}
 
 	expectedDocs := []map[string]interface{}{

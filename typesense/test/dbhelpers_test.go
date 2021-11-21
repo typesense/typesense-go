@@ -23,30 +23,36 @@ func newSchema(collectionName string) *api.CollectionSchema {
 		Name: collectionName,
 		Fields: []api.Field{
 			{
-				Name:  "company_name",
-				Type:  "string",
-				Index: pointer.True(),
+				Name:     "company_name",
+				Type:     "string",
+				Index:    pointer.True(),
+				Optional: pointer.False(),
+				Facet:    pointer.False(),
 			},
 			{
-				Name:  "num_employees",
-				Type:  "int32",
-				Index: pointer.True(),
+				Name:     "num_employees",
+				Type:     "int32",
+				Index:    pointer.True(),
+				Optional: pointer.False(),
+				Facet:    pointer.False(),
 			},
 			{
-				Name:  "country",
-				Type:  "string",
-				Facet: true,
-				Index: pointer.True(),
+				Name:     "country",
+				Type:     "string",
+				Facet:    pointer.True(),
+				Index:    pointer.True(),
+				Optional: pointer.True(),
 			},
 		},
-		DefaultSortingField: "num_employees",
+		DefaultSortingField: pointer.String("num_employees"),
 	}
 }
 
-func expectedNewCollection(name string) *api.Collection {
-	return &api.Collection{
+func expectedNewCollection(name string) *api.CollectionResponse {
+	return &api.CollectionResponse{
 		CollectionSchema: *newSchema(name),
 		NumDocuments:     0,
+		NumMemoryShards:  4,
 	}
 }
 
@@ -115,7 +121,7 @@ func newKeySchema() *api.ApiKeySchema {
 		Description: "Search-only key.",
 		Actions:     []string{"documents:search"},
 		Collections: []string{"*"},
-		ExpiresAt:   time.Now().Add(1 * time.Hour).Unix(),
+		ExpiresAt:   pointer.Int64(time.Now().Add(1 * time.Hour).Unix()),
 	}
 }
 
@@ -127,7 +133,7 @@ func newKey() *api.ApiKey {
 
 type newSearchOverrideSchemaOption func(*api.SearchOverrideSchema)
 
-func withOverrideRuleMatch(match string) newSearchOverrideSchemaOption {
+func withOverrideRuleMatch(match api.SearchOverrideRuleMatch) newSearchOverrideSchemaOption {
 	return func(o *api.SearchOverrideSchema) {
 		o.Rule.Match = match
 	}
