@@ -396,6 +396,7 @@ components:
           company_name:
             field: company_name
             snippet: <mark>Stark</mark> Industries
+        text_match: 1234556
       properties:
         document:
           description: Can be any key-value pair
@@ -405,9 +406,13 @@ components:
           items:
             $ref: '#/components/schemas/SearchHighlight'
           type: array
+        text_match:
+          format: int64
+          type: integer
       required:
         - document
         - highlights
+        - text_match
       type: object
     SearchSynonym:
       allOf:
@@ -657,13 +662,13 @@ paths:
           schema:
             type: string
         - in: query
-          name: filter_by
-          schema:
-            type: string
-        - in: query
           name: batch_size
           schema:
             type: integer
+        - in: query
+          name: filter_by
+          schema:
+            type: string
       responses:
         200:
           content:
@@ -850,10 +855,6 @@ paths:
           schema:
             type: string
         - in: query
-          name: filter_by
-          schema:
-            type: string
-        - in: query
           name: include_fields
           schema:
             items:
@@ -865,6 +866,10 @@ paths:
             items:
               type: string
             type: array
+        - in: query
+          name: filter_by
+          schema:
+            type: string
       responses:
         200:
           content:
@@ -897,6 +902,10 @@ paths:
           schema:
             type: string
         - in: query
+          name: action
+          schema:
+            type: string
+        - in: query
           name: batch_size
           schema:
             type: integer
@@ -908,10 +917,6 @@ paths:
               - coerce_or_drop
               - drop
               - reject
-            type: string
-        - in: query
-          name: action
-          schema:
             type: string
       requestBody:
         content:
@@ -952,15 +957,43 @@ paths:
           schema:
             type: string
         - in: query
-          name: max_facet_values
+          name: prefix
           schema:
-            type: integer
+            items:
+              type: boolean
+            type: array
         - in: query
-          name: highlight_start_tag
+          name: include_fields
+          schema:
+            items:
+              type: string
+            type: array
+        - in: query
+          name: highlight_end_tag
           schema:
             type: string
         - in: query
-          name: drop_tokens_threshold
+          name: snippet_threshold
+          schema:
+            type: integer
+        - in: query
+          name: use_cache
+          schema:
+            type: boolean
+        - in: query
+          name: min_len_2typo
+          schema:
+            type: integer
+        - in: query
+          name: num_typos
+          schema:
+            type: integer
+        - in: query
+          name: prioritize_exact_match
+          schema:
+            type: boolean
+        - in: query
+          name: cache_ttl
           schema:
             type: integer
         - in: query
@@ -974,27 +1007,27 @@ paths:
                 example: all
                 type: string
         - in: query
-          name: prefix
-          schema:
-            items:
-              type: boolean
-            type: array
-        - in: query
-          name: group_limit
-          schema:
-            type: integer
-        - in: query
-          name: highlight_full_fields
+          name: group_by
           schema:
             items:
               type: string
             type: array
         - in: query
-          name: highlight_affix_num_tokens
+          name: filter_by
           schema:
-            type: integer
+            type: string
         - in: query
-          name: prioritize_exact_match
+          name: exclude_fields
+          schema:
+            items:
+              type: string
+            type: array
+        - in: query
+          name: highlight_start_tag
+          schema:
+            type: string
+        - in: query
+          name: exhaustive_search
           schema:
             type: boolean
         - in: query
@@ -1005,30 +1038,23 @@ paths:
               type: string
             type: array
         - in: query
-          name: sort_by
+          name: max_facet_values
           schema:
-            items:
-              example: num_employees:desc
-              type: string
-            type: array
-        - in: query
-          name: facet_query
-          schema:
-            type: string
+            type: integer
         - in: query
           name: per_page
           schema:
             type: integer
         - in: query
+          name: highlight_affix_num_tokens
+          schema:
+            type: integer
+        - in: query
+          name: drop_tokens_threshold
+          schema:
+            type: integer
+        - in: query
           name: typo_tokens_threshold
-          schema:
-            type: integer
-        - in: query
-          name: search_cutoff_ms
-          schema:
-            type: integer
-        - in: query
-          name: min_len_2typo
           schema:
             type: integer
         - in: query
@@ -1037,69 +1063,17 @@ paths:
           schema:
             type: string
         - in: query
-          name: group_by
-          schema:
-            items:
-              type: string
-            type: array
-        - in: query
-          name: highlight_end_tag
-          schema:
-            type: string
-        - in: query
-          name: enable_overrides
-          schema:
-            type: boolean
-        - in: query
-          name: cache_ttl
-          schema:
-            type: integer
-        - in: query
-          name: facet_by
-          schema:
-            items:
-              type: string
-            type: array
-        - in: query
-          name: filter_by
-          schema:
-            type: string
-        - in: query
-          name: num_typos
-          schema:
-            type: integer
-        - in: query
-          name: include_fields
-          schema:
-            items:
-              type: string
-            type: array
-        - in: query
           name: query_by_weights
           schema:
             items:
               type: string
             type: array
         - in: query
-          name: snippet_threshold
+          name: page
           schema:
             type: integer
         - in: query
-          name: hidden_hits
-          schema:
-            items:
-              type: string
-            type: array
-        - in: query
-          name: pre_segmented_query
-          schema:
-            type: boolean
-        - in: query
-          name: use_cache
-          schema:
-            type: boolean
-        - in: query
-          name: page
+          name: group_limit
           schema:
             type: integer
         - in: query
@@ -1109,15 +1083,7 @@ paths:
               type: string
             type: array
         - in: query
-          name: exhaustive_search
-          schema:
-            type: boolean
-        - in: query
-          name: min_len_1typo
-          schema:
-            type: integer
-        - in: query
-          name: exclude_fields
+          name: hidden_hits
           schema:
             items:
               type: string
@@ -1128,6 +1094,45 @@ paths:
             items:
               type: string
             type: array
+        - in: query
+          name: pre_segmented_query
+          schema:
+            type: boolean
+        - in: query
+          name: enable_overrides
+          schema:
+            type: boolean
+        - in: query
+          name: min_len_1typo
+          schema:
+            type: integer
+        - in: query
+          name: sort_by
+          schema:
+            items:
+              example: num_employees:desc
+              type: string
+            type: array
+        - in: query
+          name: facet_by
+          schema:
+            items:
+              type: string
+            type: array
+        - in: query
+          name: facet_query
+          schema:
+            type: string
+        - in: query
+          name: highlight_full_fields
+          schema:
+            items:
+              type: string
+            type: array
+        - in: query
+          name: search_cutoff_ms
+          schema:
+            type: integer
       responses:
         200:
           content:
