@@ -269,15 +269,14 @@ paths:
               - highlight_full_fields # only for codegen
               - pinned_hits # only for codegen
               - prefix # only for codegen
-              
+
             properties:
               q:
                 description: The query text to search for in the collection.
                   Use * as the search string to return all documents.
                   This is typically useful when used in conjunction with filter_by.
                 type: string
-                
-                
+
               query_by:
                 description: A list of `string` fields that should be queried
                   against. Multiple fields are separated with a comma.
@@ -285,8 +284,7 @@ paths:
                 items:
                   type: string
                 default: []
-                
-                
+
               query_by_weights:
                 description:
                   The relative weight to give each `query_by` field when ranking results.
@@ -296,7 +294,7 @@ paths:
                 items:
                   type: string
                 default: []
-                
+
               max_hits:
                 description: >
                   Maximum number of hits returned. Increasing this value might
@@ -308,7 +306,7 @@ paths:
                     example: all
                     enum:
                       - all
-                      
+
               prefix:
                 description:
                   Boolean field to indicate that the last word in the query should
@@ -318,14 +316,14 @@ paths:
                 items:
                   type: boolean
                 default: []
-                
+
               filter_by:
                 description:
                   Filter conditions for refining your search results. Separate
                   multiple conditions with &&.
                 type: string
                 example: "num_employees:>100 && country: [USA, UK]"
-                
+
               sort_by:
                 description:
                   A list of numerical fields and their corresponding sort orders
@@ -340,7 +338,7 @@ paths:
                   type: string
                   example: num_employees:desc
                 default: []
-                
+
               facet_by:
                 description:
                   A list of fields that will be used for faceting your results
@@ -349,11 +347,11 @@ paths:
                 items:
                   type: string
                 default: []
-                
+
               max_facet_values:
                 description: Maximum number of facet values to be returned.
                 type: integer
-                
+
               facet_query:
                 description:
                   Facet values that are returned can now be filtered via this parameter.
@@ -361,21 +359,21 @@ paths:
                   by `category`, you can set `facet_query=category:shoe` to return only
                   facet values that contain the prefix "shoe".
                 type: string
-                
+
               num_typos:
                 description: >
                   The number of typographical errors (1 or 2) that would be tolerated.
                   Default: 2
                 type: integer
-                
+
               page:
                 description: Results from this specific page number would be fetched.
                 type: integer
-                
+
               per_page:
                 description: "Number of results to fetch per page. Default: 10"
                 type: integer
-                
+
               group_by:
                 description:
                   You can aggregate search results into groups or buckets by specify
@@ -385,41 +383,41 @@ paths:
                 items:
                   type: string
                 default: []
-              
+
               group_limit:
                 description: >
                   Maximum number of hits to be returned for every group. If the `group_limit` is
                   set as `K` then only the top K hits in each group are returned in the response.
                   Default: 3
                 type: integer
-              
+
               include_fields:
                 description: List of fields from the document to include in the search result
                 type: array
                 items:
                   type: string
                 default: []
-                
+
               exclude_fields:
                 description: List of fields from the document to exclude in the search result
                 type: array
                 items:
                   type: string
                 default: []
-                
+
               highlight_full_fields:
                 description: List of fields which should be highlighted fully without snippeting
                 type: array
                 items:
                   type: string
                 default: []
-                
+
               highlight_affix_num_tokens:
                 description: >
                   The number of tokens that should surround the highlighted text on each side.
                   Default: 4
                 type: integer
-                
+
               highlight_start_tag:
                 description: >
                   The start tag used for the highlighted snippets.
@@ -430,13 +428,13 @@ paths:
                   The end tag used for the highlighted snippets.
                   Default: `</mark>`
                 type: string
-                
+
               snippet_threshold:
                 description: >
                   Field values under this length will be fully highlighted, instead of showing
                   a snippet of relevant portion. Default: 30
                 type: integer
-                
+
               drop_tokens_threshold:
                 description: >
                   If the number of results found for a specific query is less than
@@ -450,7 +448,7 @@ paths:
                   Typesense will attempt to look for tokens with more typos until
                   enough results are found. Default: 100
                 type: integer
-                
+
               pinned_hits:
                 description: >
                   A list of records to unconditionally include in the search results
@@ -467,7 +465,7 @@ paths:
                 items:
                   type: string
                 default: []
-                
+
               hidden_hits:
                 description: >
                   A list of records to unconditionally hide from search results.
@@ -481,7 +479,7 @@ paths:
                 items:
                   type: string
                 default: []
-                
+
               highlight_fields:
                 description: >
                   A list of custom fields that must be highlighted even if you don't query 
@@ -490,7 +488,7 @@ paths:
                 items:
                   type: string
                 default: []
-                
+
               pre_segmented_query:
                 description: >
                   You can index content from any logographic language into Typesense if you
@@ -499,13 +497,13 @@ paths:
 
                   Set this parameter to tre to do the same
                 type: boolean
-                
+
               enable_overrides:
                 description: >
                   If you have some overrides defined but want to disable all of them during
                   query time, you can do that by setting this parameter to false
                 type: boolean
-                
+
               prioritize_exact_match:
                 description: >
                   Set this parameter to true to ensure that an exact match is ranked above
@@ -1287,7 +1285,7 @@ components:
           items:
             type: string # characters only
           default: []
-        
+
         symbols_to_index:
           type: array
           description: >
@@ -1419,7 +1417,7 @@ components:
               type: string
             per_page:
               type: integer
-          
+
     SearchGroupedHit:
       type: object
       required:
@@ -1440,6 +1438,7 @@ components:
       required:
         - document
         - highlights
+        - text_match
       properties:
         highlights:
           type: array
@@ -1451,6 +1450,9 @@ components:
           description: Can be any key-value pair
           additionalProperties:
             type: object
+        text_match:
+          type: integer
+          format: int64
       example:
         highlights:
           company_name:
@@ -1461,6 +1463,7 @@ components:
           company_name: Stark Industries
           num_employees: 5215
           country: USA
+        text_match: 1234556
     SearchHighlight:
       type: object
       required:
@@ -1520,9 +1523,9 @@ components:
           items:
             $ref: "#/components/schemas/SearchOverrideExclude"
         filter_by:
-            type: string
-            description: >
-              A filter by clause that is applied to any search query that matches the override rule.
+          type: string
+          description: >
+            A filter by clause that is applied to any search query that matches the override rule.
         remove_matched_tokens:
           type: boolean
           description: >
