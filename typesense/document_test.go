@@ -83,7 +83,7 @@ func TestDocumentUpdate(t *testing.T) {
 	mockAPIClient.EXPECT().
 		UpdateDocumentWithResponse(notNill, "companies", "123", expectedDocument).
 		Return(&api.UpdateDocumentResponse{
-			JSON200: &mockedResult,
+			JSON201: &mockedResult,
 		}, nil).
 		Times(1)
 
