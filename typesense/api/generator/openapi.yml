@@ -956,7 +956,7 @@ paths:
               x-go-type: "interface{}"
         required: true
       responses:
-        200:
+        201:
           description: The document referenced by the ID was updated
           content:
             application/json:
