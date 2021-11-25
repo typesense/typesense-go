@@ -107,6 +107,11 @@ type HealthStatus struct {
 	Ok bool `json:"ok"`
 }
 
+// MultiSearchParameters defines model for MultiSearchParameters.
+type MultiSearchParameters struct {
+	Searches []SearchParameters `json:"searches"`
+}
+
 // SearchGroupedHit defines model for SearchGroupedHit.
 type SearchGroupedHit struct {
 	GroupKey []string `json:"group_key"`
@@ -184,6 +189,120 @@ type SearchOverrideSchema struct {
 // SearchOverridesResponse defines model for SearchOverridesResponse.
 type SearchOverridesResponse struct {
 	Overrides []*SearchOverride `json:"overrides"`
+}
+
+// SearchParameters defines model for SearchParameters.
+type SearchParameters struct {
+	// The duration (in seconds) that determines how long the search query is cached.  This value can be set on a per-query basis. Default: 60.
+	CacheTtl *int `json:"cache_ttl,omitempty"`
+
+	// If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
+	DropTokensThreshold *int `json:"drop_tokens_threshold,omitempty"`
+
+	// If you have some overrides defined but want to disable all of them during query time, you can do that by setting this parameter to false
+	EnableOverrides *bool `json:"enable_overrides,omitempty"`
+
+	// List of fields from the document to exclude in the search result
+	ExcludeFields []string `json:"exclude_fields"`
+
+	// Setting this to true will make Typesense consider all prefixes and typo  corrections of the words in the query without stopping early when enough results are found  (drop_tokens_threshold and typo_tokens_threshold configurations are ignored).
+	ExhaustiveSearch *bool `json:"exhaustive_search,omitempty"`
+
+	// A list of fields that will be used for faceting your results on. Separate multiple fields with a comma.
+	FacetBy []string `json:"facet_by"`
+
+	// Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
+	FacetQuery *string `json:"facet_query,omitempty"`
+
+	// Filter conditions for refining your search results. Separate multiple conditions with &&.
+	FilterBy *string `json:"filter_by,omitempty"`
+
+	// You can aggregate search results into groups or buckets by specify one or more `group_by` fields. Separate multiple fields with a comma. To group on a particular field, it must be a faceted field.
+	GroupBy []string `json:"group_by"`
+
+	// Maximum number of hits to be returned for every group. If the `group_limit` is set as `K` then only the top K hits in each group are returned in the response. Default: 3
+	GroupLimit *int `json:"group_limit,omitempty"`
+
+	// A list of records to unconditionally hide from search results. A list of `record_id`s to hide. Eg: to hide records with IDs 123 and 456, you'd specify `123,456`.
+	// You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
+	HiddenHits []string `json:"hidden_hits"`
+
+	// The number of tokens that should surround the highlighted text on each side. Default: 4
+	HighlightAffixNumTokens *int `json:"highlight_affix_num_tokens,omitempty"`
+
+	// The end tag used for the highlighted snippets. Default: `</mark>`
+	HighlightEndTag *string `json:"highlight_end_tag,omitempty"`
+
+	// A list of custom fields that must be highlighted even if you don't query  for them
+	HighlightFields *[]string `json:"highlight_fields,omitempty"`
+
+	// List of fields which should be highlighted fully without snippeting
+	HighlightFullFields []string `json:"highlight_full_fields"`
+
+	// The start tag used for the highlighted snippets. Default: `<mark>`
+	HighlightStartTag *string `json:"highlight_start_tag,omitempty"`
+
+	// List of fields from the document to include in the search result
+	IncludeFields []string `json:"include_fields"`
+
+	// Maximum number of facet values to be returned.
+	MaxFacetValues *int `json:"max_facet_values,omitempty"`
+
+	// Maximum number of hits returned. Increasing this value might increase search latency. Default: 500. Use `all` to return all hits found.
+	MaxHits *interface{} `json:"max_hits,omitempty"`
+
+	// Minimum word length for 1-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
+	MinLen1typo *int `json:"min_len_1typo,omitempty"`
+
+	// Minimum word length for 2-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
+	MinLen2typo *int `json:"min_len_2typo,omitempty"`
+
+	// The number of typographical errors (1 or 2) that would be tolerated. Default: 2
+	NumTypos *int `json:"num_typos,omitempty"`
+
+	// Results from this specific page number would be fetched.
+	Page *int `json:"page,omitempty"`
+
+	// Number of results to fetch per page. Default: 10
+	PerPage *int `json:"per_page,omitempty"`
+
+	// A list of records to unconditionally include in the search results at specific positions. An example use case would be to feature or promote certain items on the top of search results. A list of `record_id:hit_position`. Eg: to include a record with ID 123 at Position 1 and another record with ID 456 at Position 5, you'd specify `123:1,456:5`.
+	// You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and  finally `hidden_hits`.
+	PinnedHits []string `json:"pinned_hits"`
+
+	// You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself  before indexing and querying.
+	// Set this parameter to tre to do the same
+	PreSegmentedQuery *bool `json:"pre_segmented_query,omitempty"`
+
+	// Boolean field to indicate that the last word in the query should be treated as a prefix, and not as a whole word. This is used for building autocomplete and instant search interfaces. Defaults to true.
+	Prefix []bool `json:"prefix"`
+
+	// Set this parameter to true to ensure that an exact match is ranked above the others
+	PrioritizeExactMatch *bool `json:"prioritize_exact_match,omitempty"`
+
+	// The query text to search for in the collection. Use * as the search string to return all documents. This is typically useful when used in conjunction with filter_by.
+	Q string `json:"q"`
+
+	// A list of `string` fields that should be queried against. Multiple fields are separated with a comma.
+	QueryBy []string `json:"query_by"`
+
+	// The relative weight to give each `query_by` field when ranking results. This can be used to boost fields in priority, when looking for matches. Multiple fields are separated with a comma.
+	QueryByWeights []string `json:"query_by_weights"`
+
+	// Typesense will attempt to return results early if the cutoff time has elapsed.  This is not a strict guarantee and facet computation is not bound by this parameter.
+	SearchCutoffMs *int `json:"search_cutoff_ms,omitempty"`
+
+	// Field values under this length will be fully highlighted, instead of showing a snippet of relevant portion. Default: 30
+	SnippetThreshold *int `json:"snippet_threshold,omitempty"`
+
+	// A list of numerical fields and their corresponding sort orders that will be used for ordering your results. Up to 3 sort fields can be specified. The text similarity score is exposed as a special `_text_match` field that you can use in the list of sorting fields. If no `sort_by` parameter is specified, results are sorted by `_text_match:desc,default_sorting_field:desc`
+	SortBy []string `json:"sort_by"`
+
+	// If the number of results found for a specific query is less than this number, Typesense will attempt to look for tokens with more typos until enough results are found. Default: 100
+	TypoTokensThreshold *int `json:"typo_tokens_threshold,omitempty"`
+
+	// Enable server side caching of search query results. By default, caching is disabled.
+	UseCache *bool `json:"use_cache,omitempty"`
 }
 
 // SearchResult defines model for SearchResult.
@@ -289,41 +408,41 @@ type ImportDocumentsParamsDirtyValues string
 
 // SearchCollectionParams defines parameters for SearchCollection.
 type SearchCollectionParams struct {
-	GroupBy                 *[]string    `json:"group_by,omitempty"`
-	ExcludeFields           *[]string    `json:"exclude_fields,omitempty"`
-	HighlightFullFields     *[]string    `json:"highlight_full_fields,omitempty"`
-	HighlightStartTag       *string      `json:"highlight_start_tag,omitempty"`
-	UseCache                *bool        `json:"use_cache,omitempty"`
-	QueryByWeights          *[]string    `json:"query_by_weights,omitempty"`
-	MaxFacetValues          *int         `json:"max_facet_values,omitempty"`
-	FacetQuery              *string      `json:"facet_query,omitempty"`
-	DropTokensThreshold     *int         `json:"drop_tokens_threshold,omitempty"`
-	PreSegmentedQuery       *bool        `json:"pre_segmented_query,omitempty"`
-	QueryBy                 []string     `json:"query_by"`
-	NumTypos                *int         `json:"num_typos,omitempty"`
-	Page                    *int         `json:"page,omitempty"`
-	FacetBy                 *[]string    `json:"facet_by,omitempty"`
-	GroupLimit              *int         `json:"group_limit,omitempty"`
-	IncludeFields           *[]string    `json:"include_fields,omitempty"`
-	HighlightEndTag         *string      `json:"highlight_end_tag,omitempty"`
-	EnableOverrides         *bool        `json:"enable_overrides,omitempty"`
 	MaxHits                 *interface{} `json:"max_hits,omitempty"`
-	Prefix                  *[]bool      `json:"prefix,omitempty"`
+	HighlightFields         *[]string    `json:"highlight_fields,omitempty"`
+	PreSegmentedQuery       *bool        `json:"pre_segmented_query,omitempty"`
 	SortBy                  *[]string    `json:"sort_by,omitempty"`
-	PinnedHits              *[]string    `json:"pinned_hits,omitempty"`
-	HiddenHits              *[]string    `json:"hidden_hits,omitempty"`
-	PerPage                 *int         `json:"per_page,omitempty"`
-	PrioritizeExactMatch    *bool        `json:"prioritize_exact_match,omitempty"`
-	TypoTokensThreshold     *int         `json:"typo_tokens_threshold,omitempty"`
-	CacheTtl                *int         `json:"cache_ttl,omitempty"`
-	MinLen2typo             *int         `json:"min_len_2typo,omitempty"`
-	Q                       string       `json:"q"`
+	GroupLimit              *int         `json:"group_limit,omitempty"`
+	HighlightFullFields     *[]string    `json:"highlight_full_fields,omitempty"`
+	HighlightEndTag         *string      `json:"highlight_end_tag,omitempty"`
+	DropTokensThreshold     *int         `json:"drop_tokens_threshold,omitempty"`
 	FilterBy                *string      `json:"filter_by,omitempty"`
+	MaxFacetValues          *int         `json:"max_facet_values,omitempty"`
+	Page                    *int         `json:"page,omitempty"`
 	HighlightAffixNumTokens *int         `json:"highlight_affix_num_tokens,omitempty"`
 	SnippetThreshold        *int         `json:"snippet_threshold,omitempty"`
-	HighlightFields         *[]string    `json:"highlight_fields,omitempty"`
-	ExhaustiveSearch        *bool        `json:"exhaustive_search,omitempty"`
 	SearchCutoffMs          *int         `json:"search_cutoff_ms,omitempty"`
+	MinLen2typo             *int         `json:"min_len_2typo,omitempty"`
+	QueryBy                 []string     `json:"query_by"`
+	Prefix                  *[]bool      `json:"prefix,omitempty"`
+	PrioritizeExactMatch    *bool        `json:"prioritize_exact_match,omitempty"`
+	FacetQuery              *string      `json:"facet_query,omitempty"`
+	NumTypos                *int         `json:"num_typos,omitempty"`
+	PerPage                 *int         `json:"per_page,omitempty"`
+	TypoTokensThreshold     *int         `json:"typo_tokens_threshold,omitempty"`
+	UseCache                *bool        `json:"use_cache,omitempty"`
+	Q                       string       `json:"q"`
+	PinnedHits              *[]string    `json:"pinned_hits,omitempty"`
+	HiddenHits              *[]string    `json:"hidden_hits,omitempty"`
+	EnableOverrides         *bool        `json:"enable_overrides,omitempty"`
+	GroupBy                 *[]string    `json:"group_by,omitempty"`
+	HighlightStartTag       *string      `json:"highlight_start_tag,omitempty"`
+	ExhaustiveSearch        *bool        `json:"exhaustive_search,omitempty"`
+	QueryByWeights          *[]string    `json:"query_by_weights,omitempty"`
+	FacetBy                 *[]string    `json:"facet_by,omitempty"`
+	IncludeFields           *[]string    `json:"include_fields,omitempty"`
+	ExcludeFields           *[]string    `json:"exclude_fields,omitempty"`
+	CacheTtl                *int         `json:"cache_ttl,omitempty"`
 	MinLen1typo             *int         `json:"min_len_1typo,omitempty"`
 }
 
@@ -338,6 +457,14 @@ type UpsertSearchSynonymJSONBody SearchSynonymSchema
 
 // CreateKeyJSONBody defines parameters for CreateKey.
 type CreateKeyJSONBody ApiKeySchema
+
+// PostMultiSearchJSONBody defines parameters for PostMultiSearch.
+type PostMultiSearchJSONBody MultiSearchParameters
+
+// PostMultiSearchParams defines parameters for PostMultiSearch.
+type PostMultiSearchParams struct {
+	MultiSearchParameters SearchParameters `json:"multiSearchParameters"`
+}
 
 // TakeSnapshotParams defines parameters for TakeSnapshot.
 type TakeSnapshotParams struct {
@@ -365,3 +492,6 @@ type UpsertSearchSynonymJSONRequestBody UpsertSearchSynonymJSONBody
 
 // CreateKeyJSONRequestBody defines body for CreateKey for application/json ContentType.
 type CreateKeyJSONRequestBody CreateKeyJSONBody
+
+// PostMultiSearchJSONRequestBody defines body for PostMultiSearch for application/json ContentType.
+type PostMultiSearchJSONRequestBody PostMultiSearchJSONBody

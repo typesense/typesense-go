@@ -74,10 +74,11 @@ func main() {
 	// Use generator.yml to generate client_gen.go and types_gen.go
 	log.Println("Generating client")
 	oAPICodeGen()
+	log.Println("Successfully Completed !")
 }
 
 func fetchOpenAPISpec() error {
-	url := "https://raw.githubusercontent.com/typesense/typesense-api-spec/master/openapi.yml"
+	url := "https://raw.githubusercontent.com/typesense/typesense-api-spec/v0.22.0/openapi.yml"
 
 	// Fetch the spec
 	resp, err := http.Get(url)
@@ -160,9 +161,14 @@ func unwrapImportDocuments(m *yml) {
 	(*m)["paths"].(yml)["/collections/{collectionName}/documents/import"].(yml)["post"].(yml)["parameters"] = parameters
 }
 
+func getSearchParameters(m *yml) yml {
+	search := (*m)["components"].(yml)["schemas"].(yml)["SearchParameters"].(yml)["properties"].(yml)
+	return search
+}
+
 func unwrapSearchParameters(m *yml) {
 	parameters := (*m)["paths"].(yml)["/collections/{collectionName}/documents/search"].(yml)["get"].(yml)["parameters"].([]interface{})
-	searchParameters := parameters[1].(yml)["schema"].(yml)["properties"].(yml)
+	searchParameters := getSearchParameters(m)
 
 	for k, v := range searchParameters {
 		newMap := make(yml)

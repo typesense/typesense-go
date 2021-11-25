@@ -34,7 +34,6 @@ func TestDocumentRetrieve(t *testing.T) {
 }
 
 func TestDocumentRetrieveOnApiClientErrorReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
@@ -50,7 +49,6 @@ func TestDocumentRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 }
 
 func TestDocumentRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
@@ -161,7 +159,6 @@ func TestDocumentDelete(t *testing.T) {
 }
 
 func TestDocumentDeleteOnApiClientErrorReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
@@ -177,7 +174,6 @@ func TestDocumentDeleteOnApiClientErrorReturnsError(t *testing.T) {
 }
 
 func TestDocumentDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)

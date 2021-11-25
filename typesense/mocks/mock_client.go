@@ -1157,6 +1157,86 @@ func (mr *MockAPIClientInterfaceMockRecorder) IndexDocumentWithResponse(ctx, col
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IndexDocumentWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).IndexDocumentWithResponse), varargs...)
 }
 
+// PostMultiSearch mocks base method.
+func (m *MockAPIClientInterface) PostMultiSearch(ctx context.Context, params *api.PostMultiSearchParams, body api.PostMultiSearchJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, params, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "PostMultiSearch", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// PostMultiSearch indicates an expected call of PostMultiSearch.
+func (mr *MockAPIClientInterfaceMockRecorder) PostMultiSearch(ctx, params, body interface{}, reqEditors ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, params, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostMultiSearch", reflect.TypeOf((*MockAPIClientInterface)(nil).PostMultiSearch), varargs...)
+}
+
+// PostMultiSearchWithBody mocks base method.
+func (m *MockAPIClientInterface) PostMultiSearchWithBody(ctx context.Context, params *api.PostMultiSearchParams, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, params, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "PostMultiSearchWithBody", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// PostMultiSearchWithBody indicates an expected call of PostMultiSearchWithBody.
+func (mr *MockAPIClientInterfaceMockRecorder) PostMultiSearchWithBody(ctx, params, contentType, body interface{}, reqEditors ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, params, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostMultiSearchWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).PostMultiSearchWithBody), varargs...)
+}
+
+// PostMultiSearchWithBodyWithResponse mocks base method.
+func (m *MockAPIClientInterface) PostMultiSearchWithBodyWithResponse(ctx context.Context, params *api.PostMultiSearchParams, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*api.PostMultiSearchResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, params, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "PostMultiSearchWithBodyWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.PostMultiSearchResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// PostMultiSearchWithBodyWithResponse indicates an expected call of PostMultiSearchWithBodyWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) PostMultiSearchWithBodyWithResponse(ctx, params, contentType, body interface{}, reqEditors ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, params, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostMultiSearchWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).PostMultiSearchWithBodyWithResponse), varargs...)
+}
+
+// PostMultiSearchWithResponse mocks base method.
+func (m *MockAPIClientInterface) PostMultiSearchWithResponse(ctx context.Context, params *api.PostMultiSearchParams, body api.PostMultiSearchJSONRequestBody, reqEditors ...api.RequestEditorFn) (*api.PostMultiSearchResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, params, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "PostMultiSearchWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.PostMultiSearchResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// PostMultiSearchWithResponse indicates an expected call of PostMultiSearchWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) PostMultiSearchWithResponse(ctx, params, body interface{}, reqEditors ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, params, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostMultiSearchWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).PostMultiSearchWithResponse), varargs...)
+}
+
 // SearchCollection mocks base method.
 func (m *MockAPIClientInterface) SearchCollection(ctx context.Context, collectionName string, params *api.SearchCollectionParams, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
