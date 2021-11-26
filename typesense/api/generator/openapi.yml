@@ -959,6 +959,7 @@ paths:
                 $ref: "#/components/schemas/SuccessStatus"
   /multi_search:
     post:
+      operationId: multiSearch
       tags:
         - documents
       summary: send multiple search requests in a single HTTP request
@@ -1532,7 +1533,7 @@ components:
                 
               filter_by:
                 description:
-                  Filter conditions for refining your search results. Separate
+                  Filter conditions for refining youropen api validator search results. Separate
                   multiple conditions with &&.
                 type: string
                 example: "num_employees:>100 && country: [USA, UK]"
@@ -1760,7 +1761,18 @@ components:
         searches:
           type: array
           items:
-            $ref: "#/components/schemas/SearchParameters"
+            $ref: "#/components/schemas/MultiSearchCollectionParameters"
+    MultiSearchCollectionParameters:
+      allOf:
+        - $ref: "#/components/schemas/SearchParameters"
+        - type: object
+          required:
+              - collection
+          properties:
+            collection:
+              type: string
+              description: >
+                The collection to search in.
   securitySchemes:
     api_key_header:
       type: apiKey

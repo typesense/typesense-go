@@ -21,10 +21,15 @@ type Client struct {
 	apiClient   APIClientInterface
 	collections CollectionsInterface
 	aliases     AliasesInterface
+	multiSearch MultiSearchInterface
 }
 
 func (c *Client) Collections() CollectionsInterface {
 	return c.collections
+}
+
+func (c *Client) MultiSearch() MultiSearchInterface {
+	return c.multiSearch
 }
 
 func (c *Client) Collection(collectionName string) CollectionInterface {
