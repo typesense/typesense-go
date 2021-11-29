@@ -17,6 +17,12 @@ go get github.com/typesense/typesense-go
 
 ## Usage
 
+Import the the package into your code : 
+
+```go 
+import "github.com/typesense/typesense-go/typesense"
+```
+
 Create new client:
 
 ```go
