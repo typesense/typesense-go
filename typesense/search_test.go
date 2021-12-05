@@ -16,7 +16,7 @@ import (
 func newSearchParams() *api.SearchCollectionParams {
 	return &api.SearchCollectionParams{
 		Q:              "text",
-		QueryBy:        []string{"company_name"},
+		QueryBy:        "company_name",
 		MaxHits:        pointer.Interface("all"),
 		Prefix:         &[]bool{true},
 		FilterBy:       pointer.String("num_employees:=100"),
@@ -35,19 +35,19 @@ func newSearchParams() *api.SearchCollectionParams {
 
 func newSearchResult() *api.SearchResult {
 	return &api.SearchResult{
-		Found:        1,
-		SearchTimeMs: 1,
-		FacetCounts:  []int{},
-		Hits: []api.SearchResultHit{
+		Found:        pointer.Int(1),
+		SearchTimeMs: pointer.Int(1),
+		FacetCounts:  &[]int{},
+		Hits: &[]api.SearchResultHit{
 			{
-				Highlights: []api.SearchHighlight{
+				Highlights: &[]api.SearchHighlight{
 					{
-						Field:         "company_name",
-						Snippet:       "<mark>Stark</mark> Industries",
-						MatchedTokens: []interface{}{"Stark"},
+						Field:         pointer.String("company_name"),
+						Snippet:       pointer.String("<mark>Stark</mark> Industries"),
+						MatchedTokens: &[]interface{}{"Stark"},
 					},
 				},
-				Document: map[string]interface{}{
+				Document: &map[string]interface{}{
 					"id":            "124",
 					"company_name":  "Stark Industries",
 					"num_employees": float64(5215),
@@ -82,19 +82,19 @@ func TestSearchResultDeserialization(t *testing.T) {
 		]
 	  }`
 	expected := &api.SearchResult{
-		Found:        1,
-		SearchTimeMs: 1,
-		FacetCounts:  []int{},
-		Hits: []api.SearchResultHit{
+		Found:        pointer.Int(1),
+		SearchTimeMs: pointer.Int(1),
+		FacetCounts:  &[]int{},
+		Hits: &[]api.SearchResultHit{
 			{
-				Highlights: []api.SearchHighlight{
+				Highlights: &[]api.SearchHighlight{
 					{
-						Field:         "company_name",
-						Snippet:       "<mark>Stark</mark> Industries",
-						MatchedTokens: []interface{}{"Stark"},
+						Field:         pointer.String("company_name"),
+						Snippet:       pointer.String("<mark>Stark</mark> Industries"),
+						MatchedTokens: &[]interface{}{"Stark"},
 					},
 				},
-				Document: map[string]interface{}{
+				Document: &map[string]interface{}{
 					"id":            "124",
 					"company_name":  "Stark Industries",
 					"num_employees": float64(5215),

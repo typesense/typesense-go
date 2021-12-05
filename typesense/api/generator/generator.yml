@@ -35,7 +35,6 @@ components:
           format: int64
           type: integer
       required:
-        - description
         - actions
         - collections
       type: object
@@ -101,14 +100,9 @@ components:
               format: int64
               readOnly: true
               type: integer
-            num_memory_shards:
-              format: int64
-              readOnly: true
-              type: integer
           required:
             - num_documents
             - created_at
-            - num_memory_shards
           type: object
     CollectionSchema:
       properties:
@@ -194,7 +188,7 @@ components:
       type: object
     MultiSearchCollectionParameters:
       allOf:
-        - $ref: '#/components/schemas/SearchParameters'
+        - $ref: '#/components/schemas/MultiSearchParameters'
         - properties:
             collection:
               description: |
@@ -204,13 +198,182 @@ components:
             - collection
           type: object
     MultiSearchParameters:
+      description: |
+        Parameters for the multi search API.
       properties:
-        searches:
+        cache_ttl:
+          description: |
+            The duration (in seconds) that determines how long the search query is cached.  This value can be set on a per-query basis. Default: 60.
+          type: integer
+        drop_tokens_threshold:
+          description: |
+            If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
+          type: integer
+        enable_overrides:
+          description: |
+            If you have some overrides defined but want to disable all of them during query time, you can do that by setting this parameter to false
+          type: boolean
+        exclude_fields:
+          default: []
+          description: List of fields from the document to exclude in the search result
           items:
-            $ref: '#/components/schemas/MultiSearchCollectionParameters'
+            type: string
           type: array
-      required:
-        - searches
+        exhaustive_search:
+          description: |
+            Setting this to true will make Typesense consider all prefixes and typo  corrections of the words in the query without stopping early when enough results are found  (drop_tokens_threshold and typo_tokens_threshold configurations are ignored).
+          type: boolean
+        facet_by:
+          default: []
+          description: A list of fields that will be used for faceting your results on. Separate multiple fields with a comma.
+          items:
+            type: string
+          type: array
+        facet_query:
+          description: Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
+          type: string
+        filter_by:
+          description: Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
+          example: 'num_employees:>100 && country: [USA, UK]'
+          type: string
+        group_by:
+          default: []
+          description: You can aggregate search results into groups or buckets by specify one or more `group_by` fields. Separate multiple fields with a comma. To group on a particular field, it must be a faceted field.
+          items:
+            type: string
+          type: array
+        group_limit:
+          description: |
+            Maximum number of hits to be returned for every group. If the `group_limit` is set as `K` then only the top K hits in each group are returned in the response. Default: 3
+          type: integer
+        hidden_hits:
+          default: []
+          description: |
+            A list of records to unconditionally hide from search results. A list of `record_id`s to hide. Eg: to hide records with IDs 123 and 456, you'd specify `123,456`.
+            You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
+          items:
+            type: string
+          type: array
+        highlight_affix_num_tokens:
+          description: |
+            The number of tokens that should surround the highlighted text on each side. Default: 4
+          type: integer
+        highlight_end_tag:
+          description: |
+            The end tag used for the highlighted snippets. Default: `</mark>`
+          type: string
+        highlight_fields:
+          default: []
+          description: |
+            A list of custom fields that must be highlighted even if you don't query  for them
+          items:
+            type: string
+          type: array
+        highlight_full_fields:
+          default: []
+          description: List of fields which should be highlighted fully without snippeting
+          items:
+            type: string
+          type: array
+        highlight_start_tag:
+          description: |
+            The start tag used for the highlighted snippets. Default: `<mark>`
+          type: string
+        include_fields:
+          default: []
+          description: List of fields from the document to include in the search result
+          items:
+            type: string
+          type: array
+        max_facet_values:
+          description: Maximum number of facet values to be returned.
+          type: integer
+        max_hits:
+          description: |
+            Maximum number of hits returned. Increasing this value might increase search latency. Default: 500. Use `all` to return all hits found.
+          oneOf:
+            - example: 500
+              type: integer
+            - enum:
+                - all
+              example: all
+              type: string
+        min_len_1typo:
+          description: |
+            Minimum word length for 1-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
+          type: integer
+        min_len_2typo:
+          description: |
+            Minimum word length for 2-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
+          type: integer
+        num_typos:
+          description: |
+            The number of typographical errors (1 or 2) that would be tolerated. Default: 2
+          type: integer
+        page:
+          description: Results from this specific page number would be fetched.
+          type: integer
+        per_page:
+          description: 'Number of results to fetch per page. Default: 10'
+          type: integer
+        pinned_hits:
+          default: []
+          description: |
+            A list of records to unconditionally include in the search results at specific positions. An example use case would be to feature or promote certain items on the top of search results. A list of `record_id:hit_position`. Eg: to include a record with ID 123 at Position 1 and another record with ID 456 at Position 5, you'd specify `123:1,456:5`.
+            You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and  finally `hidden_hits`.
+          items:
+            type: string
+          type: array
+        pre_segmented_query:
+          description: |
+            You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself  before indexing and querying.
+            Set this parameter to tre to do the same
+          type: boolean
+        prefix:
+          default: []
+          description: Boolean field to indicate that the last word in the query should be treated as a prefix, and not as a whole word. This is used for building autocomplete and instant search interfaces. Defaults to true.
+          items:
+            type: boolean
+          type: array
+        prioritize_exact_match:
+          description: |
+            Set this parameter to true to ensure that an exact match is ranked above the others
+          type: boolean
+        q:
+          description: The query text to search for in the collection. Use * as the search string to return all documents. This is typically useful when used in conjunction with filter_by.
+          type: string
+        query_by:
+          description: A list of `string` fields that should be queried against. Multiple fields are separated with a comma.
+          type: string
+        query_by_weights:
+          default: []
+          description: The relative weight to give each `query_by` field when ranking results. This can be used to boost fields in priority, when looking for matches. Multiple fields are separated with a comma.
+          items:
+            type: string
+          type: array
+        search_cutoff_ms:
+          description: |
+            Typesense will attempt to return results early if the cutoff time has elapsed.  This is not a strict guarantee and facet computation is not bound by this parameter.
+          type: integer
+        snippet_threshold:
+          description: |
+            Field values under this length will be fully highlighted, instead of showing a snippet of relevant portion. Default: 30
+          type: integer
+        sort_by:
+          default: []
+          description: A list of numerical fields and their corresponding sort orders that will be used for ordering your results. Up to 3 sort fields can be specified. The text similarity score is exposed as a special `_text_match` field that you can use in the list of sorting fields. If no `sort_by` parameter is specified, results are sorted by `_text_match:desc,default_sorting_field:desc`
+          items:
+            example: num_employees:desc
+            type: string
+          type: array
+        typo_tokens_threshold:
+          description: |
+            If the number of results found for a specific query is less than this number, Typesense will attempt to look for tokens with more typos until enough results are found. Default: 100
+          type: integer
+        use_cache:
+          description: |
+            Enable server side caching of search query results. By default, caching is disabled.
+          type: boolean
       type: object
     MultiSearchResponse:
       properties:
@@ -218,6 +381,17 @@ components:
           items:
             $ref: '#/components/schemas/SearchResult'
           type: array
+      required:
+        - results
+      type: object
+    MultiSearchSearchesParameter:
+      properties:
+        searches:
+          items:
+            $ref: '#/components/schemas/MultiSearchCollectionParameters'
+          type: array
+      required:
+        - searches
       type: object
     ScopedKeyParameters:
       properties:
@@ -269,12 +443,6 @@ components:
           items:
             type: string
           type: array
-      required:
-        - field
-        - snippet
-        - snippets
-        - indices
-        - matched_tokens
       type: object
     SearchOverride:
       allOf:
@@ -346,8 +514,6 @@ components:
           $ref: '#/components/schemas/SearchOverrideRule'
       required:
         - rule
-        - includes
-        - excludes
       type: object
     SearchOverridesResponse:
       properties:
@@ -503,11 +669,8 @@ components:
           description: The query text to search for in the collection. Use * as the search string to return all documents. This is typically useful when used in conjunction with filter_by.
           type: string
         query_by:
-          default: []
           description: A list of `string` fields that should be queried against. Multiple fields are separated with a comma.
-          items:
-            type: string
-          type: array
+          type: string
         query_by_weights:
           default: []
           description: The relative weight to give each `query_by` field when ranking results. This can be used to boost fields in priority, when looking for matches. Multiple fields are separated with a comma.
@@ -540,16 +703,6 @@ components:
       required:
         - q
         - query_by
-        - query_by_weights
-        - sort_by
-        - facet_by
-        - group_by
-        - include_fields
-        - exclude_fields
-        - hidden_hits
-        - highlight_full_fields
-        - pinned_hits
-        - prefix
       type: object
     SearchResult:
       properties:
@@ -588,14 +741,6 @@ components:
         search_time_ms:
           description: The number of milliseconds the search took
           type: integer
-      required:
-        - facet_counts
-        - grouped_hits
-        - hits
-        - found
-        - search_time_ms
-        - page
-        - request_params
       type: object
     SearchResultHit:
       example:
@@ -621,10 +766,6 @@ components:
         text_match:
           format: int64
           type: integer
-      required:
-        - document
-        - highlights
-        - text_match
       type: object
     SearchSynonym:
       allOf:
@@ -647,7 +788,6 @@ components:
             type: string
           type: array
       required:
-        - root
         - synonyms
       type: object
     SearchSynonymsResponse:
@@ -1067,10 +1207,6 @@ paths:
           schema:
             type: string
         - in: query
-          name: filter_by
-          schema:
-            type: string
-        - in: query
           name: include_fields
           schema:
             items:
@@ -1082,6 +1218,10 @@ paths:
             items:
               type: string
             type: array
+        - in: query
+          name: filter_by
+          schema:
+            type: string
       responses:
         200:
           content:
@@ -1169,31 +1309,81 @@ paths:
           schema:
             type: string
         - in: query
-          name: enable_overrides
+          name: sort_by
           schema:
-            type: boolean
+            items:
+              example: num_employees:desc
+              type: string
+            type: array
         - in: query
-          name: use_cache
-          schema:
-            type: boolean
-        - in: query
-          name: query_by_weights
+          name: include_fields
           schema:
             items:
               type: string
             type: array
         - in: query
-          name: filter_by
+          name: highlight_end_tag
           schema:
             type: string
         - in: query
-          name: facet_query
-          schema:
-            type: string
-        - in: query
-          name: search_cutoff_ms
+          name: cache_ttl
           schema:
             type: integer
+        - in: query
+          name: min_len_2typo
+          schema:
+            type: integer
+        - in: query
+          name: hidden_hits
+          schema:
+            items:
+              type: string
+            type: array
+        - in: query
+          name: prioritize_exact_match
+          schema:
+            type: boolean
+        - in: query
+          name: max_facet_values
+          schema:
+            type: integer
+        - in: query
+          name: group_by
+          schema:
+            items:
+              type: string
+            type: array
+        - in: query
+          name: group_limit
+          schema:
+            type: integer
+        - in: query
+          name: typo_tokens_threshold
+          schema:
+            type: integer
+        - in: query
+          name: pinned_hits
+          schema:
+            items:
+              type: string
+            type: array
+        - in: query
+          name: snippet_threshold
+          schema:
+            type: integer
+        - in: query
+          name: drop_tokens_threshold
+          schema:
+            type: integer
+        - in: query
+          name: pre_segmented_query
+          schema:
+            type: boolean
+        - in: query
+          name: q
+          required: true
+          schema:
+            type: string
         - in: query
           name: max_hits
           schema:
@@ -1211,56 +1401,70 @@ paths:
               type: boolean
             type: array
         - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+        - in: query
+          name: facet_query
+          schema:
+            type: string
+        - in: query
           name: highlight_affix_num_tokens
           schema:
             type: integer
         - in: query
-          name: cache_ttl
+          name: use_cache
+          schema:
+            type: boolean
+        - in: query
+          name: filter_by
+          schema:
+            type: string
+        - in: query
+          name: facet_by
+          schema:
+            items:
+              type: string
+            type: array
+        - in: query
+          name: min_len_1typo
           schema:
             type: integer
         - in: query
-          name: include_fields
+          name: highlight_start_tag
           schema:
-            items:
-              type: string
-            type: array
-        - in: query
-          name: hidden_hits
-          schema:
-            items:
-              type: string
-            type: array
+            type: string
         - in: query
           name: query_by
           required: true
           schema:
-            items:
-              type: string
-            type: array
+            type: string
         - in: query
-          name: max_facet_values
-          schema:
-            type: integer
-        - in: query
-          name: group_by
+          name: query_by_weights
           schema:
             items:
               type: string
             type: array
         - in: query
-          name: typo_tokens_threshold
+          name: exclude_fields
+          schema:
+            items:
+              type: string
+            type: array
+        - in: query
+          name: enable_overrides
+          schema:
+            type: boolean
+        - in: query
+          name: num_typos
           schema:
             type: integer
         - in: query
-          name: pre_segmented_query
-          schema:
-            type: boolean
-        - in: query
-          name: exhaustive_search
-          schema:
-            type: boolean
-        - in: query
-          name: pinned_hits
+          name: highlight_full_fields
           schema:
             items:
               type: string
@@ -1272,77 +1476,11 @@ paths:
               type: string
             type: array
         - in: query
-          name: prioritize_exact_match
+          name: exhaustive_search
           schema:
             type: boolean
         - in: query
-          name: min_len_2typo
-          schema:
-            type: integer
-        - in: query
-          name: sort_by
-          schema:
-            items:
-              example: num_employees:desc
-              type: string
-            type: array
-        - in: query
-          name: exclude_fields
-          schema:
-            items:
-              type: string
-            type: array
-        - in: query
-          name: drop_tokens_threshold
-          schema:
-            type: integer
-        - in: query
-          name: snippet_threshold
-          schema:
-            type: integer
-        - in: query
-          name: q
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: per_page
-          schema:
-            type: integer
-        - in: query
-          name: highlight_full_fields
-          schema:
-            items:
-              type: string
-            type: array
-        - in: query
-          name: group_limit
-          schema:
-            type: integer
-        - in: query
-          name: highlight_start_tag
-          schema:
-            type: string
-        - in: query
-          name: highlight_end_tag
-          schema:
-            type: string
-        - in: query
-          name: min_len_1typo
-          schema:
-            type: integer
-        - in: query
-          name: facet_by
-          schema:
-            items:
-              type: string
-            type: array
-        - in: query
-          name: num_typos
-          schema:
-            type: integer
-        - in: query
-          name: page
+          name: search_cutoff_ms
           schema:
             type: integer
       responses:
@@ -1692,12 +1830,7 @@ paths:
       operationId: multiSearch
       parameters:
         - in: query
-          name: q
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: per_page
+          name: num_typos
           schema:
             type: integer
         - in: query
@@ -1707,61 +1840,87 @@ paths:
               type: string
             type: array
         - in: query
-          name: snippet_threshold
+          name: highlight_fields
+          schema:
+            items:
+              type: string
+            type: array
+        - in: query
+          name: exhaustive_search
+          schema:
+            type: boolean
+        - in: query
+          name: search_cutoff_ms
           schema:
             type: integer
+        - in: query
+          name: sort_by
+          schema:
+            items:
+              example: num_employees:desc
+              type: string
+            type: array
+        - in: query
+          name: include_fields
+          schema:
+            items:
+              type: string
+            type: array
         - in: query
           name: highlight_end_tag
           schema:
             type: string
         - in: query
-          name: min_len_1typo
+          name: cache_ttl
           schema:
             type: integer
         - in: query
-          name: facet_by
+          name: min_len_2typo
+          schema:
+            type: integer
+        - in: query
+          name: max_facet_values
+          schema:
+            type: integer
+        - in: query
+          name: group_by
           schema:
             items:
               type: string
             type: array
-        - in: query
-          name: num_typos
-          schema:
-            type: integer
-        - in: query
-          name: page
-          schema:
-            type: integer
         - in: query
           name: group_limit
           schema:
             type: integer
         - in: query
-          name: highlight_start_tag
+          name: typo_tokens_threshold
           schema:
-            type: string
+            type: integer
         - in: query
-          name: query_by_weights
+          name: pinned_hits
           schema:
             items:
               type: string
             type: array
         - in: query
-          name: filter_by
+          name: hidden_hits
           schema:
-            type: string
+            items:
+              type: string
+            type: array
         - in: query
-          name: facet_query
-          schema:
-            type: string
-        - in: query
-          name: enable_overrides
+          name: prioritize_exact_match
           schema:
             type: boolean
         - in: query
-          name: use_cache
+          name: pre_segmented_query
           schema:
             type: boolean
+        - in: query
+          name: q
+          required: true
+          schema:
+            type: string
         - in: query
           name: max_hits
           schema:
@@ -1779,71 +1938,60 @@ paths:
               type: boolean
             type: array
         - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+        - in: query
+          name: snippet_threshold
+          schema:
+            type: integer
+        - in: query
+          name: drop_tokens_threshold
+          schema:
+            type: integer
+        - in: query
+          name: facet_query
+          schema:
+            type: string
+        - in: query
           name: highlight_affix_num_tokens
           schema:
             type: integer
         - in: query
-          name: search_cutoff_ms
+          name: use_cache
+          schema:
+            type: boolean
+        - in: query
+          name: filter_by
+          schema:
+            type: string
+        - in: query
+          name: facet_by
+          schema:
+            items:
+              type: string
+            type: array
+        - in: query
+          name: min_len_1typo
           schema:
             type: integer
         - in: query
-          name: cache_ttl
+          name: highlight_start_tag
           schema:
-            type: integer
+            type: string
         - in: query
           name: query_by
           required: true
           schema:
-            items:
-              type: string
-            type: array
+            type: string
         - in: query
-          name: max_facet_values
-          schema:
-            type: integer
-        - in: query
-          name: group_by
+          name: query_by_weights
           schema:
             items:
-              type: string
-            type: array
-        - in: query
-          name: include_fields
-          schema:
-            items:
-              type: string
-            type: array
-        - in: query
-          name: hidden_hits
-          schema:
-            items:
-              type: string
-            type: array
-        - in: query
-          name: typo_tokens_threshold
-          schema:
-            type: integer
-        - in: query
-          name: pre_segmented_query
-          schema:
-            type: boolean
-        - in: query
-          name: exhaustive_search
-          schema:
-            type: boolean
-        - in: query
-          name: prioritize_exact_match
-          schema:
-            type: boolean
-        - in: query
-          name: min_len_2typo
-          schema:
-            type: integer
-        - in: query
-          name: sort_by
-          schema:
-            items:
-              example: num_employees:desc
               type: string
             type: array
         - in: query
@@ -1853,26 +2001,14 @@ paths:
               type: string
             type: array
         - in: query
-          name: drop_tokens_threshold
+          name: enable_overrides
           schema:
-            type: integer
-        - in: query
-          name: pinned_hits
-          schema:
-            items:
-              type: string
-            type: array
-        - in: query
-          name: highlight_fields
-          schema:
-            items:
-              type: string
-            type: array
+            type: boolean
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MultiSearchParameters'
+              $ref: '#/components/schemas/MultiSearchSearchesParameter'
       responses:
         200:
           content:
@@ -1883,6 +2019,8 @@ paths:
                     items:
                       $ref: '#/components/schemas/SearchResult'
                     type: array
+                required:
+                  - results
                 type: object
           description: Search results
       summary: send multiple search requests in a single HTTP request

@@ -2,14 +2,13 @@ package typesense
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/typesense/typesense-go/typesense/api"
 )
 
 type MultiSearchInterface interface {
-	Perform(searchRequest *api.MultiSearchParams, commonSearchParams api.MultiSearchParameters) (*struct {
-		Results *[]api.SearchResult "json:\"results,omitempty\""
+	Perform(searchParams *api.MultiSearchParams, commonSearchParams api.MultiSearchSearchesParameter) (*struct {
+		Results []api.SearchResult "json:\"results\""
 	}, error)
 }
 
@@ -17,12 +16,9 @@ type multiSearch struct {
 	apiClient APIClientInterface
 }
 
-func (m *multiSearch) Perform(searchParams *api.MultiSearchParams, commonSearchParams api.MultiSearchParameters) (*struct {
-	Results *[]api.SearchResult "json:\"results,omitempty\""
+func (m *multiSearch) Perform(searchParams *api.MultiSearchParams, commonSearchParams api.MultiSearchSearchesParameter) (*struct {
+	Results []api.SearchResult "json:\"results\""
 }, error) {
-	fmt.Printf("Hello")
-	fmt.Printf("%v\n", *searchParams)
-	fmt.Printf("%v\n", commonSearchParams)
 	response, err := m.apiClient.MultiSearchWithResponse(context.Background(), searchParams, api.MultiSearchJSONRequestBody(commonSearchParams))
 	if err != nil {
 		return nil, err

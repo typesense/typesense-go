@@ -27,17 +27,18 @@ func TestMultiSearch(t *testing.T) {
 	require.NoError(t, err)
 
 	searchParams := &api.MultiSearchParams{
-		Q:       "Company",
-		QueryBy: []string{"company_name"},
+		FilterBy: pointer.String("num_employees:>100"),
+		Q:        "Company",
+		QueryBy:  "company_name",
 	}
 
-	searches := api.MultiSearchParameters{
+	searches := api.MultiSearchSearchesParameter{
 		Searches: []api.MultiSearchCollectionParameters{
 			{
 				Collection: collectionName,
-				SearchParameters: api.SearchParameters{
-					Q:       "Company",
-					QueryBy: []string{"company_name"},
+				MultiSearchParameters: api.MultiSearchParameters{
+					Q:       pointer.String("Company"),
+					QueryBy: pointer.String("company_name"),
 				},
 			},
 		},
@@ -50,14 +51,11 @@ func TestMultiSearch(t *testing.T) {
 			withResponseNumEmployees(150)),
 	}
 
-	// fmt.Println("Hello")
-	// fmt.Println(typesenseClient)
-	// fmt.Printf("%v\n", *searchParams)
-	// fmt.Printf("%v\n", searches)
-
-	result, err := typesenseClient.MultiSearch().Perform(searchParams, searches)
-
-	fmt.Printf("%+v\n", result)
+	result, err := typesenseClient.MultiSearch.Perform(searchParams, searches)
+	if err != nil {
+		fmt.Printf("%v", err)
+	}
+	fmt.Printf("%v\n", (*result.Results[0].Hits)[0].Document)
 	_ = result
 	_ = expectedDocs
 	_ = err
