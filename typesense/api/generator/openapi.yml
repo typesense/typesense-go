@@ -980,14 +980,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - results
-                properties:
-                  results:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/SearchResult"
+               $ref: "#/components/schemas/MultiSearchResult"
 
 
 components:
@@ -1435,7 +1428,7 @@ components:
       properties:
         message:
           type: string
-    MultiSearchResponse:
+    MultiSearchResult:
       type: object
       required:
         - results

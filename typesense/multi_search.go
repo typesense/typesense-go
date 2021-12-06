@@ -7,18 +7,14 @@ import (
 )
 
 type MultiSearchInterface interface {
-	Perform(searchParams *api.MultiSearchParams, commonSearchParams api.MultiSearchSearchesParameter) (*struct {
-		Results []api.SearchResult "json:\"results\""
-	}, error)
+	Perform(searchParams *api.MultiSearchParams, commonSearchParams api.MultiSearchSearchesParameter) (*api.MultiSearchResult, error)
 }
 
 type multiSearch struct {
 	apiClient APIClientInterface
 }
 
-func (m *multiSearch) Perform(searchParams *api.MultiSearchParams, commonSearchParams api.MultiSearchSearchesParameter) (*struct {
-	Results []api.SearchResult "json:\"results\""
-}, error) {
+func (m *multiSearch) Perform(searchParams *api.MultiSearchParams, commonSearchParams api.MultiSearchSearchesParameter) (*api.MultiSearchResult, error) {
 	response, err := m.apiClient.MultiSearchWithResponse(context.Background(), searchParams, api.MultiSearchJSONRequestBody(commonSearchParams))
 	if err != nil {
 		return nil, err
