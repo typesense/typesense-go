@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package test
@@ -6,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 )
 
 func TestSearchSynonymRetrieve(t *testing.T) {
@@ -20,6 +22,7 @@ func TestSearchSynonymRetrieve(t *testing.T) {
 	result, err := typesenseClient.Collection(collectionName).Synonym(synonymID).Retrieve()
 
 	require.NoError(t, err)
+	expectedResult.Root = pointer.String("")
 	require.Equal(t, expectedResult, result)
 }
 

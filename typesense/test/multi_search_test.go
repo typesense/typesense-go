@@ -69,7 +69,7 @@ func TestMultiSearch(t *testing.T) {
 	result, err := typesenseClient.MultiSearch.Perform(searchParams, searches)
 	require.NoError(t, err)
 
-	require.Equal(t, 1, len(result.Results))
+	require.Equal(t, 3, len(result.Results))
 
 	// Check first result
 	for i, doc := range *result.Results[0].Hits {

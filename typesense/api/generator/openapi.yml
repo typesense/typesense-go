@@ -521,14 +521,11 @@ paths:
                 type: string
               include_fields:
                 description: List of fields from the document to include in the search result
-                type: array
-                items:
-                  type: string
+                type: string
               exclude_fields:
-                description: List of fields from the document to exclude in the search result
-                type: array
-                items:
-                  type: string
+                description: List of fields from the document to exclude in the search result  
+                type: string
+                
       responses:
         200:
           description: Exports all the documents in a given collection.
