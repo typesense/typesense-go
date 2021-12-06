@@ -18,7 +18,7 @@ func newSearchParams() *api.SearchCollectionParams {
 		Q:              "text",
 		QueryBy:        "company_name",
 		MaxHits:        pointer.Interface("all"),
-		Prefix:          pointer.String("true"),
+		Prefix:         pointer.String("true"),
 		FilterBy:       pointer.String("num_employees:=100"),
 		SortBy:         pointer.String("num_employees:desc"),
 		FacetBy:        pointer.String("year_started"),
@@ -27,7 +27,7 @@ func newSearchParams() *api.SearchCollectionParams {
 		NumTypos:       pointer.Int(2),
 		Page:           pointer.Int(1),
 		PerPage:        pointer.Int(10),
-		GroupBy:      	pointer.String("country"),
+		GroupBy:        pointer.String("country"),
 		GroupLimit:     pointer.Int(3),
 		IncludeFields:  pointer.String("company_name"),
 	}
