@@ -53,17 +53,20 @@ func TestMultiSearch(t *testing.T) {
 			{
 				Collection: collectionName2,
 				MultiSearchParameters: api.MultiSearchParameters{
-					FilterBy: pointer.String("num_employees:>100"),
+					Q:        pointer.String("Stark"),
+					FilterBy: pointer.String("num_employees:>=1000"),
 				},
 			},
 		},
 	}
 
-	expectedDocs := []map[string]interface{}{
-		newDocumentResponse("127", withResponseCompanyName("Company 3"),
-			withResponseNumEmployees(250)),
-		newDocumentResponse("125", withResponseCompanyName("Company 2"),
-			withResponseNumEmployees(150)),
+	expectedDocs1 := []map[string]interface{}{
+		newDocumentResponse("127", withResponseCompanyName("Company 3"), withResponseNumEmployees(250)),
+		newDocumentResponse("125", withResponseCompanyName("Company 2"), withResponseNumEmployees(150)),
+	}
+
+	expectedDocs2 := []map[string]interface{}{
+		newDocumentResponse("131", withResponseCompanyName("Stark Industries 5"), withResponseNumEmployees(1000)),
 	}
 
 	result, err := typesenseClient.MultiSearch.Perform(searchParams, searches)
@@ -73,6 +76,14 @@ func TestMultiSearch(t *testing.T) {
 
 	// Check first result
 	for i, doc := range *result.Results[0].Hits {
-		require.Equal(t, *doc.Document, expectedDocs[i])
+		require.Equal(t, *doc.Document, expectedDocs1[i])
+	}
+
+	// Check second result
+	require.Equal(t, 0, len(*result.Results[1].Hits))
+
+	// Check third result
+	for i, doc := range *result.Results[2].Hits {
+		require.Equal(t, *doc.Document, expectedDocs2[i])
 	}
 }
