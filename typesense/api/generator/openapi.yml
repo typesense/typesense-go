@@ -999,8 +999,6 @@ components:
       required:
         - name
         - fields
-        - token_separators # only for codegen
-        - symbols_to_index # only for codegen
       type: object
       properties:
         name:
@@ -1189,6 +1187,11 @@ components:
         text_match:
           type: integer
           format: int64
+        geo_distance_meters:
+          type: object
+          description: Can be any key-value pair
+          additionalProperties:
+            type: integer
       example:
         highlights:
           company_name:
@@ -1467,10 +1470,7 @@ components:
             The relative weight to give each `query_by` field when ranking results.
             This can be used to boost fields in priority, when looking for matches.
             Multiple fields are separated with a comma.
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
 
         max_hits:
           description: >
@@ -1489,10 +1489,7 @@ components:
             Boolean field to indicate that the last word in the query should
             be treated as a prefix, and not as a whole word. This is used for building
             autocomplete and instant search interfaces. Defaults to true.
-          type: array
-          items:
-            type: boolean
-          default: []
+          type: string
 
         filter_by:
           description:
@@ -1510,20 +1507,14 @@ components:
             you can use in the list of sorting fields.
             If no `sort_by` parameter is specified, results are sorted by
             `_text_match:desc,default_sorting_field:desc`
-          type: array
-          items:
-            type: string
-            example: num_employees:desc
-          default: []
+          type: string
+          example: num_employees:desc
 
         facet_by:
           description:
             A list of fields that will be used for faceting your results
             on. Separate multiple fields with a comma.
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
 
         max_facet_values:
           description: Maximum number of facet values to be returned.
@@ -1556,10 +1547,7 @@ components:
             You can aggregate search results into groups or buckets by specify
             one or more `group_by` fields. Separate multiple fields with a comma.
             To group on a particular field, it must be a faceted field.
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
 
         group_limit:
           description: >
@@ -1570,24 +1558,16 @@ components:
 
         include_fields:
           description: List of fields from the document to include in the search result
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
 
         exclude_fields:
           description: List of fields from the document to exclude in the search result
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
+
 
         highlight_full_fields:
           description: List of fields which should be highlighted fully without snippeting
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
 
         highlight_affix_num_tokens:
           description: >
@@ -1638,10 +1618,7 @@ components:
             You could also use the Overrides feature to override search results based
             on rules. Overrides are applied first, followed by `pinned_hits` and 
             finally `hidden_hits`.
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
 
         hidden_hits:
           description: >
@@ -1652,19 +1629,13 @@ components:
             You could also use the Overrides feature to override search results based
             on rules. Overrides are applied first, followed by `pinned_hits` and
             finally `hidden_hits`.
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
 
         highlight_fields:
           description: >
             A list of custom fields that must be highlighted even if you don't query 
             for them
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
 
         pre_segmented_query:
           description: >
@@ -1738,10 +1709,7 @@ components:
             The relative weight to give each `query_by` field when ranking results.
             This can be used to boost fields in priority, when looking for matches.
             Multiple fields are separated with a comma.
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
 
         max_hits:
           description: >
@@ -1760,10 +1728,7 @@ components:
             Boolean field to indicate that the last word in the query should
             be treated as a prefix, and not as a whole word. This is used for building
             autocomplete and instant search interfaces. Defaults to true.
-          type: array
-          items:
-            type: boolean
-          default: []
+          type: string
 
         filter_by:
           description:
@@ -1781,20 +1746,13 @@ components:
             you can use in the list of sorting fields.
             If no `sort_by` parameter is specified, results are sorted by
             `_text_match:desc,default_sorting_field:desc`
-          type: array
-          items:
-            type: string
-            example: num_employees:desc
-          default: []
+          type: string
 
         facet_by:
           description:
             A list of fields that will be used for faceting your results
             on. Separate multiple fields with a comma.
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
 
         max_facet_values:
           description: Maximum number of facet values to be returned.
@@ -1827,10 +1785,7 @@ components:
             You can aggregate search results into groups or buckets by specify
             one or more `group_by` fields. Separate multiple fields with a comma.
             To group on a particular field, it must be a faceted field.
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
 
         group_limit:
           description: >
@@ -1841,24 +1796,15 @@ components:
 
         include_fields:
           description: List of fields from the document to include in the search result
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
 
         exclude_fields:
           description: List of fields from the document to exclude in the search result
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
 
         highlight_full_fields:
           description: List of fields which should be highlighted fully without snippeting
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
 
         highlight_affix_num_tokens:
           description: >
@@ -1909,10 +1855,7 @@ components:
             You could also use the Overrides feature to override search results based
             on rules. Overrides are applied first, followed by `pinned_hits` and 
             finally `hidden_hits`.
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
 
         hidden_hits:
           description: >
@@ -1923,19 +1866,13 @@ components:
             You could also use the Overrides feature to override search results based
             on rules. Overrides are applied first, followed by `pinned_hits` and
             finally `hidden_hits`.
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
 
         highlight_fields:
           description: >
             A list of custom fields that must be highlighted even if you don't query 
             for them
-          type: array
-          items:
-            type: string
-          default: []
+          type: string
 
         pre_segmented_query:
           description: >

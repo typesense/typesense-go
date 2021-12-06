@@ -4,7 +4,6 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -13,7 +12,8 @@ import (
 )
 
 func TestMultiSearch(t *testing.T) {
-	collectionName := createNewCollection(t, "companies")
+	collectionName1 := createNewCollection(t, "companies")
+	collectionName2 := createNewCollection(t, "companies")
 	documents := []interface{}{
 		newDocument("123", withCompanyName("Company 1"), withNumEmployees(50)),
 		newDocument("125", withCompanyName("Company 2"), withNumEmployees(150)),
@@ -23,7 +23,10 @@ func TestMultiSearch(t *testing.T) {
 	}
 
 	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
-	_, err := typesenseClient.Collection(collectionName).Documents().Import(documents, params)
+	_, err := typesenseClient.Collection(collectionName1).Documents().Import(documents, params)
+	require.NoError(t, err)
+
+	_, err = typesenseClient.Collection(collectionName1).Documents().Import(documents, params)
 	require.NoError(t, err)
 
 	searchParams := &api.MultiSearchParams{
@@ -35,10 +38,22 @@ func TestMultiSearch(t *testing.T) {
 	searches := api.MultiSearchSearchesParameter{
 		Searches: []api.MultiSearchCollectionParameters{
 			{
-				Collection: collectionName,
+				Collection: collectionName1,
 				MultiSearchParameters: api.MultiSearchParameters{
-					Q:       pointer.String("Company"),
-					QueryBy: pointer.String("company_name"),
+					FilterBy: pointer.String("num_employees:>100"),
+					SortBy:   pointer.String("num_employees:desc"),
+				},
+			},
+			{
+				Collection: collectionName1,
+				MultiSearchParameters: api.MultiSearchParameters{
+					FilterBy: pointer.String("num_employees:>1000"),
+				},
+			},
+			{
+				Collection: collectionName2,
+				MultiSearchParameters: api.MultiSearchParameters{
+					FilterBy: pointer.String("num_employees:>100"),
 				},
 			},
 		},
@@ -52,11 +67,12 @@ func TestMultiSearch(t *testing.T) {
 	}
 
 	result, err := typesenseClient.MultiSearch.Perform(searchParams, searches)
-	if err != nil {
-		fmt.Printf("%v", err)
+	require.NoError(t, err)
+
+	require.Equal(t, 1, len(result.Results))
+
+	// Check first result
+	for i, doc := range *result.Results[0].Hits {
+		require.Equal(t, *doc.Document, expectedDocs[i])
 	}
-	fmt.Printf("%v\n", (*result.Results[0].Hits)[0].Document)
-	_ = result
-	_ = expectedDocs
-	_ = err
 }
