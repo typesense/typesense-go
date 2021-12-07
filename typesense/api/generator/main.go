@@ -24,11 +24,11 @@ const (
 func main() {
 	m := make(yml)
 
-	log.Println("Fetching openapi.yml from typesense api spec")
-	err := fetchOpenAPISpec()
-	if err != nil {
-		log.Fatalf("Aboring: %s", err.Error())
-	}
+	// log.Println("Fetching openapi.yml from typesense api spec")
+	// err := fetchOpenAPISpec()
+	// if err != nil {
+	// 	log.Fatalf("Aboring: %s", err.Error())
+	// }
 
 	configFile, err := os.Open("./typesense/api/generator/openapi.yml")
 	if err != nil {
@@ -203,9 +203,6 @@ func unwrapMultiSearchParameters(m *yml) {
 	for k, v := range searchParameters {
 		newMap := make(yml)
 		newMap["name"] = k
-		if k == "q" || k == "query_by" {
-			newMap["required"] = true
-		}
 		newMap["in"] = query
 		newMap["schema"] = make(yml)
 		if v.(yml)["oneOf"] == nil {

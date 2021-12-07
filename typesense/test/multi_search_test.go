@@ -31,8 +31,8 @@ func TestMultiSearch(t *testing.T) {
 
 	searchParams := &api.MultiSearchParams{
 		FilterBy: pointer.String("num_employees:>100"),
-		Q:        "Company",
-		QueryBy:  "company_name",
+		Q:        pointer.String("Company"),
+		QueryBy:  pointer.String("company_name"),
 	}
 
 	searches := api.MultiSearchSearchesParameter{
