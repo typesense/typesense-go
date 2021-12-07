@@ -43,8 +43,9 @@ func main() {
 	}
 
 	// Unwrapping the search parameters
-	log.Println("Unwrapping search parameters")
+	log.Println("Unwrapping search parameters and multi_search parameters")
 	unwrapSearchParameters(&m)
+	unwrapMultiSearchParameters(&m)
 	// Unwrapping import and export parameters
 	log.Println("Unwrapping documents import parameters")
 	unwrapImportDocuments(&m)
@@ -74,10 +75,11 @@ func main() {
 	// Use generator.yml to generate client_gen.go and types_gen.go
 	log.Println("Generating client")
 	oAPICodeGen()
+	log.Println("Successfully Completed !")
 }
 
 func fetchOpenAPISpec() error {
-	url := "https://raw.githubusercontent.com/typesense/typesense-api-spec/master/openapi.yml"
+	url := "https://raw.githubusercontent.com/typesense/typesense-api-spec/v0.22.0/openapi.yml"
 
 	// Fetch the spec
 	resp, err := http.Get(url)
@@ -160,9 +162,14 @@ func unwrapImportDocuments(m *yml) {
 	(*m)["paths"].(yml)["/collections/{collectionName}/documents/import"].(yml)["post"].(yml)["parameters"] = parameters
 }
 
+func getSearchParameters(m *yml) yml {
+	search := (*m)["components"].(yml)["schemas"].(yml)["SearchParameters"].(yml)["properties"].(yml)
+	return search
+}
+
 func unwrapSearchParameters(m *yml) {
 	parameters := (*m)["paths"].(yml)["/collections/{collectionName}/documents/search"].(yml)["get"].(yml)["parameters"].([]interface{})
-	searchParameters := parameters[1].(yml)["schema"].(yml)["properties"].(yml)
+	searchParameters := getSearchParameters(m)
 
 	for k, v := range searchParameters {
 		newMap := make(yml)
@@ -187,6 +194,32 @@ func unwrapSearchParameters(m *yml) {
 
 	parameters = append(parameters[:1], parameters[2:]...)
 	(*m)["paths"].(yml)["/collections/{collectionName}/documents/search"].(yml)["get"].(yml)["parameters"] = parameters
+}
+
+func unwrapMultiSearchParameters(m *yml) {
+	parameters := (*m)["paths"].(yml)["/multi_search"].(yml)["post"].(yml)["parameters"].([]interface{})
+	searchParameters := getSearchParameters(m)
+
+	for k, v := range searchParameters {
+		newMap := make(yml)
+		newMap["name"] = k
+		newMap["in"] = query
+		newMap["schema"] = make(yml)
+		if v.(yml)["oneOf"] == nil {
+			if v.(yml)["type"].(string) == array {
+				newMap["schema"].(yml)["type"] = array
+				newMap["schema"].(yml)["items"] = v.(yml)["items"]
+			} else {
+				newMap["schema"].(yml)["type"] = v.(yml)["type"].(string)
+			}
+		} else {
+			newMap["schema"].(yml)["oneOf"] = v.(yml)["oneOf"]
+		}
+		parameters = append(parameters, newMap)
+	}
+
+	parameters = parameters[1:]
+	(*m)["paths"].(yml)["/multi_search"].(yml)["post"].(yml)["parameters"] = parameters
 }
 
 func oAPICodeGen() {

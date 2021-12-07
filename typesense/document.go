@@ -34,10 +34,10 @@ func (d *document) Update(document interface{}) (map[string]interface{}, error) 
 	if err != nil {
 		return nil, err
 	}
-	if response.JSON200 == nil {
+	if response.JSON201 == nil {
 		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
-	return *response.JSON200, nil
+	return *response.JSON201, nil
 }
 
 func (d *document) Delete() (map[string]interface{}, error) {

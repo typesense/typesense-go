@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package test
@@ -23,36 +24,54 @@ func newSchema(collectionName string) *api.CollectionSchema {
 		Name: collectionName,
 		Fields: []api.Field{
 			{
-				Name:     "company_name",
-				Type:     "string",
-				Index:    pointer.True(),
-				Optional: pointer.False(),
-				Facet:    pointer.False(),
+				Name: "company_name",
+				Type: "string",
 			},
 			{
-				Name:     "num_employees",
-				Type:     "int32",
-				Index:    pointer.True(),
-				Optional: pointer.False(),
-				Facet:    pointer.False(),
+				Name: "num_employees",
+				Type: "int32",
 			},
 			{
 				Name:     "country",
 				Type:     "string",
 				Facet:    pointer.True(),
-				Index:    pointer.True(),
 				Optional: pointer.True(),
 			},
 		},
-		DefaultSortingField: pointer.String("num_employees"),
 	}
 }
 
 func expectedNewCollection(name string) *api.CollectionResponse {
+	schema := &api.CollectionSchema{
+		Name: name,
+		Fields: []api.Field{
+			{
+				Name:     "company_name",
+				Type:     "string",
+				Facet:    pointer.False(),
+				Optional: pointer.False(),
+				Index:    pointer.True(),
+			},
+			{
+				Name:     "num_employees",
+				Type:     "int32",
+				Facet:    pointer.False(),
+				Optional: pointer.False(),
+				Index:    pointer.True(),
+			},
+			{
+				Name:     "country",
+				Type:     "string",
+				Facet:    pointer.True(),
+				Optional: pointer.True(),
+				Index:    pointer.True(),
+			},
+		},
+		DefaultSortingField: pointer.String(""),
+	}
 	return &api.CollectionResponse{
-		CollectionSchema: *newSchema(name),
+		CollectionSchema: *schema,
 		NumDocuments:     0,
-		NumMemoryShards:  4,
 	}
 }
 
@@ -118,7 +137,7 @@ func newDocumentResponse(docID string, opts ...newDocumentResponseOption) map[st
 
 func newKeySchema() *api.ApiKeySchema {
 	return &api.ApiKeySchema{
-		Description: "Search-only key.",
+		Description: pointer.String("Search-only key."),
 		Actions:     []string{"documents:search"},
 		Collections: []string{"*"},
 		ExpiresAt:   pointer.Int64(time.Now().Add(1 * time.Hour).Unix()),
@@ -145,7 +164,7 @@ func newSearchOverrideSchema(opts ...newSearchOverrideSchemaOption) *api.SearchO
 			Query: "apple",
 			Match: "exact",
 		},
-		Includes: []api.SearchOverrideInclude{
+		Includes: &[]api.SearchOverrideInclude{
 			{
 				Id:       "422",
 				Position: 1,
@@ -155,7 +174,7 @@ func newSearchOverrideSchema(opts ...newSearchOverrideSchemaOption) *api.SearchO
 				Position: 2,
 			},
 		},
-		Excludes: []api.SearchOverrideExclude{
+		Excludes: &[]api.SearchOverrideExclude{
 			{
 				Id: "287",
 			},

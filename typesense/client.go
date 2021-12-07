@@ -21,6 +21,7 @@ type Client struct {
 	apiClient   APIClientInterface
 	collections CollectionsInterface
 	aliases     AliasesInterface
+	MultiSearch MultiSearchInterface
 }
 
 func (c *Client) Collections() CollectionsInterface {
@@ -215,5 +216,6 @@ func NewClient(opts ...ClientOption) *Client {
 	}
 	c.collections = &collections{c.apiClient}
 	c.aliases = &aliases{c.apiClient}
+	c.MultiSearch = &multiSearch{c.apiClient}
 	return c
 }

@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package test
@@ -26,11 +27,11 @@ func TestCollectionSearch(t *testing.T) {
 
 	searchParams := &api.SearchCollectionParams{
 		Q:              "Company",
-		QueryBy:        []string{"company_name"},
-		QueryByWeights: &([]string{"2", "1"}),
+		QueryBy:        "company_name, company_name",
+		QueryByWeights: pointer.String("2, 1"),
 		MaxHits:        pointer.Interface("all"),
 		FilterBy:       pointer.String("num_employees:>=100"),
-		SortBy:         &([]string{"num_employees:desc"}),
+		SortBy:         pointer.String("num_employees:desc"),
 		NumTypos:       pointer.Int(2),
 		Page:           pointer.Int(1),
 		PerPage:        pointer.Int(10),
@@ -46,12 +47,12 @@ func TestCollectionSearch(t *testing.T) {
 	result, err := typesenseClient.Collection(collectionName).Documents().Search(searchParams)
 
 	require.NoError(t, err)
-	require.Equal(t, 2, result.Found, "found documents number is invalid")
-	require.Equal(t, 2, len(result.Hits), "number of hits is invalid")
+	require.Equal(t, 2, *result.Found, "found documents number is invalid")
+	require.Equal(t, 2, len(*result.Hits), "number of hits is invalid")
 
-	docs := make([]map[string]interface{}, len(result.Hits))
-	for i, hit := range result.Hits {
-		docs[i] = hit.Document
+	docs := make([]map[string]interface{}, len(*result.Hits))
+	for i, hit := range *result.Hits {
+		docs[i] = *hit.Document
 	}
 
 	require.Equal(t, expectedDocs, docs)
@@ -73,10 +74,10 @@ func TestCollectionSearchRange(t *testing.T) {
 	searchParams := &api.SearchCollectionParams{
 		Q:        "*",
 		FilterBy: pointer.String("num_employees:>=100&&num_employees:<=300"),
-		SortBy:   &([]string{"num_employees:asc"}),
+		SortBy:   pointer.String("num_employees:asc"),
 		Page:     pointer.Int(1),
 		PerPage:  pointer.Int(10),
-		QueryBy:  []string{"company_name", "country"},
+		QueryBy:  "company_name, country",
 	}
 
 	expectedDocs := []map[string]interface{}{
@@ -89,12 +90,12 @@ func TestCollectionSearchRange(t *testing.T) {
 	result, err := typesenseClient.Collection(collectionName).Documents().Search(searchParams)
 
 	require.NoError(t, err)
-	require.Equal(t, 2, result.Found, "found documents number is invalid")
-	require.Equal(t, 2, len(result.Hits), "number of hits is invalid")
+	require.Equal(t, 2, *result.Found, "found documents number is invalid")
+	require.Equal(t, 2, len(*result.Hits), "number of hits is invalid")
 
-	docs := make([]map[string]interface{}, len(result.Hits))
-	for i, hit := range result.Hits {
-		docs[i] = hit.Document
+	docs := make([]map[string]interface{}, len(*result.Hits))
+	for i, hit := range *result.Hits {
+		docs[i] = *hit.Document
 	}
 
 	require.Equal(t, expectedDocs, docs)

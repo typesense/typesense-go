@@ -16,38 +16,38 @@ import (
 func newSearchParams() *api.SearchCollectionParams {
 	return &api.SearchCollectionParams{
 		Q:              "text",
-		QueryBy:        []string{"company_name"},
+		QueryBy:        "company_name",
 		MaxHits:        pointer.Interface("all"),
-		Prefix:         &[]bool{true},
+		Prefix:         pointer.String("true"),
 		FilterBy:       pointer.String("num_employees:=100"),
-		SortBy:         &([]string{"num_employees:desc"}),
-		FacetBy:        &([]string{"year_started"}),
+		SortBy:         pointer.String("num_employees:desc"),
+		FacetBy:        pointer.String("year_started"),
 		MaxFacetValues: pointer.Int(10),
 		FacetQuery:     pointer.String("facetQuery"),
 		NumTypos:       pointer.Int(2),
 		Page:           pointer.Int(1),
 		PerPage:        pointer.Int(10),
-		GroupBy:        &([]string{"country"}),
+		GroupBy:        pointer.String("country"),
 		GroupLimit:     pointer.Int(3),
-		IncludeFields:  &([]string{"company_name"}),
+		IncludeFields:  pointer.String("company_name"),
 	}
 }
 
 func newSearchResult() *api.SearchResult {
 	return &api.SearchResult{
-		Found:        1,
-		SearchTimeMs: 1,
-		FacetCounts:  []int{},
-		Hits: []api.SearchResultHit{
+		Found:        pointer.Int(1),
+		SearchTimeMs: pointer.Int(1),
+		FacetCounts:  &[]int{},
+		Hits: &[]api.SearchResultHit{
 			{
-				Highlights: []api.SearchHighlight{
+				Highlights: &[]api.SearchHighlight{
 					{
-						Field:         "company_name",
-						Snippet:       "<mark>Stark</mark> Industries",
-						MatchedTokens: []interface{}{"Stark"},
+						Field:         pointer.String("company_name"),
+						Snippet:       pointer.String("<mark>Stark</mark> Industries"),
+						MatchedTokens: &[]interface{}{"Stark"},
 					},
 				},
-				Document: map[string]interface{}{
+				Document: &map[string]interface{}{
 					"id":            "124",
 					"company_name":  "Stark Industries",
 					"num_employees": float64(5215),
@@ -82,19 +82,19 @@ func TestSearchResultDeserialization(t *testing.T) {
 		]
 	  }`
 	expected := &api.SearchResult{
-		Found:        1,
-		SearchTimeMs: 1,
-		FacetCounts:  []int{},
-		Hits: []api.SearchResultHit{
+		Found:        pointer.Int(1),
+		SearchTimeMs: pointer.Int(1),
+		FacetCounts:  &[]int{},
+		Hits: &[]api.SearchResultHit{
 			{
-				Highlights: []api.SearchHighlight{
+				Highlights: &[]api.SearchHighlight{
 					{
-						Field:         "company_name",
-						Snippet:       "<mark>Stark</mark> Industries",
-						MatchedTokens: []interface{}{"Stark"},
+						Field:         pointer.String("company_name"),
+						Snippet:       pointer.String("<mark>Stark</mark> Industries"),
+						MatchedTokens: &[]interface{}{"Stark"},
 					},
 				},
-				Document: map[string]interface{}{
+				Document: &map[string]interface{}{
 					"id":            "124",
 					"company_name":  "Stark Industries",
 					"num_employees": float64(5215),

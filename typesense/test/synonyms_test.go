@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package test
@@ -8,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 )
 
 func TestSearchSynonymUpsertNewSynonym(t *testing.T) {
@@ -24,6 +26,7 @@ func TestSearchSynonymUpsertNewSynonym(t *testing.T) {
 	result, err = typesenseClient.Collection(collectionName).Synonym(synonymID).Retrieve()
 
 	require.NoError(t, err)
+	expectedResult.Root = pointer.String("")
 	require.Equal(t, expectedResult, result)
 }
 
@@ -46,6 +49,7 @@ func TestSearchSynonymUpsertExistingSynonym(t *testing.T) {
 	result, err = typesenseClient.Collection(collectionName).Synonym(synonymID).Retrieve()
 
 	require.NoError(t, err)
+	expectedResult.Root = pointer.String("")
 	require.Equal(t, expectedResult, result)
 }
 
@@ -78,6 +82,7 @@ func TestSearchSynonymsRetrieve(t *testing.T) {
 	}
 
 	for k, v := range expectedResult {
+		v.Root = pointer.String("")
 		assert.Equal(t, v, resultMap[k])
 	}
 }

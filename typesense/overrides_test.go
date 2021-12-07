@@ -18,7 +18,7 @@ func createNewSearchOverrideSchema() *api.SearchOverrideSchema {
 			Query: "apple",
 			Match: "exact",
 		},
-		Includes: []api.SearchOverrideInclude{
+		Includes: &[]api.SearchOverrideInclude{
 			{
 				Id:       "422",
 				Position: 1,
@@ -28,7 +28,7 @@ func createNewSearchOverrideSchema() *api.SearchOverrideSchema {
 				Position: 2,
 			},
 		},
-		Excludes: []api.SearchOverrideExclude{
+		Excludes: &[]api.SearchOverrideExclude{
 			{
 				Id: "287",
 			},
@@ -144,7 +144,6 @@ func TestSearchOverridesRetrieve(t *testing.T) {
 }
 
 func TestSearchOverridesRetrieveOnApiClientErrorReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
@@ -160,7 +159,6 @@ func TestSearchOverridesRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 }
 
 func TestSearchOverridesRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
