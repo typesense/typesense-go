@@ -269,4 +269,3 @@ func TestMultiSearchOnApiClientError(t *testing.T) {
 	_, err := client.MultiSearch.Perform(params, newMultiSearchBodyParams())
 	assert.NotNil(t, err)
 }
-
