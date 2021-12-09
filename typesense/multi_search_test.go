@@ -2,6 +2,8 @@ package typesense
 
 import (
 	"encoding/json"
+	"errors"
+	"net/http"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -227,4 +229,43 @@ func TestMultiSearch(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
+}
+
+func TestMultiSearchOnHttpStatusErrorCodeReturnsError(t *testing.T) {
+	expectedParams := newMultiSearchParams()
+	expectedBody := newMultiSearchBodyParams()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
+
+	mockAPIClient.EXPECT().
+		MultiSearchWithResponse(gomock.Not(gomock.Nil()), expectedParams, api.MultiSearchJSONRequestBody(expectedBody)).
+		Return(&api.MultiSearchResponse{
+			HTTPResponse: &http.Response{
+				StatusCode: 500,
+			},
+			Body: []byte("Internal Server error"),
+		}, nil).Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	params := newMultiSearchParams()
+	_, err := client.MultiSearch.Perform(params, newMultiSearchBodyParams())
+	assert.NotNil(t, err)
+}
+
+func TestMultiSearchOnApiClientError(t *testing.T) {
+	expectedParams := newMultiSearchParams()
+	expectedBody := newMultiSearchBodyParams()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
+
+	mockAPIClient.EXPECT().
+		MultiSearchWithResponse(gomock.Not(gomock.Nil()), expectedParams, api.MultiSearchJSONRequestBody(expectedBody)).
+		Return(nil, errors.New("failed request")).Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	params := newMultiSearchParams()
+	_, err := client.MultiSearch.Perform(params, newMultiSearchBodyParams())
+	assert.NotNil(t, err)
 }
