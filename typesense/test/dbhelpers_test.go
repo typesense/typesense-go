@@ -68,6 +68,8 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 			},
 		},
 		DefaultSortingField: pointer.String(""),
+		TokenSeparators:     &[]string{},
+		SymbolsToIndex:      &[]string{},
 	}
 	return &api.CollectionResponse{
 		CollectionSchema: *schema,

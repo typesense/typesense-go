@@ -35,7 +35,7 @@ jobs:
     docker:
       - image: circleci/golang:1.15.8
       - name: db
-        image: typesense/typesense:0.21.0
+        image: typesense/typesense:0.22.0
         command: /opt/typesense-server --data-dir=/tmp --api-key=test_key
     steps:
       - checkout
