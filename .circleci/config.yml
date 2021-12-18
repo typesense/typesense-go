@@ -14,12 +14,12 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-mod-v2-{{ checksum "go.sum" }}
+            - go-mod-v4-{{ checksum "go.sum" }}
       - run:
           name: Install Dependencies
           command: go mod download
       - save_cache:
-          key: go-mod-v2-{{ checksum "go.sum" }}
+          key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
       - run:
@@ -41,14 +41,14 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-mod-v2-{{ checksum "go.sum" }}
+            - go-mod-v4-{{ checksum "go.sum" }}
       - run:
           name: Install Dependencies
           command: go mod download
       - save_cache:
-          key: go-mod-v2-{{ checksum "go.sum" }}
+          key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
-            - "/go/pkg/mod"
+            - "/home/circleci/go/pkg/mod"
       - run:
           name: Run tests
           environment:
