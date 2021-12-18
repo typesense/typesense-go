@@ -33,7 +33,7 @@ jobs:
           command: revive -config .revive.toml -formatter friendly ./...
   test:
     docker:
-      - image: circleci/golang:1.15.8
+      - image: cimg/go:1.17.5
       - name: db
         image: typesense/typesense:0.22.0
         command: /opt/typesense-server --data-dir=/tmp --api-key=test_key
