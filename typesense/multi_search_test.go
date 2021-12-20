@@ -17,7 +17,6 @@ func newMultiSearchParams() *api.MultiSearchParams {
 	return &api.MultiSearchParams{
 		Q:              pointer.String("text"),
 		QueryBy:        pointer.String("company_name"),
-		MaxHits:        pointer.Interface("all"),
 		Prefix:         pointer.String("true"),
 		FilterBy:       pointer.String("num_employees:=100"),
 		SortBy:         pointer.String("num_employees:desc"),
@@ -60,7 +59,7 @@ func newMultiSearchResult() *api.MultiSearchResult {
 			{
 				Found:        pointer.Int(1),
 				SearchTimeMs: pointer.Int(1),
-				FacetCounts:  &[]int{},
+				FacetCounts:  &[]api.FacetCounts{},
 				Hits: &[]api.SearchResultHit{
 					{
 						Highlights: &[]api.SearchHighlight{
@@ -82,7 +81,7 @@ func newMultiSearchResult() *api.MultiSearchResult {
 			{
 				Found:        pointer.Int(1),
 				SearchTimeMs: pointer.Int(1),
-				FacetCounts:  &[]int{},
+				FacetCounts:  &[]api.FacetCounts{},
 				Hits: &[]api.SearchResultHit{
 					{
 						Highlights: &[]api.SearchHighlight{
@@ -159,7 +158,7 @@ func TestMultiSearchResultDeserialization(t *testing.T) {
 			{
 				Found:        pointer.Int(1),
 				SearchTimeMs: pointer.Int(1),
-				FacetCounts:  &[]int{},
+				FacetCounts:  &[]api.FacetCounts{},
 				Hits: &[]api.SearchResultHit{
 					{
 						Highlights: &[]api.SearchHighlight{
@@ -181,7 +180,7 @@ func TestMultiSearchResultDeserialization(t *testing.T) {
 			{
 				Found:        pointer.Int(1),
 				SearchTimeMs: pointer.Int(1),
-				FacetCounts:  &[]int{},
+				FacetCounts:  &[]api.FacetCounts{},
 				Hits: &[]api.SearchResultHit{
 					{
 						Highlights: &[]api.SearchHighlight{
