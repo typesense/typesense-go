@@ -33,7 +33,7 @@ jobs:
           command: revive -config .revive.toml -formatter friendly ./...
   test:
     docker:
-      - image: circleci/golang:1.15.8
+      - image: cimg/go:1.17.5
       - name: db
         image: typesense/typesense:0.22.0
         command: /opt/typesense-server --data-dir=/tmp --api-key=test_key
@@ -41,14 +41,14 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-mod-v4-{{ checksum "go.sum" }}
+            - go-mod-v1-{{ checksum "go.sum" }}
       - run:
           name: Install Dependencies
           command: go mod download
       - save_cache:
-          key: go-mod-v4-{{ checksum "go.sum" }}
+          key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
-            - "/go/pkg/mod"
+            - "/home/circleci/go/pkg/mod"
       - run:
           name: Run tests
           environment:

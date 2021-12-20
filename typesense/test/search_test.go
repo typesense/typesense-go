@@ -29,7 +29,6 @@ func TestCollectionSearch(t *testing.T) {
 		Q:              "Company",
 		QueryBy:        "company_name, company_name",
 		QueryByWeights: pointer.String("2, 1"),
-		MaxHits:        pointer.Interface("all"),
 		FilterBy:       pointer.String("num_employees:>=100"),
 		SortBy:         pointer.String("num_employees:desc"),
 		NumTypos:       pointer.Int(2),

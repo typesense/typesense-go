@@ -17,7 +17,6 @@ func newSearchParams() *api.SearchCollectionParams {
 	return &api.SearchCollectionParams{
 		Q:              "text",
 		QueryBy:        "company_name",
-		MaxHits:        pointer.Interface("all"),
 		Prefix:         pointer.String("true"),
 		FilterBy:       pointer.String("num_employees:=100"),
 		SortBy:         pointer.String("num_employees:desc"),
@@ -37,7 +36,7 @@ func newSearchResult() *api.SearchResult {
 	return &api.SearchResult{
 		Found:        pointer.Int(1),
 		SearchTimeMs: pointer.Int(1),
-		FacetCounts:  &[]int{},
+		FacetCounts:  &[]api.FacetCounts{},
 		Hits: &[]api.SearchResultHit{
 			{
 				Highlights: &[]api.SearchHighlight{
@@ -84,7 +83,7 @@ func TestSearchResultDeserialization(t *testing.T) {
 	expected := &api.SearchResult{
 		Found:        pointer.Int(1),
 		SearchTimeMs: pointer.Int(1),
-		FacetCounts:  &[]int{},
+		FacetCounts:  &[]api.FacetCounts{},
 		Hits: &[]api.SearchResultHit{
 			{
 				Highlights: &[]api.SearchHighlight{

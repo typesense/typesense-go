@@ -256,7 +256,6 @@ paths:
           in: query
           schema:
             $ref: "#/components/schemas/SearchParameters"
-
       responses:
         200:
           description: Search results
@@ -523,9 +522,9 @@ paths:
                 description: List of fields from the document to include in the search result
                 type: string
               exclude_fields:
-                description: List of fields from the document to exclude in the search result  
+                description: List of fields from the document to exclude in the search result
                 type: string
-                
+
       responses:
         200:
           description: Exports all the documents in a given collection.
@@ -980,8 +979,7 @@ paths:
           content:
             application/json:
               schema:
-               $ref: "#/components/schemas/MultiSearchResult"
-
+                $ref: "#/components/schemas/MultiSearchResult"
 
 components:
   schemas:
@@ -1113,13 +1111,19 @@ components:
         facet_counts:
           type: array
           items:
-            type: integer
+            $ref: "#/components/schemas/FacetCounts"
         found:
           type: integer
           description: The number of documents found
         search_time_ms:
           type: integer
           description: The number of milliseconds the search took
+        out_of:
+          type: integer
+          description: The total number of pages
+        search_cutoff:
+          type: boolean
+          description: Whether the search was cut off
         page:
           type: integer
           description: The search result page number
@@ -1462,18 +1466,6 @@ components:
             Multiple fields are separated with a comma.
           type: string
 
-        max_hits:
-          description: >
-            Maximum number of hits returned. Increasing this value might
-            increase search latency. Default: 500. Use `all` to return all hits found.
-          oneOf:
-            - type: integer
-              example: 500
-            - type: string
-              example: all
-              enum:
-                - all
-
         prefix:
           description:
             Boolean field to indicate that the last word in the query should
@@ -1554,7 +1546,6 @@ components:
           description: List of fields from the document to exclude in the search result
           type: string
 
-
         highlight_full_fields:
           description: List of fields which should be highlighted fully without snippeting
           type: string
@@ -1633,7 +1624,7 @@ components:
             are able to segment / split the text into space-separated words yourself 
             before indexing and querying.
 
-            Set this parameter to tre to do the same
+            Set this parameter to true to do the same
           type: boolean
 
         enable_overrides:
@@ -1677,7 +1668,7 @@ components:
             Minimum word length for 2-typo correction to be applied. 
             The value of num_typos is still treated as the maximum allowed typos.
           type: integer
-    
+
     MultiSearchParameters:
       description: >
         Parameters for the multi search API.
@@ -1700,18 +1691,6 @@ components:
             This can be used to boost fields in priority, when looking for matches.
             Multiple fields are separated with a comma.
           type: string
-
-        max_hits:
-          description: >
-            Maximum number of hits returned. Increasing this value might
-            increase search latency. Default: 500. Use `all` to return all hits found.
-          oneOf:
-            - type: integer
-              example: 500
-            - type: string
-              example: all
-              enum:
-                - all
 
         prefix:
           description:
@@ -1870,7 +1849,7 @@ components:
             are able to segment / split the text into space-separated words yourself 
             before indexing and querying.
 
-            Set this parameter to tre to do the same
+            Set this parameter to true to do the same
           type: boolean
 
         enable_overrides:
@@ -1934,6 +1913,36 @@ components:
               type: string
               description: >
                 The collection to search in.
+    FacetCounts:
+      type: object
+      properties:
+        counts:
+          type: array
+          items:
+            type: object
+            properties:
+              count:
+                type: integer
+              highlighted:
+                type: string
+              value:
+                type: string
+        field_name:
+          type: string
+        stats:
+          type: object
+          properties:
+            max:
+              type: integer
+            min:
+              type: integer
+            sum:
+              type: integer
+            total_values:
+              type: integer
+            avg:
+              type: number
+              format: float
   securitySchemes:
     api_key_header:
       type: apiKey

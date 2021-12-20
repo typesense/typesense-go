@@ -153,6 +153,36 @@ components:
         message:
           type: string
       type: object
+    FacetCounts:
+      properties:
+        counts:
+          items:
+            properties:
+              count:
+                type: integer
+              highlighted:
+                type: string
+              value:
+                type: string
+            type: object
+          type: array
+        field_name:
+          type: string
+        stats:
+          properties:
+            avg:
+              format: float
+              type: number
+            max:
+              type: integer
+            min:
+              type: integer
+            sum:
+              type: integer
+            total_values:
+              type: integer
+          type: object
+      type: object
     Field:
       properties:
         facet:
@@ -265,16 +295,6 @@ components:
         max_facet_values:
           description: Maximum number of facet values to be returned.
           type: integer
-        max_hits:
-          description: |
-            Maximum number of hits returned. Increasing this value might increase search latency. Default: 500. Use `all` to return all hits found.
-          oneOf:
-            - example: 500
-              type: integer
-            - enum:
-                - all
-              example: all
-              type: string
         min_len_1typo:
           description: |
             Minimum word length for 1-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
@@ -301,7 +321,7 @@ components:
         pre_segmented_query:
           description: |
             You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself  before indexing and querying.
-            Set this parameter to tre to do the same
+            Set this parameter to true to do the same
           type: boolean
         prefix:
           description: Boolean field to indicate that the last word in the query should be treated as a prefix, and not as a whole word. This is used for building autocomplete and instant search interfaces. Defaults to true.
@@ -557,16 +577,6 @@ components:
         max_facet_values:
           description: Maximum number of facet values to be returned.
           type: integer
-        max_hits:
-          description: |
-            Maximum number of hits returned. Increasing this value might increase search latency. Default: 500. Use `all` to return all hits found.
-          oneOf:
-            - example: 500
-              type: integer
-            - enum:
-                - all
-              example: all
-              type: string
         min_len_1typo:
           description: |
             Minimum word length for 1-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
@@ -593,7 +603,7 @@ components:
         pre_segmented_query:
           description: |
             You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself  before indexing and querying.
-            Set this parameter to tre to do the same
+            Set this parameter to true to do the same
           type: boolean
         prefix:
           description: Boolean field to indicate that the last word in the query should be treated as a prefix, and not as a whole word. This is used for building autocomplete and instant search interfaces. Defaults to true.
@@ -639,7 +649,7 @@ components:
       properties:
         facet_counts:
           items:
-            type: integer
+            $ref: '#/components/schemas/FacetCounts'
           type: array
         found:
           description: The number of documents found
@@ -653,6 +663,9 @@ components:
           items:
             $ref: '#/components/schemas/SearchResultHit'
           type: array
+        out_of:
+          description: The total number of pages
+          type: integer
         page:
           description: The search result page number
           type: integer
@@ -669,6 +682,9 @@ components:
             - q
             - per_page
           type: object
+        search_cutoff:
+          description: Whether the search was cut off
+          type: boolean
         search_time_ms:
           description: The number of milliseconds the search took
           type: integer
@@ -1245,90 +1261,15 @@ paths:
           schema:
             type: string
         - in: query
+          name: highlight_full_fields
+          schema:
+            type: string
+        - in: query
+          name: highlight_fields
+          schema:
+            type: string
+        - in: query
           name: pre_segmented_query
-          schema:
-            type: boolean
-        - in: query
-          name: cache_ttl
-          schema:
-            type: integer
-        - in: query
-          name: min_len_1typo
-          schema:
-            type: integer
-        - in: query
-          name: max_hits
-          schema:
-            oneOf:
-              - example: 500
-                type: integer
-              - enum:
-                  - all
-                example: all
-                type: string
-        - in: query
-          name: facet_by
-          schema:
-            type: string
-        - in: query
-          name: highlight_start_tag
-          schema:
-            type: string
-        - in: query
-          name: prioritize_exact_match
-          schema:
-            type: boolean
-        - in: query
-          name: per_page
-          schema:
-            type: integer
-        - in: query
-          name: highlight_end_tag
-          schema:
-            type: string
-        - in: query
-          name: drop_tokens_threshold
-          schema:
-            type: integer
-        - in: query
-          name: highlight_affix_num_tokens
-          schema:
-            type: integer
-        - in: query
-          name: query_by
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: prefix
-          schema:
-            type: string
-        - in: query
-          name: max_facet_values
-          schema:
-            type: integer
-        - in: query
-          name: page
-          schema:
-            type: integer
-        - in: query
-          name: group_limit
-          schema:
-            type: integer
-        - in: query
-          name: include_fields
-          schema:
-            type: string
-        - in: query
-          name: typo_tokens_threshold
-          schema:
-            type: integer
-        - in: query
-          name: hidden_hits
-          schema:
-            type: string
-        - in: query
-          name: exhaustive_search
           schema:
             type: boolean
         - in: query
@@ -1345,13 +1286,66 @@ paths:
           schema:
             type: string
         - in: query
+          name: query_by_weights
+          schema:
+            type: string
+        - in: query
+          name: include_fields
+          schema:
+            type: string
+        - in: query
+          name: highlight_end_tag
+          schema:
+            type: string
+        - in: query
+          name: query_by
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: max_facet_values
+          schema:
+            type: integer
+        - in: query
+          name: exclude_fields
+          schema:
+            type: string
+        - in: query
+          name: highlight_affix_num_tokens
+          schema:
+            type: integer
+        - in: query
+          name: snippet_threshold
+          schema:
+            type: integer
+        - in: query
+          name: drop_tokens_threshold
+          schema:
+            type: integer
+        - in: query
+          name: prioritize_exact_match
+          schema:
+            type: boolean
+        - in: query
+          name: cache_ttl
+          schema:
+            type: integer
+        - in: query
           name: facet_query
           schema:
             type: string
         - in: query
-          name: highlight_full_fields
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: highlight_start_tag
           schema:
             type: string
+        - in: query
+          name: typo_tokens_threshold
+          schema:
+            type: integer
         - in: query
           name: pinned_hits
           schema:
@@ -1361,15 +1355,11 @@ paths:
           schema:
             type: boolean
         - in: query
-          name: query_by_weights
+          name: exhaustive_search
           schema:
-            type: string
+            type: boolean
         - in: query
-          name: filter_by
-          schema:
-            type: string
-        - in: query
-          name: snippet_threshold
+          name: min_len_2typo
           schema:
             type: integer
         - in: query
@@ -1381,17 +1371,33 @@ paths:
           schema:
             type: string
         - in: query
-          name: exclude_fields
+          name: filter_by
           schema:
             type: string
         - in: query
-          name: highlight_fields
-          schema:
-            type: string
-        - in: query
-          name: min_len_2typo
+          name: per_page
           schema:
             type: integer
+        - in: query
+          name: hidden_hits
+          schema:
+            type: string
+        - in: query
+          name: min_len_1typo
+          schema:
+            type: integer
+        - in: query
+          name: group_limit
+          schema:
+            type: integer
+        - in: query
+          name: prefix
+          schema:
+            type: string
+        - in: query
+          name: facet_by
+          schema:
+            type: string
       responses:
         200:
           content:
@@ -1739,27 +1745,15 @@ paths:
       operationId: multiSearch
       parameters:
         - in: query
-          name: include_fields
+          name: highlight_full_fields
           schema:
             type: string
         - in: query
-          name: typo_tokens_threshold
-          schema:
-            type: integer
-        - in: query
-          name: hidden_hits
+          name: highlight_fields
           schema:
             type: string
         - in: query
-          name: pinned_hits
-          schema:
-            type: string
-        - in: query
-          name: enable_overrides
-          schema:
-            type: boolean
-        - in: query
-          name: exhaustive_search
+          name: pre_segmented_query
           schema:
             type: boolean
         - in: query
@@ -1775,29 +1769,77 @@ paths:
           schema:
             type: string
         - in: query
-          name: facet_query
-          schema:
-            type: string
-        - in: query
-          name: highlight_full_fields
-          schema:
-            type: string
-        - in: query
           name: query_by_weights
           schema:
             type: string
         - in: query
-          name: filter_by
+          name: sort_by
           schema:
             type: string
+        - in: query
+          name: highlight_end_tag
+          schema:
+            type: string
+        - in: query
+          name: query_by
+          schema:
+            type: string
+        - in: query
+          name: max_facet_values
+          schema:
+            type: integer
+        - in: query
+          name: include_fields
+          schema:
+            type: string
+        - in: query
+          name: highlight_affix_num_tokens
+          schema:
+            type: integer
         - in: query
           name: snippet_threshold
           schema:
             type: integer
         - in: query
-          name: highlight_fields
+          name: drop_tokens_threshold
+          schema:
+            type: integer
+        - in: query
+          name: prioritize_exact_match
+          schema:
+            type: boolean
+        - in: query
+          name: cache_ttl
+          schema:
+            type: integer
+        - in: query
+          name: facet_query
           schema:
             type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: exclude_fields
+          schema:
+            type: string
+        - in: query
+          name: typo_tokens_threshold
+          schema:
+            type: integer
+        - in: query
+          name: pinned_hits
+          schema:
+            type: string
+        - in: query
+          name: enable_overrides
+          schema:
+            type: boolean
+        - in: query
+          name: exhaustive_search
+          schema:
+            type: boolean
         - in: query
           name: min_len_2typo
           schema:
@@ -1811,45 +1853,11 @@ paths:
           schema:
             type: string
         - in: query
-          name: exclude_fields
-          schema:
-            type: string
-        - in: query
-          name: min_len_1typo
-          schema:
-            type: integer
-        - in: query
-          name: sort_by
-          schema:
-            type: string
-        - in: query
-          name: pre_segmented_query
-          schema:
-            type: boolean
-        - in: query
-          name: cache_ttl
-          schema:
-            type: integer
-        - in: query
-          name: prioritize_exact_match
-          schema:
-            type: boolean
-        - in: query
-          name: max_hits
-          schema:
-            oneOf:
-              - example: 500
-                type: integer
-              - enum:
-                  - all
-                example: all
-                type: string
-        - in: query
-          name: facet_by
-          schema:
-            type: string
-        - in: query
           name: highlight_start_tag
+          schema:
+            type: string
+        - in: query
+          name: filter_by
           schema:
             type: string
         - in: query
@@ -1857,35 +1865,23 @@ paths:
           schema:
             type: integer
         - in: query
-          name: highlight_end_tag
+          name: hidden_hits
           schema:
             type: string
         - in: query
-          name: drop_tokens_threshold
+          name: min_len_1typo
           schema:
             type: integer
-        - in: query
-          name: page
-          schema:
-            type: integer
-        - in: query
-          name: group_limit
-          schema:
-            type: integer
-        - in: query
-          name: highlight_affix_num_tokens
-          schema:
-            type: integer
-        - in: query
-          name: query_by
-          schema:
-            type: string
         - in: query
           name: prefix
           schema:
             type: string
         - in: query
-          name: max_facet_values
+          name: facet_by
+          schema:
+            type: string
+        - in: query
+          name: group_limit
           schema:
             type: integer
       requestBody:
