@@ -16,6 +16,7 @@ type CollectionInterface interface {
 	Override(overrideID string) OverrideInterface
 	Synonyms() SynonymsInterface
 	Synonym(synonymID string) SynonymInterface
+	Update(schema *api.CollectionUpdateSchema) (*api.CollectionUpdateSchema, error)
 }
 
 // collection is internal implementation of CollectionInterface
@@ -68,4 +69,16 @@ func (c *collection) Synonyms() SynonymsInterface {
 
 func (c *collection) Synonym(synonymID string) SynonymInterface {
 	return &synonym{apiClient: c.apiClient, collectionName: c.name, synonymID: synonymID}
+}
+
+func (c *collection) Update(schema *api.CollectionUpdateSchema) (*api.CollectionUpdateSchema, error) {
+	response, err := c.apiClient.UpdateCollectionWithResponse(context.Background(), c.name,
+		api.UpdateCollectionJSONRequestBody(*schema))
+	if err != nil {
+		return nil, err
+	}
+	if response.JSON200 == nil {
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
+	}
+	return response.JSON200, nil
 }
