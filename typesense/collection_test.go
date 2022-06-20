@@ -2,6 +2,7 @@ package typesense
 
 import (
 	"errors"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"net/http"
 	"testing"
 
@@ -10,6 +11,26 @@ import (
 	"github.com/typesense/typesense-go/typesense/api"
 	"github.com/typesense/typesense-go/typesense/mocks"
 )
+
+func updateExistingSchema(collectionName string) *api.CollectionUpdateSchema {
+	return &api.CollectionUpdateSchema{
+		Fields: []api.Field{
+			{
+				Name: "url",
+				Drop: pointer.True(),
+			},
+			{
+				Name:  "url",
+				Type:  "string",
+				Index: pointer.False(),
+			},
+		},
+	}
+}
+
+func updateExistingCollection(name string) *api.CollectionUpdateSchema {
+	return updateExistingSchema(name)
+}
 
 func TestCollectionRetrieve(t *testing.T) {
 	expectedResult := createNewCollection("companies")
@@ -127,4 +148,69 @@ func TestCollectionDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	client := NewClient(WithAPIClient(mockAPIClient))
 	_, err := client.Collection("companies").Delete()
 	assert.NotNil(t, err)
+}
+
+func TestCollectionUpdate(t *testing.T) {
+	updateSchema := updateExistingSchema("companies")
+	expectedResult := updateExistingCollection("companies")
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
+	mockedResult := updateExistingCollection("companies")
+
+	mockAPIClient.EXPECT().
+		UpdateCollectionWithResponse(gomock.Not(gomock.Nil()), "companies",
+			api.UpdateCollectionJSONRequestBody(*updateSchema)).
+		Return(&api.UpdateCollectionResponse{
+			JSON200: mockedResult,
+		}, nil).
+		Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	result, err := client.Collection("companies").Update(updateSchema)
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedResult, result)
+}
+
+func TestCollectionUpdateOnApiClientErrorReturnsError(t *testing.T) {
+	updateSchema := updateExistingSchema("companies")
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
+
+	mockAPIClient.EXPECT().
+		UpdateCollectionWithResponse(gomock.Not(gomock.Nil()), "companies",
+			api.UpdateCollectionJSONRequestBody(*updateSchema)).
+		Return(nil, errors.New("failed request")).
+		Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	_, err := client.Collection("companies").Update(updateSchema)
+	assert.Error(t, err)
+}
+
+func TestCollectionUpdateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
+	updateSchema := updateExistingSchema("companies")
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
+
+	mockAPIClient.EXPECT().
+		UpdateCollectionWithResponse(gomock.Not(gomock.Nil()), "non_existent",
+			api.UpdateCollectionJSONRequestBody(*updateSchema)).
+		Return(&api.UpdateCollectionResponse{
+			HTTPResponse: &http.Response{
+				StatusCode: 404,
+			},
+			Body: []byte("Collection not found"),
+		}, nil).
+		Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	_, err := client.Collection("non_existent").Update(updateSchema)
+	assert.Error(t, err)
 }

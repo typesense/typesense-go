@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Typesense API
   description: "An open source search engine for building delightful search experiences."
-  version: 0.21.0
+  version: 0.23.0
 externalDocs:
   description: Find out more about Typsesense
   url: https://typesense.org
@@ -23,19 +23,19 @@ tags:
     description: Promote certain documents over others
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/0.21.0/api/#curation
+      url: https://typesense.org/docs/0.23.0/api/#curation
   - name: keys
     description: Manage API Keys with fine-grain access control
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/0.21.0/api/#api-keys
+      url: https://typesense.org/docs/0.23.0/api/#api-keys
   - name: debug
     description: Debugging information
   - name: operations
     description: Manage Typesense cluster
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/0.21.0/api/#cluster-operations
+      url: https://typesense.org/docs/0.23.0/api/#cluster-operations
 
 paths:
   /collections:
@@ -109,6 +109,40 @@ paths:
                 $ref: "#/components/schemas/CollectionResponse"
         404:
           description: Collection not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+    patch:
+      tags:
+        - collections
+      summary: Update a collection
+      description:
+        Update a collection's schema to modify the fields and their types.
+      operationId: updateCollection
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The document object with fields to be updated
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollectionUpdateSchema"
+        required: true
+      responses:
+        200:
+          description: The updated partial collection schema
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionUpdateSchema"
+        404:
+          description: The collection was not found
           content:
             application/json:
               schema:
@@ -669,7 +703,7 @@ paths:
               x-go-type: "interface{}"
         required: true
       responses:
-        201:
+        200:
           description: The document referenced by the ID was updated
           content:
             application/json:
@@ -1032,6 +1066,26 @@ components:
           items:
             type: string # characters only
           default: []
+    CollectionUpdateSchema:
+      required:
+        - fields
+      type: object
+      properties:
+        fields:
+          type: array
+          description: A list of fields for querying, filtering and faceting
+          example:
+            - name: company_name
+              type: string
+              facet: false
+            - name: num_employees
+              type: int32
+              facet: false
+            - name: country
+              type: string
+              facet: true
+          items:
+            $ref: "#/components/schemas/Field"
     CollectionResponse:
       allOf:
         - $ref: "#/components/schemas/CollectionSchema"
@@ -1074,6 +1128,21 @@ components:
           type: boolean
           example: true
           default: true
+        locale:
+          type: string
+          example: el
+        sort:
+          type: boolean
+          example: true
+          default: false
+        infix:
+          type: boolean
+          example: true
+          default: false
+        drop:
+          type: boolean
+          example: true
+          # omitting default value since we want it to be null
     CollectionAliasSchema:
       type: object
       required:

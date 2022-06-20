@@ -1317,6 +1317,86 @@ func (mr *MockAPIClientInterfaceMockRecorder) TakeSnapshotWithResponse(ctx, para
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TakeSnapshotWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).TakeSnapshotWithResponse), varargs...)
 }
 
+// UpdateCollection mocks base method.
+func (m *MockAPIClientInterface) UpdateCollection(ctx context.Context, collectionName string, body api.UpdateCollectionJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, collectionName, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateCollection", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateCollection indicates an expected call of UpdateCollection.
+func (mr *MockAPIClientInterfaceMockRecorder) UpdateCollection(ctx, collectionName, body interface{}, reqEditors ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, collectionName, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCollection", reflect.TypeOf((*MockAPIClientInterface)(nil).UpdateCollection), varargs...)
+}
+
+// UpdateCollectionWithBody mocks base method.
+func (m *MockAPIClientInterface) UpdateCollectionWithBody(ctx context.Context, collectionName, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, collectionName, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateCollectionWithBody", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateCollectionWithBody indicates an expected call of UpdateCollectionWithBody.
+func (mr *MockAPIClientInterfaceMockRecorder) UpdateCollectionWithBody(ctx, collectionName, contentType, body interface{}, reqEditors ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, collectionName, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCollectionWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).UpdateCollectionWithBody), varargs...)
+}
+
+// UpdateCollectionWithBodyWithResponse mocks base method.
+func (m *MockAPIClientInterface) UpdateCollectionWithBodyWithResponse(ctx context.Context, collectionName, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*api.UpdateCollectionResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, collectionName, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateCollectionWithBodyWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.UpdateCollectionResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateCollectionWithBodyWithResponse indicates an expected call of UpdateCollectionWithBodyWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) UpdateCollectionWithBodyWithResponse(ctx, collectionName, contentType, body interface{}, reqEditors ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, collectionName, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCollectionWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpdateCollectionWithBodyWithResponse), varargs...)
+}
+
+// UpdateCollectionWithResponse mocks base method.
+func (m *MockAPIClientInterface) UpdateCollectionWithResponse(ctx context.Context, collectionName string, body api.UpdateCollectionJSONRequestBody, reqEditors ...api.RequestEditorFn) (*api.UpdateCollectionResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, collectionName, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateCollectionWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.UpdateCollectionResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateCollectionWithResponse indicates an expected call of UpdateCollectionWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) UpdateCollectionWithResponse(ctx, collectionName, body interface{}, reqEditors ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, collectionName, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCollectionWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpdateCollectionWithResponse), varargs...)
+}
+
 // UpdateDocument mocks base method.
 func (m *MockAPIClientInterface) UpdateDocument(ctx context.Context, collectionName, documentId string, body api.UpdateDocumentJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
