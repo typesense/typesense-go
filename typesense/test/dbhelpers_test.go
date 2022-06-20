@@ -51,6 +51,10 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 				Facet:    pointer.False(),
 				Optional: pointer.False(),
 				Index:    pointer.True(),
+				Infix:    pointer.False(),
+				Locale:   pointer.String(""),
+				Sort:     pointer.False(),
+				Drop:     nil,
 			},
 			{
 				Name:     "num_employees",
@@ -58,6 +62,10 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 				Facet:    pointer.False(),
 				Optional: pointer.False(),
 				Index:    pointer.True(),
+				Infix:    pointer.False(),
+				Locale:   pointer.String(""),
+				Sort:     pointer.True(),
+				Drop:     nil,
 			},
 			{
 				Name:     "country",
@@ -65,6 +73,10 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 				Facet:    pointer.True(),
 				Optional: pointer.True(),
 				Index:    pointer.True(),
+				Infix:    pointer.False(),
+				Locale:   pointer.String(""),
+				Sort:     pointer.False(),
+				Drop:     nil,
 			},
 		},
 		DefaultSortingField: pointer.String(""),
@@ -181,6 +193,7 @@ func newSearchOverrideSchema(opts ...newSearchOverrideSchemaOption) *api.SearchO
 				Id: "287",
 			},
 		},
+		RemoveMatchedTokens: pointer.True(),
 	}
 	for _, opt := range opts {
 		opt(schema)

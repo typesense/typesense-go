@@ -12,7 +12,7 @@ import (
 	"github.com/typesense/typesense-go/typesense/mocks"
 )
 
-func updateExistingSchema(collectionName string) *api.CollectionUpdateSchema {
+func updateExistingSchema() *api.CollectionUpdateSchema {
 	return &api.CollectionUpdateSchema{
 		Fields: []api.Field{
 			{
@@ -28,8 +28,8 @@ func updateExistingSchema(collectionName string) *api.CollectionUpdateSchema {
 	}
 }
 
-func updateExistingCollection(name string) *api.CollectionUpdateSchema {
-	return updateExistingSchema(name)
+func updateExistingCollection() *api.CollectionUpdateSchema {
+	return updateExistingSchema()
 }
 
 func TestCollectionRetrieve(t *testing.T) {
@@ -151,13 +151,13 @@ func TestCollectionDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 }
 
 func TestCollectionUpdate(t *testing.T) {
-	updateSchema := updateExistingSchema("companies")
-	expectedResult := updateExistingCollection("companies")
+	updateSchema := updateExistingSchema()
+	expectedResult := updateExistingCollection()
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
-	mockedResult := updateExistingCollection("companies")
+	mockedResult := updateExistingCollection()
 
 	mockAPIClient.EXPECT().
 		UpdateCollectionWithResponse(gomock.Not(gomock.Nil()), "companies",
@@ -175,7 +175,7 @@ func TestCollectionUpdate(t *testing.T) {
 }
 
 func TestCollectionUpdateOnApiClientErrorReturnsError(t *testing.T) {
-	updateSchema := updateExistingSchema("companies")
+	updateSchema := updateExistingSchema()
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -193,7 +193,7 @@ func TestCollectionUpdateOnApiClientErrorReturnsError(t *testing.T) {
 }
 
 func TestCollectionUpdateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
-	updateSchema := updateExistingSchema("companies")
+	updateSchema := updateExistingSchema()
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
