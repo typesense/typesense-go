@@ -1687,6 +1687,13 @@ components:
             for them
           type: string
 
+        split_join_tokens:
+          description: >
+            Treat space as typo: search for q=basket ball if q=basketball is not found or vice-versa.
+            Splitting/joining of tokens will only be attempted if the original query produces no results.
+            To always trigger this behavior, set value to `always``.
+            To disable, set value to `off`. Default is `fallback`.
+          type: string
         pre_segmented_query:
           description: >
             You can index content from any logographic language into Typesense if you
@@ -1706,6 +1713,14 @@ components:
           description: >
             Set this parameter to true to ensure that an exact match is ranked above
             the others
+          type: boolean
+        max_candidates:
+          description: >
+            Control the number of words that Typesense considers for typo and prefix searching.
+          type: integer
+        prioritize_token_position:
+          description: >
+            Make Typesense prioritize documents where the query words appear earlier in the text.
           type: boolean
         exhaustive_search:
           description: >
@@ -2002,11 +2017,14 @@ components:
           type: object
           properties:
             max:
-              type: integer
+              type: number
+              format: float
             min:
-              type: integer
+              type: number
+              format: float
             sum:
-              type: integer
+              type: number
+              format: float
             total_values:
               type: integer
             avg:

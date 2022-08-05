@@ -194,11 +194,14 @@ components:
               format: float
               type: number
             max:
-              type: integer
+              format: float
+              type: number
             min:
-              type: integer
+              format: float
+              type: number
             sum:
-              type: integer
+              format: float
+              type: number
             total_values:
               type: integer
           type: object
@@ -608,6 +611,10 @@ components:
         include_fields:
           description: List of fields from the document to include in the search result
           type: string
+        max_candidates:
+          description: |
+            Control the number of words that Typesense considers for typo and prefix searching.
+          type: integer
         max_facet_values:
           description: Maximum number of facet values to be returned.
           type: integer
@@ -646,6 +653,10 @@ components:
           description: |
             Set this parameter to true to ensure that an exact match is ranked above the others
           type: boolean
+        prioritize_token_position:
+          description: |
+            Make Typesense prioritize documents where the query words appear earlier in the text.
+          type: boolean
         q:
           description: The query text to search for in the collection. Use * as the search string to return all documents. This is typically useful when used in conjunction with filter_by.
           type: string
@@ -666,6 +677,10 @@ components:
         sort_by:
           description: A list of numerical fields and their corresponding sort orders that will be used for ordering your results. Up to 3 sort fields can be specified. The text similarity score is exposed as a special `_text_match` field that you can use in the list of sorting fields. If no `sort_by` parameter is specified, results are sorted by `_text_match:desc,default_sorting_field:desc`
           example: num_employees:desc
+          type: string
+        split_join_tokens:
+          description: |
+            Treat space as typo: search for q=basket ball if q=basketball is not found or vice-versa. Splitting/joining of tokens will only be attempted if the original query produces no results. To always trigger this behavior, set value to `always``. To disable, set value to `off`. Default is `fallback`.
           type: string
         typo_tokens_threshold:
           description: |
@@ -1269,10 +1284,6 @@ paths:
           schema:
             type: string
         - in: query
-          name: action
-          schema:
-            type: string
-        - in: query
           name: batch_size
           schema:
             type: integer
@@ -1284,6 +1295,10 @@ paths:
               - coerce_or_drop
               - drop
               - reject
+            type: string
+        - in: query
+          name: action
+          schema:
             type: string
       requestBody:
         content:
@@ -1324,51 +1339,7 @@ paths:
           schema:
             type: string
         - in: query
-          name: drop_tokens_threshold
-          schema:
-            type: integer
-        - in: query
-          name: exhaustive_search
-          schema:
-            type: boolean
-        - in: query
-          name: highlight_start_tag
-          schema:
-            type: string
-        - in: query
-          name: include_fields
-          schema:
-            type: string
-        - in: query
-          name: highlight_end_tag
-          schema:
-            type: string
-        - in: query
-          name: highlight_fields
-          schema:
-            type: string
-        - in: query
-          name: search_cutoff_ms
-          schema:
-            type: integer
-        - in: query
           name: min_len_2typo
-          schema:
-            type: integer
-        - in: query
-          name: per_page
-          schema:
-            type: integer
-        - in: query
-          name: num_typos
-          schema:
-            type: integer
-        - in: query
-          name: use_cache
-          schema:
-            type: boolean
-        - in: query
-          name: cache_ttl
           schema:
             type: integer
         - in: query
@@ -1376,11 +1347,39 @@ paths:
           schema:
             type: string
         - in: query
-          name: filter_by
+          name: group_by
           schema:
             type: string
         - in: query
+          name: highlight_start_tag
+          schema:
+            type: string
+        - in: query
+          name: snippet_threshold
+          schema:
+            type: integer
+        - in: query
+          name: drop_tokens_threshold
+          schema:
+            type: integer
+        - in: query
+          name: prioritize_exact_match
+          schema:
+            type: boolean
+        - in: query
           name: sort_by
+          schema:
+            type: string
+        - in: query
+          name: highlight_end_tag
+          schema:
+            type: string
+        - in: query
+          name: min_len_1typo
+          schema:
+            type: integer
+        - in: query
+          name: prefix
           schema:
             type: string
         - in: query
@@ -1388,31 +1387,43 @@ paths:
           schema:
             type: string
         - in: query
-          name: highlight_full_fields
+          name: num_typos
           schema:
-            type: string
+            type: integer
         - in: query
           name: typo_tokens_threshold
           schema:
             type: integer
         - in: query
+          name: max_candidates
+          schema:
+            type: integer
+        - in: query
+          name: max_facet_values
+          schema:
+            type: integer
+        - in: query
+          name: exclude_fields
+          schema:
+            type: string
+        - in: query
+          name: highlight_full_fields
+          schema:
+            type: string
+        - in: query
+          name: search_cutoff_ms
+          schema:
+            type: integer
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: include_fields
+          schema:
+            type: string
+        - in: query
           name: hidden_hits
-          schema:
-            type: string
-        - in: query
-          name: prefix
-          schema:
-            type: string
-        - in: query
-          name: highlight_affix_num_tokens
-          schema:
-            type: integer
-        - in: query
-          name: snippet_threshold
-          schema:
-            type: integer
-        - in: query
-          name: pinned_hits
           schema:
             type: string
         - in: query
@@ -1420,32 +1431,53 @@ paths:
           schema:
             type: boolean
         - in: query
-          name: page
+          name: per_page
           schema:
             type: integer
         - in: query
-          name: facet_by
+          name: highlight_fields
           schema:
             type: string
         - in: query
-          name: exclude_fields
+          name: exhaustive_search
           schema:
-            type: string
+            type: boolean
+        - in: query
+          name: cache_ttl
+          schema:
+            type: integer
         - in: query
           name: q
           required: true
           schema:
             type: string
         - in: query
-          name: prioritize_exact_match
+          name: query_by
+          required: true
           schema:
-            type: boolean
+            type: string
         - in: query
-          name: max_facet_values
+          name: highlight_affix_num_tokens
           schema:
             type: integer
         - in: query
-          name: group_by
+          name: pinned_hits
+          schema:
+            type: string
+        - in: query
+          name: split_join_tokens
+          schema:
+            type: string
+        - in: query
+          name: prioritize_token_position
+          schema:
+            type: boolean
+        - in: query
+          name: filter_by
+          schema:
+            type: string
+        - in: query
+          name: facet_by
           schema:
             type: string
         - in: query
@@ -1457,14 +1489,9 @@ paths:
           schema:
             type: boolean
         - in: query
-          name: min_len_1typo
+          name: use_cache
           schema:
-            type: integer
-        - in: query
-          name: query_by
-          required: true
-          schema:
-            type: string
+            type: boolean
       responses:
         200:
           content:
@@ -1812,11 +1839,63 @@ paths:
       operationId: multiSearch
       parameters:
         - in: query
+          name: include_fields
+          schema:
+            type: string
+        - in: query
+          name: hidden_hits
+          schema:
+            type: string
+        - in: query
+          name: enable_overrides
+          schema:
+            type: boolean
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: highlight_fields
+          schema:
+            type: string
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+        - in: query
           name: query_by
           schema:
             type: string
         - in: query
-          name: group_by
+          name: highlight_affix_num_tokens
+          schema:
+            type: integer
+        - in: query
+          name: pinned_hits
+          schema:
+            type: string
+        - in: query
+          name: split_join_tokens
+          schema:
+            type: string
+        - in: query
+          name: prioritize_token_position
+          schema:
+            type: boolean
+        - in: query
+          name: exhaustive_search
+          schema:
+            type: boolean
+        - in: query
+          name: cache_ttl
+          schema:
+            type: integer
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: facet_by
           schema:
             type: string
         - in: query
@@ -1828,41 +1907,33 @@ paths:
           schema:
             type: boolean
         - in: query
-          name: min_len_1typo
+          name: use_cache
           schema:
-            type: integer
+            type: boolean
+        - in: query
+          name: filter_by
+          schema:
+            type: string
+        - in: query
+          name: group_by
+          schema:
+            type: string
         - in: query
           name: highlight_start_tag
           schema:
             type: string
         - in: query
+          name: snippet_threshold
+          schema:
+            type: integer
+        - in: query
           name: drop_tokens_threshold
           schema:
             type: integer
         - in: query
-          name: exhaustive_search
+          name: prioritize_exact_match
           schema:
             type: boolean
-        - in: query
-          name: per_page
-          schema:
-            type: integer
-        - in: query
-          name: include_fields
-          schema:
-            type: string
-        - in: query
-          name: highlight_end_tag
-          schema:
-            type: string
-        - in: query
-          name: highlight_fields
-          schema:
-            type: string
-        - in: query
-          name: search_cutoff_ms
-          schema:
-            type: integer
         - in: query
           name: min_len_2typo
           schema:
@@ -1872,25 +1943,13 @@ paths:
           schema:
             type: string
         - in: query
-          name: num_typos
-          schema:
-            type: integer
-        - in: query
-          name: use_cache
-          schema:
-            type: boolean
-        - in: query
-          name: cache_ttl
-          schema:
-            type: integer
-        - in: query
-          name: prefix
+          name: highlight_end_tag
           schema:
             type: string
         - in: query
-          name: filter_by
+          name: min_len_1typo
           schema:
-            type: string
+            type: integer
         - in: query
           name: sort_by
           schema:
@@ -1900,43 +1959,19 @@ paths:
           schema:
             type: string
         - in: query
-          name: highlight_full_fields
+          name: num_typos
           schema:
-            type: string
+            type: integer
         - in: query
           name: typo_tokens_threshold
           schema:
             type: integer
         - in: query
-          name: hidden_hits
-          schema:
-            type: string
-        - in: query
-          name: page
+          name: max_candidates
           schema:
             type: integer
         - in: query
-          name: highlight_affix_num_tokens
-          schema:
-            type: integer
-        - in: query
-          name: snippet_threshold
-          schema:
-            type: integer
-        - in: query
-          name: pinned_hits
-          schema:
-            type: string
-        - in: query
-          name: enable_overrides
-          schema:
-            type: boolean
-        - in: query
-          name: q
-          schema:
-            type: string
-        - in: query
-          name: facet_by
+          name: prefix
           schema:
             type: string
         - in: query
@@ -1944,13 +1979,17 @@ paths:
           schema:
             type: string
         - in: query
-          name: max_facet_values
+          name: highlight_full_fields
+          schema:
+            type: string
+        - in: query
+          name: search_cutoff_ms
           schema:
             type: integer
         - in: query
-          name: prioritize_exact_match
+          name: max_facet_values
           schema:
-            type: boolean
+            type: integer
       requestBody:
         content:
           application/json:
