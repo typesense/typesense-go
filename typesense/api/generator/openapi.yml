@@ -1441,7 +1441,10 @@ components:
       required:
         - actions
         - collections
+        - description
       properties:
+        value:
+          type: string
         description:
           type: string
         actions:

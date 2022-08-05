@@ -16,7 +16,7 @@ import (
 
 func createNewKeySchema() *api.ApiKeySchema {
 	return &api.ApiKeySchema{
-		Description: pointer.String("Search-only key."),
+		Description: "Search-only key.",
 		Actions:     []string{"documents:search"},
 		Collections: []string{"companies"},
 		ExpiresAt:   pointer.Int64(time.Date(2222, 0, 1, 0, 0, 0, 0, time.UTC).Unix()),
