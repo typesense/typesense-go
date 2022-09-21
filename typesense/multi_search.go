@@ -41,7 +41,7 @@ func (m *multiSearch) PerformWithContentType(searchParams *api.MultiSearchParams
 	if err != nil {
 		return nil, err
 	}
-	if response.HTTPResponse == nil {
+	if response.Body == nil {
 		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return response, nil
