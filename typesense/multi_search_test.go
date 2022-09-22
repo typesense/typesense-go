@@ -11,6 +11,7 @@ import (
 	"github.com/typesense/typesense-go/typesense/api"
 	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"github.com/typesense/typesense-go/typesense/mocks"
+	"bytes"
 )
 
 func newMultiSearchParams() *api.MultiSearchParams {
@@ -214,20 +215,46 @@ func TestMultiSearch(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
-	mockedResult := newMultiSearchResult()
 
-	mockAPIClient.EXPECT().
-		MultiSearchWithResponse(gomock.Not(gomock.Nil()), expectedParams, api.MultiSearchJSONRequestBody(expectedBody)).Return(&api.MultiSearchResponse{
-		JSON200: mockedResult,
-	}, nil).Times(1)
+	t.Run("Perform JSON search request", func(t *testing.T) {
+		mockedResult := newMultiSearchResult()
 
-	client := NewClient(WithAPIClient(mockAPIClient))
-	params := newMultiSearchParams()
-	body := newMultiSearchBodyParams()
-	result, err := client.MultiSearch.Perform(params, body)
+		mockAPIClient.EXPECT().
+			MultiSearchWithResponse(gomock.Not(gomock.Nil()), expectedParams, api.MultiSearchJSONRequestBody(expectedBody)).Return(&api.MultiSearchResponse{
+			JSON200: mockedResult,
+		}, nil).Times(1)
 
-	assert.Nil(t, err)
-	assert.Equal(t, expectedResult, result)
+		client := NewClient(WithAPIClient(mockAPIClient))
+		params := newMultiSearchParams()
+		body := newMultiSearchBodyParams()
+		result, err := client.MultiSearch.Perform(params, body)
+
+		assert.Nil(t, err)
+		assert.Equal(t, expectedResult, result)
+	})
+
+	t.Run("Perform with content type", func(t *testing.T) {
+		expectedContentType := "application/x-json-stream"
+		expectedResponseBytes, err := json.Marshal(expectedResult)
+		assert.Nil(t, err)
+
+		expectedReqBody, err := json.Marshal(expectedBody)
+		assert.Nil(t, err)
+		reqReader := bytes.NewReader(expectedReqBody)
+		mockAPIClient.EXPECT().
+			MultiSearchWithBodyWithResponse(gomock.Not(gomock.Nil()), expectedParams, expectedContentType, reqReader).
+			Return(&api.MultiSearchResponse{
+				Body: expectedResponseBytes,
+			}, nil).Times(1)
+
+		client := NewClient(WithAPIClient(mockAPIClient))
+		params := newMultiSearchParams()
+		reqBody := newMultiSearchBodyParams()
+		result, err := client.MultiSearch.PerformWithContentType(params, reqBody, expectedContentType)
+
+		assert.Nil(t, err)
+		assert.Equal(t, expectedResponseBytes, result.Body)
+	})
 }
 
 func TestMultiSearchOnHttpStatusErrorCodeReturnsError(t *testing.T) {
