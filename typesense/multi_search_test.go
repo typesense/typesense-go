@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"testing"
 
+	"bytes"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/typesense/typesense-go/typesense/api"
 	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"github.com/typesense/typesense-go/typesense/mocks"
-	"bytes"
 )
 
 func newMultiSearchParams() *api.MultiSearchParams {
