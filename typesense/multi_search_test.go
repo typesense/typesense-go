@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"bytes"
+
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/typesense/typesense-go/typesense/api"
