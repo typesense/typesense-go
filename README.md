@@ -1,11 +1,10 @@
-# typesense-go 
+# typesense-go
 
 [![Build Status](https://cloud.drone.io/api/badges/typesense/typesense-go/status.svg)](https://cloud.drone.io/typesense/typesense-go)
 [![GoReportCard Status](https://goreportcard.com/badge/github.com/typesense/typesense-go)](https://goreportcard.com/report/github.com/typesense/typesense-go)
 [![Go Reference](https://pkg.go.dev/badge/github.com/typesense/typesense-go.svg)](https://pkg.go.dev/github.com/typesense/typesense-go)
 [![GitHub release](https://img.shields.io/github/v/release/typesense/typesense-go)](https://github.com/typesense/typesense-go/releases/latest)
 [![Gitter](https://badges.gitter.im/typesense-go/community.svg)](https://gitter.im/typesense-go/community)
-
 
 Go client for the Typesense API: https://github.com/typesense/typesense
 
@@ -17,9 +16,9 @@ go get github.com/typesense/typesense-go
 
 ## Usage
 
-Import the the package into your code : 
+Import the the package into your code :
 
-```go 
+```go
 import "github.com/typesense/typesense-go/typesense"
 ```
 
@@ -113,7 +112,20 @@ You can also find some examples in [integration tests](https://github.com/typese
 ```go
 	searchParameters := &api.SearchCollectionParams{
 		Q:        "stark",
-		QueryBy:  []string{"company_name"},
+		QueryBy:  "company_name",
+		FilterBy: pointer.String("num_employees:>100"),
+		SortBy:   &([]string{"num_employees:desc"}),
+	}
+
+	client.Collection("companies").Documents().Search(searchParameters)
+```
+
+for the supporting multiple `QueryBy` params, you can add `,` after each field
+
+```go
+	searchParameters := &api.SearchCollectionParams{
+		Q:        "stark",
+		QueryBy:  "company_name, country",
 		FilterBy: pointer.String("num_employees:>100"),
 		SortBy:   &([]string{"num_employees:desc"}),
 	}
@@ -170,10 +182,9 @@ client.Collection("companies").Documents().Export()
 
 The documents to be imported can be either an array of document objects or be formatted as a newline delimited JSON string (see [JSONL](https://jsonlines.org)).
 
-
 Import an array of documents:
 
-```go	
+```go
 	documents := []interface{}{
 		struct {
 			ID           string `json:"id"`
@@ -372,10 +383,13 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/typese
 #### Development Workflow Setup
 
 Install dependencies,
+
 ```bash
 go mod download
 ```
+
 Update the generated files,
+
 ```bash
 go generate
 ```
