@@ -114,15 +114,20 @@ components:
           description: The name of an int32 / float field that determines the order in which the search results are ranked when a sort_by clause is not provided during searching. This field must indicate some kind of popularity.
           example: num_employees
           type: string
+        enable_nested_fields:
+          default: false
+          description: Enables experimental support at a collection level for nested object or object array fields. This field is only available if the Typesense server is version `0.24.0.rcn34` or later.
+          example: true
+          type: boolean
         fields:
           description: A list of fields for querying, filtering and faceting
           example:
             - facet: false
-              name: company_name
-              type: string
-            - facet: false
               name: num_employees
               type: int32
+            - facet: false
+              name: company_name
+              type: string
             - facet: true
               name: country
               type: string
@@ -138,6 +143,8 @@ components:
           description: |
             List of symbols or special characters to be indexed.
           items:
+            maxLength: 1
+            minLength: 1
             type: string
           type: array
         token_separators:
@@ -145,6 +152,8 @@ components:
           description: |
             List of symbols or special characters to be used for  splitting the text into individual words in addition to space and new-line characters.
           items:
+            maxLength: 1
+            minLength: 1
             type: string
           type: array
       required:
@@ -194,16 +203,16 @@ components:
         stats:
           properties:
             avg:
-              format: float
+              format: double
               type: number
             max:
-              format: float
+              format: double
               type: number
             min:
-              format: float
+              format: double
               type: number
             sum:
-              format: float
+              format: double
               type: number
             total_values:
               type: integer
@@ -332,6 +341,15 @@ components:
         include_fields:
           description: List of fields from the document to include in the search result
           type: string
+        infix:
+          description: If infix index is enabled for this field, infix searching can be done on a per-field basis by sending a comma separated string parameter called infix to the search query. This parameter can have 3 values; `off` infix search is disabled, which is default `always` infix search is performed along with regular search `fallback` infix search is performed if regular search does not produce results
+          type: string
+        max_extra_prefix:
+          description: There are also 2 parameters that allow you to control the extent of infix searching max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before or after the query that can be present in the token. For example query "K2100" has 2 extra symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
+          type: integer
+        max_extra_suffix:
+          description: There are also 2 parameters that allow you to control the extent of infix searching max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before or after the query that can be present in the token. For example query "K2100" has 2 extra symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
+          type: integer
         max_facet_values:
           description: Maximum number of facet values to be returned.
           type: integer
@@ -614,9 +632,18 @@ components:
         include_fields:
           description: List of fields from the document to include in the search result
           type: string
+        infix:
+          description: If infix index is enabled for this field, infix searching can be done on a per-field basis by sending a comma separated string parameter called infix to the search query. This parameter can have 3 values; `off` infix search is disabled, which is default `always` infix search is performed along with regular search `fallback` infix search is performed if regular search does not produce results
+          type: string
         max_candidates:
           description: |
             Control the number of words that Typesense considers for typo and prefix searching.
+          type: integer
+        max_extra_prefix:
+          description: There are also 2 parameters that allow you to control the extent of infix searching max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before or after the query that can be present in the token. For example query "K2100" has 2 extra symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
+          type: integer
+        max_extra_suffix:
+          description: There are also 2 parameters that allow you to control the extent of infix searching max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before or after the query that can be present in the token. For example query "K2100" has 2 extra symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
           type: integer
         max_facet_values:
           description: Maximum number of facet values to be returned.
@@ -861,6 +888,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/CollectionAlias'
           description: Collection alias was deleted
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Alias not found
       summary: Delete an alias
       tags:
         - collections
@@ -881,6 +914,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/CollectionAlias'
           description: Collection alias fetched
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: The alias was not found
       summary: Retrieve an alias
       tags:
         - collections
@@ -907,6 +946,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/CollectionAlias'
           description: The collection alias was created/updated
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Bad request, see error message for details
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Alias not found
       summary: Create or update a collection alias
       tags:
         - collections
@@ -944,6 +995,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/CollectionResponse'
           description: Collection successfully created
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Bad request, see error message for details
         409:
           content:
             application/json:
@@ -1030,6 +1087,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/CollectionUpdateSchema'
           description: The updated partial collection schema
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Bad request, see error message for details
         404:
           content:
             application/json:
@@ -1051,13 +1114,13 @@ paths:
           schema:
             type: string
         - in: query
-          name: batch_size
-          schema:
-            type: integer
-        - in: query
           name: filter_by
           schema:
             type: string
+        - in: query
+          name: batch_size
+          schema:
+            type: integer
       responses:
         200:
           content:
@@ -1268,7 +1331,7 @@ paths:
           description: Exports all the documents in a given collection.
         404:
           content:
-            application/octet-stream:
+            application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
           description: The collection was not found
@@ -1287,6 +1350,10 @@ paths:
           schema:
             type: string
         - in: query
+          name: action
+          schema:
+            type: string
+        - in: query
           name: batch_size
           schema:
             type: integer
@@ -1298,10 +1365,6 @@ paths:
               - coerce_or_drop
               - drop
               - reject
-            type: string
-        - in: query
-          name: action
-          schema:
             type: string
       requestBody:
         content:
@@ -1321,6 +1384,12 @@ paths:
                   {"success": false, "error": "Bad JSON.", "document": "[bad doc"}
                 type: string
           description: Result of the import operation. Each line of the response indicates the result of each document present in the request body (in the same order). If the import of a single document fails, it does not affect the other documents. If there is a failure, the response line will include a corresponding error message and as well as the actual document content.
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Bad request, see error message for details
         404:
           content:
             application/json:
@@ -1342,101 +1411,23 @@ paths:
           schema:
             type: string
         - in: query
-          name: cache_ttl
-          schema:
-            type: integer
-        - in: query
-          name: min_len_1typo
-          schema:
-            type: integer
-        - in: query
-          name: min_len_2typo
-          schema:
-            type: integer
-        - in: query
-          name: facet_query
-          schema:
-            type: string
-        - in: query
-          name: page
-          schema:
-            type: integer
-        - in: query
-          name: enable_overrides
-          schema:
-            type: boolean
-        - in: query
-          name: max_candidates
-          schema:
-            type: integer
-        - in: query
-          name: highlight_end_tag
-          schema:
-            type: string
-        - in: query
-          name: sort_by
-          schema:
-            type: string
-        - in: query
-          name: facet_by
-          schema:
-            type: string
-        - in: query
-          name: max_facet_values
-          schema:
-            type: integer
-        - in: query
-          name: exclude_fields
-          schema:
-            type: string
-        - in: query
-          name: typo_tokens_threshold
-          schema:
-            type: integer
-        - in: query
-          name: exhaustive_search
-          schema:
-            type: boolean
-        - in: query
-          name: q
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: query_by
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: group_limit
-          schema:
-            type: integer
-        - in: query
-          name: highlight_affix_num_tokens
-          schema:
-            type: integer
-        - in: query
-          name: split_join_tokens
-          schema:
-            type: string
-        - in: query
-          name: query_by_weights
-          schema:
-            type: string
-        - in: query
-          name: num_typos
-          schema:
-            type: integer
-        - in: query
           name: group_by
           schema:
             type: string
         - in: query
-          name: pre_segmented_query
+          name: drop_tokens_threshold
+          schema:
+            type: integer
+        - in: query
+          name: prioritize_exact_match
           schema:
             type: boolean
         - in: query
-          name: pinned_hits
+          name: cache_ttl
+          schema:
+            type: integer
+        - in: query
+          name: query_by_weights
           schema:
             type: string
         - in: query
@@ -1448,43 +1439,36 @@ paths:
           schema:
             type: integer
         - in: query
+          name: exclude_fields
+          schema:
+            type: string
+        - in: query
           name: snippet_threshold
           schema:
             type: integer
         - in: query
-          name: drop_tokens_threshold
-          schema:
-            type: integer
-        - in: query
-          name: use_cache
-          schema:
-            type: boolean
-        - in: query
-          name: highlight_full_fields
+          name: pinned_hits
           schema:
             type: string
         - in: query
-          name: highlight_fields
-          schema:
-            type: string
-        - in: query
-          name: prioritize_exact_match
+          name: pre_segmented_query
           schema:
             type: boolean
         - in: query
-          name: prioritize_token_position
+          name: exhaustive_search
           schema:
             type: boolean
         - in: query
-          name: search_cutoff_ms
-          schema:
-            type: integer
-        - in: query
-          name: prefix
+          name: q
+          required: true
           schema:
             type: string
         - in: query
-          name: include_fields
+          name: infix
+          schema:
+            type: string
+        - in: query
+          name: facet_query
           schema:
             type: string
         - in: query
@@ -1492,9 +1476,106 @@ paths:
           schema:
             type: string
         - in: query
+          name: use_cache
+          schema:
+            type: boolean
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: highlight_full_fields
+          schema:
+            type: string
+        - in: query
+          name: highlight_affix_num_tokens
+          schema:
+            type: integer
+        - in: query
+          name: highlight_end_tag
+          schema:
+            type: string
+        - in: query
           name: hidden_hits
           schema:
             type: string
+        - in: query
+          name: max_extra_suffix
+          schema:
+            type: integer
+        - in: query
+          name: sort_by
+          schema:
+            type: string
+        - in: query
+          name: max_facet_values
+          schema:
+            type: integer
+        - in: query
+          name: typo_tokens_threshold
+          schema:
+            type: integer
+        - in: query
+          name: highlight_fields
+          schema:
+            type: string
+        - in: query
+          name: split_join_tokens
+          schema:
+            type: string
+        - in: query
+          name: max_candidates
+          schema:
+            type: integer
+        - in: query
+          name: prioritize_token_position
+          schema:
+            type: boolean
+        - in: query
+          name: max_extra_prefix
+          schema:
+            type: integer
+        - in: query
+          name: num_typos
+          schema:
+            type: integer
+        - in: query
+          name: include_fields
+          schema:
+            type: string
+        - in: query
+          name: search_cutoff_ms
+          schema:
+            type: integer
+        - in: query
+          name: min_len_1typo
+          schema:
+            type: integer
+        - in: query
+          name: query_by
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: prefix
+          schema:
+            type: string
+        - in: query
+          name: enable_overrides
+          schema:
+            type: boolean
+        - in: query
+          name: facet_by
+          schema:
+            type: string
+        - in: query
+          name: group_limit
+          schema:
+            type: integer
+        - in: query
+          name: min_len_2typo
+          schema:
+            type: integer
       responses:
         200:
           content:
@@ -1561,6 +1642,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/SearchOverride'
           description: The ID of the deleted search override
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Search override not found
       summary: Delete an override associated with a collection
       tags:
         - documents
@@ -1622,6 +1709,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/SearchOverride'
           description: Created/updated search override
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Search override not found
       summary: Create or update an override to promote certain documents over others
       tags:
         - documents
@@ -1643,6 +1736,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/SearchSynonymsResponse'
           description: List of all search synonyms
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Search synonyms was not found
       summary: List all collection synonyms
       tags:
         - documents
@@ -1669,6 +1768,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/SearchSynonym'
           description: The ID of the deleted search synonym
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Search synonym not found
       summary: Delete a synonym associated with a collection
       tags:
         - documents
@@ -1695,6 +1800,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/SearchSynonym'
           description: Search synonym fetched
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Search synonym was not found
       summary: Retrieve a single search synonym
       tags:
         - documents
@@ -1728,6 +1839,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/SearchSynonym'
           description: Created/updated search synonym
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Search synonym was not found
       summary: Create or update a synonym
       tags:
         - documents
@@ -1791,6 +1908,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiKey'
           description: Created API key
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Bad request, see error message for details
+        409:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: API key generation conflict
       summary: Create an API Key
       tags:
         - keys
@@ -1812,6 +1941,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiKey'
           description: The key referenced by the ID
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Bad request, see error message for details
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Key not found
       summary: Delete an API key given its ID.
       tags:
         - keys
@@ -1833,6 +1974,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiKey'
           description: The key referenced by the ID
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: The key was not found
       summary: Retrieve (metadata about) a key
       tags:
         - keys
@@ -1842,25 +1989,9 @@ paths:
       operationId: multiSearch
       parameters:
         - in: query
-          name: split_join_tokens
-          schema:
-            type: string
-        - in: query
           name: query_by_weights
           schema:
             type: string
-        - in: query
-          name: num_typos
-          schema:
-            type: integer
-        - in: query
-          name: group_by
-          schema:
-            type: string
-        - in: query
-          name: pre_segmented_query
-          schema:
-            type: boolean
         - in: query
           name: filter_by
           schema:
@@ -1870,105 +2001,21 @@ paths:
           schema:
             type: integer
         - in: query
-          name: snippet_threshold
+          name: group_by
           schema:
-            type: integer
+            type: string
         - in: query
           name: drop_tokens_threshold
           schema:
             type: integer
         - in: query
-          name: pinned_hits
-          schema:
-            type: string
-        - in: query
-          name: highlight_full_fields
-          schema:
-            type: string
-        - in: query
-          name: highlight_fields
-          schema:
-            type: string
-        - in: query
           name: prioritize_exact_match
           schema:
             type: boolean
         - in: query
-          name: prioritize_token_position
-          schema:
-            type: boolean
-        - in: query
-          name: use_cache
-          schema:
-            type: boolean
-        - in: query
-          name: prefix
-          schema:
-            type: string
-        - in: query
-          name: include_fields
-          schema:
-            type: string
-        - in: query
-          name: highlight_start_tag
-          schema:
-            type: string
-        - in: query
-          name: hidden_hits
-          schema:
-            type: string
-        - in: query
-          name: search_cutoff_ms
-          schema:
-            type: integer
-        - in: query
-          name: min_len_1typo
-          schema:
-            type: integer
-        - in: query
-          name: min_len_2typo
-          schema:
-            type: integer
-        - in: query
-          name: facet_query
-          schema:
-            type: string
-        - in: query
-          name: page
-          schema:
-            type: integer
-        - in: query
-          name: enable_overrides
-          schema:
-            type: boolean
-        - in: query
-          name: max_candidates
-          schema:
-            type: integer
-        - in: query
           name: cache_ttl
           schema:
             type: integer
-        - in: query
-          name: sort_by
-          schema:
-            type: string
-        - in: query
-          name: facet_by
-          schema:
-            type: string
-        - in: query
-          name: max_facet_values
-          schema:
-            type: integer
-        - in: query
-          name: exclude_fields
-          schema:
-            type: string
-        - in: query
-          name: highlight_end_tag
-          schema:
-            type: string
         - in: query
           name: exhaustive_search
           schema:
@@ -1978,7 +2025,123 @@ paths:
           schema:
             type: string
         - in: query
+          name: infix
+          schema:
+            type: string
+        - in: query
+          name: facet_query
+          schema:
+            type: string
+        - in: query
+          name: exclude_fields
+          schema:
+            type: string
+        - in: query
+          name: snippet_threshold
+          schema:
+            type: integer
+        - in: query
+          name: pinned_hits
+          schema:
+            type: string
+        - in: query
+          name: pre_segmented_query
+          schema:
+            type: boolean
+        - in: query
+          name: highlight_start_tag
+          schema:
+            type: string
+        - in: query
+          name: use_cache
+          schema:
+            type: boolean
+        - in: query
+          name: hidden_hits
+          schema:
+            type: string
+        - in: query
+          name: max_extra_suffix
+          schema:
+            type: integer
+        - in: query
+          name: sort_by
+          schema:
+            type: string
+        - in: query
+          name: max_facet_values
+          schema:
+            type: integer
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: highlight_full_fields
+          schema:
+            type: string
+        - in: query
+          name: highlight_affix_num_tokens
+          schema:
+            type: integer
+        - in: query
+          name: highlight_end_tag
+          schema:
+            type: string
+        - in: query
+          name: prioritize_token_position
+          schema:
+            type: boolean
+        - in: query
+          name: max_extra_prefix
+          schema:
+            type: integer
+        - in: query
+          name: num_typos
+          schema:
+            type: integer
+        - in: query
+          name: include_fields
+          schema:
+            type: string
+        - in: query
+          name: typo_tokens_threshold
+          schema:
+            type: integer
+        - in: query
+          name: highlight_fields
+          schema:
+            type: string
+        - in: query
+          name: split_join_tokens
+          schema:
+            type: string
+        - in: query
+          name: max_candidates
+          schema:
+            type: integer
+        - in: query
           name: query_by
+          schema:
+            type: string
+        - in: query
+          name: prefix
+          schema:
+            type: string
+        - in: query
+          name: enable_overrides
+          schema:
+            type: boolean
+        - in: query
+          name: search_cutoff_ms
+          schema:
+            type: integer
+        - in: query
+          name: min_len_1typo
+          schema:
+            type: integer
+        - in: query
+          name: facet_by
           schema:
             type: string
         - in: query
@@ -1986,11 +2149,7 @@ paths:
           schema:
             type: integer
         - in: query
-          name: highlight_affix_num_tokens
-          schema:
-            type: integer
-        - in: query
-          name: typo_tokens_threshold
+          name: min_len_2typo
           schema:
             type: integer
       requestBody:
@@ -2005,6 +2164,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/MultiSearchResult'
           description: Search results
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Bad request, see error message for details
       summary: send multiple search requests in a single HTTP request
       tags:
         - documents

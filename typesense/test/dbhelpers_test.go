@@ -79,6 +79,7 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 				Drop:     nil,
 			},
 		},
+		EnableNestedFields:  pointer.False(),
 		DefaultSortingField: pointer.String(""),
 		TokenSeparators:     &[]string{},
 		SymbolsToIndex:      &[]string{},
@@ -151,7 +152,7 @@ func newDocumentResponse(docID string, opts ...newDocumentResponseOption) map[st
 
 func newKeySchema() *api.ApiKeySchema {
 	return &api.ApiKeySchema{
-		Description: pointer.String("Search-only key."),
+		Description: "Search-only key.",
 		Actions:     []string{"documents:search"},
 		Collections: []string{"*"},
 		ExpiresAt:   pointer.Int64(time.Now().Add(1 * time.Hour).Unix()),

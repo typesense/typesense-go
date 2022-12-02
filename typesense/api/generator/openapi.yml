@@ -80,6 +80,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CollectionResponse"
+        400:
+          description: Bad request, see error message for details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
         409:
           description: Collection already exists
           content:
@@ -141,6 +147,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CollectionUpdateSchema"
+        400:
+          description: Bad request, see error message for details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
         404:
           description: The collection was not found
           content:
@@ -394,6 +406,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SearchOverride"
+        404:
+          description: Search override not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
     delete:
       tags:
         - documents
@@ -420,6 +438,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SearchOverride"
+        404:
+          description: Search override not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
   /collections/{collectionName}/synonyms:
     get:
       tags:
@@ -440,6 +464,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SearchSynonymsResponse"
+        404:
+          description: Search synonyms was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
   /collections/{collectionName}/synonyms/{synonymId}:
     get:
       tags:
@@ -467,6 +497,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SearchSynonym"
+        404:
+          description: Search synonym was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
     put:
       tags:
         - documents
@@ -500,6 +536,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SearchSynonym"
+        404:
+          description: Search synonym was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
     delete:
       tags:
         - documents
@@ -525,6 +567,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SearchSynonym"
+        404:
+          description: Search synonym not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+
   /collections/{collectionName}/documents/export:
     get:
       tags:
@@ -573,7 +622,7 @@ paths:
         404:
           description: The collection was not found
           content:
-            application/octet-stream:
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
   /collections/{collectionName}/documents/import:
@@ -632,6 +681,12 @@ paths:
                 example: |
                   {"success": true}
                   {"success": false, "error": "Bad JSON.", "document": "[bad doc"}
+        400:
+          description: Bad request, see error message for details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
         404:
           description: The collection was not found
           content:
@@ -785,6 +840,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiKey"
+        400:
+          description: Bad request, see error message for details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+        409:
+          description: API key generation conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
   /keys/{keyId}:
     get:
       tags:
@@ -810,6 +877,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiKey"
+        404:
+          description: The key was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
     delete:
       tags:
         - keys
@@ -830,6 +903,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiKey"
+        400:
+          description: Bad request, see error message for details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+        404:
+          description: Key not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
   /aliases:
     get:
       tags:
@@ -876,6 +961,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CollectionAlias"
+        400:
+          description: Bad request, see error message for details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+        404:
+          description: Alias not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
     get:
       tags:
         - collections
@@ -896,6 +993,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CollectionAlias"
+        404:
+          description: The alias was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
     delete:
       tags:
         - collections
@@ -915,6 +1018,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CollectionAlias"
+        404:
+          description: Alias not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
   /debug:
     get:
       tags:
@@ -1014,6 +1123,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MultiSearchResult"
+        400:
+          description: Bad request, see error message for details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
 
 components:
   schemas:
@@ -1031,11 +1146,11 @@ components:
           type: array
           description: A list of fields for querying, filtering and faceting
           example:
-            - name: company_name
-              type: string
-              facet: false
             - name: num_employees
               type: int32
+              facet: false
+            - name: company_name
+              type: string
               facet: false
             - name: country
               type: string
@@ -1048,7 +1163,7 @@ components:
             The name of an int32 / float field that determines the order in which
             the search results are ranked when a sort_by clause is not provided during
             searching. This field must indicate some kind of popularity.
-          example: num_employees
+          example: num_employees # Go with the first field name listed above to produce sane defaults
           default: ""
         token_separators:
           type: array
@@ -1057,14 +1172,28 @@ components:
             splitting the text into individual words in addition to space and new-line characters.
           items:
             type: string # characters only
+            # Could `enum` be used instead, given it's symbols/special *characters*, e.g.:
+            # enum: ["@", "!", ".", "/", ","]
+            minLength: 1
+            maxLength: 1
           default: []
-
+        enable_nested_fields:
+            type: boolean
+            description:
+              Enables experimental support at a collection level for nested object or object array fields.
+              This field is only available if the Typesense server is version `0.24.0.rcn34` or later.
+            default: false
+            example: true
         symbols_to_index:
           type: array
           description: >
             List of symbols or special characters to be indexed.
           items:
             type: string # characters only
+            # Could `enum` be used instead, given it's symbols/special *characters*, e.g.:
+            # enum: ["@", "!", ".", "/", ","]
+            minLength: 1
+            maxLength: 1
           default: []
     CollectionUpdateSchema:
       required:
@@ -1545,6 +1674,31 @@ components:
             autocomplete and instant search interfaces. Defaults to true.
           type: string
 
+        infix:
+          description:
+            If infix index is enabled for this field, infix searching can be done on a per-field 
+            basis by sending a comma separated string parameter called infix to the search query. 
+            This parameter can have 3 values; `off` infix search is disabled, which is default
+             `always` infix search is performed along with regular search
+             `fallback` infix search is performed if regular search does not produce results
+          type: string
+
+        max_extra_prefix:
+          description:
+            There are also 2 parameters that allow you to control the extent of infix searching 
+            max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before 
+            or after the query that can be present in the token. For example query "K2100" has 2 extra 
+            symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
+          type: integer
+        
+        max_extra_suffix:
+          description:
+            There are also 2 parameters that allow you to control the extent of infix searching 
+            max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before 
+            or after the query that can be present in the token. For example query "K2100" has 2 extra 
+            symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
+          type: integer
+
         filter_by:
           description:
             Filter conditions for refining youropen api validator search results. Separate
@@ -1786,6 +1940,31 @@ components:
             autocomplete and instant search interfaces. Defaults to true.
           type: string
 
+        infix:
+          description:
+            If infix index is enabled for this field, infix searching can be done on a per-field 
+            basis by sending a comma separated string parameter called infix to the search query. 
+            This parameter can have 3 values; `off` infix search is disabled, which is default
+             `always` infix search is performed along with regular search
+             `fallback` infix search is performed if regular search does not produce results
+          type: string
+
+        max_extra_prefix:
+          description:
+            There are also 2 parameters that allow you to control the extent of infix searching 
+            max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before 
+            or after the query that can be present in the token. For example query "K2100" has 2 extra 
+            symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
+          type: integer
+        
+        max_extra_suffix:
+          description:
+            There are also 2 parameters that allow you to control the extent of infix searching 
+            max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before 
+            or after the query that can be present in the token. For example query "K2100" has 2 extra 
+            symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
+          type: integer
+
         filter_by:
           description:
             Filter conditions for refining youropen api validator search results. Separate
@@ -2021,18 +2200,18 @@ components:
           properties:
             max:
               type: number
-              format: float
+              format: double
             min:
               type: number
-              format: float
+              format: double
             sum:
               type: number
-              format: float
+              format: double
             total_values:
               type: integer
             avg:
               type: number
-              format: float
+              format: double
   securitySchemes:
     api_key_header:
       type: apiKey

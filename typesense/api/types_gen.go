@@ -85,6 +85,9 @@ type CollectionSchema struct {
 	// The name of an int32 / float field that determines the order in which the search results are ranked when a sort_by clause is not provided during searching. This field must indicate some kind of popularity.
 	DefaultSortingField *string `json:"default_sorting_field,omitempty"`
 
+	// Enables experimental support at a collection level for nested object or object array fields. This field is only available if the Typesense server is version `0.24.0.rcn34` or later.
+	EnableNestedFields *bool `json:"enable_nested_fields,omitempty"`
+
 	// A list of fields for querying, filtering and faceting
 	Fields []Field `json:"fields"`
 
@@ -113,10 +116,10 @@ type FacetCounts struct {
 	} `json:"counts,omitempty"`
 	FieldName *string `json:"field_name,omitempty"`
 	Stats     *struct {
-		Avg         *float32 `json:"avg,omitempty"`
-		Max         *float32 `json:"max,omitempty"`
-		Min         *float32 `json:"min,omitempty"`
-		Sum         *float32 `json:"sum,omitempty"`
+		Avg         *float64 `json:"avg,omitempty"`
+		Max         *float64 `json:"max,omitempty"`
+		Min         *float64 `json:"min,omitempty"`
+		Sum         *float64 `json:"sum,omitempty"`
 		TotalValues *int     `json:"total_values,omitempty"`
 	} `json:"stats,omitempty"`
 }
@@ -201,6 +204,15 @@ type MultiSearchParameters struct {
 
 	// List of fields from the document to include in the search result
 	IncludeFields *string `json:"include_fields,omitempty"`
+
+	// If infix index is enabled for this field, infix searching can be done on a per-field basis by sending a comma separated string parameter called infix to the search query. This parameter can have 3 values; `off` infix search is disabled, which is default `always` infix search is performed along with regular search `fallback` infix search is performed if regular search does not produce results
+	Infix *string `json:"infix,omitempty"`
+
+	// There are also 2 parameters that allow you to control the extent of infix searching max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before or after the query that can be present in the token. For example query "K2100" has 2 extra symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
+	MaxExtraPrefix *int `json:"max_extra_prefix,omitempty"`
+
+	// There are also 2 parameters that allow you to control the extent of infix searching max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before or after the query that can be present in the token. For example query "K2100" has 2 extra symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
+	MaxExtraSuffix *int `json:"max_extra_suffix,omitempty"`
 
 	// Maximum number of facet values to be returned.
 	MaxFacetValues *int `json:"max_facet_values,omitempty"`
@@ -433,8 +445,8 @@ type UpdateCollectionJSONBody CollectionUpdateSchema
 
 // DeleteDocumentsParams defines parameters for DeleteDocuments.
 type DeleteDocumentsParams struct {
-	BatchSize *int    `json:"batch_size,omitempty"`
 	FilterBy  *string `json:"filter_by,omitempty"`
+	BatchSize *int    `json:"batch_size,omitempty"`
 }
 
 // IndexDocumentJSONBody defines parameters for IndexDocument.
@@ -458,9 +470,9 @@ type ExportDocumentsParams struct {
 
 // ImportDocumentsParams defines parameters for ImportDocuments.
 type ImportDocumentsParams struct {
+	Action      *string                           `json:"action,omitempty"`
 	BatchSize   *int                              `json:"batch_size,omitempty"`
 	DirtyValues *ImportDocumentsParamsDirtyValues `json:"dirty_values,omitempty"`
-	Action      *string                           `json:"action,omitempty"`
 }
 
 // ImportDocumentsParamsDirtyValues defines parameters for ImportDocuments.
@@ -468,44 +480,47 @@ type ImportDocumentsParamsDirtyValues string
 
 // SearchCollectionParams defines parameters for SearchCollection.
 type SearchCollectionParams struct {
-	CacheTtl                *int    `json:"cache_ttl,omitempty"`
-	MinLen1typo             *int    `json:"min_len_1typo,omitempty"`
-	MinLen2typo             *int    `json:"min_len_2typo,omitempty"`
-	FacetQuery              *string `json:"facet_query,omitempty"`
-	Page                    *int    `json:"page,omitempty"`
-	EnableOverrides         *bool   `json:"enable_overrides,omitempty"`
-	MaxCandidates           *int    `json:"max_candidates,omitempty"`
-	HighlightEndTag         *string `json:"highlight_end_tag,omitempty"`
-	SortBy                  *string `json:"sort_by,omitempty"`
-	FacetBy                 *string `json:"facet_by,omitempty"`
-	MaxFacetValues          *int    `json:"max_facet_values,omitempty"`
-	ExcludeFields           *string `json:"exclude_fields,omitempty"`
-	TypoTokensThreshold     *int    `json:"typo_tokens_threshold,omitempty"`
-	ExhaustiveSearch        *bool   `json:"exhaustive_search,omitempty"`
-	Q                       string  `json:"q"`
-	QueryBy                 string  `json:"query_by"`
-	GroupLimit              *int    `json:"group_limit,omitempty"`
-	HighlightAffixNumTokens *int    `json:"highlight_affix_num_tokens,omitempty"`
-	SplitJoinTokens         *string `json:"split_join_tokens,omitempty"`
-	QueryByWeights          *string `json:"query_by_weights,omitempty"`
-	NumTypos                *int    `json:"num_typos,omitempty"`
 	GroupBy                 *string `json:"group_by,omitempty"`
-	PreSegmentedQuery       *bool   `json:"pre_segmented_query,omitempty"`
-	PinnedHits              *string `json:"pinned_hits,omitempty"`
+	DropTokensThreshold     *int    `json:"drop_tokens_threshold,omitempty"`
+	PrioritizeExactMatch    *bool   `json:"prioritize_exact_match,omitempty"`
+	CacheTtl                *int    `json:"cache_ttl,omitempty"`
+	QueryByWeights          *string `json:"query_by_weights,omitempty"`
 	FilterBy                *string `json:"filter_by,omitempty"`
 	PerPage                 *int    `json:"per_page,omitempty"`
+	ExcludeFields           *string `json:"exclude_fields,omitempty"`
 	SnippetThreshold        *int    `json:"snippet_threshold,omitempty"`
-	DropTokensThreshold     *int    `json:"drop_tokens_threshold,omitempty"`
-	UseCache                *bool   `json:"use_cache,omitempty"`
-	HighlightFullFields     *string `json:"highlight_full_fields,omitempty"`
-	HighlightFields         *string `json:"highlight_fields,omitempty"`
-	PrioritizeExactMatch    *bool   `json:"prioritize_exact_match,omitempty"`
-	PrioritizeTokenPosition *bool   `json:"prioritize_token_position,omitempty"`
-	SearchCutoffMs          *int    `json:"search_cutoff_ms,omitempty"`
-	Prefix                  *string `json:"prefix,omitempty"`
-	IncludeFields           *string `json:"include_fields,omitempty"`
+	PinnedHits              *string `json:"pinned_hits,omitempty"`
+	PreSegmentedQuery       *bool   `json:"pre_segmented_query,omitempty"`
+	ExhaustiveSearch        *bool   `json:"exhaustive_search,omitempty"`
+	Q                       string  `json:"q"`
+	Infix                   *string `json:"infix,omitempty"`
+	FacetQuery              *string `json:"facet_query,omitempty"`
 	HighlightStartTag       *string `json:"highlight_start_tag,omitempty"`
+	UseCache                *bool   `json:"use_cache,omitempty"`
+	Page                    *int    `json:"page,omitempty"`
+	HighlightFullFields     *string `json:"highlight_full_fields,omitempty"`
+	HighlightAffixNumTokens *int    `json:"highlight_affix_num_tokens,omitempty"`
+	HighlightEndTag         *string `json:"highlight_end_tag,omitempty"`
 	HiddenHits              *string `json:"hidden_hits,omitempty"`
+	MaxExtraSuffix          *int    `json:"max_extra_suffix,omitempty"`
+	SortBy                  *string `json:"sort_by,omitempty"`
+	MaxFacetValues          *int    `json:"max_facet_values,omitempty"`
+	TypoTokensThreshold     *int    `json:"typo_tokens_threshold,omitempty"`
+	HighlightFields         *string `json:"highlight_fields,omitempty"`
+	SplitJoinTokens         *string `json:"split_join_tokens,omitempty"`
+	MaxCandidates           *int    `json:"max_candidates,omitempty"`
+	PrioritizeTokenPosition *bool   `json:"prioritize_token_position,omitempty"`
+	MaxExtraPrefix          *int    `json:"max_extra_prefix,omitempty"`
+	NumTypos                *int    `json:"num_typos,omitempty"`
+	IncludeFields           *string `json:"include_fields,omitempty"`
+	SearchCutoffMs          *int    `json:"search_cutoff_ms,omitempty"`
+	MinLen1typo             *int    `json:"min_len_1typo,omitempty"`
+	QueryBy                 string  `json:"query_by"`
+	Prefix                  *string `json:"prefix,omitempty"`
+	EnableOverrides         *bool   `json:"enable_overrides,omitempty"`
+	FacetBy                 *string `json:"facet_by,omitempty"`
+	GroupLimit              *int    `json:"group_limit,omitempty"`
+	MinLen2typo             *int    `json:"min_len_2typo,omitempty"`
 }
 
 // UpdateDocumentJSONBody defines parameters for UpdateDocument.
@@ -525,44 +540,47 @@ type MultiSearchJSONBody MultiSearchSearchesParameter
 
 // MultiSearchParams defines parameters for MultiSearch.
 type MultiSearchParams struct {
-	SplitJoinTokens         *string `json:"split_join_tokens,omitempty"`
 	QueryByWeights          *string `json:"query_by_weights,omitempty"`
-	NumTypos                *int    `json:"num_typos,omitempty"`
-	GroupBy                 *string `json:"group_by,omitempty"`
-	PreSegmentedQuery       *bool   `json:"pre_segmented_query,omitempty"`
 	FilterBy                *string `json:"filter_by,omitempty"`
 	PerPage                 *int    `json:"per_page,omitempty"`
-	SnippetThreshold        *int    `json:"snippet_threshold,omitempty"`
+	GroupBy                 *string `json:"group_by,omitempty"`
 	DropTokensThreshold     *int    `json:"drop_tokens_threshold,omitempty"`
-	PinnedHits              *string `json:"pinned_hits,omitempty"`
-	HighlightFullFields     *string `json:"highlight_full_fields,omitempty"`
-	HighlightFields         *string `json:"highlight_fields,omitempty"`
 	PrioritizeExactMatch    *bool   `json:"prioritize_exact_match,omitempty"`
-	PrioritizeTokenPosition *bool   `json:"prioritize_token_position,omitempty"`
-	UseCache                *bool   `json:"use_cache,omitempty"`
-	Prefix                  *string `json:"prefix,omitempty"`
-	IncludeFields           *string `json:"include_fields,omitempty"`
-	HighlightStartTag       *string `json:"highlight_start_tag,omitempty"`
-	HiddenHits              *string `json:"hidden_hits,omitempty"`
-	SearchCutoffMs          *int    `json:"search_cutoff_ms,omitempty"`
-	MinLen1typo             *int    `json:"min_len_1typo,omitempty"`
-	MinLen2typo             *int    `json:"min_len_2typo,omitempty"`
-	FacetQuery              *string `json:"facet_query,omitempty"`
-	Page                    *int    `json:"page,omitempty"`
-	EnableOverrides         *bool   `json:"enable_overrides,omitempty"`
-	MaxCandidates           *int    `json:"max_candidates,omitempty"`
 	CacheTtl                *int    `json:"cache_ttl,omitempty"`
-	SortBy                  *string `json:"sort_by,omitempty"`
-	FacetBy                 *string `json:"facet_by,omitempty"`
-	MaxFacetValues          *int    `json:"max_facet_values,omitempty"`
-	ExcludeFields           *string `json:"exclude_fields,omitempty"`
-	HighlightEndTag         *string `json:"highlight_end_tag,omitempty"`
 	ExhaustiveSearch        *bool   `json:"exhaustive_search,omitempty"`
 	Q                       *string `json:"q,omitempty"`
-	QueryBy                 *string `json:"query_by,omitempty"`
-	GroupLimit              *int    `json:"group_limit,omitempty"`
+	Infix                   *string `json:"infix,omitempty"`
+	FacetQuery              *string `json:"facet_query,omitempty"`
+	ExcludeFields           *string `json:"exclude_fields,omitempty"`
+	SnippetThreshold        *int    `json:"snippet_threshold,omitempty"`
+	PinnedHits              *string `json:"pinned_hits,omitempty"`
+	PreSegmentedQuery       *bool   `json:"pre_segmented_query,omitempty"`
+	HighlightStartTag       *string `json:"highlight_start_tag,omitempty"`
+	UseCache                *bool   `json:"use_cache,omitempty"`
+	HiddenHits              *string `json:"hidden_hits,omitempty"`
+	MaxExtraSuffix          *int    `json:"max_extra_suffix,omitempty"`
+	SortBy                  *string `json:"sort_by,omitempty"`
+	MaxFacetValues          *int    `json:"max_facet_values,omitempty"`
+	Page                    *int    `json:"page,omitempty"`
+	HighlightFullFields     *string `json:"highlight_full_fields,omitempty"`
 	HighlightAffixNumTokens *int    `json:"highlight_affix_num_tokens,omitempty"`
+	HighlightEndTag         *string `json:"highlight_end_tag,omitempty"`
+	PrioritizeTokenPosition *bool   `json:"prioritize_token_position,omitempty"`
+	MaxExtraPrefix          *int    `json:"max_extra_prefix,omitempty"`
+	NumTypos                *int    `json:"num_typos,omitempty"`
+	IncludeFields           *string `json:"include_fields,omitempty"`
 	TypoTokensThreshold     *int    `json:"typo_tokens_threshold,omitempty"`
+	HighlightFields         *string `json:"highlight_fields,omitempty"`
+	SplitJoinTokens         *string `json:"split_join_tokens,omitempty"`
+	MaxCandidates           *int    `json:"max_candidates,omitempty"`
+	QueryBy                 *string `json:"query_by,omitempty"`
+	Prefix                  *string `json:"prefix,omitempty"`
+	EnableOverrides         *bool   `json:"enable_overrides,omitempty"`
+	SearchCutoffMs          *int    `json:"search_cutoff_ms,omitempty"`
+	MinLen1typo             *int    `json:"min_len_1typo,omitempty"`
+	FacetBy                 *string `json:"facet_by,omitempty"`
+	GroupLimit              *int    `json:"group_limit,omitempty"`
+	MinLen2typo             *int    `json:"min_len_2typo,omitempty"`
 }
 
 // TakeSnapshotParams defines parameters for TakeSnapshot.
