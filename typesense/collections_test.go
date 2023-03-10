@@ -45,8 +45,8 @@ func createNewSchema(collectionName string) *api.CollectionSchema {
 
 func createNewCollection(name string) *api.CollectionResponse {
 	return &api.CollectionResponse{
-		CollectionSchema: *createNewSchema(name),
-		NumDocuments:     0,
+		Name:         name,
+		NumDocuments: pointer.Int64(0),
 	}
 }
 

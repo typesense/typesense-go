@@ -51,6 +51,9 @@ func main() {
 	unwrapImportDocuments(&m)
 	log.Println("Unwrapping documents export parameters")
 	unwrapExportDocuments(&m)
+	// Unwrapping update documents with condition parameters
+	log.Println("Unwrapping documents update with condition parameters")
+	unwrapUpdateDocumentsWithConditionParameters(&m)
 	// Unwrapping delete document parameters
 	log.Println("Unwrapping documents delete parameters")
 	unwrapDeleteDocument(&m)
@@ -121,6 +124,21 @@ func unwrapDeleteDocument(m *yml) {
 	}
 	parameters = append(parameters[:1], parameters[2:]...)
 	(*m)["paths"].(yml)["/collections/{collectionName}/documents"].(yml)["delete"].(yml)["parameters"] = parameters
+}
+
+func unwrapUpdateDocumentsWithConditionParameters(m *yml) {
+	parameters := (*m)["paths"].(yml)["/collections/{collectionName}/documents"].(yml)["patch"].(yml)["parameters"].([]interface{})
+	updateParameters := parameters[1].(yml)["schema"].(yml)["properties"].(yml)
+	for k, v := range updateParameters {
+		newMap := make(yml)
+		newMap["name"] = k
+		newMap["in"] = query
+		newMap["schema"] = make(yml)
+		newMap["schema"].(yml)["type"] = v.(yml)["type"].(string)
+		parameters = append(parameters, newMap)
+	}
+	parameters = append(parameters[:1], parameters[2:]...)
+	(*m)["paths"].(yml)["/collections/{collectionName}/documents"].(yml)["patch"].(yml)["parameters"] = parameters
 }
 
 func unwrapExportDocuments(m *yml) {

@@ -23,6 +23,8 @@ const (
 type DocumentsInterface interface {
 	// Create returns indexed document
 	Create(document interface{}) (map[string]interface{}, error)
+	// Update updates documents matching the filter_by condition
+	Update(updateFields interface{}, params *api.UpdateDocumentsParams) (int, error)
 	// Upsert returns indexed/updated document
 	Upsert(document interface{}) (map[string]interface{}, error)
 	// Delete returns number of deleted documents
@@ -60,6 +62,18 @@ func (d *documents) indexDocument(document interface{}, params *api.IndexDocumen
 
 func (d *documents) Create(document interface{}) (map[string]interface{}, error) {
 	return d.indexDocument(document, &api.IndexDocumentParams{})
+}
+
+func (d *documents) Update(updateFields interface{}, params *api.UpdateDocumentsParams) (int, error) {
+	response, err := d.apiClient.UpdateDocumentsWithResponse(context.Background(),
+		d.collectionName, params, updateFields)
+	if err != nil {
+		return 0, err
+	}
+	if response.JSON200 == nil {
+		return 0, &HTTPError{Status: response.StatusCode(), Body: response.Body}
+	}
+	return response.JSON200.NumUpdated, nil
 }
 
 func (d *documents) Upsert(document interface{}) (map[string]interface{}, error) {

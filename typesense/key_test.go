@@ -2,6 +2,7 @@ package typesense
 
 import (
 	"errors"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"net/http"
 	"testing"
 
@@ -71,12 +72,12 @@ func TestKeyRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 }
 
 func TestKeyDelete(t *testing.T) {
-	expectedResult := &api.ApiKey{Id: 1}
+	expectedResult := &api.ApiKey{Id: pointer.Int64(1)}
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
-	mockedResult := &api.ApiKey{Id: 1}
+	mockedResult := &api.ApiKey{Id: pointer.Int64(1)}
 
 	mockAPIClient.EXPECT().
 		DeleteKeyWithResponse(gomock.Not(gomock.Nil()), int64(1)).

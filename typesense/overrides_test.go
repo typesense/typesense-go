@@ -2,6 +2,7 @@ package typesense
 
 import (
 	"errors"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"net/http"
 	"testing"
 
@@ -38,8 +39,7 @@ func createNewSearchOverrideSchema() *api.SearchOverrideSchema {
 
 func createNewSearchOverride(overrideID string) *api.SearchOverride {
 	return &api.SearchOverride{
-		SearchOverrideSchema: *createNewSearchOverrideSchema(),
-		Id:                   overrideID,
+		Id: pointer.String(overrideID),
 	}
 }
 

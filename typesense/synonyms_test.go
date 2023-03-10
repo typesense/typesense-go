@@ -2,6 +2,7 @@ package typesense
 
 import (
 	"errors"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"net/http"
 	"testing"
 
@@ -20,8 +21,7 @@ func createNewSearchSynonymSchema() *api.SearchSynonymSchema {
 
 func createNewSearchSynonym(synonymID string) *api.SearchSynonym {
 	return &api.SearchSynonym{
-		SearchSynonymSchema: *createNewSearchSynonymSchema(),
-		Id:                  synonymID,
+		Id: pointer.String(synonymID),
 	}
 }
 

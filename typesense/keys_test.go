@@ -25,18 +25,15 @@ func createNewKeySchema() *api.ApiKeySchema {
 
 func createNewKey(id int64) *api.ApiKey {
 	return &api.ApiKey{
-		ApiKeySchema: *createNewKeySchema(),
-		Id:           id,
-		ValuePrefix:  "vxpx",
+		Id: pointer.Int64(id),
 	}
 }
 
 func TestKeyCreate(t *testing.T) {
 	newKey := createNewKeySchema()
 	expectedResult := &api.ApiKey{
-		ApiKeySchema: *createNewKeySchema(),
-		Id:           1,
-		Value:        "k8pX5hD0793d8YQC5aD1aEPd7VleSuGP",
+		Id:    pointer.Int64(1),
+		Value: pointer.String("k8pX5hD0793d8YQC5aD1aEPd7VleSuGP"),
 	}
 
 	ctrl := gomock.NewController(t)

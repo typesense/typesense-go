@@ -180,6 +180,37 @@ func TestDocumentUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
+func TestDocumentsUpdate(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
+
+	expectedParams := &api.UpdateDocumentsParams{FilterBy: pointer.String("num_employees:>100")}
+
+	mockedResult := struct {
+		NumUpdated int `json:"num_updated"`
+	}{27}
+
+	expectedBody := strings.NewReader(`{"country":"USA"}`)
+
+	mockAPIClient.EXPECT().
+		UpdateDocumentsWithResponse(gomock.Not(gomock.Nil()), "companies", expectedParams, eqReader(expectedBody)).
+		Return(&api.UpdateDocumentsResponse{
+			JSON200: &mockedResult,
+		}, nil).
+		Times(1)
+
+	updateFields := strings.NewReader(`{"country":"USA"}`)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+
+	params := &api.UpdateDocumentsParams{FilterBy: pointer.String("num_employees:>100")}
+	result, err := client.Collection("companies").Documents().Update(updateFields, params)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 27, result)
+}
+
 func TestDocumentsDelete(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
