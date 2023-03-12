@@ -2,6 +2,7 @@ package typesense
 
 import (
 	"errors"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"net/http"
 	"testing"
 
@@ -71,12 +72,12 @@ func TestSearchOverrideRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 }
 
 func TestSearchOverrideDelete(t *testing.T) {
-	expectedResult := &api.SearchOverride{Id: "customize-apple"}
+	expectedResult := &api.SearchOverride{Id: pointer.String("customize-apple")}
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
-	mockedResult := &api.SearchOverride{Id: "customize-apple"}
+	mockedResult := &api.SearchOverride{Id: pointer.String("customize-apple")}
 
 	mockAPIClient.EXPECT().
 		DeleteSearchOverrideWithResponse(gomock.Not(gomock.Nil()), "companies", "customize-apple").

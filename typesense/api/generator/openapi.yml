@@ -234,6 +234,66 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
+    patch:
+      tags:
+        - documents
+      summary: Update documents with conditional query
+      description:
+        The filter_by query parameter is used to filter to specify a condition against which the documents are matched.
+        The request body contains the fields that should be updated for any documents that match the filter condition.
+        This endpoint is only available if the Typesense server is version `0.25.0.rc12` or later.
+      operationId: updateDocuments
+      parameters:
+        - name: collectionName
+          in: path
+          description: The name of the collection to update documents in
+          required: true
+          schema:
+            type: string
+        - name: updateDocumentsParameters
+          in: query
+          schema:
+            type: object
+            properties:
+              filter_by:
+                type: string
+                example: "num_employees:>100 && country: [USA, UK]"
+      responses:
+        '200':
+          description: 
+            The response contains a single field, `num_updated`, indicating the number of documents affected.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - num_updated
+                properties:
+                  num_updated:
+                    type: integer
+                    description: The number of documents that have been updated
+                    example: 1
+        '400':
+          description: 'Bad request, see error message for details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: The collection was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      requestBody:
+        description: The document fields to be updated
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Can be any key-value pair
+              x-go-type: "interface{}"
+        required: true
     delete:
       tags:
         - documents
@@ -1591,18 +1651,11 @@ components:
       allOf:
         - $ref: "#/components/schemas/ApiKeySchema"
         - type: object
-          required:
-            - id
-            - value
-            - value_prefix
           properties:
             id:
               type: integer
               format: int64
-              readOnly: true
-            value:
-              type: string
-              readOnly: true
+              readOnly: true          
             value_prefix:
               type: string
               readOnly: true

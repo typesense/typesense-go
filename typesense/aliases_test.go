@@ -2,6 +2,7 @@ package typesense
 
 import (
 	"errors"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"net/http"
 	"testing"
 
@@ -15,7 +16,7 @@ import (
 func createNewCollectionAlias(collectionName string, name string) *api.CollectionAlias {
 	return &api.CollectionAlias{
 		CollectionName: collectionName,
-		Name:           name,
+		Name:           pointer.String(name),
 	}
 }
 
