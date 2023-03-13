@@ -1378,7 +1378,7 @@ components:
           description: The number of milliseconds the search took
         out_of:
           type: integer
-          description: The total number of pages
+          description: The total number of documents in the collection
         search_cutoff:
           type: boolean
           description: Whether the search was cut off
