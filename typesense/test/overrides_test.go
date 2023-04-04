@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package test
@@ -30,9 +31,11 @@ func TestSearchOverrideUpsertNewOverride(t *testing.T) {
 func TestSearchOverrideUpsertExistingOverride(t *testing.T) {
 	collectionName := createNewCollection(t, "companies")
 	overrideID := newUUIDName("customize-apple")
-	expectedResult := newSearchOverride(overrideID, withOverrideRuleMatch("contains"))
+	expectedResult := newSearchOverride(overrideID)
+	expectedResult.Rule.Match = "contains"
 
-	body := newSearchOverrideSchema(withOverrideRuleMatch("exact"))
+	body := newSearchOverrideSchema()
+	body.Rule.Match = "exact"
 	_, err := typesenseClient.Collection(collectionName).Overrides().Upsert(overrideID, body)
 	require.NoError(t, err)
 
@@ -74,7 +77,7 @@ func TestSearchOverridesRetrieve(t *testing.T) {
 
 	resultMap := map[string]*api.SearchOverride{}
 	for _, override := range result {
-		resultMap[override.Id] = override
+		resultMap[*override.Id] = override
 	}
 
 	for k, v := range expectedResult {

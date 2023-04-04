@@ -39,23 +39,17 @@ func TestMultiSearch(t *testing.T) {
 		Searches: []api.MultiSearchCollectionParameters{
 			{
 				Collection: collectionName1,
-				MultiSearchParameters: api.MultiSearchParameters{
-					FilterBy: pointer.String("num_employees:>100"),
-					SortBy:   pointer.String("num_employees:desc"),
-				},
+				FilterBy:   pointer.String("num_employees:>100"),
+				SortBy:     pointer.String("num_employees:desc"),
 			},
 			{
 				Collection: collectionName1,
-				MultiSearchParameters: api.MultiSearchParameters{
-					FilterBy: pointer.String("num_employees:>1000"),
-				},
+				FilterBy:   pointer.String("num_employees:>1000"),
 			},
 			{
 				Collection: collectionName2,
-				MultiSearchParameters: api.MultiSearchParameters{
-					Q:        pointer.String("Stark"),
-					FilterBy: pointer.String("num_employees:>=1000"),
-				},
+				Q:          pointer.String("Stark"),
+				FilterBy:   pointer.String("num_employees:>=1000"),
 			},
 		},
 	}

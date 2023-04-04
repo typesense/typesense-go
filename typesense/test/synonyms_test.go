@@ -33,7 +33,8 @@ func TestSearchSynonymUpsertNewSynonym(t *testing.T) {
 func TestSearchSynonymUpsertExistingSynonym(t *testing.T) {
 	collectionName := createNewCollection(t, "product")
 	synonymID := newUUIDName("customize-apple")
-	expectedResult := newSearchSynonym(synonymID, withSynonyms("blazer", "coat", "jacket"))
+	expectedResult := newSearchSynonym(synonymID)
+	expectedResult.Synonyms = []string{"blazer", "coat", "jacket"}
 
 	body := newSearchSynonymSchema(withSynonyms("blazer", "coat"))
 	_, err := typesenseClient.Collection(collectionName).Synonyms().Upsert(synonymID, body)
@@ -78,7 +79,7 @@ func TestSearchSynonymsRetrieve(t *testing.T) {
 
 	resultMap := map[string]*api.SearchSynonym{}
 	for _, synonym := range result {
-		resultMap[synonym.Id] = synonym
+		resultMap[*synonym.Id] = synonym
 	}
 
 	for k, v := range expectedResult {

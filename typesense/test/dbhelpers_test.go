@@ -42,7 +42,7 @@ func newSchema(collectionName string) *api.CollectionSchema {
 }
 
 func expectedNewCollection(name string) *api.CollectionResponse {
-	schema := &api.CollectionSchema{
+	return &api.CollectionResponse{
 		Name: name,
 		Fields: []api.Field{
 			{
@@ -83,10 +83,8 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 		DefaultSortingField: pointer.String(""),
 		TokenSeparators:     &[]string{},
 		SymbolsToIndex:      &[]string{},
-	}
-	return &api.CollectionResponse{
-		CollectionSchema: *schema,
-		NumDocuments:     0,
+		NumDocuments:        pointer.Int64(0),
+		CreatedAt:           pointer.Int64(0),
 	}
 }
 
@@ -161,7 +159,10 @@ func newKeySchema() *api.ApiKeySchema {
 
 func newKey() *api.ApiKey {
 	return &api.ApiKey{
-		ApiKeySchema: *newKeySchema(),
+		Description: "Search-only key.",
+		Actions:     []string{"documents:search"},
+		Collections: []string{"*"},
+		ExpiresAt:   pointer.Int64(time.Now().Add(1 * time.Hour).Unix()),
 	}
 }
 
@@ -173,7 +174,7 @@ func withOverrideRuleMatch(match api.SearchOverrideRuleMatch) newSearchOverrideS
 	}
 }
 
-func newSearchOverrideSchema(opts ...newSearchOverrideSchemaOption) *api.SearchOverrideSchema {
+func newSearchOverrideSchema() *api.SearchOverrideSchema {
 	schema := &api.SearchOverrideSchema{
 		Rule: api.SearchOverrideRule{
 			Query: "apple",
@@ -196,16 +197,33 @@ func newSearchOverrideSchema(opts ...newSearchOverrideSchemaOption) *api.SearchO
 		},
 		RemoveMatchedTokens: pointer.True(),
 	}
-	for _, opt := range opts {
-		opt(schema)
-	}
+
 	return schema
 }
 
-func newSearchOverride(overrideID string, opts ...newSearchOverrideSchemaOption) *api.SearchOverride {
+func newSearchOverride(overrideID string) *api.SearchOverride {
 	return &api.SearchOverride{
-		SearchOverrideSchema: *newSearchOverrideSchema(opts...),
-		Id:                   overrideID,
+		Id: pointer.String(overrideID),
+		Rule: api.SearchOverrideRule{
+			Query: "apple",
+			Match: "exact",
+		},
+		Includes: &[]api.SearchOverrideInclude{
+			{
+				Id:       "422",
+				Position: 1,
+			},
+			{
+				Id:       "54",
+				Position: 2,
+			},
+		},
+		Excludes: &[]api.SearchOverrideExclude{
+			{
+				Id: "287",
+			},
+		},
+		RemoveMatchedTokens: pointer.True(),
 	}
 }
 
@@ -227,17 +245,17 @@ func newSearchSynonymSchema(opts ...newSynonymOption) *api.SearchSynonymSchema {
 	return schema
 }
 
-func newSearchSynonym(synonymID string, opts ...newSynonymOption) *api.SearchSynonym {
+func newSearchSynonym(synonymID string) *api.SearchSynonym {
 	return &api.SearchSynonym{
-		SearchSynonymSchema: *newSearchSynonymSchema(opts...),
-		Id:                  synonymID,
+		Id:       pointer.String(synonymID),
+		Synonyms: []string{"blazer", "coat", "jacket"},
 	}
 }
 
 func newCollectionAlias(collectionName string, name string) *api.CollectionAlias {
 	return &api.CollectionAlias{
 		CollectionName: collectionName,
-		Name:           name,
+		Name:           pointer.String(name),
 	}
 }
 

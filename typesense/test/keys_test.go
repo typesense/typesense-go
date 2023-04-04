@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package test
@@ -32,7 +33,7 @@ func TestKeysRetrieve(t *testing.T) {
 	require.True(t, len(results) >= 1, "number of keys is invalid")
 	var result *api.ApiKey
 	for _, key := range results {
-		if key.Id == expectedKey.Id {
+		if *key.Id == *expectedKey.Id {
 			result = key
 			break
 		}
@@ -42,6 +43,6 @@ func TestKeysRetrieve(t *testing.T) {
 	require.Equal(t, expectedKey.Description, result.Description)
 	require.Equal(t, expectedKey.Actions, result.Actions)
 	require.Equal(t, expectedKey.Collections, result.Collections)
-	require.True(t, strings.HasPrefix(expectedKey.Value, result.ValuePrefix),
+	require.True(t, strings.HasPrefix(*expectedKey.Value, *result.ValuePrefix),
 		"value_prefix is invalid")
 }

@@ -31,7 +31,7 @@ func TestCollectionSearch(t *testing.T) {
 		QueryByWeights: pointer.String("2, 1"),
 		FilterBy:       pointer.String("num_employees:>=100"),
 		SortBy:         pointer.String("num_employees:desc"),
-		NumTypos:       pointer.Int(2),
+		NumTypos:       pointer.String("2"),
 		Page:           pointer.Int(1),
 		PerPage:        pointer.Int(10),
 	}

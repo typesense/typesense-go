@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package test
@@ -15,7 +16,7 @@ func TestCollectionRetrieve(t *testing.T) {
 	expectedResult := expectedNewCollection(collectionName)
 
 	result, err := typesenseClient.Collection(collectionName).Retrieve()
-	result.CreatedAt = 0
+	result.CreatedAt = pointer.Int64(0)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedResult, result)
@@ -26,7 +27,7 @@ func TestCollectionDelete(t *testing.T) {
 	expectedResult := expectedNewCollection(collectionName)
 
 	result, err := typesenseClient.Collection(collectionName).Delete()
-	result.CreatedAt = 0
+	result.CreatedAt = pointer.Int64(0)
 	require.NoError(t, err)
 	require.Equal(t, expectedResult, result)
 

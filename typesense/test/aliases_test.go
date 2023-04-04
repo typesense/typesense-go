@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package test
@@ -74,7 +75,7 @@ func TestCollectionAliasesRetrieve(t *testing.T) {
 
 	resultMap := map[string]*api.CollectionAlias{}
 	for _, alias := range result {
-		resultMap[alias.Name] = alias
+		resultMap[*alias.Name] = alias
 	}
 
 	for k, v := range expectedResult {

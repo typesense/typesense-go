@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Typesense API
   description: "An open source search engine for building delightful search experiences."
-  version: 0.23.0
+  version: 0.24.0
 externalDocs:
   description: Find out more about Typsesense
   url: https://typesense.org
@@ -1417,7 +1417,7 @@ components:
         group_key:
           type: array
           items:
-            type: string
+            type: object
         hits:
           type: array
           description: The documents that matched the search query
@@ -1793,7 +1793,7 @@ components:
           description: >
             The number of typographical errors (1 or 2) that would be tolerated.
             Default: 2
-          type: integer
+          type: string
 
         page:
           description: Results from this specific page number would be fetched.

@@ -25,7 +25,7 @@ func newMultiSearchParams() *api.MultiSearchParams {
 		FacetBy:        pointer.String("year_started"),
 		MaxFacetValues: pointer.Int(10),
 		FacetQuery:     pointer.String("facetQuery"),
-		NumTypos:       pointer.Int(2),
+		NumTypos:       pointer.String("2"),
 		Page:           pointer.Int(1),
 		PerPage:        pointer.Int(10),
 		GroupBy:        pointer.String("country"),

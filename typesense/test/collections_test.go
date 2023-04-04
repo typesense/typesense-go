@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package test
@@ -8,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 )
 
 func TestCollectionCreate(t *testing.T) {
@@ -16,7 +18,7 @@ func TestCollectionCreate(t *testing.T) {
 	expectedResult := expectedNewCollection(collectionName)
 
 	result, err := typesenseClient.Collections().Create(schema)
-	result.CreatedAt = 0
+	result.CreatedAt = pointer.Int64(0)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedResult, result)
@@ -50,7 +52,7 @@ func TestCollectionsRetrieve(t *testing.T) {
 	resultMap := map[string]*api.CollectionResponse{}
 	for _, collection := range result {
 		resultMap[collection.Name] = collection
-		resultMap[collection.Name].CreatedAt = 0
+		resultMap[collection.Name].CreatedAt = pointer.Int64(0)
 	}
 
 	for k, v := range expectedResult {
