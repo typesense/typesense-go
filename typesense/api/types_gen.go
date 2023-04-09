@@ -599,8 +599,8 @@ type SuccessStatus struct {
 
 // DeleteDocumentsParams defines parameters for DeleteDocuments.
 type DeleteDocumentsParams struct {
-	FilterBy  *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
 	BatchSize *int    `form:"batch_size,omitempty" json:"batch_size,omitempty"`
+	FilterBy  *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
 }
 
 // UpdateDocumentsJSONBody defines parameters for UpdateDocuments.
@@ -642,48 +642,48 @@ type ImportDocumentsParamsDirtyValues string
 
 // SearchCollectionParams defines parameters for SearchCollection.
 type SearchCollectionParams struct {
-	Q                       string  `form:"q" json:"q"`
-	MaxExtraSuffix          *int    `form:"max_extra_suffix,omitempty" json:"max_extra_suffix,omitempty"`
-	PerPage                 *int    `form:"per_page,omitempty" json:"per_page,omitempty"`
-	SnippetThreshold        *int    `form:"snippet_threshold,omitempty" json:"snippet_threshold,omitempty"`
-	TypoTokensThreshold     *int    `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
-	SplitJoinTokens         *string `form:"split_join_tokens,omitempty" json:"split_join_tokens,omitempty"`
-	MaxCandidates           *int    `form:"max_candidates,omitempty" json:"max_candidates,omitempty"`
-	QueryBy                 string  `form:"query_by" json:"query_by"`
-	MaxFacetValues          *int    `form:"max_facet_values,omitempty" json:"max_facet_values,omitempty"`
-	IncludeFields           *string `form:"include_fields,omitempty" json:"include_fields,omitempty"`
-	HighlightAffixNumTokens *int    `form:"highlight_affix_num_tokens,omitempty" json:"highlight_affix_num_tokens,omitempty"`
-	EnableHighlightV1       *bool   `form:"enable_highlight_v1,omitempty" json:"enable_highlight_v1,omitempty"`
-	ExhaustiveSearch        *bool   `form:"exhaustive_search,omitempty" json:"exhaustive_search,omitempty"`
 	CacheTtl                *int    `form:"cache_ttl,omitempty" json:"cache_ttl,omitempty"`
-	Prefix                  *string `form:"prefix,omitempty" json:"prefix,omitempty"`
-	Infix                   *string `form:"infix,omitempty" json:"infix,omitempty"`
-	FilterBy                *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
-	FacetBy                 *string `form:"facet_by,omitempty" json:"facet_by,omitempty"`
-	NumTypos                *string `form:"num_typos,omitempty" json:"num_typos,omitempty"`
-	GroupLimit              *int    `form:"group_limit,omitempty" json:"group_limit,omitempty"`
-	HighlightFullFields     *string `form:"highlight_full_fields,omitempty" json:"highlight_full_fields,omitempty"`
-	HighlightFields         *string `form:"highlight_fields,omitempty" json:"highlight_fields,omitempty"`
-	MinLen2typo             *int    `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
-	MaxExtraPrefix          *int    `form:"max_extra_prefix,omitempty" json:"max_extra_prefix,omitempty"`
-	ExcludeFields           *string `form:"exclude_fields,omitempty" json:"exclude_fields,omitempty"`
-	PinnedHits              *string `form:"pinned_hits,omitempty" json:"pinned_hits,omitempty"`
-	UseCache                *bool   `form:"use_cache,omitempty" json:"use_cache,omitempty"`
-	SortBy                  *string `form:"sort_by,omitempty" json:"sort_by,omitempty"`
 	DropTokensThreshold     *int    `form:"drop_tokens_threshold,omitempty" json:"drop_tokens_threshold,omitempty"`
-	PrioritizeTokenPosition *bool   `form:"prioritize_token_position,omitempty" json:"prioritize_token_position,omitempty"`
-	Page                    *int    `form:"page,omitempty" json:"page,omitempty"`
-	HighlightStartTag       *string `form:"highlight_start_tag,omitempty" json:"highlight_start_tag,omitempty"`
-	PreSegmentedQuery       *bool   `form:"pre_segmented_query,omitempty" json:"pre_segmented_query,omitempty"`
-	PrioritizeExactMatch    *bool   `form:"prioritize_exact_match,omitempty" json:"prioritize_exact_match,omitempty"`
-	HighlightEndTag         *string `form:"highlight_end_tag,omitempty" json:"highlight_end_tag,omitempty"`
+	EnableHighlightV1       *bool   `form:"enable_highlight_v1,omitempty" json:"enable_highlight_v1,omitempty"`
 	EnableOverrides         *bool   `form:"enable_overrides,omitempty" json:"enable_overrides,omitempty"`
-	MinLen1typo             *int    `form:"min_len_1typo,omitempty" json:"min_len_1typo,omitempty"`
-	QueryByWeights          *string `form:"query_by_weights,omitempty" json:"query_by_weights,omitempty"`
+	ExcludeFields           *string `form:"exclude_fields,omitempty" json:"exclude_fields,omitempty"`
+	ExhaustiveSearch        *bool   `form:"exhaustive_search,omitempty" json:"exhaustive_search,omitempty"`
+	FacetBy                 *string `form:"facet_by,omitempty" json:"facet_by,omitempty"`
 	FacetQuery              *string `form:"facet_query,omitempty" json:"facet_query,omitempty"`
+	FilterBy                *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
 	GroupBy                 *string `form:"group_by,omitempty" json:"group_by,omitempty"`
+	GroupLimit              *int    `form:"group_limit,omitempty" json:"group_limit,omitempty"`
 	HiddenHits              *string `form:"hidden_hits,omitempty" json:"hidden_hits,omitempty"`
+	HighlightAffixNumTokens *int    `form:"highlight_affix_num_tokens,omitempty" json:"highlight_affix_num_tokens,omitempty"`
+	HighlightEndTag         *string `form:"highlight_end_tag,omitempty" json:"highlight_end_tag,omitempty"`
+	HighlightFields         *string `form:"highlight_fields,omitempty" json:"highlight_fields,omitempty"`
+	HighlightFullFields     *string `form:"highlight_full_fields,omitempty" json:"highlight_full_fields,omitempty"`
+	HighlightStartTag       *string `form:"highlight_start_tag,omitempty" json:"highlight_start_tag,omitempty"`
+	IncludeFields           *string `form:"include_fields,omitempty" json:"include_fields,omitempty"`
+	Infix                   *string `form:"infix,omitempty" json:"infix,omitempty"`
+	MaxCandidates           *int    `form:"max_candidates,omitempty" json:"max_candidates,omitempty"`
+	MaxExtraPrefix          *int    `form:"max_extra_prefix,omitempty" json:"max_extra_prefix,omitempty"`
+	MaxExtraSuffix          *int    `form:"max_extra_suffix,omitempty" json:"max_extra_suffix,omitempty"`
+	MaxFacetValues          *int    `form:"max_facet_values,omitempty" json:"max_facet_values,omitempty"`
+	MinLen1typo             *int    `form:"min_len_1typo,omitempty" json:"min_len_1typo,omitempty"`
+	MinLen2typo             *int    `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
+	NumTypos                *string `form:"num_typos,omitempty" json:"num_typos,omitempty"`
+	Page                    *int    `form:"page,omitempty" json:"page,omitempty"`
+	PerPage                 *int    `form:"per_page,omitempty" json:"per_page,omitempty"`
+	PinnedHits              *string `form:"pinned_hits,omitempty" json:"pinned_hits,omitempty"`
+	PreSegmentedQuery       *bool   `form:"pre_segmented_query,omitempty" json:"pre_segmented_query,omitempty"`
+	Prefix                  *string `form:"prefix,omitempty" json:"prefix,omitempty"`
+	PrioritizeExactMatch    *bool   `form:"prioritize_exact_match,omitempty" json:"prioritize_exact_match,omitempty"`
+	PrioritizeTokenPosition *bool   `form:"prioritize_token_position,omitempty" json:"prioritize_token_position,omitempty"`
+	Q                       string  `form:"q" json:"q"`
+	QueryBy                 string  `form:"query_by" json:"query_by"`
+	QueryByWeights          *string `form:"query_by_weights,omitempty" json:"query_by_weights,omitempty"`
 	SearchCutoffMs          *int    `form:"search_cutoff_ms,omitempty" json:"search_cutoff_ms,omitempty"`
+	SnippetThreshold        *int    `form:"snippet_threshold,omitempty" json:"snippet_threshold,omitempty"`
+	SortBy                  *string `form:"sort_by,omitempty" json:"sort_by,omitempty"`
+	SplitJoinTokens         *string `form:"split_join_tokens,omitempty" json:"split_join_tokens,omitempty"`
+	TypoTokensThreshold     *int    `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
+	UseCache                *bool   `form:"use_cache,omitempty" json:"use_cache,omitempty"`
 	VectorQuery             *string `form:"vector_query,omitempty" json:"vector_query,omitempty"`
 }
 
@@ -692,49 +692,49 @@ type UpdateDocumentJSONBody = interface{}
 
 // MultiSearchParams defines parameters for MultiSearch.
 type MultiSearchParams struct {
-	PrioritizeExactMatch    *bool   `form:"prioritize_exact_match,omitempty" json:"prioritize_exact_match,omitempty"`
-	Page                    *int    `form:"page,omitempty" json:"page,omitempty"`
-	HighlightStartTag       *string `form:"highlight_start_tag,omitempty" json:"highlight_start_tag,omitempty"`
-	PreSegmentedQuery       *bool   `form:"pre_segmented_query,omitempty" json:"pre_segmented_query,omitempty"`
-	HighlightEndTag         *string `form:"highlight_end_tag,omitempty" json:"highlight_end_tag,omitempty"`
-	EnableOverrides         *bool   `form:"enable_overrides,omitempty" json:"enable_overrides,omitempty"`
-	MinLen1typo             *int    `form:"min_len_1typo,omitempty" json:"min_len_1typo,omitempty"`
-	HiddenHits              *string `form:"hidden_hits,omitempty" json:"hidden_hits,omitempty"`
-	SearchCutoffMs          *int    `form:"search_cutoff_ms,omitempty" json:"search_cutoff_ms,omitempty"`
-	VectorQuery             *string `form:"vector_query,omitempty" json:"vector_query,omitempty"`
-	QueryByWeights          *string `form:"query_by_weights,omitempty" json:"query_by_weights,omitempty"`
-	FacetQuery              *string `form:"facet_query,omitempty" json:"facet_query,omitempty"`
-	GroupBy                 *string `form:"group_by,omitempty" json:"group_by,omitempty"`
-	SnippetThreshold        *int    `form:"snippet_threshold,omitempty" json:"snippet_threshold,omitempty"`
-	TypoTokensThreshold     *int    `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
-	SplitJoinTokens         *string `form:"split_join_tokens,omitempty" json:"split_join_tokens,omitempty"`
-	MaxCandidates           *int    `form:"max_candidates,omitempty" json:"max_candidates,omitempty"`
-	Q                       *string `form:"q,omitempty" json:"q,omitempty"`
-	MaxExtraSuffix          *int    `form:"max_extra_suffix,omitempty" json:"max_extra_suffix,omitempty"`
-	PerPage                 *int    `form:"per_page,omitempty" json:"per_page,omitempty"`
-	HighlightAffixNumTokens *int    `form:"highlight_affix_num_tokens,omitempty" json:"highlight_affix_num_tokens,omitempty"`
-	EnableHighlightV1       *bool   `form:"enable_highlight_v1,omitempty" json:"enable_highlight_v1,omitempty"`
-	ExhaustiveSearch        *bool   `form:"exhaustive_search,omitempty" json:"exhaustive_search,omitempty"`
 	CacheTtl                *int    `form:"cache_ttl,omitempty" json:"cache_ttl,omitempty"`
-	QueryBy                 *string `form:"query_by,omitempty" json:"query_by,omitempty"`
-	MaxFacetValues          *int    `form:"max_facet_values,omitempty" json:"max_facet_values,omitempty"`
-	IncludeFields           *string `form:"include_fields,omitempty" json:"include_fields,omitempty"`
-	FacetBy                 *string `form:"facet_by,omitempty" json:"facet_by,omitempty"`
-	NumTypos                *string `form:"num_typos,omitempty" json:"num_typos,omitempty"`
-	GroupLimit              *int    `form:"group_limit,omitempty" json:"group_limit,omitempty"`
-	HighlightFullFields     *string `form:"highlight_full_fields,omitempty" json:"highlight_full_fields,omitempty"`
-	HighlightFields         *string `form:"highlight_fields,omitempty" json:"highlight_fields,omitempty"`
-	Prefix                  *string `form:"prefix,omitempty" json:"prefix,omitempty"`
-	Infix                   *string `form:"infix,omitempty" json:"infix,omitempty"`
-	FilterBy                *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
-	MinLen2typo             *int    `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
-	UseCache                *bool   `form:"use_cache,omitempty" json:"use_cache,omitempty"`
-	MaxExtraPrefix          *int    `form:"max_extra_prefix,omitempty" json:"max_extra_prefix,omitempty"`
-	ExcludeFields           *string `form:"exclude_fields,omitempty" json:"exclude_fields,omitempty"`
-	PinnedHits              *string `form:"pinned_hits,omitempty" json:"pinned_hits,omitempty"`
-	SortBy                  *string `form:"sort_by,omitempty" json:"sort_by,omitempty"`
 	DropTokensThreshold     *int    `form:"drop_tokens_threshold,omitempty" json:"drop_tokens_threshold,omitempty"`
+	EnableHighlightV1       *bool   `form:"enable_highlight_v1,omitempty" json:"enable_highlight_v1,omitempty"`
+	EnableOverrides         *bool   `form:"enable_overrides,omitempty" json:"enable_overrides,omitempty"`
+	ExcludeFields           *string `form:"exclude_fields,omitempty" json:"exclude_fields,omitempty"`
+	ExhaustiveSearch        *bool   `form:"exhaustive_search,omitempty" json:"exhaustive_search,omitempty"`
+	FacetBy                 *string `form:"facet_by,omitempty" json:"facet_by,omitempty"`
+	FacetQuery              *string `form:"facet_query,omitempty" json:"facet_query,omitempty"`
+	FilterBy                *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
+	GroupBy                 *string `form:"group_by,omitempty" json:"group_by,omitempty"`
+	GroupLimit              *int    `form:"group_limit,omitempty" json:"group_limit,omitempty"`
+	HiddenHits              *string `form:"hidden_hits,omitempty" json:"hidden_hits,omitempty"`
+	HighlightAffixNumTokens *int    `form:"highlight_affix_num_tokens,omitempty" json:"highlight_affix_num_tokens,omitempty"`
+	HighlightEndTag         *string `form:"highlight_end_tag,omitempty" json:"highlight_end_tag,omitempty"`
+	HighlightFields         *string `form:"highlight_fields,omitempty" json:"highlight_fields,omitempty"`
+	HighlightFullFields     *string `form:"highlight_full_fields,omitempty" json:"highlight_full_fields,omitempty"`
+	HighlightStartTag       *string `form:"highlight_start_tag,omitempty" json:"highlight_start_tag,omitempty"`
+	IncludeFields           *string `form:"include_fields,omitempty" json:"include_fields,omitempty"`
+	Infix                   *string `form:"infix,omitempty" json:"infix,omitempty"`
+	MaxCandidates           *int    `form:"max_candidates,omitempty" json:"max_candidates,omitempty"`
+	MaxExtraPrefix          *int    `form:"max_extra_prefix,omitempty" json:"max_extra_prefix,omitempty"`
+	MaxExtraSuffix          *int    `form:"max_extra_suffix,omitempty" json:"max_extra_suffix,omitempty"`
+	MaxFacetValues          *int    `form:"max_facet_values,omitempty" json:"max_facet_values,omitempty"`
+	MinLen1typo             *int    `form:"min_len_1typo,omitempty" json:"min_len_1typo,omitempty"`
+	MinLen2typo             *int    `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
+	NumTypos                *string `form:"num_typos,omitempty" json:"num_typos,omitempty"`
+	Page                    *int    `form:"page,omitempty" json:"page,omitempty"`
+	PerPage                 *int    `form:"per_page,omitempty" json:"per_page,omitempty"`
+	PinnedHits              *string `form:"pinned_hits,omitempty" json:"pinned_hits,omitempty"`
+	PreSegmentedQuery       *bool   `form:"pre_segmented_query,omitempty" json:"pre_segmented_query,omitempty"`
+	Prefix                  *string `form:"prefix,omitempty" json:"prefix,omitempty"`
+	PrioritizeExactMatch    *bool   `form:"prioritize_exact_match,omitempty" json:"prioritize_exact_match,omitempty"`
 	PrioritizeTokenPosition *bool   `form:"prioritize_token_position,omitempty" json:"prioritize_token_position,omitempty"`
+	Q                       *string `form:"q,omitempty" json:"q,omitempty"`
+	QueryBy                 *string `form:"query_by,omitempty" json:"query_by,omitempty"`
+	QueryByWeights          *string `form:"query_by_weights,omitempty" json:"query_by_weights,omitempty"`
+	SearchCutoffMs          *int    `form:"search_cutoff_ms,omitempty" json:"search_cutoff_ms,omitempty"`
+	SnippetThreshold        *int    `form:"snippet_threshold,omitempty" json:"snippet_threshold,omitempty"`
+	SortBy                  *string `form:"sort_by,omitempty" json:"sort_by,omitempty"`
+	SplitJoinTokens         *string `form:"split_join_tokens,omitempty" json:"split_join_tokens,omitempty"`
+	TypoTokensThreshold     *int    `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
+	UseCache                *bool   `form:"use_cache,omitempty" json:"use_cache,omitempty"`
+	VectorQuery             *string `form:"vector_query,omitempty" json:"vector_query,omitempty"`
 }
 
 // TakeSnapshotParams defines parameters for TakeSnapshot.

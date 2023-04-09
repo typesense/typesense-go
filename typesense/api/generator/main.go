@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"sort"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -17,6 +18,25 @@ const (
 	query = "query"
 	array = "array"
 )
+
+type MapKV struct {
+	Key   string
+	Value interface{}
+}
+
+func sortedSlice(params map[string]interface{}) []MapKV {
+	var kvs []MapKV
+
+	for k, v := range params {
+		kvs = append(kvs, MapKV{k, v})
+	}
+
+	sort.Slice(kvs, func(i, j int) bool {
+		return kvs[i].Key < kvs[j].Key
+	})
+
+	return kvs
+}
 
 // This script makes the changes needed for oapi-codegen to generate client_gen.go and types_gen.go from
 // https://github.com/typesense/typesense-api-spec/blob/master/openapi.yml
@@ -114,12 +134,12 @@ func searchResultHit(m *yml) {
 func unwrapDeleteDocument(m *yml) {
 	parameters := (*m)["paths"].(yml)["/collections/{collectionName}/documents"].(yml)["delete"].(yml)["parameters"].([]interface{})
 	deleteParameters := parameters[1].(yml)["schema"].(yml)["properties"].(yml)
-	for k, v := range deleteParameters {
+	for _, obj := range sortedSlice(deleteParameters) {
 		newMap := make(yml)
-		newMap["name"] = k
+		newMap["name"] = obj.Key
 		newMap["in"] = query
 		newMap["schema"] = make(yml)
-		newMap["schema"].(yml)["type"] = v.(yml)["type"].(string)
+		newMap["schema"].(yml)["type"] = obj.Value.(yml)["type"].(string)
 		parameters = append(parameters, newMap)
 	}
 	parameters = append(parameters[:1], parameters[2:]...)
@@ -129,12 +149,12 @@ func unwrapDeleteDocument(m *yml) {
 func unwrapUpdateDocumentsWithConditionParameters(m *yml) {
 	parameters := (*m)["paths"].(yml)["/collections/{collectionName}/documents"].(yml)["patch"].(yml)["parameters"].([]interface{})
 	updateParameters := parameters[1].(yml)["schema"].(yml)["properties"].(yml)
-	for k, v := range updateParameters {
+	for _, obj := range sortedSlice(updateParameters) {
 		newMap := make(yml)
-		newMap["name"] = k
+		newMap["name"] = obj.Key
 		newMap["in"] = query
 		newMap["schema"] = make(yml)
-		newMap["schema"].(yml)["type"] = v.(yml)["type"].(string)
+		newMap["schema"].(yml)["type"] = obj.Value.(yml)["type"].(string)
 		parameters = append(parameters, newMap)
 	}
 	parameters = append(parameters[:1], parameters[2:]...)
@@ -144,16 +164,16 @@ func unwrapUpdateDocumentsWithConditionParameters(m *yml) {
 func unwrapExportDocuments(m *yml) {
 	parameters := (*m)["paths"].(yml)["/collections/{collectionName}/documents/export"].(yml)["get"].(yml)["parameters"].([]interface{})
 	exportParameters := parameters[1].(yml)["schema"].(yml)["properties"].(yml)
-	for k, v := range exportParameters {
+	for _, obj := range sortedSlice(exportParameters) {
 		newMap := make(yml)
-		newMap["name"] = k
+		newMap["name"] = obj.Key
 		newMap["in"] = query
 		newMap["schema"] = make(yml)
-		if v.(yml)["type"].(string) == array {
+		if obj.Value.(yml)["type"].(string) == array {
 			newMap["schema"].(yml)["type"] = array
-			newMap["schema"].(yml)["items"] = v.(yml)["items"]
+			newMap["schema"].(yml)["items"] = obj.Value.(yml)["items"]
 		} else {
-			newMap["schema"].(yml)["type"] = v.(yml)["type"].(string)
+			newMap["schema"].(yml)["type"] = obj.Value.(yml)["type"].(string)
 		}
 		parameters = append(parameters, newMap)
 	}
@@ -165,14 +185,14 @@ func unwrapImportDocuments(m *yml) {
 	parameters := (*m)["paths"].(yml)["/collections/{collectionName}/documents/import"].(yml)["post"].(yml)["parameters"].([]interface{})
 	importParameters := parameters[1].(yml)["schema"].(yml)["properties"].(yml)
 
-	for k, v := range importParameters {
+	for _, obj := range sortedSlice(importParameters) {
 		newMap := make(yml)
-		newMap["name"] = k
+		newMap["name"] = obj.Key
 		newMap["in"] = query
 		newMap["schema"] = make(yml)
-		newMap["schema"].(yml)["type"] = v.(yml)["type"].(string)
-		if v.(yml)["enum"] != nil {
-			newMap["schema"].(yml)["enum"] = v.(yml)["enum"]
+		newMap["schema"].(yml)["type"] = obj.Value.(yml)["type"].(string)
+		if obj.Value.(yml)["enum"] != nil {
+			newMap["schema"].(yml)["enum"] = obj.Value.(yml)["enum"]
 		}
 		parameters = append(parameters, newMap)
 	}
@@ -189,23 +209,23 @@ func unwrapSearchParameters(m *yml) {
 	parameters := (*m)["paths"].(yml)["/collections/{collectionName}/documents/search"].(yml)["get"].(yml)["parameters"].([]interface{})
 	searchParameters := getSearchParameters(m)
 
-	for k, v := range searchParameters {
+	for _, obj := range sortedSlice(searchParameters) {
 		newMap := make(yml)
-		newMap["name"] = k
-		if k == "q" || k == "query_by" {
+		newMap["name"] = obj.Key
+		if obj.Key == "q" || obj.Key == "query_by" {
 			newMap["required"] = true
 		}
 		newMap["in"] = query
 		newMap["schema"] = make(yml)
-		if v.(yml)["oneOf"] == nil {
-			if v.(yml)["type"].(string) == array {
+		if obj.Value.(yml)["oneOf"] == nil {
+			if obj.Value.(yml)["type"].(string) == array {
 				newMap["schema"].(yml)["type"] = array
-				newMap["schema"].(yml)["items"] = v.(yml)["items"]
+				newMap["schema"].(yml)["items"] = obj.Value.(yml)["items"]
 			} else {
-				newMap["schema"].(yml)["type"] = v.(yml)["type"].(string)
+				newMap["schema"].(yml)["type"] = obj.Value.(yml)["type"].(string)
 			}
 		} else {
-			newMap["schema"].(yml)["oneOf"] = v.(yml)["oneOf"]
+			newMap["schema"].(yml)["oneOf"] = obj.Value.(yml)["oneOf"]
 		}
 		parameters = append(parameters, newMap)
 	}
@@ -218,20 +238,20 @@ func unwrapMultiSearchParameters(m *yml) {
 	parameters := (*m)["paths"].(yml)["/multi_search"].(yml)["post"].(yml)["parameters"].([]interface{})
 	searchParameters := getSearchParameters(m)
 
-	for k, v := range searchParameters {
+	for _, obj := range sortedSlice(searchParameters) {
 		newMap := make(yml)
-		newMap["name"] = k
+		newMap["name"] = obj.Key
 		newMap["in"] = query
 		newMap["schema"] = make(yml)
-		if v.(yml)["oneOf"] == nil {
-			if v.(yml)["type"].(string) == array {
+		if obj.Value.(yml)["oneOf"] == nil {
+			if obj.Value.(yml)["type"].(string) == array {
 				newMap["schema"].(yml)["type"] = array
-				newMap["schema"].(yml)["items"] = v.(yml)["items"]
+				newMap["schema"].(yml)["items"] = obj.Value.(yml)["items"]
 			} else {
-				newMap["schema"].(yml)["type"] = v.(yml)["type"].(string)
+				newMap["schema"].(yml)["type"] = obj.Value.(yml)["type"].(string)
 			}
 		} else {
-			newMap["schema"].(yml)["oneOf"] = v.(yml)["oneOf"]
+			newMap["schema"].(yml)["oneOf"] = obj.Value.(yml)["oneOf"]
 		}
 		parameters = append(parameters, newMap)
 	}

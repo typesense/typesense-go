@@ -1143,13 +1143,13 @@ paths:
           schema:
             type: string
         - in: query
-          name: filter_by
-          schema:
-            type: string
-        - in: query
           name: batch_size
           schema:
             type: integer
+        - in: query
+          name: filter_by
+          schema:
+            type: string
       responses:
         200:
           content:
@@ -1492,49 +1492,11 @@ paths:
           schema:
             type: string
         - in: query
-          name: q
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: max_extra_suffix
+          name: cache_ttl
           schema:
             type: integer
         - in: query
-          name: per_page
-          schema:
-            type: integer
-        - in: query
-          name: snippet_threshold
-          schema:
-            type: integer
-        - in: query
-          name: typo_tokens_threshold
-          schema:
-            type: integer
-        - in: query
-          name: split_join_tokens
-          schema:
-            type: string
-        - in: query
-          name: max_candidates
-          schema:
-            type: integer
-        - in: query
-          name: query_by
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: max_facet_values
-          schema:
-            type: integer
-        - in: query
-          name: include_fields
-          schema:
-            type: string
-        - in: query
-          name: highlight_affix_num_tokens
+          name: drop_tokens_threshold
           schema:
             type: integer
         - in: query
@@ -1542,107 +1504,19 @@ paths:
           schema:
             type: boolean
         - in: query
-          name: exhaustive_search
+          name: enable_overrides
           schema:
             type: boolean
-        - in: query
-          name: cache_ttl
-          schema:
-            type: integer
-        - in: query
-          name: prefix
-          schema:
-            type: string
-        - in: query
-          name: infix
-          schema:
-            type: string
-        - in: query
-          name: filter_by
-          schema:
-            type: string
-        - in: query
-          name: facet_by
-          schema:
-            type: string
-        - in: query
-          name: num_typos
-          schema:
-            type: string
-        - in: query
-          name: group_limit
-          schema:
-            type: integer
-        - in: query
-          name: highlight_full_fields
-          schema:
-            type: string
-        - in: query
-          name: highlight_fields
-          schema:
-            type: string
-        - in: query
-          name: min_len_2typo
-          schema:
-            type: integer
-        - in: query
-          name: max_extra_prefix
-          schema:
-            type: integer
         - in: query
           name: exclude_fields
           schema:
             type: string
         - in: query
-          name: pinned_hits
-          schema:
-            type: string
-        - in: query
-          name: use_cache
+          name: exhaustive_search
           schema:
             type: boolean
         - in: query
-          name: sort_by
-          schema:
-            type: string
-        - in: query
-          name: drop_tokens_threshold
-          schema:
-            type: integer
-        - in: query
-          name: prioritize_token_position
-          schema:
-            type: boolean
-        - in: query
-          name: page
-          schema:
-            type: integer
-        - in: query
-          name: highlight_start_tag
-          schema:
-            type: string
-        - in: query
-          name: pre_segmented_query
-          schema:
-            type: boolean
-        - in: query
-          name: prioritize_exact_match
-          schema:
-            type: boolean
-        - in: query
-          name: highlight_end_tag
-          schema:
-            type: string
-        - in: query
-          name: enable_overrides
-          schema:
-            type: boolean
-        - in: query
-          name: min_len_1typo
-          schema:
-            type: integer
-        - in: query
-          name: query_by_weights
+          name: facet_by
           schema:
             type: string
         - in: query
@@ -1650,17 +1524,143 @@ paths:
           schema:
             type: string
         - in: query
+          name: filter_by
+          schema:
+            type: string
+        - in: query
           name: group_by
           schema:
             type: string
         - in: query
+          name: group_limit
+          schema:
+            type: integer
+        - in: query
           name: hidden_hits
+          schema:
+            type: string
+        - in: query
+          name: highlight_affix_num_tokens
+          schema:
+            type: integer
+        - in: query
+          name: highlight_end_tag
+          schema:
+            type: string
+        - in: query
+          name: highlight_fields
+          schema:
+            type: string
+        - in: query
+          name: highlight_full_fields
+          schema:
+            type: string
+        - in: query
+          name: highlight_start_tag
+          schema:
+            type: string
+        - in: query
+          name: include_fields
+          schema:
+            type: string
+        - in: query
+          name: infix
+          schema:
+            type: string
+        - in: query
+          name: max_candidates
+          schema:
+            type: integer
+        - in: query
+          name: max_extra_prefix
+          schema:
+            type: integer
+        - in: query
+          name: max_extra_suffix
+          schema:
+            type: integer
+        - in: query
+          name: max_facet_values
+          schema:
+            type: integer
+        - in: query
+          name: min_len_1typo
+          schema:
+            type: integer
+        - in: query
+          name: min_len_2typo
+          schema:
+            type: integer
+        - in: query
+          name: num_typos
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+        - in: query
+          name: pinned_hits
+          schema:
+            type: string
+        - in: query
+          name: pre_segmented_query
+          schema:
+            type: boolean
+        - in: query
+          name: prefix
+          schema:
+            type: string
+        - in: query
+          name: prioritize_exact_match
+          schema:
+            type: boolean
+        - in: query
+          name: prioritize_token_position
+          schema:
+            type: boolean
+        - in: query
+          name: q
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query_by
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query_by_weights
           schema:
             type: string
         - in: query
           name: search_cutoff_ms
           schema:
             type: integer
+        - in: query
+          name: snippet_threshold
+          schema:
+            type: integer
+        - in: query
+          name: sort_by
+          schema:
+            type: string
+        - in: query
+          name: split_join_tokens
+          schema:
+            type: string
+        - in: query
+          name: typo_tokens_threshold
+          schema:
+            type: integer
+        - in: query
+          name: use_cache
+          schema:
+            type: boolean
         - in: query
           name: vector_query
           schema:
@@ -2078,87 +2078,11 @@ paths:
       operationId: multiSearch
       parameters:
         - in: query
-          name: prioritize_exact_match
-          schema:
-            type: boolean
-        - in: query
-          name: page
+          name: cache_ttl
           schema:
             type: integer
         - in: query
-          name: highlight_start_tag
-          schema:
-            type: string
-        - in: query
-          name: pre_segmented_query
-          schema:
-            type: boolean
-        - in: query
-          name: highlight_end_tag
-          schema:
-            type: string
-        - in: query
-          name: enable_overrides
-          schema:
-            type: boolean
-        - in: query
-          name: min_len_1typo
-          schema:
-            type: integer
-        - in: query
-          name: hidden_hits
-          schema:
-            type: string
-        - in: query
-          name: search_cutoff_ms
-          schema:
-            type: integer
-        - in: query
-          name: vector_query
-          schema:
-            type: string
-        - in: query
-          name: query_by_weights
-          schema:
-            type: string
-        - in: query
-          name: facet_query
-          schema:
-            type: string
-        - in: query
-          name: group_by
-          schema:
-            type: string
-        - in: query
-          name: snippet_threshold
-          schema:
-            type: integer
-        - in: query
-          name: typo_tokens_threshold
-          schema:
-            type: integer
-        - in: query
-          name: split_join_tokens
-          schema:
-            type: string
-        - in: query
-          name: max_candidates
-          schema:
-            type: integer
-        - in: query
-          name: q
-          schema:
-            type: string
-        - in: query
-          name: max_extra_suffix
-          schema:
-            type: integer
-        - in: query
-          name: per_page
-          schema:
-            type: integer
-        - in: query
-          name: highlight_affix_num_tokens
+          name: drop_tokens_threshold
           schema:
             type: integer
         - in: query
@@ -2166,51 +2090,23 @@ paths:
           schema:
             type: boolean
         - in: query
-          name: exhaustive_search
+          name: enable_overrides
           schema:
             type: boolean
         - in: query
-          name: cache_ttl
-          schema:
-            type: integer
-        - in: query
-          name: query_by
+          name: exclude_fields
           schema:
             type: string
         - in: query
-          name: max_facet_values
+          name: exhaustive_search
           schema:
-            type: integer
-        - in: query
-          name: include_fields
-          schema:
-            type: string
+            type: boolean
         - in: query
           name: facet_by
           schema:
             type: string
         - in: query
-          name: num_typos
-          schema:
-            type: string
-        - in: query
-          name: group_limit
-          schema:
-            type: integer
-        - in: query
-          name: highlight_full_fields
-          schema:
-            type: string
-        - in: query
-          name: highlight_fields
-          schema:
-            type: string
-        - in: query
-          name: prefix
-          schema:
-            type: string
-        - in: query
-          name: infix
+          name: facet_query
           schema:
             type: string
         - in: query
@@ -2218,7 +2114,131 @@ paths:
           schema:
             type: string
         - in: query
+          name: group_by
+          schema:
+            type: string
+        - in: query
+          name: group_limit
+          schema:
+            type: integer
+        - in: query
+          name: hidden_hits
+          schema:
+            type: string
+        - in: query
+          name: highlight_affix_num_tokens
+          schema:
+            type: integer
+        - in: query
+          name: highlight_end_tag
+          schema:
+            type: string
+        - in: query
+          name: highlight_fields
+          schema:
+            type: string
+        - in: query
+          name: highlight_full_fields
+          schema:
+            type: string
+        - in: query
+          name: highlight_start_tag
+          schema:
+            type: string
+        - in: query
+          name: include_fields
+          schema:
+            type: string
+        - in: query
+          name: infix
+          schema:
+            type: string
+        - in: query
+          name: max_candidates
+          schema:
+            type: integer
+        - in: query
+          name: max_extra_prefix
+          schema:
+            type: integer
+        - in: query
+          name: max_extra_suffix
+          schema:
+            type: integer
+        - in: query
+          name: max_facet_values
+          schema:
+            type: integer
+        - in: query
+          name: min_len_1typo
+          schema:
+            type: integer
+        - in: query
           name: min_len_2typo
+          schema:
+            type: integer
+        - in: query
+          name: num_typos
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+        - in: query
+          name: pinned_hits
+          schema:
+            type: string
+        - in: query
+          name: pre_segmented_query
+          schema:
+            type: boolean
+        - in: query
+          name: prefix
+          schema:
+            type: string
+        - in: query
+          name: prioritize_exact_match
+          schema:
+            type: boolean
+        - in: query
+          name: prioritize_token_position
+          schema:
+            type: boolean
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: query_by
+          schema:
+            type: string
+        - in: query
+          name: query_by_weights
+          schema:
+            type: string
+        - in: query
+          name: search_cutoff_ms
+          schema:
+            type: integer
+        - in: query
+          name: snippet_threshold
+          schema:
+            type: integer
+        - in: query
+          name: sort_by
+          schema:
+            type: string
+        - in: query
+          name: split_join_tokens
+          schema:
+            type: string
+        - in: query
+          name: typo_tokens_threshold
           schema:
             type: integer
         - in: query
@@ -2226,29 +2246,9 @@ paths:
           schema:
             type: boolean
         - in: query
-          name: max_extra_prefix
-          schema:
-            type: integer
-        - in: query
-          name: exclude_fields
+          name: vector_query
           schema:
             type: string
-        - in: query
-          name: pinned_hits
-          schema:
-            type: string
-        - in: query
-          name: sort_by
-          schema:
-            type: string
-        - in: query
-          name: drop_tokens_threshold
-          schema:
-            type: integer
-        - in: query
-          name: prioritize_token_position
-          schema:
-            type: boolean
       requestBody:
         content:
           application/json:
