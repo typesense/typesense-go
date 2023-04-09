@@ -81,3 +81,57 @@ func TestMultiSearch(t *testing.T) {
 		require.Equal(t, *doc.Document, expectedDocs2[i])
 	}
 }
+
+func TestMultiSearchVectorQuery(t *testing.T) {
+	_, err := typesenseClient.Collection("embeddings").Delete()
+
+	collSchema := api.CollectionSchema{
+		Name: "embeddings",
+		Fields: []api.Field{
+			{
+				Name: "title",
+				Type: "string",
+			},
+			{
+				Name:   "vec",
+				Type:   "float[]",
+				NumDim: pointer.Int(4),
+			},
+		},
+	}
+
+	_, err = typesenseClient.Collections().Create(&collSchema)
+	require.NoError(t, err)
+
+	type vecDocument struct {
+		ID    string    `json:"id"`
+		Title string    `json:"title"`
+		Vec   []float32 `json:"vec"`
+	}
+
+	vecDoc := &vecDocument{
+		ID:    "0",
+		Title: "Stark Industries",
+		Vec:   []float32{0.45, 0.222, 0.021, 0.1323},
+	}
+
+	_, err = typesenseClient.Collection("embeddings").Documents().Create(vecDoc)
+	require.NoError(t, err)
+
+	searchParams := &api.MultiSearchParams{}
+	searches := api.MultiSearchSearchesParameter{
+		Searches: []api.MultiSearchCollectionParameters{
+			{
+				Collection:  "embeddings",
+				Q:           pointer.String("*"),
+				VectorQuery: pointer.String("vec:([0.96826,0.94,0.39557,0.306488], k: 10)"),
+			},
+		},
+	}
+
+	searchResp, err := typesenseClient.MultiSearch.Perform(searchParams, searches)
+	require.NoError(t, err)
+
+	require.NotNil(t, searchResp.Results[0].Hits)
+	require.Equal(t, 1, len(*searchResp.Results[0].Hits))
+}

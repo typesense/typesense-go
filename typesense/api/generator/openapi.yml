@@ -1328,6 +1328,9 @@ components:
           type: boolean
           example: true
           default: false
+        num_dim:
+          type: integer
+          example: 256
         drop:
           type: boolean
           example: true
@@ -1428,9 +1431,13 @@ components:
       properties:
         highlights:
           type: array
-          description: Contains highlighted portions of the search fields
+          description: (Deprecated) Contains highlighted portions of the search fields
           items:
             $ref: "#/components/schemas/SearchHighlight"
+        highlight:
+          type: object
+          description: Highlighted version of the matching document
+          additionalProperties: true
         document:
           type: object
           description: Can be any key-value pair
@@ -1444,6 +1451,10 @@ components:
           description: Can be any key-value pair
           additionalProperties:
             type: integer
+        vector_distance:
+          type: number
+          format: float
+          description: Distance between the query vector and matching document's vector value
       example:
         highlights:
           company_name:
@@ -1468,6 +1479,18 @@ components:
         snippets:
           type: array
           description: Present only for (array) string[] fields
+          example:
+            - <mark>Stark</mark> Industries
+            - <mark>Stark</mark> Corp
+          items:
+            type: string
+        value:
+          type: string
+          description: Full field value with highlighting, present only for (non-array) string fields
+          example: <mark>Stark</mark> Industries is a major supplier of space equipment.
+        values:
+          type: array
+          description: Full field value with highlighting, present only for (array) string[] fields
           example:
             - <mark>Stark</mark> Industries
             - <mark>Stark</mark> Corp
@@ -1846,6 +1869,13 @@ components:
             Default: `</mark>`
           type: string
 
+        enable_highlight_v1:
+          description: >
+            Flag for enabling/disabling the deprecated, old highlight structure in the response.
+            Default: true
+          type: boolean
+          default: true
+
         snippet_threshold:
           description: >
             Field values under this length will be fully highlighted, instead of showing
@@ -1904,6 +1934,7 @@ components:
             To always trigger this behavior, set value to `always``.
             To disable, set value to `off`. Default is `fallback`.
           type: string
+
         pre_segmented_query:
           description: >
             You can index content from any logographic language into Typesense if you
@@ -1962,6 +1993,10 @@ components:
             Minimum word length for 2-typo correction to be applied. 
             The value of num_typos is still treated as the maximum allowed typos.
           type: integer
+        vector_query:
+          description: >
+            Vector query expression for fetching documents "closest" to a given query/document vector.
+          type: string
 
     MultiSearchParameters:
       description: >
@@ -2058,7 +2093,7 @@ components:
           description: >
             The number of typographical errors (1 or 2) that would be tolerated.
             Default: 2
-          type: integer
+          type: string
 
         page:
           description: Results from this specific page number would be fetched.
@@ -2212,6 +2247,10 @@ components:
             Minimum word length for 2-typo correction to be applied. 
             The value of num_typos is still treated as the maximum allowed typos.
           type: integer
+        vector_query:
+          description: >
+            Vector query expression for fetching documents "closest" to a given query/document vector.
+          type: string
     MultiSearchSearchesParameter:
       type: object
       required:
