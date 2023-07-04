@@ -78,7 +78,7 @@ type CollectionAliasesResponse struct {
 
 // CollectionResponse defines model for CollectionResponse.
 type CollectionResponse struct {
-	// CreatedAt Timestamp of when the collection was created
+	// CreatedAt Timestamp of when the collection was created (Unix epoch in seconds)
 	CreatedAt *int64 `json:"created_at,omitempty"`
 
 	// DefaultSortingField The name of an int32 / float field that determines the order in which the search results are ranked when a sort_by clause is not provided during searching. This field must indicate some kind of popularity.

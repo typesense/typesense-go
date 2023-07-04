@@ -87,7 +87,7 @@ components:
         - $ref: '#/components/schemas/CollectionSchema'
         - properties:
             created_at:
-              description: Timestamp of when the collection was created
+              description: Timestamp of when the collection was created (Unix epoch in seconds)
               format: int64
               readOnly: true
               type: integer
