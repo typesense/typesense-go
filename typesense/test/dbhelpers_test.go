@@ -109,6 +109,12 @@ func withNumEmployees(numEmployees int) newDocumentOption {
 	}
 }
 
+func withCountry(country string) newDocumentOption {
+	return func(doc *testDocument) {
+		doc.Country = country
+	}
+}
+
 func newDocument(docID string, opts ...newDocumentOption) *testDocument {
 	doc := &testDocument{
 		ID:           docID,

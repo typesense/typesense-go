@@ -1445,6 +1445,22 @@ func NewImportDocumentsRequestWithBody(server string, collectionName string, par
 
 	}
 
+	if params.RemoteEmbeddingBatchSize != nil {
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "remote_embedding_batch_size", runtime.ParamLocationQuery, *params.RemoteEmbeddingBatchSize); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+	}
+
 	queryURL.RawQuery = queryValues.Encode()
 
 	req, err := http.NewRequest("POST", queryURL.String(), body)
@@ -1981,6 +1997,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 	}
 
+	if params.Preset != nil {
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "preset", runtime.ParamLocationQuery, *params.Preset); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+	}
+
 	if params.PrioritizeExactMatch != nil {
 
 		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "prioritize_exact_match", runtime.ParamLocationQuery, *params.PrioritizeExactMatch); err != nil {
@@ -2040,6 +2072,38 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 	if params.QueryByWeights != nil {
 
 		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "query_by_weights", runtime.ParamLocationQuery, *params.QueryByWeights); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+	}
+
+	if params.RemoteEmbeddingNumTries != nil {
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "remote_embedding_num_tries", runtime.ParamLocationQuery, *params.RemoteEmbeddingNumTries); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+	}
+
+	if params.RemoteEmbeddingTimeoutMs != nil {
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "remote_embedding_timeout_ms", runtime.ParamLocationQuery, *params.RemoteEmbeddingTimeoutMs); err != nil {
 			return nil, err
 		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 			return nil, err
@@ -3368,6 +3432,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 	}
 
+	if params.Preset != nil {
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "preset", runtime.ParamLocationQuery, *params.Preset); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+	}
+
 	if params.PrioritizeExactMatch != nil {
 
 		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "prioritize_exact_match", runtime.ParamLocationQuery, *params.PrioritizeExactMatch); err != nil {
@@ -3435,6 +3515,38 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 	if params.QueryByWeights != nil {
 
 		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "query_by_weights", runtime.ParamLocationQuery, *params.QueryByWeights); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+	}
+
+	if params.RemoteEmbeddingNumTries != nil {
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "remote_embedding_num_tries", runtime.ParamLocationQuery, *params.RemoteEmbeddingNumTries); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+	}
+
+	if params.RemoteEmbeddingTimeoutMs != nil {
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "remote_embedding_timeout_ms", runtime.ParamLocationQuery, *params.RemoteEmbeddingTimeoutMs); err != nil {
 			return nil, err
 		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 			return nil, err

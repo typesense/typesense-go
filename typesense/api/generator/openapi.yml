@@ -718,6 +718,8 @@ paths:
                   - coerce_or_drop
                   - drop
                   - reject
+              remote_embedding_batch_size:
+                type: integer
       requestBody:
         description: The json array of documents or the JSONL file to import
         content:
@@ -1290,7 +1292,7 @@ components:
               readOnly: true
             created_at:
               type: integer
-              description: Timestamp of when the collection was created
+              description: Timestamp of when the collection was created (Unix epoch in seconds)
               format: int64
               readOnly: true
     Field:
@@ -1308,11 +1310,9 @@ components:
         optional:
           type: boolean
           example: true
-          default: false
         facet:
           type: boolean
           example: false
-          default: false
         index:
           type: boolean
           example: true
@@ -1323,7 +1323,6 @@ components:
         sort:
           type: boolean
           example: true
-          default: false
         infix:
           type: boolean
           example: true
@@ -1335,6 +1334,33 @@ components:
           type: boolean
           example: true
           # omitting default value since we want it to be null
+        embed:
+          type: object
+          required:
+            - from
+            - model_config
+          properties:
+            from:
+              type: array
+              items:
+                type: string
+            model_config:
+              type: object
+              required:
+                - model_name
+              properties:
+                model_name:
+                  type: string
+                api_key:
+                  type: string
+                access_token:
+                  type: string
+                client_id:
+                  type: string
+                client_secret: 
+                  type: string
+                project_id:
+                  type: string
     CollectionAliasSchema:
       type: object
       required:
@@ -1420,7 +1446,7 @@ components:
         group_key:
           type: array
           items:
-            type: object
+            type: string
         hits:
           type: array
           description: The documents that matched the search query
@@ -1944,6 +1970,12 @@ components:
             Set this parameter to true to do the same
           type: boolean
 
+        preset:
+          description: >
+            Search using a bunch of search parameters by setting this parameter to
+            the name of the existing Preset.
+          type: string
+
         enable_overrides:
           description: >
             If you have some overrides defined but want to disable all of them during
@@ -1997,6 +2029,14 @@ components:
           description: >
             Vector query expression for fetching documents "closest" to a given query/document vector.
           type: string
+        remote_embedding_timeout_ms:
+          description: >
+            Timeout (in milliseconds) for fetching remote embeddings.
+          type: integer
+        remote_embedding_num_tries:
+          description: >
+            Number of times to retry fetching remote embeddings.
+          type: integer
 
     MultiSearchParameters:
       description: >
@@ -2206,6 +2246,12 @@ components:
             Set this parameter to true to do the same
           type: boolean
 
+        preset:
+          description: >
+            Search using a bunch of search parameters by setting this parameter to
+            the name of the existing Preset.
+          type: string
+
         enable_overrides:
           description: >
             If you have some overrides defined but want to disable all of them during
@@ -2251,6 +2297,14 @@ components:
           description: >
             Vector query expression for fetching documents "closest" to a given query/document vector.
           type: string
+        remote_embedding_timeout_ms:
+          description: >
+            Timeout (in milliseconds) for fetching remote embeddings.
+          type: integer
+        remote_embedding_num_tries:
+          description: >
+            Number of times to retry fetching remote embeddings.
+          type: integer
     MultiSearchSearchesParameter:
       type: object
       required:

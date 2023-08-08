@@ -82,6 +82,61 @@ func TestMultiSearch(t *testing.T) {
 	}
 }
 
+func TestMultiSearchGroupBy(t *testing.T) {
+	collectionName1 := createNewCollection(t, "companies")
+	documents := []interface{}{
+		newDocument("0", withCompanyName("Company 1"), withNumEmployees(50), withCountry("France")),
+		newDocument("1", withCompanyName("Company 2"), withNumEmployees(150), withCountry("France")),
+		newDocument("2", withCompanyName("Company 3"), withNumEmployees(20), withCountry("France")),
+		newDocument("3", withCompanyName("Company 4"), withNumEmployees(500), withCountry("England")),
+	}
+
+	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
+	_, err := typesenseClient.Collection(collectionName1).Documents().Import(documents, params)
+	require.NoError(t, err)
+
+	searchParams := &api.MultiSearchParams{
+		Q:       pointer.String("*"),
+		QueryBy: pointer.String("company_name"),
+		GroupBy: pointer.String("country"),
+	}
+
+	searches := api.MultiSearchSearchesParameter{
+		Searches: []api.MultiSearchCollectionParameters{
+			{
+				Collection: collectionName1,
+				SortBy:     pointer.String("num_employees:desc"),
+			},
+		},
+	}
+
+	/*
+		expectedDocs1 := []map[string]interface{}{
+			newDocumentResponse("127", withResponseCompanyName("Company 3"), withResponseNumEmployees(250)),
+			newDocumentResponse("125", withResponseCompanyName("Company 2"), withResponseNumEmployees(150)),
+		}
+	*/
+
+	result, err := typesenseClient.MultiSearch.Perform(searchParams, searches)
+	require.NoError(t, err)
+	require.Equal(t, 1, len(result.Results))
+	require.NotNil(t, result.Results[0].GroupedHits)
+
+	require.Equal(t, 2, len(*result.Results[0].GroupedHits))
+
+	for i, doc := range *result.Results[0].GroupedHits {
+		if i == 0 {
+			require.Equal(t, 1, len(doc.GroupKey))
+			require.Equal(t, "England", doc.GroupKey[0])
+		}
+
+		if i == 1 {
+			require.Equal(t, 1, len(doc.GroupKey))
+			require.Equal(t, "France", doc.GroupKey[0])
+		}
+	}
+}
+
 func TestMultiSearchVectorQuery(t *testing.T) {
 	_, err := typesenseClient.Collection("embeddings").Delete()
 
