@@ -2,6 +2,11 @@ package typesense
 
 import (
 	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
 
 	"github.com/typesense/typesense-go/typesense/api"
 )
@@ -9,6 +14,7 @@ import (
 type KeysInterface interface {
 	Create(key *api.ApiKeySchema) (*api.ApiKey, error)
 	Retrieve() ([]*api.ApiKey, error)
+	GenerateScopedSearchKey(searchKey string, params map[string]interface{}) (string, error)
 }
 
 type keys struct {
@@ -36,4 +42,18 @@ func (k *keys) Retrieve() ([]*api.ApiKey, error) {
 		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return response.JSON200.Keys, nil
+}
+
+func (k *keys) GenerateScopedSearchKey(searchKey string, params map[string]interface{}) (string, error) {
+	paramsStr, err := json.Marshal(params)
+	if err != nil {
+		return "", err
+	}
+
+	mac := hmac.New(sha256.New, []byte(searchKey))
+	mac.Write(paramsStr)
+
+	digest := base64.StdEncoding.EncodeToString(mac.Sum(nil))
+	rawScopedKey := fmt.Sprintf("%s%s%s", digest, searchKey[0:4], paramsStr)
+	return base64.StdEncoding.EncodeToString([]byte(rawScopedKey)), nil
 }

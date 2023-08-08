@@ -161,3 +161,16 @@ func TestKeysRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	_, err := client.Keys().Retrieve()
 	assert.NotNil(t, err)
 }
+
+func TestKeysGenerateScopedSearchKey(t *testing.T) {
+	// setup example from the docs
+	searchKey := "RN23GFr1s6jQ9kgSNg2O7fYcAUXU7127"
+	scopedSearchKey := "SC9sT0hncHFwTHNFc3U3d3psRDZBUGNXQUViQUdDNmRHSmJFQnNnczJ4VT1STjIzeyJmaWx0ZXJfYnkiOiJjb21wYW55X2lkOjEyNCJ9"
+
+	scopedKey, err := (&keys{}).GenerateScopedSearchKey(searchKey, map[string]interface{}{
+		"filter_by": "company_id:124",
+	})
+
+	assert.NoError(t, err)
+	assert.Equal(t, scopedKey, scopedSearchKey)
+}
