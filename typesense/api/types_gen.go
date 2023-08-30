@@ -718,6 +718,7 @@ type SearchCollectionParams struct {
 	TypoTokensThreshold      *int    `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
 	UseCache                 *bool   `form:"use_cache,omitempty" json:"use_cache,omitempty"`
 	VectorQuery              *string `form:"vector_query,omitempty" json:"vector_query,omitempty"`
+	TextMatchType            *string `form:"text_match_type,omitempty" json:"text_match_type,omitempty"`
 }
 
 // UpdateDocumentJSONBody defines parameters for UpdateDocument.
@@ -771,6 +772,7 @@ type MultiSearchParams struct {
 	TypoTokensThreshold      *int    `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
 	UseCache                 *bool   `form:"use_cache,omitempty" json:"use_cache,omitempty"`
 	VectorQuery              *string `form:"vector_query,omitempty" json:"vector_query,omitempty"`
+	TextMatchType            *string `form:"text_match_type,omitempty" json:"text_match_type,omitempty"`
 }
 
 // TakeSnapshotParams defines parameters for TakeSnapshot.
