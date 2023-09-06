@@ -481,8 +481,7 @@ components:
     SearchGroupedHit:
       properties:
         group_key:
-          items:
-            type: string
+          items: {}
           type: array
         hits:
           description: The documents that matched the search query

@@ -456,7 +456,7 @@ type MultiSearchSearchesParameter struct {
 
 // SearchGroupedHit defines model for SearchGroupedHit.
 type SearchGroupedHit struct {
-	GroupKey []string `json:"group_key"`
+	GroupKey []interface{} `json:"group_key"`
 
 	// Hits The documents that matched the search query
 	Hits []SearchResultHit `json:"hits"`

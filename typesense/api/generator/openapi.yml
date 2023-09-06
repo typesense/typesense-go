@@ -1445,8 +1445,7 @@ components:
       properties:
         group_key:
           type: array
-          items:
-            type: string
+          items: {}
         hits:
           type: array
           description: The documents that matched the search query
