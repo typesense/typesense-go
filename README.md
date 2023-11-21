@@ -65,7 +65,7 @@ You can also find some examples in [integration tests](https://github.com/typese
 				Facet: true,
 			},
 		},
-		DefaultSortingField: "num_employees",
+		DefaultSortingField: pointer.String("num_employees"),
 	}
 
 	client.Collections().Create(schema)
@@ -199,8 +199,8 @@ Import an array of documents:
 		},
 	}
 	params := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 40,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(40),
 	}
 
 	client.Collection("companies").Documents().Import(documents, params)
@@ -210,8 +210,8 @@ Import a JSONL file:
 
 ```go
 	params := &api.ImportDocumentsParams{
-		Action:    "create",
-		BatchSize: 40,
+		Action:    pointer.String("create"),
+		BatchSize: pointer.Int(40),
 	}
 	importBody, err := os.Open("documents.jsonl")
 	// defer close, error handling ...
