@@ -237,6 +237,9 @@ type MultiSearchCollectionParameters struct {
 	// Infix If infix index is enabled for this field, infix searching can be done on a per-field basis by sending a comma separated string parameter called infix to the search query. This parameter can have 3 values; `off` infix search is disabled, which is default `always` infix search is performed along with regular search `fallback` infix search is performed if regular search does not produce results
 	Infix *string `json:"infix,omitempty"`
 
+	// Limit Number of hits to fetch. Can be used as an alternative to the per_page parameter.  Default: 10.
+	Limit *int `json:"limit,omitempty"`
+
 	// MaxExtraPrefix There are also 2 parameters that allow you to control the extent of infix searching max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before or after the query that can be present in the token. For example query "K2100" has 2 extra symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
 	MaxExtraPrefix *int `json:"max_extra_prefix,omitempty"`
 
@@ -254,6 +257,9 @@ type MultiSearchCollectionParameters struct {
 
 	// NumTypos The number of typographical errors (1 or 2) that would be tolerated. Default: 2
 	NumTypos *string `json:"num_typos,omitempty"`
+
+	// Offset Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
+	Offset *int `json:"offset,omitempty"`
 
 	// Page Results from this specific page number would be fetched.
 	Page *int `json:"page,omitempty"`
@@ -301,6 +307,9 @@ type MultiSearchCollectionParameters struct {
 
 	// SortBy A list of numerical fields and their corresponding sort orders that will be used for ordering your results. Up to 3 sort fields can be specified. The text similarity score is exposed as a special `_text_match` field that you can use in the list of sorting fields. If no `sort_by` parameter is specified, results are sorted by `_text_match:desc,default_sorting_field:desc`
 	SortBy *string `json:"sort_by,omitempty"`
+
+	// TextMatchType In a multi-field matching context, this parameter determines how the representative text match score of a record is calculated. Possible values are max_score (default) or max_weight.
+	TextMatchType *string `json:"text_match_type,omitempty"`
 
 	// TypoTokensThreshold If the number of results found for a specific query is less than this number, Typesense will attempt to look for tokens with more typos until enough results are found. Default: 100
 	TypoTokensThreshold *int `json:"typo_tokens_threshold,omitempty"`
@@ -369,6 +378,9 @@ type MultiSearchParameters struct {
 	// Infix If infix index is enabled for this field, infix searching can be done on a per-field basis by sending a comma separated string parameter called infix to the search query. This parameter can have 3 values; `off` infix search is disabled, which is default `always` infix search is performed along with regular search `fallback` infix search is performed if regular search does not produce results
 	Infix *string `json:"infix,omitempty"`
 
+	// Limit Number of hits to fetch. Can be used as an alternative to the per_page parameter.  Default: 10.
+	Limit *int `json:"limit,omitempty"`
+
 	// MaxExtraPrefix There are also 2 parameters that allow you to control the extent of infix searching max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before or after the query that can be present in the token. For example query "K2100" has 2 extra symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
 	MaxExtraPrefix *int `json:"max_extra_prefix,omitempty"`
 
@@ -386,6 +398,9 @@ type MultiSearchParameters struct {
 
 	// NumTypos The number of typographical errors (1 or 2) that would be tolerated. Default: 2
 	NumTypos *string `json:"num_typos,omitempty"`
+
+	// Offset Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
+	Offset *int `json:"offset,omitempty"`
 
 	// Page Results from this specific page number would be fetched.
 	Page *int `json:"page,omitempty"`
@@ -433,6 +448,9 @@ type MultiSearchParameters struct {
 
 	// SortBy A list of numerical fields and their corresponding sort orders that will be used for ordering your results. Up to 3 sort fields can be specified. The text similarity score is exposed as a special `_text_match` field that you can use in the list of sorting fields. If no `sort_by` parameter is specified, results are sorted by `_text_match:desc,default_sorting_field:desc`
 	SortBy *string `json:"sort_by,omitempty"`
+
+	// TextMatchType In a multi-field matching context, this parameter determines how the representative text match score of a record is calculated. Possible values are max_score (default) or max_weight.
+	TextMatchType *string `json:"text_match_type,omitempty"`
 
 	// TypoTokensThreshold If the number of results found for a specific query is less than this number, Typesense will attempt to look for tokens with more typos until enough results are found. Default: 100
 	TypoTokensThreshold *int `json:"typo_tokens_threshold,omitempty"`
@@ -691,6 +709,7 @@ type SearchCollectionParams struct {
 	HighlightStartTag        *string `form:"highlight_start_tag,omitempty" json:"highlight_start_tag,omitempty"`
 	IncludeFields            *string `form:"include_fields,omitempty" json:"include_fields,omitempty"`
 	Infix                    *string `form:"infix,omitempty" json:"infix,omitempty"`
+	Limit                    *int    `form:"limit,omitempty" json:"limit,omitempty"`
 	MaxCandidates            *int    `form:"max_candidates,omitempty" json:"max_candidates,omitempty"`
 	MaxExtraPrefix           *int    `form:"max_extra_prefix,omitempty" json:"max_extra_prefix,omitempty"`
 	MaxExtraSuffix           *int    `form:"max_extra_suffix,omitempty" json:"max_extra_suffix,omitempty"`
@@ -698,6 +717,7 @@ type SearchCollectionParams struct {
 	MinLen1typo              *int    `form:"min_len_1typo,omitempty" json:"min_len_1typo,omitempty"`
 	MinLen2typo              *int    `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
 	NumTypos                 *string `form:"num_typos,omitempty" json:"num_typos,omitempty"`
+	Offset                   *int    `form:"offset,omitempty" json:"offset,omitempty"`
 	Page                     *int    `form:"page,omitempty" json:"page,omitempty"`
 	PerPage                  *int    `form:"per_page,omitempty" json:"per_page,omitempty"`
 	PinnedHits               *string `form:"pinned_hits,omitempty" json:"pinned_hits,omitempty"`
@@ -715,6 +735,7 @@ type SearchCollectionParams struct {
 	SnippetThreshold         *int    `form:"snippet_threshold,omitempty" json:"snippet_threshold,omitempty"`
 	SortBy                   *string `form:"sort_by,omitempty" json:"sort_by,omitempty"`
 	SplitJoinTokens          *string `form:"split_join_tokens,omitempty" json:"split_join_tokens,omitempty"`
+	TextMatchType            *string `form:"text_match_type,omitempty" json:"text_match_type,omitempty"`
 	TypoTokensThreshold      *int    `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
 	UseCache                 *bool   `form:"use_cache,omitempty" json:"use_cache,omitempty"`
 	VectorQuery              *string `form:"vector_query,omitempty" json:"vector_query,omitempty"`
@@ -744,6 +765,7 @@ type MultiSearchParams struct {
 	HighlightStartTag        *string `form:"highlight_start_tag,omitempty" json:"highlight_start_tag,omitempty"`
 	IncludeFields            *string `form:"include_fields,omitempty" json:"include_fields,omitempty"`
 	Infix                    *string `form:"infix,omitempty" json:"infix,omitempty"`
+	Limit                    *int    `form:"limit,omitempty" json:"limit,omitempty"`
 	MaxCandidates            *int    `form:"max_candidates,omitempty" json:"max_candidates,omitempty"`
 	MaxExtraPrefix           *int    `form:"max_extra_prefix,omitempty" json:"max_extra_prefix,omitempty"`
 	MaxExtraSuffix           *int    `form:"max_extra_suffix,omitempty" json:"max_extra_suffix,omitempty"`
@@ -751,6 +773,7 @@ type MultiSearchParams struct {
 	MinLen1typo              *int    `form:"min_len_1typo,omitempty" json:"min_len_1typo,omitempty"`
 	MinLen2typo              *int    `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
 	NumTypos                 *string `form:"num_typos,omitempty" json:"num_typos,omitempty"`
+	Offset                   *int    `form:"offset,omitempty" json:"offset,omitempty"`
 	Page                     *int    `form:"page,omitempty" json:"page,omitempty"`
 	PerPage                  *int    `form:"per_page,omitempty" json:"per_page,omitempty"`
 	PinnedHits               *string `form:"pinned_hits,omitempty" json:"pinned_hits,omitempty"`
@@ -768,6 +791,7 @@ type MultiSearchParams struct {
 	SnippetThreshold         *int    `form:"snippet_threshold,omitempty" json:"snippet_threshold,omitempty"`
 	SortBy                   *string `form:"sort_by,omitempty" json:"sort_by,omitempty"`
 	SplitJoinTokens          *string `form:"split_join_tokens,omitempty" json:"split_join_tokens,omitempty"`
+	TextMatchType            *string `form:"text_match_type,omitempty" json:"text_match_type,omitempty"`
 	TypoTokensThreshold      *int    `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
 	UseCache                 *bool   `form:"use_cache,omitempty" json:"use_cache,omitempty"`
 	VectorQuery              *string `form:"vector_query,omitempty" json:"vector_query,omitempty"`

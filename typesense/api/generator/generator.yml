@@ -364,6 +364,10 @@ components:
         infix:
           description: If infix index is enabled for this field, infix searching can be done on a per-field basis by sending a comma separated string parameter called infix to the search query. This parameter can have 3 values; `off` infix search is disabled, which is default `always` infix search is performed along with regular search `fallback` infix search is performed if regular search does not produce results
           type: string
+        limit:
+          description: |
+            Number of hits to fetch. Can be used as an alternative to the per_page parameter.  Default: 10.
+          type: integer
         max_extra_prefix:
           description: There are also 2 parameters that allow you to control the extent of infix searching max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before or after the query that can be present in the token. For example query "K2100" has 2 extra symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
           type: integer
@@ -385,6 +389,9 @@ components:
           description: |
             The number of typographical errors (1 or 2) that would be tolerated. Default: 2
           type: string
+        offset:
+          description: Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
+          type: integer
         page:
           description: Results from this specific page number would be fetched.
           type: integer
@@ -439,6 +446,9 @@ components:
           type: integer
         sort_by:
           description: A list of numerical fields and their corresponding sort orders that will be used for ordering your results. Up to 3 sort fields can be specified. The text similarity score is exposed as a special `_text_match` field that you can use in the list of sorting fields. If no `sort_by` parameter is specified, results are sorted by `_text_match:desc,default_sorting_field:desc`
+          type: string
+        text_match_type:
+          description: In a multi-field matching context, this parameter determines how the representative text match score of a record is calculated. Possible values are max_score (default) or max_weight.
           type: string
         typo_tokens_threshold:
           description: |
@@ -687,6 +697,10 @@ components:
         infix:
           description: If infix index is enabled for this field, infix searching can be done on a per-field basis by sending a comma separated string parameter called infix to the search query. This parameter can have 3 values; `off` infix search is disabled, which is default `always` infix search is performed along with regular search `fallback` infix search is performed if regular search does not produce results
           type: string
+        limit:
+          description: |
+            Number of hits to fetch. Can be used as an alternative to the per_page parameter.  Default: 10.
+          type: integer
         max_candidates:
           description: |
             Control the number of words that Typesense considers for typo and prefix searching.
@@ -712,6 +726,9 @@ components:
           description: |
             The number of typographical errors (1 or 2) that would be tolerated. Default: 2
           type: string
+        offset:
+          description: Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
+          type: integer
         page:
           description: Results from this specific page number would be fetched.
           type: integer
@@ -775,6 +792,9 @@ components:
         split_join_tokens:
           description: |
             Treat space as typo: search for q=basket ball if q=basketball is not found or vice-versa. Splitting/joining of tokens will only be attempted if the original query produces no results. To always trigger this behavior, set value to `always``. To disable, set value to `off`. Default is `fallback`.
+          type: string
+        text_match_type:
+          description: In a multi-field matching context, this parameter determines how the representative text match score of a record is calculated. Possible values are max_score (default) or max_weight.
           type: string
         typo_tokens_threshold:
           description: |
@@ -930,7 +950,7 @@ externalDocs:
 info:
   description: An open source search engine for building delightful search experiences.
   title: Typesense API
-  version: 0.24.0
+  version: 0.25.0
 openapi: 3.0.3
 paths:
   /aliases:
@@ -1619,6 +1639,10 @@ paths:
           schema:
             type: string
         - in: query
+          name: limit
+          schema:
+            type: integer
+        - in: query
           name: max_candidates
           schema:
             type: integer
@@ -1646,6 +1670,10 @@ paths:
           name: num_typos
           schema:
             type: string
+        - in: query
+          name: offset
+          schema:
+            type: integer
         - in: query
           name: page
           schema:
@@ -1714,6 +1742,10 @@ paths:
             type: string
         - in: query
           name: split_join_tokens
+          schema:
+            type: string
+        - in: query
+          name: text_match_type
           schema:
             type: string
         - in: query
@@ -2217,6 +2249,10 @@ paths:
           schema:
             type: string
         - in: query
+          name: limit
+          schema:
+            type: integer
+        - in: query
           name: max_candidates
           schema:
             type: integer
@@ -2244,6 +2280,10 @@ paths:
           name: num_typos
           schema:
             type: string
+        - in: query
+          name: offset
+          schema:
+            type: integer
         - in: query
           name: page
           schema:
@@ -2310,6 +2350,10 @@ paths:
             type: string
         - in: query
           name: split_join_tokens
+          schema:
+            type: string
+        - in: query
+          name: text_match_type
           schema:
             type: string
         - in: query
