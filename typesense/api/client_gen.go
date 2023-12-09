@@ -4421,6 +4421,7 @@ type UpdateDocumentResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *map[string]interface{}
+	JSON201      *map[string]interface{}
 	JSON404      *ApiResponse
 }
 
@@ -5823,6 +5824,13 @@ func ParseUpdateDocumentResponse(rsp *http.Response) (*UpdateDocumentResponse, e
 			return nil, err
 		}
 		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest map[string]interface{}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest ApiResponse

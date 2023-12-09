@@ -1434,6 +1434,13 @@ paths:
                 description: Can be any key-value pair
                 type: object
           description: The document referenced by the ID was updated
+        201:
+          content:
+            application/json:
+              schema:
+                description: Can be any key-value pair
+                type: object
+          description: The document referenced by the ID was updated
         404:
           content:
             application/json:
