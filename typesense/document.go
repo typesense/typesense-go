@@ -2,6 +2,7 @@ package typesense
 
 import (
 	"context"
+	"net/http"
 )
 
 type DocumentInterface interface {
@@ -34,10 +35,15 @@ func (d *document) Update(document interface{}) (map[string]interface{}, error) 
 	if err != nil {
 		return nil, err
 	}
-	if response.JSON200 == nil {
+
+	switch response.StatusCode() {
+	case http.StatusOK:
+		return *response.JSON200, nil
+	case http.StatusCreated:
+		return *response.JSON201, nil
+	default:
 		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
-	return *response.JSON200, nil
 }
 
 func (d *document) Delete() (map[string]interface{}, error) {
