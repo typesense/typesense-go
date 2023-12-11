@@ -1443,6 +1443,8 @@ components:
         - group_key
         - hits
       properties:
+        found:
+          type: integer
         group_key:
           type: array
           items: {}

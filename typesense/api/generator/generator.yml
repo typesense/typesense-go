@@ -490,6 +490,8 @@ components:
       type: object
     SearchGroupedHit:
       properties:
+        found:
+          type: integer
         group_key:
           items: {}
           type: array
