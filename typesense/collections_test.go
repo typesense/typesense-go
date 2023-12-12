@@ -50,6 +50,45 @@ func createNewCollection(name string) *api.CollectionResponse {
 	}
 }
 
+type MockStruct struct {
+	Field1 string `typesense:"string"`
+}
+
+func (m MockStruct) CollectionName() string {
+	return "custom_collection_name"
+}
+
+func TestCreateSchemaFromGoStruct(t *testing.T) {
+	mockStruct := MockStruct{Field1: "Test"}
+
+	schema, err := CreateSchemaFromGoStruct(mockStruct)
+	assert.NoError(t, err)
+	assert.NotNil(t, schema)
+	assert.Equal(t, "custom_collection_name", schema.Name)
+}
+
+func TestCreateCollectionFromStruct(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
+	client := NewClient(WithAPIClient(mockAPIClient))
+	mockStruct := MockStruct{Field1: "Test"}
+
+	schema, _ := CreateSchemaFromGoStruct(mockStruct)
+	expectedResult := &api.CollectionResponse{Name: "custom_collection_name", NumDocuments: pointer.Int64(0)}
+
+	mockAPIClient.EXPECT().
+		CreateCollectionWithResponse(gomock.Not(gomock.Nil()), api.CreateCollectionJSONRequestBody(*schema)).
+		Return(&api.CreateCollectionResponse{JSON201: expectedResult}, nil).
+		Times(1)
+
+	result, err := client.Collections().CreateCollectionFromStruct(mockStruct)
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedResult, result)
+}
+
 func TestCollectionCreate(t *testing.T) {
 	newSchema := createNewSchema("companies")
 	expectedResult := createNewCollection("companies")
