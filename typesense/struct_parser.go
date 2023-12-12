@@ -46,7 +46,7 @@ func CreateSchemaFromGoStruct(structData interface{}) (*api.CollectionSchema, er
 		tagParts := strings.Split(tagValue, ",")
 		facetValue := false // Default facet value
 		typesenseField := api.Field{
-			Name:  field.Name,
+			Name:  tagParts[0],
 			Type:  fieldType,
 			Facet: &facetValue, // Initially false
 		}
