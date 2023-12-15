@@ -99,3 +99,50 @@ func TestCollectionSearchRange(t *testing.T) {
 
 	require.Equal(t, expectedDocs, docs)
 }
+
+func TestCollectionGroupByStringArray(t *testing.T) {
+	collectionName := "tags"
+	_, err := typesenseClient.Collection(collectionName).Delete()
+
+	schema := &api.CollectionSchema{
+		Name: collectionName,
+		Fields: []api.Field{
+			{
+				Name:  "tags",
+				Type:  "string[]",
+				Facet: pointer.True(),
+			},
+		},
+	}
+
+	_, err = typesenseClient.Collections().Create(schema)
+	require.NoError(t, err)
+
+	type docWithArray struct {
+		ID   string   `json:"id"`
+		Tags []string `json:"tags"`
+	}
+
+	documents := []interface{}{
+		&docWithArray{
+			ID:   "1",
+			Tags: []string{"go", "programming", "example"},
+		},
+	}
+
+	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
+	_, err = typesenseClient.Collection(collectionName).Documents().Import(documents, params)
+	require.NoError(t, err)
+
+	searchParams := &api.SearchCollectionParams{
+		Q:       "*",
+		GroupBy: pointer.String("tags"),
+	}
+
+	result, err := typesenseClient.Collection(collectionName).Documents().Search(searchParams)
+	require.NoError(t, err)
+
+	require.NoError(t, err)
+	require.Equal(t, 1, *result.Found, "found documents number is invalid")
+	require.Equal(t, 1, len(*result.GroupedHits), "number of grouped hits is invalid")
+}
