@@ -1,6 +1,7 @@
 package typesense
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"testing"
@@ -36,7 +37,7 @@ func TestHealthStatus(t *testing.T) {
 			Times(1)
 
 		client := NewClient(WithAPIClient(mockAPIClient))
-		result, err := client.Health(2 * time.Second)
+		result, err := client.Health(context.Background(), 2*time.Second)
 		assert.NoError(t, err)
 		assert.Conditionf(t, func() bool {
 			return result == tt.ok
@@ -55,7 +56,7 @@ func TestHealthStatusOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Health(2 * time.Second)
+	result, err := client.Health(context.Background(), 2*time.Second)
 	assert.Error(t, err)
 	assert.False(t, result)
 }
@@ -76,7 +77,7 @@ func TestHealthStatusOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Health(2 * time.Second)
+	result, err := client.Health(context.Background(), 2*time.Second)
 	assert.Error(t, err)
 	assert.False(t, result)
 }

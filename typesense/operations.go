@@ -7,16 +7,16 @@ import (
 )
 
 type OperationsInterface interface {
-	Snapshot(snapshotPath string) (bool, error)
-	Vote() (bool, error)
+	Snapshot(ctx context.Context, snapshotPath string) (bool, error)
+	Vote(ctx context.Context) (bool, error)
 }
 
 type operations struct {
 	apiClient APIClientInterface
 }
 
-func (o *operations) Snapshot(snapshotPath string) (bool, error) {
-	response, err := o.apiClient.TakeSnapshotWithResponse(context.Background(),
+func (o *operations) Snapshot(ctx context.Context, snapshotPath string) (bool, error) {
+	response, err := o.apiClient.TakeSnapshotWithResponse(ctx,
 		&api.TakeSnapshotParams{SnapshotPath: snapshotPath})
 	if err != nil {
 		return false, err
@@ -27,8 +27,8 @@ func (o *operations) Snapshot(snapshotPath string) (bool, error) {
 	return response.JSON201.Success, nil
 }
 
-func (o *operations) Vote() (bool, error) {
-	response, err := o.apiClient.VoteWithResponse(context.Background())
+func (o *operations) Vote(ctx context.Context) (bool, error) {
+	response, err := o.apiClient.VoteWithResponse(ctx)
 	if err != nil {
 		return false, err
 	}

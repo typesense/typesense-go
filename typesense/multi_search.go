@@ -10,16 +10,16 @@ import (
 )
 
 type MultiSearchInterface interface {
-	Perform(commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.MultiSearchResult, error)
-	PerformWithContentType(commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter, contentType string) (*api.MultiSearchResponse, error)
+	Perform(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.MultiSearchResult, error)
+	PerformWithContentType(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter, contentType string) (*api.MultiSearchResponse, error)
 }
 
 type multiSearch struct {
 	apiClient APIClientInterface
 }
 
-func (m *multiSearch) Perform(commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.MultiSearchResult, error) {
-	response, err := m.apiClient.MultiSearchWithResponse(context.Background(), commonSearchParams, api.MultiSearchJSONRequestBody(searchParams))
+func (m *multiSearch) Perform(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.MultiSearchResult, error) {
+	response, err := m.apiClient.MultiSearchWithResponse(ctx, commonSearchParams, api.MultiSearchJSONRequestBody(searchParams))
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (m *multiSearch) Perform(commonSearchParams *api.MultiSearchParams, searchP
 	return response.JSON200, nil
 }
 
-func (m *multiSearch) PerformWithContentType(commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter, contentType string) (*api.MultiSearchResponse, error) {
+func (m *multiSearch) PerformWithContentType(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter, contentType string) (*api.MultiSearchResponse, error) {
 	body := api.MultiSearchJSONRequestBody(searchParams)
 	var requestReader io.Reader
 	buf, err := json.Marshal(body)
@@ -37,7 +37,7 @@ func (m *multiSearch) PerformWithContentType(commonSearchParams *api.MultiSearch
 		return nil, err
 	}
 	requestReader = bytes.NewReader(buf)
-	response, err := m.apiClient.MultiSearchWithBodyWithResponse(context.Background(), commonSearchParams, contentType, requestReader)
+	response, err := m.apiClient.MultiSearchWithBodyWithResponse(ctx, commonSearchParams, contentType, requestReader)
 	if err != nil {
 		return nil, err
 	}

@@ -4,6 +4,7 @@
 package test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -15,7 +16,7 @@ func TestCollectionRetrieve(t *testing.T) {
 	collectionName := createNewCollection(t, "companies")
 	expectedResult := expectedNewCollection(collectionName)
 
-	result, err := typesenseClient.Collection(collectionName).Retrieve()
+	result, err := typesenseClient.Collection(collectionName).Retrieve(context.Background())
 	result.CreatedAt = pointer.Int64(0)
 
 	require.NoError(t, err)
@@ -26,12 +27,12 @@ func TestCollectionDelete(t *testing.T) {
 	collectionName := createNewCollection(t, "companies")
 	expectedResult := expectedNewCollection(collectionName)
 
-	result, err := typesenseClient.Collection(collectionName).Delete()
+	result, err := typesenseClient.Collection(collectionName).Delete(context.Background())
 	result.CreatedAt = pointer.Int64(0)
 	require.NoError(t, err)
 	require.Equal(t, expectedResult, result)
 
-	_, err = typesenseClient.Collection(collectionName).Retrieve()
+	_, err = typesenseClient.Collection(collectionName).Retrieve(context.Background())
 	require.Error(t, err)
 }
 
@@ -47,7 +48,7 @@ func TestCollectionUpdate(t *testing.T) {
 		},
 	}
 
-	result, err := typesenseClient.Collection(collectionName).Update(updateSchema)
+	result, err := typesenseClient.Collection(collectionName).Update(context.Background(), updateSchema)
 	require.NoError(t, err)
 	require.Equal(t, 1, len(result.Fields))
 	require.Equal(t, "country", result.Fields[0].Name)

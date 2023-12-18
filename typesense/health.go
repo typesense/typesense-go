@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-func (c *Client) Health(timeout time.Duration) (bool, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+func (c *Client) Health(ctx context.Context, timeout time.Duration) (bool, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 	response, err := c.apiClient.HealthWithResponse(ctx)
 	if err != nil {

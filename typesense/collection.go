@@ -8,15 +8,15 @@ import (
 
 // CollectionInterface is a type for Collection API operations
 type CollectionInterface interface {
-	Retrieve() (*api.CollectionResponse, error)
-	Delete() (*api.CollectionResponse, error)
+	Retrieve(ctx context.Context) (*api.CollectionResponse, error)
+	Delete(ctx context.Context) (*api.CollectionResponse, error)
 	Documents() DocumentsInterface
 	Document(documentID string) DocumentInterface
 	Overrides() OverridesInterface
 	Override(overrideID string) OverrideInterface
 	Synonyms() SynonymsInterface
 	Synonym(synonymID string) SynonymInterface
-	Update(schema *api.CollectionUpdateSchema) (*api.CollectionUpdateSchema, error)
+	Update(context.Context, *api.CollectionUpdateSchema) (*api.CollectionUpdateSchema, error)
 }
 
 // collection is internal implementation of CollectionInterface
@@ -25,8 +25,8 @@ type collection struct {
 	name      string
 }
 
-func (c *collection) Retrieve() (*api.CollectionResponse, error) {
-	response, err := c.apiClient.GetCollectionWithResponse(context.Background(), c.name)
+func (c *collection) Retrieve(ctx context.Context) (*api.CollectionResponse, error) {
+	response, err := c.apiClient.GetCollectionWithResponse(ctx, c.name)
 	if err != nil {
 		return nil, err
 	}
@@ -36,8 +36,8 @@ func (c *collection) Retrieve() (*api.CollectionResponse, error) {
 	return response.JSON200, nil
 }
 
-func (c *collection) Delete() (*api.CollectionResponse, error) {
-	response, err := c.apiClient.DeleteCollectionWithResponse(context.Background(), c.name)
+func (c *collection) Delete(ctx context.Context) (*api.CollectionResponse, error) {
+	response, err := c.apiClient.DeleteCollectionWithResponse(ctx, c.name)
 	if err != nil {
 		return nil, err
 	}
@@ -71,8 +71,8 @@ func (c *collection) Synonym(synonymID string) SynonymInterface {
 	return &synonym{apiClient: c.apiClient, collectionName: c.name, synonymID: synonymID}
 }
 
-func (c *collection) Update(schema *api.CollectionUpdateSchema) (*api.CollectionUpdateSchema, error) {
-	response, err := c.apiClient.UpdateCollectionWithResponse(context.Background(), c.name,
+func (c *collection) Update(ctx context.Context, schema *api.CollectionUpdateSchema) (*api.CollectionUpdateSchema, error) {
+	response, err := c.apiClient.UpdateCollectionWithResponse(ctx, c.name,
 		api.UpdateCollectionJSONRequestBody(*schema))
 	if err != nil {
 		return nil, err

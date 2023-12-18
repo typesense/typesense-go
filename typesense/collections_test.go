@@ -1,6 +1,7 @@
 package typesense
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"testing"
@@ -68,7 +69,7 @@ func TestCollectionCreate(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Collections().Create(newSchema)
+	result, err := client.Collections().Create(context.Background(), newSchema)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -88,7 +89,7 @@ func TestCollectionCreateOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collections().Create(newSchema)
+	_, err := client.Collections().Create(context.Background(), newSchema)
 	assert.Error(t, err)
 }
 
@@ -111,7 +112,7 @@ func TestCollectionCreateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collections().Create(newSchema)
+	_, err := client.Collections().Create(context.Background(), newSchema)
 	assert.Error(t, err)
 }
 
@@ -136,7 +137,7 @@ func TestCollectionsRetrieve(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Collections().Retrieve()
+	result, err := client.Collections().Retrieve(context.Background())
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -153,7 +154,7 @@ func TestCollectionsRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collections().Retrieve()
+	_, err := client.Collections().Retrieve(context.Background())
 	assert.Error(t, err)
 }
 
@@ -173,6 +174,6 @@ func TestCollectionsRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collections().Retrieve()
+	_, err := client.Collections().Retrieve(context.Background())
 	assert.Error(t, err)
 }

@@ -1,10 +1,12 @@
 package typesense
 
 import (
+	"context"
 	"errors"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"net/http"
 	"testing"
+
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 
 	"github.com/golang/mock/gomock"
 	"github.com/jinzhu/copier"
@@ -39,7 +41,7 @@ func TestCollectionAliasUpsert(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	body := &api.CollectionAliasSchema{CollectionName: "companies"}
-	result, err := client.Aliases().Upsert("companies_alias", body)
+	result, err := client.Aliases().Upsert(context.Background(), "companies_alias", body)
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -60,7 +62,7 @@ func TestCollectionAliasUpsertOnApiClientErrorReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	body := &api.CollectionAliasSchema{CollectionName: "companies"}
-	_, err := client.Aliases().Upsert("companies_alias", body)
+	_, err := client.Aliases().Upsert(context.Background(), "companies_alias", body)
 	assert.NotNil(t, err)
 }
 
@@ -84,7 +86,7 @@ func TestCollectionAliasUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	body := &api.CollectionAliasSchema{CollectionName: "companies"}
-	_, err := client.Aliases().Upsert("companies_alias", body)
+	_, err := client.Aliases().Upsert(context.Background(), "companies_alias", body)
 	assert.NotNil(t, err)
 }
 
@@ -111,7 +113,7 @@ func TestCollectionAliasesRetrieve(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Aliases().Retrieve()
+	result, err := client.Aliases().Retrieve(context.Background())
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -129,7 +131,7 @@ func TestCollectionAliasesRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Aliases().Retrieve()
+	_, err := client.Aliases().Retrieve(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -150,6 +152,6 @@ func TestCollectionAliasesRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Aliases().Retrieve()
+	_, err := client.Aliases().Retrieve(context.Background())
 	assert.NotNil(t, err)
 }

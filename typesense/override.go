@@ -8,8 +8,8 @@ import (
 
 // OverrideInterface is a type for Search Override API operations
 type OverrideInterface interface {
-	Retrieve() (*api.SearchOverride, error)
-	Delete() (*api.SearchOverride, error)
+	Retrieve(ctx context.Context) (*api.SearchOverride, error)
+	Delete(ctx context.Context) (*api.SearchOverride, error)
 }
 
 // override is internal implementation of OverrideInterface
@@ -19,8 +19,8 @@ type override struct {
 	overrideID     string
 }
 
-func (o *override) Retrieve() (*api.SearchOverride, error) {
-	response, err := o.apiClient.GetSearchOverrideWithResponse(context.Background(),
+func (o *override) Retrieve(ctx context.Context) (*api.SearchOverride, error) {
+	response, err := o.apiClient.GetSearchOverrideWithResponse(ctx,
 		o.collectionName, o.overrideID)
 	if err != nil {
 		return nil, err
@@ -31,8 +31,8 @@ func (o *override) Retrieve() (*api.SearchOverride, error) {
 	return response.JSON200, nil
 }
 
-func (o *override) Delete() (*api.SearchOverride, error) {
-	response, err := o.apiClient.DeleteSearchOverrideWithResponse(context.Background(),
+func (o *override) Delete(ctx context.Context) (*api.SearchOverride, error) {
+	response, err := o.apiClient.DeleteSearchOverrideWithResponse(ctx,
 		o.collectionName, o.overrideID)
 	if err != nil {
 		return nil, err

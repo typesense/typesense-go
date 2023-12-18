@@ -4,6 +4,7 @@
 package test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -16,10 +17,10 @@ func TestSearchSynonymRetrieve(t *testing.T) {
 	expectedResult := newSearchSynonym(synonymID)
 
 	body := newSearchSynonymSchema()
-	_, err := typesenseClient.Collection(collectionName).Synonyms().Upsert(synonymID, body)
+	_, err := typesenseClient.Collection(collectionName).Synonyms().Upsert(context.Background(), synonymID, body)
 	require.NoError(t, err)
 
-	result, err := typesenseClient.Collection(collectionName).Synonym(synonymID).Retrieve()
+	result, err := typesenseClient.Collection(collectionName).Synonym(synonymID).Retrieve(context.Background())
 
 	require.NoError(t, err)
 	expectedResult.Root = pointer.String("")
@@ -32,14 +33,14 @@ func TestSearchSynonymDelete(t *testing.T) {
 	expectedResult := newSearchSynonym(synonymID)
 
 	body := newSearchSynonymSchema()
-	_, err := typesenseClient.Collection(collectionName).Synonyms().Upsert(synonymID, body)
+	_, err := typesenseClient.Collection(collectionName).Synonyms().Upsert(context.Background(), synonymID, body)
 	require.NoError(t, err)
 
-	result, err := typesenseClient.Collection(collectionName).Synonym(synonymID).Delete()
+	result, err := typesenseClient.Collection(collectionName).Synonym(synonymID).Delete(context.Background())
 
 	require.NoError(t, err)
 	require.Equal(t, expectedResult.Id, result.Id)
 
-	_, err = typesenseClient.Collection(collectionName).Synonym(synonymID).Retrieve()
+	_, err = typesenseClient.Collection(collectionName).Synonym(synonymID).Retrieve(context.Background())
 	require.Error(t, err)
 }

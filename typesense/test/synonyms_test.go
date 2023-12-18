@@ -4,6 +4,7 @@
 package test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,12 +19,12 @@ func TestSearchSynonymUpsertNewSynonym(t *testing.T) {
 	expectedResult := newSearchSynonym(synonymID)
 
 	body := newSearchSynonymSchema()
-	result, err := typesenseClient.Collection(collectionName).Synonyms().Upsert(synonymID, body)
+	result, err := typesenseClient.Collection(collectionName).Synonyms().Upsert(context.Background(), synonymID, body)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedResult, result)
 
-	result, err = typesenseClient.Collection(collectionName).Synonym(synonymID).Retrieve()
+	result, err = typesenseClient.Collection(collectionName).Synonym(synonymID).Retrieve(context.Background())
 
 	require.NoError(t, err)
 	expectedResult.Root = pointer.String("")
@@ -37,17 +38,17 @@ func TestSearchSynonymUpsertExistingSynonym(t *testing.T) {
 	expectedResult.Synonyms = []string{"blazer", "coat", "jacket"}
 
 	body := newSearchSynonymSchema(withSynonyms("blazer", "coat"))
-	_, err := typesenseClient.Collection(collectionName).Synonyms().Upsert(synonymID, body)
+	_, err := typesenseClient.Collection(collectionName).Synonyms().Upsert(context.Background(), synonymID, body)
 	require.NoError(t, err)
 
 	body.Synonyms = []string{"blazer", "coat", "jacket"}
 
-	result, err := typesenseClient.Collection(collectionName).Synonyms().Upsert(synonymID, body)
+	result, err := typesenseClient.Collection(collectionName).Synonyms().Upsert(context.Background(), synonymID, body)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedResult, result)
 
-	result, err = typesenseClient.Collection(collectionName).Synonym(synonymID).Retrieve()
+	result, err = typesenseClient.Collection(collectionName).Synonym(synonymID).Retrieve(context.Background())
 
 	require.NoError(t, err)
 	expectedResult.Root = pointer.String("")
@@ -68,11 +69,11 @@ func TestSearchSynonymsRetrieve(t *testing.T) {
 	}
 
 	for i := 0; i < total; i++ {
-		_, err := typesenseClient.Collection(collectionName).Synonyms().Upsert(synonymIDs[i], schema)
+		_, err := typesenseClient.Collection(collectionName).Synonyms().Upsert(context.Background(), synonymIDs[i], schema)
 		require.NoError(t, err)
 	}
 
-	result, err := typesenseClient.Collection(collectionName).Synonyms().Retrieve()
+	result, err := typesenseClient.Collection(collectionName).Synonyms().Retrieve(context.Background())
 
 	require.NoError(t, err)
 	require.True(t, len(result) >= total, "number of overrides is invalid")

@@ -4,6 +4,7 @@
 package test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -22,7 +23,7 @@ func TestCollectionSearch(t *testing.T) {
 	}
 
 	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
-	_, err := typesenseClient.Collection(collectionName).Documents().Import(documents, params)
+	_, err := typesenseClient.Collection(collectionName).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
 	searchParams := &api.SearchCollectionParams{
@@ -43,7 +44,7 @@ func TestCollectionSearch(t *testing.T) {
 			withResponseNumEmployees(150)),
 	}
 
-	result, err := typesenseClient.Collection(collectionName).Documents().Search(searchParams)
+	result, err := typesenseClient.Collection(collectionName).Documents().Search(context.Background(), searchParams)
 
 	require.NoError(t, err)
 	require.Equal(t, 2, *result.Found, "found documents number is invalid")
@@ -67,7 +68,7 @@ func TestCollectionSearchRange(t *testing.T) {
 	}
 
 	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
-	_, err := typesenseClient.Collection(collectionName).Documents().Import(documents, params)
+	_, err := typesenseClient.Collection(collectionName).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
 	searchParams := &api.SearchCollectionParams{
@@ -86,7 +87,7 @@ func TestCollectionSearchRange(t *testing.T) {
 			withResponseNumEmployees(250)),
 	}
 
-	result, err := typesenseClient.Collection(collectionName).Documents().Search(searchParams)
+	result, err := typesenseClient.Collection(collectionName).Documents().Search(context.Background(), searchParams)
 
 	require.NoError(t, err)
 	require.Equal(t, 2, *result.Found, "found documents number is invalid")
@@ -102,7 +103,7 @@ func TestCollectionSearchRange(t *testing.T) {
 
 func TestCollectionGroupByStringArray(t *testing.T) {
 	collectionName := "tags"
-	_, err := typesenseClient.Collection(collectionName).Delete()
+	_, err := typesenseClient.Collection(collectionName).Delete(context.Background())
 
 	schema := &api.CollectionSchema{
 		Name: collectionName,
@@ -115,7 +116,7 @@ func TestCollectionGroupByStringArray(t *testing.T) {
 		},
 	}
 
-	_, err = typesenseClient.Collections().Create(schema)
+	_, err = typesenseClient.Collections().Create(context.Background(), schema)
 	require.NoError(t, err)
 
 	type docWithArray struct {
@@ -131,7 +132,7 @@ func TestCollectionGroupByStringArray(t *testing.T) {
 	}
 
 	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
-	_, err = typesenseClient.Collection(collectionName).Documents().Import(documents, params)
+	_, err = typesenseClient.Collection(collectionName).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
 	searchParams := &api.SearchCollectionParams{
@@ -139,7 +140,7 @@ func TestCollectionGroupByStringArray(t *testing.T) {
 		GroupBy: pointer.String("tags"),
 	}
 
-	result, err := typesenseClient.Collection(collectionName).Documents().Search(searchParams)
+	result, err := typesenseClient.Collection(collectionName).Documents().Search(context.Background(), searchParams)
 	require.NoError(t, err)
 
 	require.NoError(t, err)

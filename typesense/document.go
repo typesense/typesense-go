@@ -5,9 +5,9 @@ import (
 )
 
 type DocumentInterface interface {
-	Retrieve() (map[string]interface{}, error)
-	Update(document interface{}) (map[string]interface{}, error)
-	Delete() (map[string]interface{}, error)
+	Retrieve(ctx context.Context) (map[string]interface{}, error)
+	Update(ctx context.Context, document interface{}) (map[string]interface{}, error)
+	Delete(ctx context.Context) (map[string]interface{}, error)
 }
 
 type document struct {
@@ -16,8 +16,8 @@ type document struct {
 	documentID     string
 }
 
-func (d *document) Retrieve() (map[string]interface{}, error) {
-	response, err := d.apiClient.GetDocumentWithResponse(context.Background(),
+func (d *document) Retrieve(ctx context.Context) (map[string]interface{}, error) {
+	response, err := d.apiClient.GetDocumentWithResponse(ctx,
 		d.collectionName, d.documentID)
 	if err != nil {
 		return nil, err
@@ -28,8 +28,8 @@ func (d *document) Retrieve() (map[string]interface{}, error) {
 	return *response.JSON200, nil
 }
 
-func (d *document) Update(document interface{}) (map[string]interface{}, error) {
-	response, err := d.apiClient.UpdateDocumentWithResponse(context.Background(),
+func (d *document) Update(ctx context.Context, document interface{}) (map[string]interface{}, error) {
+	response, err := d.apiClient.UpdateDocumentWithResponse(ctx,
 		d.collectionName, d.documentID, document)
 	if err != nil {
 		return nil, err
@@ -40,8 +40,8 @@ func (d *document) Update(document interface{}) (map[string]interface{}, error) 
 	return *response.JSON200, nil
 }
 
-func (d *document) Delete() (map[string]interface{}, error) {
-	response, err := d.apiClient.DeleteDocumentWithResponse(context.Background(),
+func (d *document) Delete(ctx context.Context) (map[string]interface{}, error) {
+	response, err := d.apiClient.DeleteDocumentWithResponse(ctx,
 		d.collectionName, d.documentID)
 	if err != nil {
 		return nil, err

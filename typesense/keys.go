@@ -12,8 +12,8 @@ import (
 )
 
 type KeysInterface interface {
-	Create(key *api.ApiKeySchema) (*api.ApiKey, error)
-	Retrieve() ([]*api.ApiKey, error)
+	Create(context.Context, *api.ApiKeySchema) (*api.ApiKey, error)
+	Retrieve(context.Context) ([]*api.ApiKey, error)
 	GenerateScopedSearchKey(searchKey string, params map[string]interface{}) (string, error)
 }
 
@@ -21,8 +21,8 @@ type keys struct {
 	apiClient APIClientInterface
 }
 
-func (k *keys) Create(key *api.ApiKeySchema) (*api.ApiKey, error) {
-	response, err := k.apiClient.CreateKeyWithResponse(context.Background(),
+func (k *keys) Create(ctx context.Context, key *api.ApiKeySchema) (*api.ApiKey, error) {
+	response, err := k.apiClient.CreateKeyWithResponse(ctx,
 		api.CreateKeyJSONRequestBody(*key))
 	if err != nil {
 		return nil, err
@@ -33,8 +33,8 @@ func (k *keys) Create(key *api.ApiKeySchema) (*api.ApiKey, error) {
 	return response.JSON201, nil
 }
 
-func (k *keys) Retrieve() ([]*api.ApiKey, error) {
-	response, err := k.apiClient.GetKeysWithResponse(context.Background())
+func (k *keys) Retrieve(ctx context.Context) ([]*api.ApiKey, error) {
+	response, err := k.apiClient.GetKeysWithResponse(ctx)
 	if err != nil {
 		return nil, err
 	}

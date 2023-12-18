@@ -4,6 +4,7 @@
 package test
 
 import (
+	"context"
 	"strings"
 	"testing"
 
@@ -13,7 +14,7 @@ import (
 func TestKeyRetrieve(t *testing.T) {
 	expectedKey := createNewKey(t)
 
-	result, err := typesenseClient.Key(*expectedKey.Id).Retrieve()
+	result, err := typesenseClient.Key(*expectedKey.Id).Retrieve(context.Background())
 
 	require.NoError(t, err)
 
@@ -27,11 +28,11 @@ func TestKeyRetrieve(t *testing.T) {
 func TestKeyDelete(t *testing.T) {
 	expectedKey := createNewKey(t)
 
-	result, err := typesenseClient.Key(*expectedKey.Id).Delete()
+	result, err := typesenseClient.Key(*expectedKey.Id).Delete(context.Background())
 
 	require.NoError(t, err)
 	require.Equal(t, expectedKey.Id, result.Id)
 
-	_, err = typesenseClient.Key(*expectedKey.Id).Retrieve()
+	_, err = typesenseClient.Key(*expectedKey.Id).Retrieve(context.Background())
 	require.Error(t, err)
 }

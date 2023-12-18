@@ -8,8 +8,8 @@ import (
 
 // AliasesInterface is a type for Aliases API operations
 type AliasesInterface interface {
-	Upsert(aliasName string, aliasSchema *api.CollectionAliasSchema) (*api.CollectionAlias, error)
-	Retrieve() ([]*api.CollectionAlias, error)
+	Upsert(ctx context.Context, aliasName string, aliasSchema *api.CollectionAliasSchema) (*api.CollectionAlias, error)
+	Retrieve(ctx context.Context) ([]*api.CollectionAlias, error)
 }
 
 // aliases is internal implementation of AliasesInterface
@@ -17,8 +17,8 @@ type aliases struct {
 	apiClient APIClientInterface
 }
 
-func (a *aliases) Upsert(aliasName string, aliasSchema *api.CollectionAliasSchema) (*api.CollectionAlias, error) {
-	response, err := a.apiClient.UpsertAliasWithResponse(context.Background(),
+func (a *aliases) Upsert(ctx context.Context, aliasName string, aliasSchema *api.CollectionAliasSchema) (*api.CollectionAlias, error) {
+	response, err := a.apiClient.UpsertAliasWithResponse(ctx,
 		aliasName, api.UpsertAliasJSONRequestBody(*aliasSchema))
 	if err != nil {
 		return nil, err
@@ -29,8 +29,8 @@ func (a *aliases) Upsert(aliasName string, aliasSchema *api.CollectionAliasSchem
 	return response.JSON200, nil
 }
 
-func (a *aliases) Retrieve() ([]*api.CollectionAlias, error) {
-	response, err := a.apiClient.GetAliasesWithResponse(context.Background())
+func (a *aliases) Retrieve(ctx context.Context) ([]*api.CollectionAlias, error) {
+	response, err := a.apiClient.GetAliasesWithResponse(ctx)
 	if err != nil {
 		return nil, err
 	}

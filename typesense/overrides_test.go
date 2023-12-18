@@ -1,10 +1,12 @@
 package typesense
 
 import (
+	"context"
 	"errors"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"net/http"
 	"testing"
+
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 
 	"github.com/golang/mock/gomock"
 	"github.com/jinzhu/copier"
@@ -63,7 +65,7 @@ func TestSearchOverrideUpsert(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	body := createNewSearchOverrideSchema()
-	result, err := client.Collection("companies").Overrides().Upsert("customize-apple", body)
+	result, err := client.Collection("companies").Overrides().Upsert(context.Background(), "customize-apple", body)
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -85,7 +87,7 @@ func TestSearchOverrideUpsertOnApiClientErrorReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	body := createNewSearchOverrideSchema()
-	_, err := client.Collection("companies").Overrides().Upsert("customize-apple", body)
+	_, err := client.Collection("companies").Overrides().Upsert(context.Background(), "customize-apple", body)
 	assert.NotNil(t, err)
 }
 
@@ -110,7 +112,7 @@ func TestSearchOverrideUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	body := createNewSearchOverrideSchema()
-	_, err := client.Collection("companies").Overrides().Upsert("customize-apple", body)
+	_, err := client.Collection("companies").Overrides().Upsert(context.Background(), "customize-apple", body)
 	assert.NotNil(t, err)
 }
 
@@ -137,7 +139,7 @@ func TestSearchOverridesRetrieve(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Collection("companies").Overrides().Retrieve()
+	result, err := client.Collection("companies").Overrides().Retrieve(context.Background())
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -154,7 +156,7 @@ func TestSearchOverridesRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Overrides().Retrieve()
+	_, err := client.Collection("companies").Overrides().Retrieve(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -174,6 +176,6 @@ func TestSearchOverridesRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) 
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Overrides().Retrieve()
+	_, err := client.Collection("companies").Overrides().Retrieve(context.Background())
 	assert.NotNil(t, err)
 }

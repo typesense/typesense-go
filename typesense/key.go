@@ -7,8 +7,8 @@ import (
 )
 
 type KeyInterface interface {
-	Retrieve() (*api.ApiKey, error)
-	Delete() (*api.ApiKey, error)
+	Retrieve(ctx context.Context) (*api.ApiKey, error)
+	Delete(ctx context.Context) (*api.ApiKey, error)
 }
 
 type key struct {
@@ -16,8 +16,8 @@ type key struct {
 	keyID     int64
 }
 
-func (k *key) Retrieve() (*api.ApiKey, error) {
-	response, err := k.apiClient.GetKeyWithResponse(context.Background(), k.keyID)
+func (k *key) Retrieve(ctx context.Context) (*api.ApiKey, error) {
+	response, err := k.apiClient.GetKeyWithResponse(ctx, k.keyID)
 	if err != nil {
 		return nil, err
 	}
@@ -27,8 +27,8 @@ func (k *key) Retrieve() (*api.ApiKey, error) {
 	return response.JSON200, nil
 }
 
-func (k *key) Delete() (*api.ApiKey, error) {
-	response, err := k.apiClient.DeleteKeyWithResponse(context.Background(), k.keyID)
+func (k *key) Delete(ctx context.Context) (*api.ApiKey, error) {
+	response, err := k.apiClient.DeleteKeyWithResponse(ctx, k.keyID)
 	if err != nil {
 		return nil, err
 	}
