@@ -1,6 +1,7 @@
 package typesense
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"testing"
@@ -51,7 +52,7 @@ func TestKeyCreate(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Keys().Create(newKey)
+	result, err := client.Keys().Create(context.Background(), newKey)
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -71,7 +72,7 @@ func TestKeyCreateOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Keys().Create(newKey)
+	_, err := client.Keys().Create(context.Background(), newKey)
 	assert.NotNil(t, err)
 }
 
@@ -94,7 +95,7 @@ func TestKeyCreateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Keys().Create(newKey)
+	_, err := client.Keys().Create(context.Background(), newKey)
 	assert.NotNil(t, err)
 }
 
@@ -121,7 +122,7 @@ func TestKeysRetrieve(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Keys().Retrieve()
+	result, err := client.Keys().Retrieve(context.Background())
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -138,7 +139,7 @@ func TestKeysRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Keys().Retrieve()
+	_, err := client.Keys().Retrieve(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -158,7 +159,7 @@ func TestKeysRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Keys().Retrieve()
+	_, err := client.Keys().Retrieve(context.Background())
 	assert.NotNil(t, err)
 }
 

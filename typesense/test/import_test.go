@@ -1,9 +1,11 @@
+//go:build integration
 // +build integration
 
 package test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"testing"
 
@@ -28,7 +30,7 @@ func TestDocumentsImport(t *testing.T) {
 	}
 
 	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
-	responses, err := typesenseClient.Collection(collectionName).Documents().Import(documents, params)
+	responses, err := typesenseClient.Collection(collectionName).Documents().Import(context.Background(), documents, params)
 
 	require.NoError(t, err)
 	for _, response := range responses {
@@ -57,7 +59,7 @@ func TestDocumentsImportJsonl(t *testing.T) {
 	require.NoError(t, je.Encode(newDocument("127", withCompanyName("Company3"))))
 
 	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
-	responses, err := typesenseClient.Collection(collectionName).Documents().ImportJsonl(&buffer, params)
+	responses, err := typesenseClient.Collection(collectionName).Documents().ImportJsonl(context.Background(), &buffer, params)
 
 	require.NoError(t, err)
 	defer responses.Close()

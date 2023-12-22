@@ -4,6 +4,7 @@
 package test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -23,10 +24,10 @@ func TestMultiSearch(t *testing.T) {
 	}
 
 	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
-	_, err := typesenseClient.Collection(collectionName1).Documents().Import(documents, params)
+	_, err := typesenseClient.Collection(collectionName1).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
-	_, err = typesenseClient.Collection(collectionName1).Documents().Import(documents, params)
+	_, err = typesenseClient.Collection(collectionName1).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
 	searchParams := &api.MultiSearchParams{
@@ -63,7 +64,7 @@ func TestMultiSearch(t *testing.T) {
 		newDocumentResponse("131", withResponseCompanyName("Stark Industries 5"), withResponseNumEmployees(1000)),
 	}
 
-	result, err := typesenseClient.MultiSearch.Perform(searchParams, searches)
+	result, err := typesenseClient.MultiSearch.Perform(context.Background(), searchParams, searches)
 	require.NoError(t, err)
 
 	require.Equal(t, 3, len(result.Results))
@@ -92,7 +93,7 @@ func TestMultiSearchGroupBy(t *testing.T) {
 	}
 
 	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
-	_, err := typesenseClient.Collection(collectionName1).Documents().Import(documents, params)
+	_, err := typesenseClient.Collection(collectionName1).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
 	searchParams := &api.MultiSearchParams{
@@ -117,7 +118,7 @@ func TestMultiSearchGroupBy(t *testing.T) {
 		}
 	*/
 
-	result, err := typesenseClient.MultiSearch.Perform(searchParams, searches)
+	result, err := typesenseClient.MultiSearch.Perform(context.Background(), searchParams, searches)
 	require.NoError(t, err)
 	require.Equal(t, 1, len(result.Results))
 	require.NotNil(t, result.Results[0].GroupedHits)
@@ -138,7 +139,7 @@ func TestMultiSearchGroupBy(t *testing.T) {
 }
 
 func TestMultiSearchVectorQuery(t *testing.T) {
-	_, err := typesenseClient.Collection("embeddings").Delete()
+	_, err := typesenseClient.Collection("embeddings").Delete(context.Background())
 
 	collSchema := api.CollectionSchema{
 		Name: "embeddings",
@@ -155,7 +156,7 @@ func TestMultiSearchVectorQuery(t *testing.T) {
 		},
 	}
 
-	_, err = typesenseClient.Collections().Create(&collSchema)
+	_, err = typesenseClient.Collections().Create(context.Background(), &collSchema)
 	require.NoError(t, err)
 
 	type vecDocument struct {
@@ -170,7 +171,7 @@ func TestMultiSearchVectorQuery(t *testing.T) {
 		Vec:   []float32{0.45, 0.222, 0.021, 0.1323},
 	}
 
-	_, err = typesenseClient.Collection("embeddings").Documents().Create(vecDoc)
+	_, err = typesenseClient.Collection("embeddings").Documents().Create(context.Background(), vecDoc)
 	require.NoError(t, err)
 
 	searchParams := &api.MultiSearchParams{}
@@ -184,7 +185,7 @@ func TestMultiSearchVectorQuery(t *testing.T) {
 		},
 	}
 
-	searchResp, err := typesenseClient.MultiSearch.Perform(searchParams, searches)
+	searchResp, err := typesenseClient.MultiSearch.Perform(context.Background(), searchParams, searches)
 	require.NoError(t, err)
 
 	require.NotNil(t, searchResp.Results[0].Hits)

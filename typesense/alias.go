@@ -8,8 +8,8 @@ import (
 
 // AliasInterface is a type for Alias API operations
 type AliasInterface interface {
-	Retrieve() (*api.CollectionAlias, error)
-	Delete() (*api.CollectionAlias, error)
+	Retrieve(ctx context.Context) (*api.CollectionAlias, error)
+	Delete(ctx context.Context) (*api.CollectionAlias, error)
 }
 
 type alias struct {
@@ -17,8 +17,8 @@ type alias struct {
 	name      string
 }
 
-func (a *alias) Retrieve() (*api.CollectionAlias, error) {
-	response, err := a.apiClient.GetAliasWithResponse(context.Background(), a.name)
+func (a *alias) Retrieve(ctx context.Context) (*api.CollectionAlias, error) {
+	response, err := a.apiClient.GetAliasWithResponse(ctx, a.name)
 	if err != nil {
 		return nil, err
 	}
@@ -28,8 +28,8 @@ func (a *alias) Retrieve() (*api.CollectionAlias, error) {
 	return response.JSON200, nil
 }
 
-func (a *alias) Delete() (*api.CollectionAlias, error) {
-	response, err := a.apiClient.DeleteAliasWithResponse(context.Background(), a.name)
+func (a *alias) Delete(ctx context.Context) (*api.CollectionAlias, error) {
+	response, err := a.apiClient.DeleteAliasWithResponse(ctx, a.name)
 	if err != nil {
 		return nil, err
 	}

@@ -4,6 +4,7 @@
 package test
 
 import (
+	"context"
 	"strings"
 	"testing"
 
@@ -15,7 +16,7 @@ func TestKeyCreate(t *testing.T) {
 	keySchema := newKeySchema()
 	expectedResult := newKey()
 
-	result, err := typesenseClient.Keys().Create(keySchema)
+	result, err := typesenseClient.Keys().Create(context.Background(), keySchema)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedResult.Description, result.Description)
@@ -27,7 +28,7 @@ func TestKeyCreate(t *testing.T) {
 func TestKeysRetrieve(t *testing.T) {
 	expectedKey := createNewKey(t)
 
-	results, err := typesenseClient.Keys().Retrieve()
+	results, err := typesenseClient.Keys().Retrieve(context.Background())
 
 	require.NoError(t, err)
 	require.True(t, len(results) >= 1, "number of keys is invalid")

@@ -2,6 +2,7 @@ package typesense
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"io"
 	"io/ioutil"
@@ -77,7 +78,7 @@ func TestDocumentsImportWithOneDocument(t *testing.T) {
 		Action:    pointer.String("create"),
 		BatchSize: pointer.Int(40),
 	}
-	result, err := client.Collection("companies").Documents().Import(documents, params)
+	result, err := client.Collection("companies").Documents().Import(context.Background(), documents, params)
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -94,7 +95,7 @@ func TestDocumentsImportWithEmptyListReturnsError(t *testing.T) {
 		BatchSize: pointer.Int(40),
 	}
 	documents := []interface{}{}
-	_, err := client.Collection("companies").Documents().Import(documents, params)
+	_, err := client.Collection("companies").Documents().Import(context.Background(), documents, params)
 	assert.NotNil(t, err)
 }
 
@@ -127,7 +128,7 @@ func TestDocumentsImportWithOneDocumentAndInvalidResultJsonReturnsError(t *testi
 		Action:    pointer.String("create"),
 		BatchSize: pointer.Int(40),
 	}
-	_, err := client.Collection("companies").Documents().Import(documents, params)
+	_, err := client.Collection("companies").Documents().Import(context.Background(), documents, params)
 	assert.NotNil(t, err)
 }
 
@@ -144,7 +145,7 @@ func TestDocumentsImportWithInvalidInputDataReturnsError(t *testing.T) {
 	documents := []interface{}{
 		func() {},
 	}
-	_, err := client.Collection("companies").Documents().Import(documents, params)
+	_, err := client.Collection("companies").Documents().Import(context.Background(), documents, params)
 	assert.NotNil(t, err)
 }
 
@@ -167,7 +168,7 @@ func TestDocumentsImportOnApiClientErrorReturnsError(t *testing.T) {
 	documents := []interface{}{
 		createNewDocument(),
 	}
-	_, err := client.Collection("companies").Documents().Import(documents, params)
+	_, err := client.Collection("companies").Documents().Import(context.Background(), documents, params)
 	assert.NotNil(t, err)
 }
 
@@ -193,7 +194,7 @@ func TestDocumentsImportOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	documents := []interface{}{
 		createNewDocument(),
 	}
-	_, err := client.Collection("companies").Documents().Import(documents, params)
+	_, err := client.Collection("companies").Documents().Import(context.Background(), documents, params)
 	assert.NotNil(t, err)
 }
 
@@ -232,7 +233,7 @@ func TestDocumentsImportWithTwoDocuments(t *testing.T) {
 		Action:    pointer.String("create"),
 		BatchSize: pointer.Int(40),
 	}
-	result, err := client.Collection("companies").Documents().Import(documents, params)
+	result, err := client.Collection("companies").Documents().Import(context.Background(), documents, params)
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -264,7 +265,7 @@ func TestDocumentsImportWithActionOnly(t *testing.T) {
 	params := &api.ImportDocumentsParams{
 		Action: pointer.String("create"),
 	}
-	_, err := client.Collection("companies").Documents().Import(documents, params)
+	_, err := client.Collection("companies").Documents().Import(context.Background(), documents, params)
 	assert.Nil(t, err)
 }
 
@@ -294,7 +295,7 @@ func TestDocumentsImportWithBatchSizeOnly(t *testing.T) {
 	params := &api.ImportDocumentsParams{
 		BatchSize: pointer.Int(10),
 	}
-	_, err := client.Collection("companies").Documents().Import(documents, params)
+	_, err := client.Collection("companies").Documents().Import(context.Background(), documents, params)
 	assert.Nil(t, err)
 }
 
@@ -325,7 +326,7 @@ func TestDocumentsImportJsonl(t *testing.T) {
 		BatchSize: pointer.Int(40),
 	}
 	importBody := createDocumentStream()
-	result, err := client.Collection("companies").Documents().ImportJsonl(importBody, params)
+	result, err := client.Collection("companies").Documents().ImportJsonl(context.Background(), importBody, params)
 	assert.Nil(t, err)
 
 	resultBytes, err := ioutil.ReadAll(result)
@@ -350,7 +351,7 @@ func TestDocumentsImportJsonlOnApiClientErrorReturnsError(t *testing.T) {
 		BatchSize: pointer.Int(40),
 	}
 	importBody := createDocumentStream()
-	_, err := client.Collection("companies").Documents().ImportJsonl(importBody, params)
+	_, err := client.Collection("companies").Documents().ImportJsonl(context.Background(), importBody, params)
 	assert.NotNil(t, err)
 }
 
@@ -374,7 +375,7 @@ func TestDocumentsImportJsonlOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		BatchSize: pointer.Int(40),
 	}
 	importBody := createDocumentStream()
-	_, err := client.Collection("companies").Documents().ImportJsonl(importBody, params)
+	_, err := client.Collection("companies").Documents().ImportJsonl(context.Background(), importBody, params)
 	assert.NotNil(t, err)
 }
 
@@ -402,7 +403,7 @@ func TestDocumentsImportJsonlWithActionOnly(t *testing.T) {
 		Action: pointer.String("create"),
 	}
 	importBody := createDocumentStream()
-	_, err := client.Collection("companies").Documents().ImportJsonl(importBody, params)
+	_, err := client.Collection("companies").Documents().ImportJsonl(context.Background(), importBody, params)
 	assert.Nil(t, err)
 }
 
@@ -430,6 +431,6 @@ func TestDocumentsImportJsonlWithBatchSizeOnly(t *testing.T) {
 		BatchSize: pointer.Int(10),
 	}
 	importBody := createDocumentStream()
-	_, err := client.Collection("companies").Documents().ImportJsonl(importBody, params)
+	_, err := client.Collection("companies").Documents().ImportJsonl(context.Background(), importBody, params)
 	assert.Nil(t, err)
 }

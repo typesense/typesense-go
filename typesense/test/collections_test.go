@@ -4,6 +4,7 @@
 package test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,7 @@ func TestCollectionCreate(t *testing.T) {
 	schema := newSchema(collectionName)
 	expectedResult := expectedNewCollection(collectionName)
 
-	result, err := typesenseClient.Collections().Create(schema)
+	result, err := typesenseClient.Collections().Create(context.Background(), schema)
 	result.CreatedAt = pointer.Int64(0)
 
 	require.NoError(t, err)
@@ -40,11 +41,11 @@ func TestCollectionsRetrieve(t *testing.T) {
 	}
 
 	for _, schema := range schemas {
-		_, err := typesenseClient.Collections().Create(schema)
+		_, err := typesenseClient.Collections().Create(context.Background(), schema)
 		require.NoError(t, err)
 	}
 
-	result, err := typesenseClient.Collections().Retrieve()
+	result, err := typesenseClient.Collections().Retrieve(context.Background())
 
 	require.NoError(t, err)
 	require.True(t, len(result) >= total, "number of collections is invalid")

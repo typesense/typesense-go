@@ -1,6 +1,7 @@
 package typesense
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"testing"
@@ -48,7 +49,7 @@ func TestCollectionRetrieve(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Collection("companies").Retrieve()
+	result, err := client.Collection("companies").Retrieve(context.Background())
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -66,7 +67,7 @@ func TestCollectionRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Retrieve()
+	_, err := client.Collection("companies").Retrieve(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -87,7 +88,7 @@ func TestCollectionRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Retrieve()
+	_, err := client.Collection("companies").Retrieve(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -107,7 +108,7 @@ func TestCollectionDelete(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Collection("companies").Delete()
+	result, err := client.Collection("companies").Delete(context.Background())
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -125,7 +126,7 @@ func TestCollectionDeleteOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Delete()
+	_, err := client.Collection("companies").Delete(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -146,7 +147,7 @@ func TestCollectionDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Delete()
+	_, err := client.Collection("companies").Delete(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -168,7 +169,7 @@ func TestCollectionUpdate(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Collection("companies").Update(updateSchema)
+	result, err := client.Collection("companies").Update(context.Background(), updateSchema)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -188,7 +189,7 @@ func TestCollectionUpdateOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Update(updateSchema)
+	_, err := client.Collection("companies").Update(context.Background(), updateSchema)
 	assert.Error(t, err)
 }
 
@@ -211,6 +212,6 @@ func TestCollectionUpdateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("non_existent").Update(updateSchema)
+	_, err := client.Collection("non_existent").Update(context.Background(), updateSchema)
 	assert.Error(t, err)
 }

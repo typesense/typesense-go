@@ -1,6 +1,7 @@
 package typesense
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -224,7 +225,7 @@ func TestMultiSearch(t *testing.T) {
 		client := NewClient(WithAPIClient(mockAPIClient))
 		params := newMultiSearchParams()
 		body := newMultiSearchBodyParams()
-		result, err := client.MultiSearch.Perform(params, body)
+		result, err := client.MultiSearch.Perform(context.Background(), params, body)
 
 		assert.Nil(t, err)
 		assert.Equal(t, expectedResult, result)
@@ -247,7 +248,7 @@ func TestMultiSearch(t *testing.T) {
 		client := NewClient(WithAPIClient(mockAPIClient))
 		params := newMultiSearchParams()
 		reqBody := newMultiSearchBodyParams()
-		result, err := client.MultiSearch.PerformWithContentType(params, reqBody, expectedContentType)
+		result, err := client.MultiSearch.PerformWithContentType(context.Background(), params, reqBody, expectedContentType)
 
 		assert.Nil(t, err)
 		assert.Equal(t, expectedResponseBytes, result.Body)
@@ -272,7 +273,7 @@ func TestMultiSearchOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := newMultiSearchParams()
-	_, err := client.MultiSearch.Perform(params, newMultiSearchBodyParams())
+	_, err := client.MultiSearch.Perform(context.Background(), params, newMultiSearchBodyParams())
 	assert.NotNil(t, err)
 }
 
@@ -289,6 +290,6 @@ func TestMultiSearchOnApiClientError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := newMultiSearchParams()
-	_, err := client.MultiSearch.Perform(params, newMultiSearchBodyParams())
+	_, err := client.MultiSearch.Perform(context.Background(), params, newMultiSearchBodyParams())
 	assert.NotNil(t, err)
 }

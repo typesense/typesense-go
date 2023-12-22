@@ -1,3 +1,4 @@
+//go:build integration && !docker
 // +build integration,!docker
 
 package test
@@ -19,7 +20,7 @@ func waitHealthyStatus(client *typesense.Client, timeout time.Duration) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-time.After(1 * time.Second):
-			if healthy, _ := client.Health(2 * time.Second); !healthy {
+			if healthy, _ := client.Health(context.Background(), 2*time.Second); !healthy {
 				continue
 			}
 			return nil

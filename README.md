@@ -68,7 +68,7 @@ You can also find some examples in [integration tests](https://github.com/typese
 		DefaultSortingField: pointer.String("num_employees"),
 	}
 
-	client.Collections().Create(schema)
+	client.Collections().Create(context.Background(), schema)
 ```
 
 ### Index a document
@@ -86,7 +86,7 @@ You can also find some examples in [integration tests](https://github.com/typese
 		Country:      "USA",
 	}
 
-	client.Collection("companies").Documents().Create(document)
+	client.Collection("companies").Documents().Create(context.Background(), document)
 ```
 
 ### Upserting a document
@@ -104,7 +104,7 @@ You can also find some examples in [integration tests](https://github.com/typese
 		Country:      "USA",
 	}
 
-	client.Collection("companies").Documents().Upsert(newDocument)
+	client.Collection("companies").Documents().Upsert(context.Background(), newDocument)
 ```
 
 ### Search a collection
@@ -117,7 +117,7 @@ You can also find some examples in [integration tests](https://github.com/typese
 		SortBy:   &([]string{"num_employees:desc"}),
 	}
 
-	client.Collection("companies").Documents().Search(searchParameters)
+	client.Collection("companies").Documents().Search(context.Background(), searchParameters)
 ```
 
 for the supporting multiple `QueryBy` params, you can add `,` after each field
@@ -130,13 +130,13 @@ for the supporting multiple `QueryBy` params, you can add `,` after each field
 		SortBy:   &([]string{"num_employees:desc"}),
 	}
 
-	client.Collection("companies").Documents().Search(searchParameters)
+	client.Collection("companies").Documents().Search(context.Background(), searchParameters)
 ```
 
 ### Retrieve a document
 
 ```go
-client.Collection("companies").Document("123").Retrieve()
+client.Collection("companies").Document("123").Retrieve(context.Background())
 ```
 
 ### Update a document
@@ -150,32 +150,32 @@ client.Collection("companies").Document("123").Retrieve()
 		NumEmployees: 5500,
 	}
 
-	client.Collection("companies").Document("123").Update(document)
+	client.Collection("companies").Document("123").Update(context.Background(), document)
 ```
 
 ### Delete an individual document
 
 ```go
-client.Collection("companies").Document("123").Delete()
+client.Collection("companies").Document("123").Delete(context.Background())
 ```
 
 ### Delete a bunch of documents
 
 ```go
 filter := &api.DeleteDocumentsParams{FilterBy: "num_employees:>100", BatchSize: 100}
-client.Collection("companies").Documents().Delete(filter)
+client.Collection("companies").Documents().Delete(context.Background(), filter)
 ```
 
 ### Retrieve a collection
 
 ```go
-client.Collection("companies").Retrieve()
+client.Collection("companies").Retrieve(context.Background())
 ```
 
 ### Export documents from a collection
 
 ```go
-client.Collection("companies").Documents().Export()
+client.Collection("companies").Documents().Export(context.Background())
 ```
 
 ### Import documents into a collection
@@ -203,7 +203,7 @@ Import an array of documents:
 		BatchSize: pointer.Int(40),
 	}
 
-	client.Collection("companies").Documents().Import(documents, params)
+	client.Collection("companies").Documents().Import(context.Background(), documents, params)
 ```
 
 Import a JSONL file:
@@ -216,19 +216,19 @@ Import a JSONL file:
 	importBody, err := os.Open("documents.jsonl")
 	// defer close, error handling ...
 
-	client.Collection("companies").Documents().ImportJsonl(importBody, params)
+	client.Collection("companies").Documents().ImportJsonl(context.Background(), importBody, params)
 ```
 
 ### List all collections
 
 ```go
-client.Collections().Retrieve()
+client.Collections().Retrieve(context.Background())
 ```
 
 ### Drop a collection
 
 ```go
-client.Collection("companies").Delete()
+client.Collection("companies").Delete(context.Background())
 ```
 
 ### Create an API Key
@@ -241,25 +241,25 @@ client.Collection("companies").Delete()
 		ExpiresAt:   time.Now().AddDate(0, 6, 0).Unix(),
 	}
 
-	client.Keys().Create(keySchema)
+	client.Keys().Create(context.Background(), keySchema)
 ```
 
 ### Retrieve an API Key
 
 ```go
-client.Key(1).Retrieve()
+client.Key(1).Retrieve(context.Background())
 ```
 
 ### List all keys
 
 ```go
-client.Keys().Retrieve()
+client.Keys().Retrieve(context.Background())
 ```
 
 ### Delete API Key
 
 ```go
-client.Key(1).Delete()
+client.Key(1).Delete(context.Background())
 ```
 
 ### Create or update an override
@@ -287,19 +287,19 @@ client.Key(1).Delete()
 		},
 	}
 
-	client.Collection("companies").Overrides().Upsert("customize-apple", override)
+	client.Collection("companies").Overrides().Upsert(context.Background(), "customize-apple", override)
 ```
 
 ### List all overrides
 
 ```go
-client.Collection("companies").Overrides().Retrieve()
+client.Collection("companies").Overrides().Retrieve(context.Background())
 ```
 
 ### Delete an override
 
 ```go
-client.Collection("companies").Override("customize-apple").Delete()
+client.Collection("companies").Override("customize-apple").Delete(context.Background())
 ```
 
 ### Create or Update an alias
@@ -312,19 +312,19 @@ client.Collection("companies").Override("customize-apple").Delete()
 ### Retrieve an alias
 
 ```go
-client.Alias("companies").Retrieve()
+client.Alias("companies").Retrieve(context.Background())
 ```
 
 ### List all aliases
 
 ```go
-client.Aliases().Retrieve()
+client.Aliases().Retrieve(context.Background())
 ```
 
 ### Delete an alias
 
 ```go
-client.Alias("companies").Delete()
+client.Alias("companies").Delete(context.Background())
 ```
 
 ### Create or update a multi-way synonym
@@ -333,7 +333,7 @@ client.Alias("companies").Delete()
 	synonym := &api.SearchSynonymSchema{
 		Synonyms: []string{"blazer", "coat", "jacket"},
 	}
-	client.Collection("products").Synonyms().Upsert("coat-synonyms", synonym)
+	client.Collection("products").Synonyms().Upsert(context.Background(), "coat-synonyms", synonym)
 ```
 
 ### Create or update a one-way synonym
@@ -343,37 +343,37 @@ client.Alias("companies").Delete()
 		Root:     "blazer",
 		Synonyms: []string{"blazer", "coat", "jacket"},
 	}
-	client.Collection("products").Synonyms().Upsert("coat-synonyms", synonym)
+	client.Collection("products").Synonyms().Upsert(context.Background(), "coat-synonyms", synonym)
 ```
 
 ### Retrieve a synonym
 
 ```go
-client.Collection("products").Synonym("coat-synonyms").Retrieve()
+client.Collection("products").Synonym("coat-synonyms").Retrieve(context.Background())
 ```
 
 ### List all synonyms
 
 ```go
-client.Collection("products").Synonyms().Retrieve()
+client.Collection("products").Synonyms().Retrieve(context.Background())
 ```
 
 ### Delete a synonym
 
 ```go
-client.Collection("products").Synonym("coat-synonyms").Delete()
+client.Collection("products").Synonym("coat-synonyms").Delete(context.Background())
 ```
 
 ### Create snapshot (for backups)
 
 ```go
-client.Operations().Snapshot("/tmp/typesense-data-snapshot")
+client.Operations().Snapshot(context.Background(), "/tmp/typesense-data-snapshot")
 ```
 
 ### Re-elect Leader
 
 ```go
-client.Operations().Vote()
+client.Operations().Vote(context.Background())
 ```
 
 ## Contributing

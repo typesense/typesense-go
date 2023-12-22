@@ -1,6 +1,7 @@
 package typesense
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"testing"
@@ -27,7 +28,7 @@ func TestCollectionAliasRetrieve(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Alias("collection_alias").Retrieve()
+	result, err := client.Alias("collection_alias").Retrieve(context.Background())
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -44,7 +45,7 @@ func TestCollectionAliasRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Alias("collection_alias").Retrieve()
+	_, err := client.Alias("collection_alias").Retrieve(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -64,7 +65,7 @@ func TestCollectionAliasRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) 
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Alias("collection_alias").Retrieve()
+	_, err := client.Alias("collection_alias").Retrieve(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -84,7 +85,7 @@ func TestCollectionAliasDelete(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Alias("collection_alias").Delete()
+	result, err := client.Alias("collection_alias").Delete(context.Background())
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -101,7 +102,7 @@ func TestCollectionAliasDeleteOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Alias("collection_alias").Delete()
+	_, err := client.Alias("collection_alias").Delete(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -121,6 +122,6 @@ func TestCollectionAliasDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Alias("collection_alias").Delete()
+	_, err := client.Alias("collection_alias").Delete(context.Background())
 	assert.NotNil(t, err)
 }

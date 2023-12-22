@@ -1,10 +1,12 @@
 package typesense
 
 import (
+	"context"
 	"errors"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"net/http"
 	"testing"
+
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -28,7 +30,7 @@ func TestSearchOverrideRetrieve(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Collection("companies").Override("customize-apple").Retrieve()
+	result, err := client.Collection("companies").Override("customize-apple").Retrieve(context.Background())
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -46,7 +48,7 @@ func TestSearchOverrideRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Override("customize-apple").Retrieve()
+	_, err := client.Collection("companies").Override("customize-apple").Retrieve(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -67,7 +69,7 @@ func TestSearchOverrideRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Override("customize-apple").Retrieve()
+	_, err := client.Collection("companies").Override("customize-apple").Retrieve(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -87,7 +89,7 @@ func TestSearchOverrideDelete(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Collection("companies").Override("customize-apple").Delete()
+	result, err := client.Collection("companies").Override("customize-apple").Delete(context.Background())
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -105,7 +107,7 @@ func TestSearchOverrideDeleteOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Override("customize-apple").Delete()
+	_, err := client.Collection("companies").Override("customize-apple").Delete(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -126,6 +128,6 @@ func TestSearchOverrideDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Override("customize-apple").Delete()
+	_, err := client.Collection("companies").Override("customize-apple").Delete(context.Background())
 	assert.NotNil(t, err)
 }

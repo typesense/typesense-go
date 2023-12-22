@@ -4,6 +4,7 @@
 package test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,12 +18,12 @@ func TestSearchOverrideUpsertNewOverride(t *testing.T) {
 	expectedResult := newSearchOverride(overrideID)
 
 	body := newSearchOverrideSchema()
-	result, err := typesenseClient.Collection(collectionName).Overrides().Upsert(overrideID, body)
+	result, err := typesenseClient.Collection(collectionName).Overrides().Upsert(context.Background(), overrideID, body)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedResult, result)
 
-	result, err = typesenseClient.Collection(collectionName).Override(overrideID).Retrieve()
+	result, err = typesenseClient.Collection(collectionName).Override(overrideID).Retrieve(context.Background())
 
 	require.NoError(t, err)
 	require.Equal(t, expectedResult, result)
@@ -36,17 +37,17 @@ func TestSearchOverrideUpsertExistingOverride(t *testing.T) {
 
 	body := newSearchOverrideSchema()
 	body.Rule.Match = "exact"
-	_, err := typesenseClient.Collection(collectionName).Overrides().Upsert(overrideID, body)
+	_, err := typesenseClient.Collection(collectionName).Overrides().Upsert(context.Background(), overrideID, body)
 	require.NoError(t, err)
 
 	body.Rule.Match = "contains"
 
-	result, err := typesenseClient.Collection(collectionName).Overrides().Upsert(overrideID, body)
+	result, err := typesenseClient.Collection(collectionName).Overrides().Upsert(context.Background(), overrideID, body)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedResult, result)
 
-	result, err = typesenseClient.Collection(collectionName).Override(overrideID).Retrieve()
+	result, err = typesenseClient.Collection(collectionName).Override(overrideID).Retrieve(context.Background())
 
 	require.NoError(t, err)
 	require.Equal(t, expectedResult, result)
@@ -66,11 +67,11 @@ func TestSearchOverridesRetrieve(t *testing.T) {
 	}
 
 	for i := 0; i < total; i++ {
-		_, err := typesenseClient.Collection(collectionName).Overrides().Upsert(overrideIDs[i], schema)
+		_, err := typesenseClient.Collection(collectionName).Overrides().Upsert(context.Background(), overrideIDs[i], schema)
 		require.NoError(t, err)
 	}
 
-	result, err := typesenseClient.Collection(collectionName).Overrides().Retrieve()
+	result, err := typesenseClient.Collection(collectionName).Overrides().Retrieve(context.Background())
 
 	require.NoError(t, err)
 	require.True(t, len(result) >= total, "number of overrides is invalid")

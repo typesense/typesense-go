@@ -1,6 +1,7 @@
 package typesense
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -127,7 +128,7 @@ func TestCollectionSearch(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := newSearchParams()
-	result, err := client.Collection("companies").Documents().Search(params)
+	result, err := client.Collection("companies").Documents().Search(context.Background(), params)
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -147,7 +148,7 @@ func TestCollectionSearchOnApiClientErrorReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := newSearchParams()
-	_, err := client.Collection("companies").Documents().Search(params)
+	_, err := client.Collection("companies").Documents().Search(context.Background(), params)
 	assert.NotNil(t, err)
 }
 
@@ -170,6 +171,6 @@ func TestCollectionSearchOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := newSearchParams()
-	_, err := client.Collection("companies").Documents().Search(params)
+	_, err := client.Collection("companies").Documents().Search(context.Background(), params)
 	assert.NotNil(t, err)
 }

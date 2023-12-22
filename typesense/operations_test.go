@@ -1,6 +1,7 @@
 package typesense
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"testing"
@@ -39,7 +40,7 @@ func TestSnapshot(t *testing.T) {
 			Times(1)
 
 		client := NewClient(WithAPIClient(mockAPIClient))
-		result, err := client.Operations().Snapshot(snapshotPath)
+		result, err := client.Operations().Snapshot(context.Background(), snapshotPath)
 		assert.NoError(t, err)
 		assert.Conditionf(t, func() bool {
 			return result == tt.ok
@@ -60,7 +61,7 @@ func TestSnapshotOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Operations().Snapshot(snapshotPath)
+	result, err := client.Operations().Snapshot(context.Background(), snapshotPath)
 	assert.Error(t, err)
 	assert.False(t, result)
 }
@@ -83,7 +84,7 @@ func TestSnapshotOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Operations().Snapshot(snapshotPath)
+	result, err := client.Operations().Snapshot(context.Background(), snapshotPath)
 	assert.Error(t, err)
 	assert.False(t, result)
 }
@@ -113,7 +114,7 @@ func TestVote(t *testing.T) {
 			Times(1)
 
 		client := NewClient(WithAPIClient(mockAPIClient))
-		result, err := client.Operations().Vote()
+		result, err := client.Operations().Vote(context.Background())
 		assert.NoError(t, err)
 		assert.Conditionf(t, func() bool {
 			return result == tt.ok
@@ -133,7 +134,7 @@ func TestVoteOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Operations().Vote()
+	result, err := client.Operations().Vote(context.Background())
 	assert.Error(t, err)
 	assert.False(t, result)
 }
@@ -155,7 +156,7 @@ func TestVoteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Operations().Vote()
+	result, err := client.Operations().Vote(context.Background())
 	assert.Error(t, err)
 	assert.False(t, result)
 }

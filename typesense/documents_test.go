@@ -1,6 +1,7 @@
 package typesense
 
 import (
+	"context"
 	"errors"
 	"io"
 	"io/ioutil"
@@ -63,7 +64,7 @@ func TestDocumentCreate(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	document := createNewDocument()
-	result, err := client.Collection("companies").Documents().Create(document)
+	result, err := client.Collection("companies").Documents().Create(context.Background(), document)
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -84,7 +85,7 @@ func TestDocumentCreateOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Create(newDocument)
+	_, err := client.Collection("companies").Documents().Create(context.Background(), newDocument)
 	assert.NotNil(t, err)
 }
 
@@ -108,7 +109,7 @@ func TestDocumentCreateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Create(newDocument)
+	_, err := client.Collection("companies").Documents().Create(context.Background(), newDocument)
 	assert.NotNil(t, err)
 }
 
@@ -131,7 +132,7 @@ func TestDocumentUpsert(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Collection("companies").Documents().Upsert(newDocument)
+	result, err := client.Collection("companies").Documents().Upsert(context.Background(), newDocument)
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -152,7 +153,7 @@ func TestDocumentUpsertOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Upsert(newDocument)
+	_, err := client.Collection("companies").Documents().Upsert(context.Background(), newDocument)
 	assert.NotNil(t, err)
 }
 
@@ -176,7 +177,7 @@ func TestDocumentUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Upsert(newDocument)
+	_, err := client.Collection("companies").Documents().Upsert(context.Background(), newDocument)
 	assert.NotNil(t, err)
 }
 
@@ -205,7 +206,7 @@ func TestDocumentsUpdate(t *testing.T) {
 	client := NewClient(WithAPIClient(mockAPIClient))
 
 	params := &api.UpdateDocumentsParams{FilterBy: pointer.String("num_employees:>100")}
-	result, err := client.Collection("companies").Documents().Update(updateFields, params)
+	result, err := client.Collection("companies").Documents().Update(context.Background(), updateFields, params)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 27, result)
@@ -230,7 +231,7 @@ func TestDocumentsDelete(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	filter := &api.DeleteDocumentsParams{FilterBy: pointer.String("num_employees:>100"), BatchSize: pointer.Int(100)}
-	result, err := client.Collection("companies").Documents().Delete(filter)
+	result, err := client.Collection("companies").Documents().Delete(context.Background(), filter)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 27, result)
@@ -249,7 +250,7 @@ func TestDocumentsDeleteOnApiClientErrorReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	filter := &api.DeleteDocumentsParams{FilterBy: pointer.String("num_employees:>100"), BatchSize: pointer.Int(100)}
-	_, err := client.Collection("companies").Documents().Delete(filter)
+	_, err := client.Collection("companies").Documents().Delete(context.Background(), filter)
 	assert.NotNil(t, err)
 }
 
@@ -271,7 +272,7 @@ func TestDocumentsDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	filter := &api.DeleteDocumentsParams{FilterBy: pointer.String("num_employees:>100"), BatchSize: pointer.Int(100)}
-	_, err := client.Collection("companies").Documents().Delete(filter)
+	_, err := client.Collection("companies").Documents().Delete(context.Background(), filter)
 	assert.NotNil(t, err)
 }
 
@@ -297,7 +298,7 @@ func TestDocumentsExport(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Collection("companies").Documents().Export()
+	result, err := client.Collection("companies").Documents().Export(context.Background())
 	assert.Nil(t, err)
 
 	resultBytes, err := ioutil.ReadAll(result)
@@ -316,7 +317,7 @@ func TestDocumentsExportOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Export()
+	_, err := client.Collection("companies").Documents().Export(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -334,6 +335,6 @@ func TestDocumentsExportOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Export()
+	_, err := client.Collection("companies").Documents().Export(context.Background())
 	assert.NotNil(t, err)
 }

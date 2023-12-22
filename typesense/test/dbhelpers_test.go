@@ -4,6 +4,7 @@
 package test
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -270,14 +271,14 @@ func createNewCollection(t *testing.T, namePrefix string) string {
 	collectionName := newUUIDName(namePrefix)
 	schema := newSchema(collectionName)
 
-	_, err := typesenseClient.Collections().Create(schema)
+	_, err := typesenseClient.Collections().Create(context.Background(), schema)
 	require.NoError(t, err)
 	return collectionName
 }
 
 func createDocument(t *testing.T, collectionName string, document *testDocument) {
 	t.Helper()
-	_, err := typesenseClient.Collection(collectionName).Documents().Create(document)
+	_, err := typesenseClient.Collection(collectionName).Documents().Create(context.Background(), document)
 	require.NoError(t, err)
 }
 
@@ -285,7 +286,7 @@ func createNewKey(t *testing.T) *api.ApiKey {
 	t.Helper()
 	keySchema := newKeySchema()
 
-	result, err := typesenseClient.Keys().Create(keySchema)
+	result, err := typesenseClient.Keys().Create(context.Background(), keySchema)
 
 	require.NoError(t, err)
 	return result
@@ -294,7 +295,7 @@ func createNewKey(t *testing.T) *api.ApiKey {
 func retrieveDocuments(t *testing.T, collectionName string, docIDs ...string) []map[string]interface{} {
 	results := make([]map[string]interface{}, len(docIDs))
 	for i, docID := range docIDs {
-		doc, err := typesenseClient.Collection(collectionName).Document(docID).Retrieve()
+		doc, err := typesenseClient.Collection(collectionName).Document(docID).Retrieve(context.Background())
 		require.NoError(t, err)
 		results[i] = doc
 	}

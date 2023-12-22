@@ -8,8 +8,8 @@ import (
 
 // OverridesInterface is a type for Search Overrides API operations
 type OverridesInterface interface {
-	Upsert(overrideID string, overrideSchema *api.SearchOverrideSchema) (*api.SearchOverride, error)
-	Retrieve() ([]*api.SearchOverride, error)
+	Upsert(ctx context.Context, overrideID string, overrideSchema *api.SearchOverrideSchema) (*api.SearchOverride, error)
+	Retrieve(ctx context.Context) ([]*api.SearchOverride, error)
 }
 
 // overrides is internal implementation of OverridesInterface
@@ -18,8 +18,8 @@ type overrides struct {
 	collectionName string
 }
 
-func (o *overrides) Upsert(overrideID string, overrideSchema *api.SearchOverrideSchema) (*api.SearchOverride, error) {
-	response, err := o.apiClient.UpsertSearchOverrideWithResponse(context.Background(),
+func (o *overrides) Upsert(ctx context.Context, overrideID string, overrideSchema *api.SearchOverrideSchema) (*api.SearchOverride, error) {
+	response, err := o.apiClient.UpsertSearchOverrideWithResponse(ctx,
 		o.collectionName, overrideID, api.UpsertSearchOverrideJSONRequestBody(*overrideSchema))
 	if err != nil {
 		return nil, err
@@ -30,8 +30,8 @@ func (o *overrides) Upsert(overrideID string, overrideSchema *api.SearchOverride
 	return response.JSON200, nil
 }
 
-func (o *overrides) Retrieve() ([]*api.SearchOverride, error) {
-	response, err := o.apiClient.GetSearchOverridesWithResponse(context.Background(), o.collectionName)
+func (o *overrides) Retrieve(ctx context.Context) ([]*api.SearchOverride, error) {
+	response, err := o.apiClient.GetSearchOverridesWithResponse(ctx, o.collectionName)
 	if err != nil {
 		return nil, err
 	}

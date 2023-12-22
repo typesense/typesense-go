@@ -1,10 +1,12 @@
 package typesense
 
 import (
+	"context"
 	"errors"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"net/http"
 	"testing"
+
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 
 	"github.com/golang/mock/gomock"
 	"github.com/jinzhu/copier"
@@ -45,7 +47,7 @@ func TestSearchSynonymUpsert(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	body := createNewSearchSynonymSchema()
-	result, err := client.Collection("products").Synonyms().Upsert("coat-synonyms", body)
+	result, err := client.Collection("products").Synonyms().Upsert(context.Background(), "coat-synonyms", body)
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -67,7 +69,7 @@ func TestSearchSynonymUpsertOnApiClientErrorReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	body := createNewSearchSynonymSchema()
-	_, err := client.Collection("products").Synonyms().Upsert("coat-synonyms", body)
+	_, err := client.Collection("products").Synonyms().Upsert(context.Background(), "coat-synonyms", body)
 	assert.NotNil(t, err)
 }
 
@@ -92,7 +94,7 @@ func TestSearchSynonymUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	body := createNewSearchSynonymSchema()
-	_, err := client.Collection("products").Synonyms().Upsert("coat-synonyms", body)
+	_, err := client.Collection("products").Synonyms().Upsert(context.Background(), "coat-synonyms", body)
 	assert.NotNil(t, err)
 }
 
@@ -119,7 +121,7 @@ func TestSearchSynonymsRetrieve(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Collection("products").Synonyms().Retrieve()
+	result, err := client.Collection("products").Synonyms().Retrieve(context.Background())
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -137,7 +139,7 @@ func TestSearchSynonymsRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("products").Synonyms().Retrieve()
+	_, err := client.Collection("products").Synonyms().Retrieve(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -158,6 +160,6 @@ func TestSearchSynonymsRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("products").Synonyms().Retrieve()
+	_, err := client.Collection("products").Synonyms().Retrieve(context.Background())
 	assert.NotNil(t, err)
 }

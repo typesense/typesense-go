@@ -1,10 +1,12 @@
 package typesense
 
 import (
+	"context"
 	"errors"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"net/http"
 	"testing"
+
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -28,7 +30,7 @@ func TestKeyRetrieve(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Key(1).Retrieve()
+	result, err := client.Key(1).Retrieve(context.Background())
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -46,7 +48,7 @@ func TestKeyRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Key(1).Retrieve()
+	_, err := client.Key(1).Retrieve(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -67,7 +69,7 @@ func TestKeyRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Key(1).Retrieve()
+	_, err := client.Key(1).Retrieve(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -87,7 +89,7 @@ func TestKeyDelete(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Key(1).Delete()
+	result, err := client.Key(1).Delete(context.Background())
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -105,7 +107,7 @@ func TestKeyDeleteOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Key(1).Delete()
+	_, err := client.Key(1).Delete(context.Background())
 	assert.NotNil(t, err)
 }
 
@@ -126,6 +128,6 @@ func TestKeyDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Key(1).Delete()
+	_, err := client.Key(1).Delete(context.Background())
 	assert.NotNil(t, err)
 }
