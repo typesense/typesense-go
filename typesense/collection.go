@@ -19,13 +19,15 @@ type CollectionInterface[T any] interface {
 	Update(context.Context, *api.CollectionUpdateSchema) (*api.CollectionUpdateSchema, error)
 }
 
+var _ CollectionInterface[any] = (*collection[any])(nil)
+
 // collection is internal implementation of CollectionInterface
-type collection struct {
+type collection[T any] struct {
 	apiClient APIClientInterface
 	name      string
 }
 
-func (c *collection) Retrieve(ctx context.Context) (*api.CollectionResponse, error) {
+func (c *collection[T]) Retrieve(ctx context.Context) (*api.CollectionResponse, error) {
 	response, err := c.apiClient.GetCollectionWithResponse(ctx, c.name)
 	if err != nil {
 		return nil, err
@@ -36,7 +38,7 @@ func (c *collection) Retrieve(ctx context.Context) (*api.CollectionResponse, err
 	return response.JSON200, nil
 }
 
-func (c *collection) Delete(ctx context.Context) (*api.CollectionResponse, error) {
+func (c *collection[T]) Delete(ctx context.Context) (*api.CollectionResponse, error) {
 	response, err := c.apiClient.DeleteCollectionWithResponse(ctx, c.name)
 	if err != nil {
 		return nil, err
@@ -47,31 +49,31 @@ func (c *collection) Delete(ctx context.Context) (*api.CollectionResponse, error
 	return response.JSON200, nil
 }
 
-func (c *collection) Documents() DocumentsInterface {
+func (c *collection[T]) Documents() DocumentsInterface {
 	return &documents{apiClient: c.apiClient, collectionName: c.name}
 }
 
-func (c *collection) Document(documentID string) DocumentInterface[map[string]any] {
-	return &document[map[string]any]{apiClient: c.apiClient, collectionName: c.name, documentID: documentID}
+func (c *collection[T]) Document(documentID string) DocumentInterface[T] {
+	return &document[T]{apiClient: c.apiClient, collectionName: c.name, documentID: documentID}
 }
 
-func (c *collection) Overrides() OverridesInterface {
+func (c *collection[T]) Overrides() OverridesInterface {
 	return &overrides{apiClient: c.apiClient, collectionName: c.name}
 }
 
-func (c *collection) Override(overrideID string) OverrideInterface {
+func (c *collection[T]) Override(overrideID string) OverrideInterface {
 	return &override{apiClient: c.apiClient, collectionName: c.name, overrideID: overrideID}
 }
 
-func (c *collection) Synonyms() SynonymsInterface {
+func (c *collection[T]) Synonyms() SynonymsInterface {
 	return &synonyms{apiClient: c.apiClient, collectionName: c.name}
 }
 
-func (c *collection) Synonym(synonymID string) SynonymInterface {
+func (c *collection[T]) Synonym(synonymID string) SynonymInterface {
 	return &synonym{apiClient: c.apiClient, collectionName: c.name, synonymID: synonymID}
 }
 
-func (c *collection) Update(ctx context.Context, schema *api.CollectionUpdateSchema) (*api.CollectionUpdateSchema, error) {
+func (c *collection[T]) Update(ctx context.Context, schema *api.CollectionUpdateSchema) (*api.CollectionUpdateSchema, error) {
 	response, err := c.apiClient.UpdateCollectionWithResponse(ctx, c.name,
 		api.UpdateCollectionJSONRequestBody(*schema))
 	if err != nil {

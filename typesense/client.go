@@ -28,8 +28,12 @@ func (c *Client) Collections() CollectionsInterface {
 	return c.collections
 }
 
+func GenericCollection[T any](c *Client, collectionName string) CollectionInterface[T] {
+	return &collection[T]{apiClient: c.apiClient, name: collectionName}
+}
+
 func (c *Client) Collection(collectionName string) CollectionInterface[map[string]any] {
-	return &collection{apiClient: c.apiClient, name: collectionName}
+	return GenericCollection[map[string]any](c, collectionName)
 }
 
 func (c *Client) Aliases() AliasesInterface {
