@@ -39,7 +39,7 @@ func createNewDocumentResponse() map[string]interface{} {
 	document := map[string]interface{}{}
 	document["id"] = "123"
 	document["companyName"] = "Stark Industries"
-	document["numEmployees"] = 5215
+	document["numEmployees"] = float64(5215)
 	document["country"] = "USA"
 	return document
 }

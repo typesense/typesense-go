@@ -1,6 +1,6 @@
 module github.com/typesense/typesense-go
 
-go 1.17
+go 1.18
 
 require (
 	github.com/deepmap/oapi-codegen v1.12.3

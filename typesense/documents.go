@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/typesense/typesense-go/typesense/api"
@@ -111,7 +110,7 @@ func (d *documents) Export(ctx context.Context) (io.ReadCloser, error) {
 	}
 	if response.StatusCode != http.StatusOK {
 		defer response.Body.Close()
-		body, _ := ioutil.ReadAll(response.Body)
+		body, _ := io.ReadAll(response.Body)
 		return nil, &HTTPError{Status: response.StatusCode, Body: body}
 	}
 	return response.Body, nil
@@ -168,7 +167,7 @@ func (d *documents) ImportJsonl(ctx context.Context, body io.Reader, params *api
 	}
 	if response.StatusCode != http.StatusOK {
 		defer response.Body.Close()
-		body, _ := ioutil.ReadAll(response.Body)
+		body, _ := io.ReadAll(response.Body)
 		return nil, &HTTPError{Status: response.StatusCode, Body: body}
 	}
 	return response.Body, nil
