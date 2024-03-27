@@ -28,7 +28,7 @@ func (c *Client) Collections() CollectionsInterface {
 	return c.collections
 }
 
-func (c *Client) Collection(collectionName string) CollectionInterface {
+func (c *Client) Collection(collectionName string) CollectionInterface[map[string]any] {
 	return &collection{apiClient: c.apiClient, name: collectionName}
 }
 

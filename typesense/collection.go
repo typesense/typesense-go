@@ -7,11 +7,11 @@ import (
 )
 
 // CollectionInterface is a type for Collection API operations
-type CollectionInterface interface {
+type CollectionInterface[T any] interface {
 	Retrieve(ctx context.Context) (*api.CollectionResponse, error)
 	Delete(ctx context.Context) (*api.CollectionResponse, error)
 	Documents() DocumentsInterface
-	Document(documentID string) DocumentInterface[map[string]any]
+	Document(documentID string) DocumentInterface[T]
 	Overrides() OverridesInterface
 	Override(overrideID string) OverrideInterface
 	Synonyms() SynonymsInterface
