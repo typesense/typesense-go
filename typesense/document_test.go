@@ -3,12 +3,10 @@ package typesense
 import (
 	"context"
 	"errors"
-	"net/http"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"github.com/typesense/typesense-go/typesense/api"
 	"github.com/typesense/typesense-go/typesense/mocks"
 )
 
@@ -21,10 +19,8 @@ func TestDocumentRetrieve(t *testing.T) {
 	mockedResult := createNewDocumentResponse()
 
 	mockAPIClient.EXPECT().
-		GetDocumentWithResponse(gomock.Not(gomock.Nil()), "companies", "123").
-		Return(&api.GetDocumentResponse{
-			JSON200: &mockedResult,
-		}, nil).
+		GetDocument(gomock.Not(gomock.Nil()), "companies", "123").
+		Return(createResponse(200, "", mockedResult), nil).
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
@@ -40,7 +36,7 @@ func TestDocumentRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
-		GetDocumentWithResponse(gomock.Not(gomock.Nil()), "companies", "123").
+		GetDocument(gomock.Not(gomock.Nil()), "companies", "123").
 		Return(nil, errors.New("failed request")).
 		Times(1)
 
@@ -55,13 +51,8 @@ func TestDocumentRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
-		GetDocumentWithResponse(gomock.Not(gomock.Nil()), "companies", "123").
-		Return(&api.GetDocumentResponse{
-			HTTPResponse: &http.Response{
-				StatusCode: 500,
-			},
-			Body: []byte("Internal server error"),
-		}, nil).
+		GetDocument(gomock.Not(gomock.Nil()), "companies", "123").
+		Return(createResponse(500, "Internal server error", nil), nil).
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
@@ -80,10 +71,8 @@ func TestDocumentUpdate(t *testing.T) {
 
 	notNill := gomock.Not(gomock.Nil())
 	mockAPIClient.EXPECT().
-		UpdateDocumentWithResponse(notNill, "companies", "123", expectedDocument).
-		Return(&api.UpdateDocumentResponse{
-			JSON200: &mockedResult,
-		}, nil).
+		UpdateDocument(notNill, "companies", "123", expectedDocument).
+		Return(createResponse(200, "", mockedResult), nil).
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
@@ -103,7 +92,7 @@ func TestDocumentUpdateOnApiClientErrorReturnsError(t *testing.T) {
 
 	notNill := gomock.Not(gomock.Nil())
 	mockAPIClient.EXPECT().
-		UpdateDocumentWithResponse(notNill, "companies", "123", expectedDocument).
+		UpdateDocument(notNill, "companies", "123", expectedDocument).
 		Return(nil, errors.New("failed request")).
 		Times(1)
 
@@ -122,13 +111,8 @@ func TestDocumentUpdateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	notNill := gomock.Not(gomock.Nil())
 	mockAPIClient.EXPECT().
-		UpdateDocumentWithResponse(notNill, "companies", "123", expectedDocument).
-		Return(&api.UpdateDocumentResponse{
-			HTTPResponse: &http.Response{
-				StatusCode: 500,
-			},
-			Body: []byte("Internal server error"),
-		}, nil).
+		UpdateDocument(notNill, "companies", "123", expectedDocument).
+		Return(createResponse(500, "Internal server error", nil), nil).
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
@@ -146,10 +130,8 @@ func TestDocumentDelete(t *testing.T) {
 	mockedResult := createNewDocumentResponse()
 
 	mockAPIClient.EXPECT().
-		DeleteDocumentWithResponse(gomock.Not(gomock.Nil()), "companies", "123").
-		Return(&api.DeleteDocumentResponse{
-			JSON200: &mockedResult,
-		}, nil).
+		DeleteDocument(gomock.Not(gomock.Nil()), "companies", "123").
+		Return(createResponse(200, "", mockedResult), nil).
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
@@ -165,7 +147,7 @@ func TestDocumentDeleteOnApiClientErrorReturnsError(t *testing.T) {
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
-		DeleteDocumentWithResponse(gomock.Not(gomock.Nil()), "companies", "123").
+		DeleteDocument(gomock.Not(gomock.Nil()), "companies", "123").
 		Return(nil, errors.New("failed request")).
 		Times(1)
 
@@ -180,13 +162,8 @@ func TestDocumentDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
-		DeleteDocumentWithResponse(gomock.Not(gomock.Nil()), "companies", "123").
-		Return(&api.DeleteDocumentResponse{
-			HTTPResponse: &http.Response{
-				StatusCode: 500,
-			},
-			Body: []byte("Internal server error"),
-		}, nil).
+		DeleteDocument(gomock.Not(gomock.Nil()), "companies", "123").
+		Return(createResponse(500, "Internal server error", nil), nil).
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
