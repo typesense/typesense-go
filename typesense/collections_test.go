@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/golang/mock/gomock"
+	"go.uber.org/mock/gomock"
 	"github.com/jinzhu/copier"
 	"github.com/stretchr/testify/assert"
 	"github.com/typesense/typesense-go/typesense/api"
