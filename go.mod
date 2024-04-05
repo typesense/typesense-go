@@ -1,15 +1,15 @@
 module github.com/typesense/typesense-go
 
-go 1.17
+go 1.18
 
 require (
 	github.com/deepmap/oapi-codegen v1.12.3
-	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.0
 	github.com/jinzhu/copier v0.3.4
 	github.com/sony/gobreaker v0.5.0
 	github.com/stretchr/testify v1.8.1
 	github.com/testcontainers/testcontainers-go v0.12.0
+	go.uber.org/mock v0.4.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -39,7 +39,6 @@ require (
 	github.com/opencontainers/runc v1.0.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/rogpeppe/go-internal v1.8.1-0.20211023094830-115ce09fd6b4 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/net v0.1.0 // indirect

@@ -5,7 +5,7 @@
 package mocks
 
 import (
-	gomock "github.com/golang/mock/gomock"
+	gomock "go.uber.org/mock/gomock"
 	http "net/http"
 	reflect "reflect"
 )
