@@ -92,7 +92,7 @@ You can also find some examples in [integration tests](https://github.com/typese
 ### Upserting a document
 
 ```go
-	document := struct {
+	newDocument := struct {
 		ID           string `json:"id"`
 		CompanyName  string `json:"company_name"`
 		NumEmployees int    `json:"num_employees"`
