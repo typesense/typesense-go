@@ -155,6 +155,18 @@ func newDocumentResponse(docID string, opts ...newDocumentResponseOption) map[st
 	return document
 }
 
+func newStructResponse(docID string, opts ...func(*testDocument)) *testDocument {
+	document := &testDocument{}
+	document.ID = docID
+	document.CompanyName = "Stark Industries"
+	document.NumEmployees = 5215
+	document.Country = "USA"
+	for _, opt := range opts {
+		opt(document)
+	}
+	return document
+}
+
 func newKeySchema() *api.ApiKeySchema {
 	return &api.ApiKeySchema{
 		Description: "Search-only key.",
