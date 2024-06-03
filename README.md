@@ -71,6 +71,24 @@ You can also find some examples in [integration tests](https://github.com/typese
 	client.Collections().Create(context.Background(), schema)
 ```
 
+### Typed document operations
+
+In `v2.0.0`+, the client allows you to define a document struct to be used type for some of the document operations.
+
+To do that, you've to use `typesense.GenericCollection`: 
+
+```go
+type companyDocument struct {
+    ID           string `json:"id"`
+    CompanyName  string `json:"company_name"`
+    NumEmployees int    `json:"num_employees"`
+    Country      string `json:"country"`
+}
+
+// doc is a typed document
+doc, err := typesense.GenericCollection[*companyDocument](typesenseClient, collectionName).Document("123").Retrieve(context.Background())
+```
+
 ### Index a document
 
 ```go
