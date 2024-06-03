@@ -2,52 +2,76 @@ package typesense
 
 import (
 	"context"
+	"encoding/json"
+	"io"
+	"strings"
 )
 
-type DocumentInterface interface {
-	Retrieve(ctx context.Context) (map[string]interface{}, error)
-	Update(ctx context.Context, document interface{}) (map[string]interface{}, error)
-	Delete(ctx context.Context) (map[string]interface{}, error)
+type DocumentInterface[T any] interface {
+	Retrieve(ctx context.Context) (T, error)
+	Update(ctx context.Context, document any) (T, error)
+	Delete(ctx context.Context) (T, error)
 }
 
-type document struct {
+var _ DocumentInterface[any] = (*document[any])(nil)
+
+type document[T any] struct {
 	apiClient      APIClientInterface
 	collectionName string
 	documentID     string
 }
 
-func (d *document) Retrieve(ctx context.Context) (map[string]interface{}, error) {
-	response, err := d.apiClient.GetDocumentWithResponse(ctx,
+func (d *document[T]) Retrieve(ctx context.Context) (resp T, err error) {
+	response, err := d.apiClient.GetDocument(ctx,
 		d.collectionName, d.documentID)
 	if err != nil {
-		return nil, err
+		return resp, err
 	}
-	if response.JSON200 == nil {
-		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
+	if !(strings.Contains(response.Header.Get("Content-Type"), "json") && response.StatusCode == 200) {
+		body, _ := io.ReadAll(response.Body)
+		response.Body.Close()
+		return resp, &HTTPError{Status: response.StatusCode, Body: body}
 	}
-	return *response.JSON200, nil
+	err = json.NewDecoder(response.Body).Decode(&resp)
+	if err != nil {
+		return resp, err
+	}
+	return resp, nil
 }
 
-func (d *document) Update(ctx context.Context, document interface{}) (map[string]interface{}, error) {
-	response, err := d.apiClient.UpdateDocumentWithResponse(ctx,
+func (d *document[T]) Update(ctx context.Context, document any) (resp T, err error) {
+	response, err := d.apiClient.UpdateDocument(ctx,
 		d.collectionName, d.documentID, document)
 	if err != nil {
-		return nil, err
+		return resp, err
 	}
-	if response.JSON200 == nil {
-		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
+	if !(strings.Contains(response.Header.Get("Content-Type"), "json") && response.StatusCode == 200) {
+		body, _ := io.ReadAll(response.Body)
+		response.Body.Close()
+		return resp, &HTTPError{Status: response.StatusCode, Body: body}
 	}
-	return *response.JSON200, nil
+	err = json.NewDecoder(response.Body).Decode(&resp)
+	if err != nil {
+		return resp, err
+	}
+	return resp, nil
 }
 
-func (d *document) Delete(ctx context.Context) (map[string]interface{}, error) {
-	response, err := d.apiClient.DeleteDocumentWithResponse(ctx,
+func (d *document[T]) Delete(ctx context.Context) (resp T, err error) {
+	response, err := d.apiClient.DeleteDocument(ctx,
 		d.collectionName, d.documentID)
 	if err != nil {
-		return nil, err
+		return resp, err
 	}
-	if response.JSON200 == nil {
-		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
+	if !(strings.Contains(response.Header.Get("Content-Type"), "json") && response.StatusCode == 200) {
+		body, _ := io.ReadAll(response.Body)
+		response.Body.Close()
+		return resp, &HTTPError{Status: response.StatusCode, Body: body}
 	}
-	return *response.JSON200, nil
+	err = json.NewDecoder(response.Body).Decode(&resp)
+	if err != nil {
+		return resp, err
+	}
+
+	return resp, nil
 }

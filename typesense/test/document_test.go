@@ -8,7 +8,18 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/typesense/typesense-go/typesense"
 )
+
+func TestDocumentRetrieveGeneric(t *testing.T) {
+	collectionName := createNewCollection(t, "companies")
+	expectedResult := newStructResponse("123")
+	createDocument(t, collectionName, newDocument("123"))
+	result, err := typesense.GenericCollection[*testDocument](typesenseClient, collectionName).Document("123").Retrieve(context.Background())
+
+	require.NoError(t, err)
+	require.Equal(t, expectedResult, result)
+}
 
 func TestDocumentRetrieve(t *testing.T) {
 	collectionName := createNewCollection(t, "companies")
