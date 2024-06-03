@@ -10,8 +10,8 @@ import (
 	http "net/http"
 	reflect "reflect"
 
-	gomock "go.uber.org/mock/gomock"
 	api "github.com/typesense/typesense-go/typesense/api"
+	gomock "go.uber.org/mock/gomock"
 )
 
 // MockAPIClientInterface is a mock of APIClientInterface interface.
@@ -1835,4 +1835,124 @@ func (mr *MockAPIClientInterfaceMockRecorder) VoteWithResponse(ctx interface{}, 
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VoteWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).VoteWithResponse), varargs...)
+}
+
+func (m *MockAPIClientInterface) RetrieveAnalyticsRulesWithResponse(ctx context.Context, reqEditors ...api.RequestEditorFn) (*api.RetrieveAnalyticsRulesResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) CreateAnalyticsRuleWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*api.CreateAnalyticsRuleResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) CreateAnalyticsRuleWithResponse(ctx context.Context, body api.CreateAnalyticsRuleJSONRequestBody, reqEditors ...api.RequestEditorFn) (*api.CreateAnalyticsRuleResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) DeleteAnalyticsRuleWithResponse(ctx context.Context, ruleName string, reqEditors ...api.RequestEditorFn) (*api.DeleteAnalyticsRuleResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) RetrieveAnalyticsRuleWithResponse(ctx context.Context, ruleName string, reqEditors ...api.RequestEditorFn) (*api.RetrieveAnalyticsRuleResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) UpsertAnalyticsRuleWithBodyWithResponse(ctx context.Context, ruleName string, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*api.UpsertAnalyticsRuleResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) UpsertAnalyticsRuleWithResponse(ctx context.Context, ruleName string, body api.UpsertAnalyticsRuleJSONRequestBody, reqEditors ...api.RequestEditorFn) (*api.UpsertAnalyticsRuleResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) RetrieveStopwordsSetsWithResponse(ctx context.Context, reqEditors ...api.RequestEditorFn) (*api.RetrieveStopwordsSetsResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) DeleteStopwordsSetWithResponse(ctx context.Context, setId string, reqEditors ...api.RequestEditorFn) (*api.DeleteStopwordsSetResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) RetrieveStopwordsSetWithResponse(ctx context.Context, setId string, reqEditors ...api.RequestEditorFn) (*api.RetrieveStopwordsSetResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) UpsertStopwordsSetWithBodyWithResponse(ctx context.Context, setId string, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*api.UpsertStopwordsSetResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) UpsertStopwordsSetWithResponse(ctx context.Context, setId string, body api.UpsertStopwordsSetJSONRequestBody, reqEditors ...api.RequestEditorFn) (*api.UpsertStopwordsSetResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) RetrieveAnalyticsRules(ctx context.Context, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) CreateAnalyticsRuleWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) CreateAnalyticsRule(ctx context.Context, body api.CreateAnalyticsRuleJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) DeleteAnalyticsRule(ctx context.Context, ruleName string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) RetrieveAnalyticsRule(ctx context.Context, ruleName string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) UpsertAnalyticsRuleWithBody(ctx context.Context, ruleName string, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) UpsertAnalyticsRule(ctx context.Context, ruleName string, body api.UpsertAnalyticsRuleJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) RetrieveStopwordsSets(ctx context.Context, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) DeleteStopwordsSet(ctx context.Context, setId string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) RetrieveStopwordsSet(ctx context.Context, setId string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) UpsertStopwordsSetWithBody(ctx context.Context, setId string, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockAPIClientInterface) UpsertStopwordsSet(ctx context.Context, setId string, body api.UpsertStopwordsSetJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	//TODO implement me
+	panic("implement me")
 }

@@ -1,5 +1,46 @@
 components:
   schemas:
+    AnalyticsRuleParameters:
+      properties:
+        destination:
+          properties:
+            collection:
+              type: string
+          type: object
+        limit:
+          type: integer
+        source:
+          properties:
+            collections:
+              items:
+                type: string
+              type: array
+          type: object
+      required:
+        - source
+        - destination
+        - limit
+      type: object
+    AnalyticsRuleSchema:
+      properties:
+        name:
+          type: string
+        params:
+          $ref: '#/components/schemas/AnalyticsRuleParameters'
+        type:
+          type: string
+      required:
+        - name
+        - type
+        - params
+      type: object
+    AnalyticsRulesRetrieveSchema:
+      properties:
+        rules:
+          items:
+            $ref: '#/components/schemas/AnalyticsRuleSchema'
+          type: array
+      type: object
     ApiKey:
       allOf:
         - $ref: '#/components/schemas/ApiKeySchema'
@@ -266,6 +307,9 @@ components:
         optional:
           example: true
           type: boolean
+        reference:
+          example: string
+          type: string
         sort:
           example: true
           type: boolean
@@ -307,8 +351,14 @@ components:
             If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
           type: integer
         enable_overrides:
+          default: false
           description: |
             If you have some overrides defined but want to disable all of them during query time, you can do that by setting this parameter to false
+          type: boolean
+        enable_typos_for_numerical_tokens:
+          default: true
+          description: |
+            Make Typesense disable typos for numerical tokens.
           type: boolean
         exclude_fields:
           description: List of fields from the document to exclude in the search result
@@ -404,6 +454,7 @@ components:
             You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and  finally `hidden_hits`.
           type: string
         pre_segmented_query:
+          default: false
           description: |
             You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself  before indexing and querying.
             Set this parameter to true to do the same
@@ -416,8 +467,19 @@ components:
             Search using a bunch of search parameters by setting this parameter to the name of the existing Preset.
           type: string
         prioritize_exact_match:
+          default: true
           description: |
             Set this parameter to true to ensure that an exact match is ranked above the others
+          type: boolean
+        prioritize_num_matching_fields:
+          default: true
+          description: |
+            Make Typesense prioritize documents where the query words appear in more number of fields.
+          type: boolean
+        prioritize_token_position:
+          default: false
+          description: |
+            Make Typesense prioritize documents where the query words appear earlier in the text.
           type: boolean
         q:
           description: The query text to search for in the collection. Use * as the search string to return all documents. This is typically useful when used in conjunction with filter_by.
@@ -484,7 +546,8 @@ components:
     ScopedKeyParameters:
       properties:
         expires_at:
-          type: number
+          format: int64
+          type: integer
         filter_by:
           type: string
       type: object
@@ -642,8 +705,14 @@ components:
             Flag for enabling/disabling the deprecated, old highlight structure in the response. Default: true
           type: boolean
         enable_overrides:
+          default: false
           description: |
             If you have some overrides defined but want to disable all of them during query time, you can do that by setting this parameter to false
+          type: boolean
+        enable_typos_for_numerical_tokens:
+          default: true
+          description: |
+            Make Typesense disable typos for numerical tokens.
           type: boolean
         exclude_fields:
           description: List of fields from the document to exclude in the search result
@@ -755,10 +824,17 @@ components:
             Search using a bunch of search parameters by setting this parameter to the name of the existing Preset.
           type: string
         prioritize_exact_match:
+          default: true
           description: |
             Set this parameter to true to ensure that an exact match is ranked above the others
           type: boolean
+        prioritize_num_matching_fields:
+          default: true
+          description: |
+            Make Typesense prioritize documents where the query words appear in more number of fields.
+          type: boolean
         prioritize_token_position:
+          default: false
           description: |
             Make Typesense prioritize documents where the query words appear earlier in the text.
           type: boolean
@@ -934,6 +1010,46 @@ components:
         snapshot_path:
           type: string
       type: object
+    StopwordsSetRetrieveSchema:
+      example: |
+        {"stopwords": [{"id": "countries", "stopwords": ["Germany", "France", "Italy"], "locale": "en"}]}
+      properties:
+        stopwords:
+          items:
+            $ref: '#/components/schemas/StopwordsSetSchema'
+          type: array
+      required:
+        - stopwords
+      type: object
+    StopwordsSetSchema:
+      example: |
+        {"id": "countries", "stopwords": ["Germany", "France", "Italy"], "locale": "en"}
+      properties:
+        id:
+          type: string
+        locale:
+          type: string
+        stopwords:
+          items:
+            type: string
+          type: array
+      required:
+        - id
+        - stopwords
+      type: object
+    StopwordsSetUpsertSchema:
+      example: |
+        {"stopwords": ["Germany", "France", "Italy"], "locale": "en"}
+      properties:
+        locale:
+          type: string
+        stopwords:
+          items:
+            type: string
+          type: array
+      required:
+        - stopwords
+      type: object
     SuccessStatus:
       properties:
         success:
@@ -1059,6 +1175,132 @@ paths:
       summary: Create or update a collection alias
       tags:
         - collections
+  /analytics/rules:
+    get:
+      description: Retrieve the details of all analytics rules
+      operationId: retrieveAnalyticsRules
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsRulesRetrieveSchema'
+          description: Analytics rules fetched
+      summary: Retrieves all analytics rules
+      tags:
+        - analytics
+    post:
+      description: When an analytics rule is created, we give it a name and describe the type, the source collections and the destination collection.
+      operationId: createAnalyticsRule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyticsRuleSchema'
+        description: The Analytics rule to be created
+        required: true
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsRuleSchema'
+          description: Analytics rule successfully created
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Bad request, see error message for details
+      summary: Creates an analytics rule
+      tags:
+        - analytics
+  /analytics/rules/{ruleName}:
+    delete:
+      description: Permanently deletes an analytics rule, given it's name
+      operationId: deleteAnalyticsRule
+      parameters:
+        - description: The name of the analytics rule to delete
+          in: path
+          name: ruleName
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsRuleSchema'
+          description: Analytics rule deleted
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Analytics rule not found
+      summary: Delete an analytics rule
+      tags:
+        - analytics
+    get:
+      description: Retrieve the details of an analytics rule, given it's name
+      operationId: retrieveAnalyticsRule
+      parameters:
+        - description: The name of the analytics rule to retrieve
+          in: path
+          name: ruleName
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsRuleSchema'
+          description: Analytics rule fetched
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Analytics rule not found
+      summary: Retrieves an analytics rule
+      tags:
+        - analytics
+    put:
+      description: Upserts an analytics rule with the given name.
+      operationId: upsertAnalyticsRule
+      parameters:
+        - description: The name of the analytics rule to upsert
+          in: path
+          name: ruleName
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyticsRuleSchema'
+        description: The Analytics rule to be upserted
+        required: true
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsRuleSchema'
+          description: Analytics rule successfully upserted
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Bad request, see error message for details
+      summary: Upserts an analytics rule
+      tags:
+        - analytics
   /collections:
     get:
       description: Returns a summary of all your collections. The collections are returned sorted by creation date, with the most recent collections appearing first.
@@ -1581,6 +1823,10 @@ paths:
           schema:
             type: boolean
         - in: query
+          name: enable_typos_for_numerical_tokens
+          schema:
+            type: boolean
+        - in: query
           name: exclude_fields
           schema:
             type: string
@@ -1702,6 +1948,10 @@ paths:
             type: string
         - in: query
           name: prioritize_exact_match
+          schema:
+            type: boolean
+        - in: query
+          name: prioritize_num_matching_fields
           schema:
             type: boolean
         - in: query
@@ -2191,6 +2441,10 @@ paths:
           schema:
             type: boolean
         - in: query
+          name: enable_typos_for_numerical_tokens
+          schema:
+            type: boolean
+        - in: query
           name: exclude_fields
           schema:
             type: string
@@ -2315,6 +2569,10 @@ paths:
           schema:
             type: boolean
         - in: query
+          name: prioritize_num_matching_fields
+          schema:
+            type: boolean
+        - in: query
           name: prioritize_token_position
           schema:
             type: boolean
@@ -2426,6 +2684,116 @@ paths:
       summary: Triggers a follower node to initiate the raft voting process, which triggers leader re-election.
       tags:
         - operations
+  /stopwords:
+    get:
+      description: Retrieve the details of all stopwords sets
+      operationId: retrieveStopwordsSets
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StopwordsSetRetrieveSchema'
+          description: Stopwords sets fetched.
+      summary: Retrieves all stopwords sets.
+      tags:
+        - stopwords
+  /stopwords/{setId}:
+    delete:
+      description: Permanently deletes a stopwords set, given it's name.
+      operationId: deleteStopwordsSet
+      parameters:
+        - description: The ID of the stopwords set to delete.
+          example: countries
+          in: path
+          name: setId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                example: |
+                  {"id": "countries"}
+                properties:
+                  id:
+                    type: string
+                required:
+                  - id
+                type: object
+          description: Stopwords set rule deleted.
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Stopwords set not found.
+      summary: Delete a stopwords set.
+      tags:
+        - stopwords
+    get:
+      description: Retrieve the details of a stopwords set, given it's name.
+      operationId: retrieveStopwordsSet
+      parameters:
+        - description: The ID of the stopwords set to retrieve.
+          example: countries
+          in: path
+          name: setId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StopwordsSetRetrieveSchema'
+          description: Stopwords set fetched.
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Stopwords set not found.
+      summary: Retrieves a stopwords set.
+      tags:
+        - stopwords
+    put:
+      description: When an analytics rule is created, we give it a name and describe the type, the source collections and the destination collection.
+      operationId: upsertStopwordsSet
+      parameters:
+        - description: The ID of the stopwords set to upsert.
+          example: countries
+          in: path
+          name: setId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StopwordsSetUpsertSchema'
+        description: The stopwords set to upsert.
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StopwordsSetSchema'
+          description: Stopwords set successfully upserted.
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Bad request, see error message for details.
+      summary: Upserts a stopwords set.
+      tags:
+        - stopwords
 security:
   - api_key_header: []
 tags:
@@ -2444,6 +2812,11 @@ tags:
       description: Find out more
       url: https://typesense.org/docs/0.23.0/api/#curation
     name: promote
+  - description: Typesense can aggregate search queries for both analytics purposes and for query suggestions.
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/docs/0.25.0/api/analytics-query-suggestions.html
+    name: analytics
   - description: Manage API Keys with fine-grain access control
     externalDocs:
       description: Find out more
@@ -2456,3 +2829,8 @@ tags:
       description: Find out more
       url: https://typesense.org/docs/0.23.0/api/#cluster-operations
     name: operations
+  - description: Manage stopwords sets
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/docs/26.0/api/stopwords.html
+    name: stopwords

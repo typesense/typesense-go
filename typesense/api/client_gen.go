@@ -103,6 +103,25 @@ type ClientInterface interface {
 
 	UpsertAlias(ctx context.Context, aliasName string, body UpsertAliasJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// RetrieveAnalyticsRules request
+	RetrieveAnalyticsRules(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateAnalyticsRule request with any body
+	CreateAnalyticsRuleWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateAnalyticsRule(ctx context.Context, body CreateAnalyticsRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteAnalyticsRule request
+	DeleteAnalyticsRule(ctx context.Context, ruleName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RetrieveAnalyticsRule request
+	RetrieveAnalyticsRule(ctx context.Context, ruleName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpsertAnalyticsRule request with any body
+	UpsertAnalyticsRuleWithBody(ctx context.Context, ruleName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpsertAnalyticsRule(ctx context.Context, ruleName string, body UpsertAnalyticsRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetCollections request
 	GetCollections(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -213,6 +232,20 @@ type ClientInterface interface {
 
 	// Vote request
 	Vote(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RetrieveStopwordsSets request
+	RetrieveStopwordsSets(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteStopwordsSet request
+	DeleteStopwordsSet(ctx context.Context, setId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RetrieveStopwordsSet request
+	RetrieveStopwordsSet(ctx context.Context, setId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpsertStopwordsSet request with any body
+	UpsertStopwordsSetWithBody(ctx context.Context, setId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpsertStopwordsSet(ctx context.Context, setId string, body UpsertStopwordsSetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) GetAliases(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -265,6 +298,90 @@ func (c *Client) UpsertAliasWithBody(ctx context.Context, aliasName string, cont
 
 func (c *Client) UpsertAlias(ctx context.Context, aliasName string, body UpsertAliasJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpsertAliasRequest(c.Server, aliasName, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RetrieveAnalyticsRules(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrieveAnalyticsRulesRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateAnalyticsRuleWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateAnalyticsRuleRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateAnalyticsRule(ctx context.Context, body CreateAnalyticsRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateAnalyticsRuleRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteAnalyticsRule(ctx context.Context, ruleName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteAnalyticsRuleRequest(c.Server, ruleName)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RetrieveAnalyticsRule(ctx context.Context, ruleName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrieveAnalyticsRuleRequest(c.Server, ruleName)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpsertAnalyticsRuleWithBody(ctx context.Context, ruleName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpsertAnalyticsRuleRequestWithBody(c.Server, ruleName, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpsertAnalyticsRule(ctx context.Context, ruleName string, body UpsertAnalyticsRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpsertAnalyticsRuleRequest(c.Server, ruleName, body)
 	if err != nil {
 		return nil, err
 	}
@@ -755,6 +872,66 @@ func (c *Client) Vote(ctx context.Context, reqEditors ...RequestEditorFn) (*http
 	return c.Client.Do(req)
 }
 
+func (c *Client) RetrieveStopwordsSets(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrieveStopwordsSetsRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteStopwordsSet(ctx context.Context, setId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteStopwordsSetRequest(c.Server, setId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RetrieveStopwordsSet(ctx context.Context, setId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrieveStopwordsSetRequest(c.Server, setId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpsertStopwordsSetWithBody(ctx context.Context, setId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpsertStopwordsSetRequestWithBody(c.Server, setId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpsertStopwordsSet(ctx context.Context, setId string, body UpsertStopwordsSetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpsertStopwordsSetRequest(c.Server, setId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 // NewGetAliasesRequest generates requests for GetAliases
 func NewGetAliasesRequest(server string) (*http.Request, error) {
 	var err error
@@ -878,6 +1055,188 @@ func NewUpsertAliasRequestWithBody(server string, aliasName string, contentType 
 	}
 
 	operationPath := fmt.Sprintf("/aliases/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRetrieveAnalyticsRulesRequest generates requests for RetrieveAnalyticsRules
+func NewRetrieveAnalyticsRulesRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/analytics/rules")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateAnalyticsRuleRequest calls the generic CreateAnalyticsRule builder with application/json body
+func NewCreateAnalyticsRuleRequest(server string, body CreateAnalyticsRuleJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateAnalyticsRuleRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateAnalyticsRuleRequestWithBody generates requests for CreateAnalyticsRule with any type of body
+func NewCreateAnalyticsRuleRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/analytics/rules")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteAnalyticsRuleRequest generates requests for DeleteAnalyticsRule
+func NewDeleteAnalyticsRuleRequest(server string, ruleName string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "ruleName", runtime.ParamLocationPath, ruleName)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/analytics/rules/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRetrieveAnalyticsRuleRequest generates requests for RetrieveAnalyticsRule
+func NewRetrieveAnalyticsRuleRequest(server string, ruleName string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "ruleName", runtime.ParamLocationPath, ruleName)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/analytics/rules/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpsertAnalyticsRuleRequest calls the generic UpsertAnalyticsRule builder with application/json body
+func NewUpsertAnalyticsRuleRequest(server string, ruleName string, body UpsertAnalyticsRuleJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpsertAnalyticsRuleRequestWithBody(server, ruleName, "application/json", bodyReader)
+}
+
+// NewUpsertAnalyticsRuleRequestWithBody generates requests for UpsertAnalyticsRule with any type of body
+func NewUpsertAnalyticsRuleRequestWithBody(server string, ruleName string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "ruleName", runtime.ParamLocationPath, ruleName)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/analytics/rules/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1565,6 +1924,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 	}
 
+	if params.EnableTyposForNumericalTokens != nil {
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_typos_for_numerical_tokens", runtime.ParamLocationQuery, *params.EnableTyposForNumericalTokens); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+	}
+
 	if params.ExcludeFields != nil {
 
 		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "exclude_fields", runtime.ParamLocationQuery, *params.ExcludeFields); err != nil {
@@ -2048,6 +2423,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 	if params.PrioritizeExactMatch != nil {
 
 		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "prioritize_exact_match", runtime.ParamLocationQuery, *params.PrioritizeExactMatch); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+	}
+
+	if params.PrioritizeNumMatchingFields != nil {
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "prioritize_num_matching_fields", runtime.ParamLocationQuery, *params.PrioritizeNumMatchingFields); err != nil {
 			return nil, err
 		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 			return nil, err
@@ -3048,6 +3439,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 	}
 
+	if params.EnableTyposForNumericalTokens != nil {
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_typos_for_numerical_tokens", runtime.ParamLocationQuery, *params.EnableTyposForNumericalTokens); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+	}
+
 	if params.ExcludeFields != nil {
 
 		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "exclude_fields", runtime.ParamLocationQuery, *params.ExcludeFields); err != nil {
@@ -3544,6 +3951,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 	}
 
+	if params.PrioritizeNumMatchingFields != nil {
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "prioritize_num_matching_fields", runtime.ParamLocationQuery, *params.PrioritizeNumMatchingFields); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+	}
+
 	if params.PrioritizeTokenPosition != nil {
 
 		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "prioritize_token_position", runtime.ParamLocationQuery, *params.PrioritizeTokenPosition); err != nil {
@@ -3850,6 +4273,148 @@ func NewVoteRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
+// NewRetrieveStopwordsSetsRequest generates requests for RetrieveStopwordsSets
+func NewRetrieveStopwordsSetsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/stopwords")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewDeleteStopwordsSetRequest generates requests for DeleteStopwordsSet
+func NewDeleteStopwordsSetRequest(server string, setId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "setId", runtime.ParamLocationPath, setId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/stopwords/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRetrieveStopwordsSetRequest generates requests for RetrieveStopwordsSet
+func NewRetrieveStopwordsSetRequest(server string, setId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "setId", runtime.ParamLocationPath, setId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/stopwords/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpsertStopwordsSetRequest calls the generic UpsertStopwordsSet builder with application/json body
+func NewUpsertStopwordsSetRequest(server string, setId string, body UpsertStopwordsSetJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpsertStopwordsSetRequestWithBody(server, setId, "application/json", bodyReader)
+}
+
+// NewUpsertStopwordsSetRequestWithBody generates requests for UpsertStopwordsSet with any type of body
+func NewUpsertStopwordsSetRequestWithBody(server string, setId string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "setId", runtime.ParamLocationPath, setId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/stopwords/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
@@ -3906,6 +4471,25 @@ type ClientWithResponsesInterface interface {
 	UpsertAliasWithBodyWithResponse(ctx context.Context, aliasName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpsertAliasResponse, error)
 
 	UpsertAliasWithResponse(ctx context.Context, aliasName string, body UpsertAliasJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertAliasResponse, error)
+
+	// RetrieveAnalyticsRules request
+	RetrieveAnalyticsRulesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAnalyticsRulesResponse, error)
+
+	// CreateAnalyticsRule request with any body
+	CreateAnalyticsRuleWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAnalyticsRuleResponse, error)
+
+	CreateAnalyticsRuleWithResponse(ctx context.Context, body CreateAnalyticsRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAnalyticsRuleResponse, error)
+
+	// DeleteAnalyticsRule request
+	DeleteAnalyticsRuleWithResponse(ctx context.Context, ruleName string, reqEditors ...RequestEditorFn) (*DeleteAnalyticsRuleResponse, error)
+
+	// RetrieveAnalyticsRule request
+	RetrieveAnalyticsRuleWithResponse(ctx context.Context, ruleName string, reqEditors ...RequestEditorFn) (*RetrieveAnalyticsRuleResponse, error)
+
+	// UpsertAnalyticsRule request with any body
+	UpsertAnalyticsRuleWithBodyWithResponse(ctx context.Context, ruleName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpsertAnalyticsRuleResponse, error)
+
+	UpsertAnalyticsRuleWithResponse(ctx context.Context, ruleName string, body UpsertAnalyticsRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertAnalyticsRuleResponse, error)
 
 	// GetCollections request
 	GetCollectionsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCollectionsResponse, error)
@@ -4017,6 +4601,20 @@ type ClientWithResponsesInterface interface {
 
 	// Vote request
 	VoteWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*VoteResponse, error)
+
+	// RetrieveStopwordsSets request
+	RetrieveStopwordsSetsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveStopwordsSetsResponse, error)
+
+	// DeleteStopwordsSet request
+	DeleteStopwordsSetWithResponse(ctx context.Context, setId string, reqEditors ...RequestEditorFn) (*DeleteStopwordsSetResponse, error)
+
+	// RetrieveStopwordsSet request
+	RetrieveStopwordsSetWithResponse(ctx context.Context, setId string, reqEditors ...RequestEditorFn) (*RetrieveStopwordsSetResponse, error)
+
+	// UpsertStopwordsSet request with any body
+	UpsertStopwordsSetWithBodyWithResponse(ctx context.Context, setId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpsertStopwordsSetResponse, error)
+
+	UpsertStopwordsSetWithResponse(ctx context.Context, setId string, body UpsertStopwordsSetJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertStopwordsSetResponse, error)
 }
 
 type GetAliasesResponse struct {
@@ -4105,6 +4703,120 @@ func (r UpsertAliasResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r UpsertAliasResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RetrieveAnalyticsRulesResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AnalyticsRulesRetrieveSchema
+}
+
+// Status returns HTTPResponse.Status
+func (r RetrieveAnalyticsRulesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetrieveAnalyticsRulesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateAnalyticsRuleResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *AnalyticsRuleSchema
+	JSON400      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateAnalyticsRuleResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateAnalyticsRuleResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteAnalyticsRuleResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AnalyticsRuleSchema
+	JSON404      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteAnalyticsRuleResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteAnalyticsRuleResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RetrieveAnalyticsRuleResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AnalyticsRuleSchema
+	JSON404      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r RetrieveAnalyticsRuleResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetrieveAnalyticsRuleResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpsertAnalyticsRuleResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *AnalyticsRuleSchema
+	JSON400      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r UpsertAnalyticsRuleResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpsertAnalyticsRuleResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -4828,6 +5540,99 @@ func (r VoteResponse) StatusCode() int {
 	return 0
 }
 
+type RetrieveStopwordsSetsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *StopwordsSetRetrieveSchema
+}
+
+// Status returns HTTPResponse.Status
+func (r RetrieveStopwordsSetsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetrieveStopwordsSetsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteStopwordsSetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Id string `json:"id"`
+	}
+	JSON404 *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteStopwordsSetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteStopwordsSetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RetrieveStopwordsSetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *StopwordsSetRetrieveSchema
+	JSON404      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r RetrieveStopwordsSetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetrieveStopwordsSetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpsertStopwordsSetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *StopwordsSetSchema
+	JSON400      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r UpsertStopwordsSetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpsertStopwordsSetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 // GetAliasesWithResponse request returning *GetAliasesResponse
 func (c *ClientWithResponses) GetAliasesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetAliasesResponse, error) {
 	rsp, err := c.GetAliases(ctx, reqEditors...)
@@ -4870,6 +5675,67 @@ func (c *ClientWithResponses) UpsertAliasWithResponse(ctx context.Context, alias
 		return nil, err
 	}
 	return ParseUpsertAliasResponse(rsp)
+}
+
+// RetrieveAnalyticsRulesWithResponse request returning *RetrieveAnalyticsRulesResponse
+func (c *ClientWithResponses) RetrieveAnalyticsRulesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAnalyticsRulesResponse, error) {
+	rsp, err := c.RetrieveAnalyticsRules(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetrieveAnalyticsRulesResponse(rsp)
+}
+
+// CreateAnalyticsRuleWithBodyWithResponse request with arbitrary body returning *CreateAnalyticsRuleResponse
+func (c *ClientWithResponses) CreateAnalyticsRuleWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAnalyticsRuleResponse, error) {
+	rsp, err := c.CreateAnalyticsRuleWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateAnalyticsRuleResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateAnalyticsRuleWithResponse(ctx context.Context, body CreateAnalyticsRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAnalyticsRuleResponse, error) {
+	rsp, err := c.CreateAnalyticsRule(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateAnalyticsRuleResponse(rsp)
+}
+
+// DeleteAnalyticsRuleWithResponse request returning *DeleteAnalyticsRuleResponse
+func (c *ClientWithResponses) DeleteAnalyticsRuleWithResponse(ctx context.Context, ruleName string, reqEditors ...RequestEditorFn) (*DeleteAnalyticsRuleResponse, error) {
+	rsp, err := c.DeleteAnalyticsRule(ctx, ruleName, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteAnalyticsRuleResponse(rsp)
+}
+
+// RetrieveAnalyticsRuleWithResponse request returning *RetrieveAnalyticsRuleResponse
+func (c *ClientWithResponses) RetrieveAnalyticsRuleWithResponse(ctx context.Context, ruleName string, reqEditors ...RequestEditorFn) (*RetrieveAnalyticsRuleResponse, error) {
+	rsp, err := c.RetrieveAnalyticsRule(ctx, ruleName, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetrieveAnalyticsRuleResponse(rsp)
+}
+
+// UpsertAnalyticsRuleWithBodyWithResponse request with arbitrary body returning *UpsertAnalyticsRuleResponse
+func (c *ClientWithResponses) UpsertAnalyticsRuleWithBodyWithResponse(ctx context.Context, ruleName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpsertAnalyticsRuleResponse, error) {
+	rsp, err := c.UpsertAnalyticsRuleWithBody(ctx, ruleName, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpsertAnalyticsRuleResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpsertAnalyticsRuleWithResponse(ctx context.Context, ruleName string, body UpsertAnalyticsRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertAnalyticsRuleResponse, error) {
+	rsp, err := c.UpsertAnalyticsRule(ctx, ruleName, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpsertAnalyticsRuleResponse(rsp)
 }
 
 // GetCollectionsWithResponse request returning *GetCollectionsResponse
@@ -5223,6 +6089,50 @@ func (c *ClientWithResponses) VoteWithResponse(ctx context.Context, reqEditors .
 	return ParseVoteResponse(rsp)
 }
 
+// RetrieveStopwordsSetsWithResponse request returning *RetrieveStopwordsSetsResponse
+func (c *ClientWithResponses) RetrieveStopwordsSetsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveStopwordsSetsResponse, error) {
+	rsp, err := c.RetrieveStopwordsSets(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetrieveStopwordsSetsResponse(rsp)
+}
+
+// DeleteStopwordsSetWithResponse request returning *DeleteStopwordsSetResponse
+func (c *ClientWithResponses) DeleteStopwordsSetWithResponse(ctx context.Context, setId string, reqEditors ...RequestEditorFn) (*DeleteStopwordsSetResponse, error) {
+	rsp, err := c.DeleteStopwordsSet(ctx, setId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteStopwordsSetResponse(rsp)
+}
+
+// RetrieveStopwordsSetWithResponse request returning *RetrieveStopwordsSetResponse
+func (c *ClientWithResponses) RetrieveStopwordsSetWithResponse(ctx context.Context, setId string, reqEditors ...RequestEditorFn) (*RetrieveStopwordsSetResponse, error) {
+	rsp, err := c.RetrieveStopwordsSet(ctx, setId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetrieveStopwordsSetResponse(rsp)
+}
+
+// UpsertStopwordsSetWithBodyWithResponse request with arbitrary body returning *UpsertStopwordsSetResponse
+func (c *ClientWithResponses) UpsertStopwordsSetWithBodyWithResponse(ctx context.Context, setId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpsertStopwordsSetResponse, error) {
+	rsp, err := c.UpsertStopwordsSetWithBody(ctx, setId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpsertStopwordsSetResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpsertStopwordsSetWithResponse(ctx context.Context, setId string, body UpsertStopwordsSetJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertStopwordsSetResponse, error) {
+	rsp, err := c.UpsertStopwordsSet(ctx, setId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpsertStopwordsSetResponse(rsp)
+}
+
 // ParseGetAliasesResponse parses an HTTP response from a GetAliasesWithResponse call
 func ParseGetAliasesResponse(rsp *http.Response) (*GetAliasesResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -5349,6 +6259,164 @@ func ParseUpsertAliasResponse(rsp *http.Response) (*UpsertAliasResponse, error) 
 			return nil, err
 		}
 		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetrieveAnalyticsRulesResponse parses an HTTP response from a RetrieveAnalyticsRulesWithResponse call
+func ParseRetrieveAnalyticsRulesResponse(rsp *http.Response) (*RetrieveAnalyticsRulesResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetrieveAnalyticsRulesResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AnalyticsRulesRetrieveSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateAnalyticsRuleResponse parses an HTTP response from a CreateAnalyticsRuleWithResponse call
+func ParseCreateAnalyticsRuleResponse(rsp *http.Response) (*CreateAnalyticsRuleResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateAnalyticsRuleResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest AnalyticsRuleSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteAnalyticsRuleResponse parses an HTTP response from a DeleteAnalyticsRuleWithResponse call
+func ParseDeleteAnalyticsRuleResponse(rsp *http.Response) (*DeleteAnalyticsRuleResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteAnalyticsRuleResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AnalyticsRuleSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetrieveAnalyticsRuleResponse parses an HTTP response from a RetrieveAnalyticsRuleWithResponse call
+func ParseRetrieveAnalyticsRuleResponse(rsp *http.Response) (*RetrieveAnalyticsRuleResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetrieveAnalyticsRuleResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AnalyticsRuleSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpsertAnalyticsRuleResponse parses an HTTP response from a UpsertAnalyticsRuleWithResponse call
+func ParseUpsertAnalyticsRuleResponse(rsp *http.Response) (*UpsertAnalyticsRuleResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpsertAnalyticsRuleResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest AnalyticsRuleSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
 
 	}
 
@@ -6358,6 +7426,133 @@ func ParseVoteResponse(rsp *http.Response) (*VoteResponse, error) {
 			return nil, err
 		}
 		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetrieveStopwordsSetsResponse parses an HTTP response from a RetrieveStopwordsSetsWithResponse call
+func ParseRetrieveStopwordsSetsResponse(rsp *http.Response) (*RetrieveStopwordsSetsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetrieveStopwordsSetsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest StopwordsSetRetrieveSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteStopwordsSetResponse parses an HTTP response from a DeleteStopwordsSetWithResponse call
+func ParseDeleteStopwordsSetResponse(rsp *http.Response) (*DeleteStopwordsSetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteStopwordsSetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Id string `json:"id"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetrieveStopwordsSetResponse parses an HTTP response from a RetrieveStopwordsSetWithResponse call
+func ParseRetrieveStopwordsSetResponse(rsp *http.Response) (*RetrieveStopwordsSetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetrieveStopwordsSetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest StopwordsSetRetrieveSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpsertStopwordsSetResponse parses an HTTP response from a UpsertStopwordsSetWithResponse call
+func ParseUpsertStopwordsSetResponse(rsp *http.Response) (*UpsertStopwordsSetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpsertStopwordsSetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest StopwordsSetSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
 
 	}
 
