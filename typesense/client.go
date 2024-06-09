@@ -1,4 +1,4 @@
-//go:generate mockgen -destination=mocks/mock_client.go -package=mocks -source client.go
+//go:generate go run go.uber.org/mock/mockgen -destination=mocks/mock_client.go -package=mocks -source client.go
 
 package typesense
 

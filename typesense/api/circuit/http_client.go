@@ -1,4 +1,4 @@
-//go:generate mockgen -source=http_client.go -destination=mocks/mock_circuit.go -package=mocks
+//go:generate go run go.uber.org/mock/mockgen -source=http_client.go -destination=mocks/mock_circuit.go -package=mocks
 
 package circuit
 
