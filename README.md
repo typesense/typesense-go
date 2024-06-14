@@ -409,10 +409,8 @@ go mod download
 Update the generated files,
 
 ```bash
-go generate
+go generate ./...
 ```
-
-> NOTE: Make sure you have `GOBIN` in environment variables
 
 ## License
 
