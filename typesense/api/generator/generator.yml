@@ -373,6 +373,10 @@ components:
         facet_query:
           description: Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
           type: string
+        facet_strategy:
+          description: |
+            Choose the underlying faceting strategy used. Comma separated string of allows values:  exhaustive, top_values or automatic (default).
+          type: string
         filter_by:
           description: Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
           example: 'num_employees:>100 && country: [USA, UK]'
@@ -726,6 +730,10 @@ components:
           type: string
         facet_query:
           description: Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
+          type: string
+        facet_strategy:
+          description: |
+            Choose the underlying faceting strategy used. Comma separated string of allows values:  exhaustive, top_values or automatic (default).
           type: string
         filter_by:
           description: Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
@@ -1843,6 +1851,10 @@ paths:
           schema:
             type: string
         - in: query
+          name: facet_strategy
+          schema:
+            type: string
+        - in: query
           name: filter_by
           schema:
             type: string
@@ -2458,6 +2470,10 @@ paths:
             type: string
         - in: query
           name: facet_query
+          schema:
+            type: string
+        - in: query
+          name: facet_strategy
           schema:
             type: string
         - in: query

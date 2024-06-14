@@ -2325,6 +2325,11 @@ components:
           description: >
             Number of times to retry fetching remote embeddings.
           type: integer
+        facet_strategy:
+          description: >
+            Choose the underlying faceting strategy used. Comma separated string of allows values: 
+            exhaustive, top_values or automatic (default).
+          type: string
 
     MultiSearchParameters:
       description: >
@@ -2631,6 +2636,11 @@ components:
           description: >
             Number of times to retry fetching remote embeddings.
           type: integer
+        facet_strategy:
+          description: >
+            Choose the underlying faceting strategy used. Comma separated string of allows values: 
+            exhaustive, top_values or automatic (default).
+          type: string
     MultiSearchSearchesParameter:
       type: object
       required:

@@ -230,6 +230,9 @@ type MultiSearchCollectionParameters struct {
 	// FacetQuery Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
 	FacetQuery *string `json:"facet_query,omitempty"`
 
+	// FacetStrategy Choose the underlying faceting strategy used. Comma separated string of allows values:  exhaustive, top_values or automatic (default).
+	FacetStrategy *string `json:"facet_strategy,omitempty"`
+
 	// FilterBy Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
 	FilterBy *string `json:"filter_by,omitempty"`
 
@@ -379,6 +382,9 @@ type MultiSearchParameters struct {
 
 	// FacetQuery Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
 	FacetQuery *string `json:"facet_query,omitempty"`
+
+	// FacetStrategy Choose the underlying faceting strategy used. Comma separated string of allows values:  exhaustive, top_values or automatic (default).
+	FacetStrategy *string `json:"facet_strategy,omitempty"`
 
 	// FilterBy Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
 	FilterBy *string `json:"filter_by,omitempty"`
@@ -760,6 +766,7 @@ type SearchCollectionParams struct {
 	ExhaustiveSearch              *bool   `form:"exhaustive_search,omitempty" json:"exhaustive_search,omitempty"`
 	FacetBy                       *string `form:"facet_by,omitempty" json:"facet_by,omitempty"`
 	FacetQuery                    *string `form:"facet_query,omitempty" json:"facet_query,omitempty"`
+	FacetStrategy                 *string `form:"facet_strategy,omitempty" json:"facet_strategy,omitempty"`
 	FilterBy                      *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
 	GroupBy                       *string `form:"group_by,omitempty" json:"group_by,omitempty"`
 	GroupLimit                    *int    `form:"group_limit,omitempty" json:"group_limit,omitempty"`
@@ -818,6 +825,7 @@ type MultiSearchParams struct {
 	ExhaustiveSearch              *bool   `form:"exhaustive_search,omitempty" json:"exhaustive_search,omitempty"`
 	FacetBy                       *string `form:"facet_by,omitempty" json:"facet_by,omitempty"`
 	FacetQuery                    *string `form:"facet_query,omitempty" json:"facet_query,omitempty"`
+	FacetStrategy                 *string `form:"facet_strategy,omitempty" json:"facet_strategy,omitempty"`
 	FilterBy                      *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
 	GroupBy                       *string `form:"group_by,omitempty" json:"group_by,omitempty"`
 	GroupLimit                    *int    `form:"group_limit,omitempty" json:"group_limit,omitempty"`
