@@ -105,17 +105,17 @@ func WithServer(serverURL string) ClientOption {
 	}
 }
 
-// WithNodes sets multiple hostnames to load balance reads & writes across all nodes.
-func WithNodes(URLs []string) ClientOption {
-	return func(c *Client) {
-		c.apiConfig.Nodes = URLs
-	}
-}
-
 // WithNearestNode sets the Load Balanced endpoint.
 func WithNearestNode(URL string) ClientOption {
 	return func(c *Client) {
 		c.apiConfig.NearestNode = URL
+	}
+}
+
+// WithNodes sets multiple hostnames to load balance reads & writes across all nodes.
+func WithNodes(URLs []string) ClientOption {
+	return func(c *Client) {
+		c.apiConfig.Nodes = URLs
 	}
 }
 
