@@ -260,15 +260,7 @@ components:
       properties:
         id:
           type: integer
-    ConversationModelResponse:
-      allOf:
-        - $ref: '#/components/schemas/ConversationModelSchema'
-        - properties:
-            id:
-              readOnly: true
-              type: string
-          type: object
-    ConversationModelSchema:
+    ConversationModelCreateSchema:
       properties:
         account_id:
           description: LLM service's account ID (only applicable for Cloudflare)
@@ -292,9 +284,21 @@ components:
       required:
         - model_name
         - api_key
-        - system_prompt
         - max_bytes
       type: object
+    ConversationModelDeleteSchema:
+      properties:
+        id:
+          type: string
+      type: object
+    ConversationModelSchema:
+      allOf:
+        - $ref: '#/components/schemas/ConversationModelCreateSchema'
+        - properties:
+            id:
+              readOnly: true
+              type: string
+          type: object
     ConversationSchema:
       properties:
         conversation:
@@ -2587,9 +2591,9 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/ConversationModelResponse'
+                  $ref: '#/components/schemas/ConversationModelSchema'
                 type: array
-                x-go-type: '[]*ConversationModelResponse'
+                x-go-type: '[]*ConversationModelSchema'
           description: List of all conversation models
       summary: List all conversation models
       tags:
@@ -2601,13 +2605,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ConversationModelSchema'
+              $ref: '#/components/schemas/ConversationModelCreateSchema'
       responses:
         201:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConversationModelResponse'
+                $ref: '#/components/schemas/ConversationModelSchema'
           description: Created Conversation Model
         400:
           content:
@@ -2615,6 +2619,72 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
           description: Bad request, see error message for details
+      tags:
+        - conversations
+  /conversations/models/{modelId}:
+    delete:
+      description: Delete a conversation model
+      operationId: deleteConversationModel
+      parameters:
+        - description: The id of the conversation model to delete
+          in: path
+          name: modelId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationModelDeleteSchema'
+          description: The conversation model was successfully deleted
+      summary: Delete a conversation model
+      tags:
+        - conversations
+    get:
+      description: Retrieve a conversation model
+      operationId: retrieveConversationModel
+      parameters:
+        - description: The id of the conversation model to retrieve
+          in: path
+          name: modelId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationModelSchema'
+          description: A conversation model
+      summary: Retrieve a conversation model
+      tags:
+        - conversations
+    put:
+      description: Update a conversation model
+      operationId: updateConversationModel
+      parameters:
+        - description: The id of the conversation model to update
+          in: path
+          name: modelId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationModelCreateSchema'
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationModelCreateSchema'
+          description: The conversation model was successfully updated
+      summary: Update a conversation model
       tags:
         - conversations
   /debug:

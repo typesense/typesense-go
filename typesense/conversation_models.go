@@ -8,8 +8,8 @@ import (
 
 // ConversationModelsInterface is a type for ConversationModels API operations
 type ConversationModelsInterface interface {
-	Create(ctx context.Context, conversationModelSchema *api.ConversationModelSchema) (*api.ConversationModelResponse, error)
-	Retrieve(ctx context.Context) ([]*api.ConversationModelResponse, error)
+	Create(ctx context.Context, conversationModelCreateSchema *api.ConversationModelCreateSchema) (*api.ConversationModelSchema, error)
+	Retrieve(ctx context.Context) ([]*api.ConversationModelSchema, error)
 }
 
 // conversationModels is internal implementation of ConversationModelsInterface
@@ -17,8 +17,8 @@ type conversationModels struct {
 	apiClient APIClientInterface
 }
 
-func (c *conversationModels) Create(ctx context.Context, conversationModelSchema *api.ConversationModelSchema) (*api.ConversationModelResponse, error) {
-	response, err := c.apiClient.CreateConversationModelWithResponse(ctx, api.CreateConversationModelJSONRequestBody(*conversationModelSchema))
+func (c *conversationModels) Create(ctx context.Context, conversationModelCreateSchema *api.ConversationModelCreateSchema) (*api.ConversationModelSchema, error) {
+	response, err := c.apiClient.CreateConversationModelWithResponse(ctx, api.CreateConversationModelJSONRequestBody(*conversationModelCreateSchema))
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func (c *conversationModels) Create(ctx context.Context, conversationModelSchema
 	return response.JSON201, nil
 }
 
-func (c *conversationModels) Retrieve(ctx context.Context) ([]*api.ConversationModelResponse, error) {
+func (c *conversationModels) Retrieve(ctx context.Context) ([]*api.ConversationModelSchema, error) {
 	response, err := c.apiClient.RetrieveAllConversationModelsWithResponse(ctx)
 	if err != nil {
 		return nil, err

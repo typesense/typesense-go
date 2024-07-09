@@ -31,3 +31,7 @@ func (c *conversations) Retrieve(ctx context.Context) ([]*api.ConversationSchema
 func (c *conversations) Models() ConversationModelsInterface {
 	return &conversationModels{apiClient: c.apiClient}
 }
+
+func (c *conversations) Model(modelId string) ConversationModelInterface {
+	return &conversationModel{apiClient: c.apiClient, modelId: modelId}
+}
