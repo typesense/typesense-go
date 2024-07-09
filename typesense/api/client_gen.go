@@ -202,6 +202,9 @@ type ClientInterface interface {
 
 	UpsertSearchSynonym(ctx context.Context, collectionName string, synonymId string, body UpsertSearchSynonymJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// RetrieveAllConversations request
+	RetrieveAllConversations(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// RetrieveAllConversationModels request
 	RetrieveAllConversationModels(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -758,6 +761,18 @@ func (c *Client) UpsertSearchSynonymWithBody(ctx context.Context, collectionName
 
 func (c *Client) UpsertSearchSynonym(ctx context.Context, collectionName string, synonymId string, body UpsertSearchSynonymJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpsertSearchSynonymRequest(c.Server, collectionName, synonymId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RetrieveAllConversations(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrieveAllConversationsRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -3386,6 +3401,33 @@ func NewUpsertSearchSynonymRequestWithBody(server string, collectionName string,
 	return req, nil
 }
 
+// NewRetrieveAllConversationsRequest generates requests for RetrieveAllConversations
+func NewRetrieveAllConversationsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/conversations")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewRetrieveAllConversationModelsRequest generates requests for RetrieveAllConversationModels
 func NewRetrieveAllConversationModelsRequest(server string) (*http.Request, error) {
 	var err error
@@ -5134,6 +5176,9 @@ type ClientWithResponsesInterface interface {
 
 	UpsertSearchSynonymWithResponse(ctx context.Context, collectionName string, synonymId string, body UpsertSearchSynonymJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertSearchSynonymResponse, error)
 
+	// RetrieveAllConversationsWithResponse request
+	RetrieveAllConversationsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllConversationsResponse, error)
+
 	// RetrieveAllConversationModelsWithResponse request
 	RetrieveAllConversationModelsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllConversationModelsResponse, error)
 
@@ -5919,6 +5964,28 @@ func (r UpsertSearchSynonymResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r UpsertSearchSynonymResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RetrieveAllConversationsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ConversationsRetrieveSchema
+}
+
+// Status returns HTTPResponse.Status
+func (r RetrieveAllConversationsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetrieveAllConversationsResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -6761,6 +6828,15 @@ func (c *ClientWithResponses) UpsertSearchSynonymWithResponse(ctx context.Contex
 		return nil, err
 	}
 	return ParseUpsertSearchSynonymResponse(rsp)
+}
+
+// RetrieveAllConversationsWithResponse request returning *RetrieveAllConversationsResponse
+func (c *ClientWithResponses) RetrieveAllConversationsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllConversationsResponse, error) {
+	rsp, err := c.RetrieveAllConversations(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetrieveAllConversationsResponse(rsp)
 }
 
 // RetrieveAllConversationModelsWithResponse request returning *RetrieveAllConversationModelsResponse
@@ -8007,6 +8083,32 @@ func ParseUpsertSearchSynonymResponse(rsp *http.Response) (*UpsertSearchSynonymR
 			return nil, err
 		}
 		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetrieveAllConversationsResponse parses an HTTP response from a RetrieveAllConversationsWithResponse call
+func ParseRetrieveAllConversationsResponse(rsp *http.Response) (*RetrieveAllConversationsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetrieveAllConversationsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ConversationsRetrieveSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
 
 	}
 

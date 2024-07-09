@@ -291,6 +291,30 @@ components:
         - system_prompt
         - max_bytes
       type: object
+    ConversationSchema:
+      properties:
+        conversation:
+          items:
+            type: object
+          type: array
+        id:
+          type: integer
+        last_updated:
+          type: integer
+        ttl:
+          description: Time to live. Conversations are stored by default for 24 hours, and then purged.
+          type: integer
+      type: object
+    ConversationsRetrieveSchema:
+      properties:
+        conversations:
+          items:
+            $ref: '#/components/schemas/ConversationSchema'
+          type: array
+          x-go-type: '[]*ConversationSchema'
+      required:
+        - conversations
+      type: object
     ErrorResponse:
       properties:
         message:
@@ -2455,6 +2479,20 @@ paths:
       summary: Create or update a synonym
       tags:
         - documents
+  /conversations:
+    get:
+      description: Retrieve all past conversations
+      operationId: retrieveAllConversations
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationsRetrieveSchema'
+          description: List of all past conversations
+      summary: List all past conversations
+      tags:
+        - conversations
   /conversations/models:
     get:
       description: Retrieve all conversation models

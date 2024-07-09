@@ -219,6 +219,21 @@ type ConversationModelSchema struct {
 	VllmUrl *string `json:"vllm_url,omitempty"`
 }
 
+// ConversationSchema defines model for ConversationSchema.
+type ConversationSchema struct {
+	Conversation *[]map[string]interface{} `json:"conversation,omitempty"`
+	Id           *int                      `json:"id,omitempty"`
+	LastUpdated  *int                      `json:"last_updated,omitempty"`
+
+	// Ttl Time to live. Conversations are stored by default for 24 hours, and then purged.
+	Ttl *int `json:"ttl,omitempty"`
+}
+
+// ConversationsRetrieveSchema defines model for ConversationsRetrieveSchema.
+type ConversationsRetrieveSchema struct {
+	Conversations []*ConversationSchema `json:"conversations"`
+}
+
 // FacetCounts defines model for FacetCounts.
 type FacetCounts struct {
 	Counts *[]struct {

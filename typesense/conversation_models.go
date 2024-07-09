@@ -17,8 +17,8 @@ type conversationModels struct {
 	apiClient APIClientInterface
 }
 
-func (a *conversationModels) Create(ctx context.Context, conversationModelSchema *api.ConversationModelSchema) (*api.ConversationModelResponse, error) {
-	response, err := a.apiClient.CreateConversationModelWithResponse(ctx, api.CreateConversationModelJSONRequestBody(*conversationModelSchema))
+func (c *conversationModels) Create(ctx context.Context, conversationModelSchema *api.ConversationModelSchema) (*api.ConversationModelResponse, error) {
+	response, err := c.apiClient.CreateConversationModelWithResponse(ctx, api.CreateConversationModelJSONRequestBody(*conversationModelSchema))
 	if err != nil {
 		return nil, err
 	}
@@ -28,8 +28,8 @@ func (a *conversationModels) Create(ctx context.Context, conversationModelSchema
 	return response.JSON201, nil
 }
 
-func (a *conversationModels) Retrieve(ctx context.Context) ([]*api.ConversationModelResponse, error) {
-	response, err := a.apiClient.RetrieveAllConversationModelsWithResponse(ctx)
+func (c *conversationModels) Retrieve(ctx context.Context) ([]*api.ConversationModelResponse, error) {
+	response, err := c.apiClient.RetrieveAllConversationModelsWithResponse(ctx)
 	if err != nil {
 		return nil, err
 	}

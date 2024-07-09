@@ -1642,6 +1642,46 @@ func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAllConversationModelsWithR
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveAllConversationModelsWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveAllConversationModelsWithResponse), varargs...)
 }
 
+// RetrieveAllConversations mocks base method.
+func (m *MockAPIClientInterface) RetrieveAllConversations(ctx context.Context, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveAllConversations", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveAllConversations indicates an expected call of RetrieveAllConversations.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAllConversations(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveAllConversations", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveAllConversations), varargs...)
+}
+
+// RetrieveAllConversationsWithResponse mocks base method.
+func (m *MockAPIClientInterface) RetrieveAllConversationsWithResponse(ctx context.Context, reqEditors ...api.RequestEditorFn) (*api.RetrieveAllConversationsResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveAllConversationsWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.RetrieveAllConversationsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveAllConversationsWithResponse indicates an expected call of RetrieveAllConversationsWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAllConversationsWithResponse(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveAllConversationsWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveAllConversationsWithResponse), varargs...)
+}
+
 // RetrieveAnalyticsRule mocks base method.
 func (m *MockAPIClientInterface) RetrieveAnalyticsRule(ctx context.Context, ruleName string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
