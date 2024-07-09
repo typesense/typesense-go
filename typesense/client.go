@@ -48,6 +48,10 @@ func (c *Client) Conversations() ConversationsInterface {
 	return &conversations{apiClient: c.apiClient}
 }
 
+func (c *Client) Conversation(conversationId int64) ConversationInterface {
+	return &conversation{apiClient: c.apiClient, conversationId: conversationId}
+}
+
 func (c *Client) Keys() KeysInterface {
 	return &keys{apiClient: c.apiClient}
 }

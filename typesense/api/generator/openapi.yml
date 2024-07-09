@@ -894,6 +894,78 @@ paths:
       summary: List all past conversations
       tags:
         - conversations
+  /conversations/{conversationId}:
+    get:
+      description: Retrieve a conversation
+      operationId: retrieveConversation
+      parameters:
+        - name: conversationId
+          in: path
+          description: The id of the conversation to retrieve
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ConversationSchema'
+                type: array
+                x-go-type: '[]*ConversationSchema'
+          description: A past conversation
+      summary: Retrieve a past conversation
+      tags:
+        - conversations
+    put:
+      description: Update the TTL for a conversation
+      operationId: updateConversation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationUpdateSchema'
+      parameters:
+        - name: conversationId
+          in: path
+          description: The id of the conversation to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationUpdateSchema'
+          description: The conversation was successfully updated
+      summary: Update the TTL for a past conversation
+      tags:
+        - conversations
+    delete:
+      description: Delete a past conversation
+      operationId: deleteConversation
+      parameters:
+        - name: conversationId
+          in: path
+          description: The id of the conversation to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationDeleteSchema'
+          description: The conversation was successfully deleted
+      summary: Delete a past conversation
+      tags:
+        - conversations
   /conversations/models:
     get:
       description: Retrieve all conversation models
@@ -3064,6 +3136,18 @@ components:
           description: Time to live. Conversations are stored by default for 24 hours, and then purged.
           type: integer
       type: object
+      required:
+        - id
+        - ttl
+    ConversationUpdateSchema:
+      properties:
+        ttl:
+          description: Time to live. Conversations are stored by default for 24 hours, and then purged.
+          type: integer
+    ConversationDeleteSchema:
+      properties:
+        id:
+          type: integer
     ConversationsRetrieveSchema:
       type: object
       required:

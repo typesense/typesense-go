@@ -256,6 +256,10 @@ components:
       required:
         - fields
       type: object
+    ConversationDeleteSchema:
+      properties:
+        id:
+          type: integer
     ConversationModelResponse:
       allOf:
         - $ref: '#/components/schemas/ConversationModelSchema'
@@ -304,7 +308,15 @@ components:
         ttl:
           description: Time to live. Conversations are stored by default for 24 hours, and then purged.
           type: integer
+      required:
+        - id
+        - ttl
       type: object
+    ConversationUpdateSchema:
+      properties:
+        ttl:
+          description: Time to live. Conversations are stored by default for 24 hours, and then purged.
+          type: integer
     ConversationsRetrieveSchema:
       properties:
         conversations:
@@ -2491,6 +2503,78 @@ paths:
                 $ref: '#/components/schemas/ConversationsRetrieveSchema'
           description: List of all past conversations
       summary: List all past conversations
+      tags:
+        - conversations
+  /conversations/{conversationId}:
+    delete:
+      description: Delete a past conversation
+      operationId: deleteConversation
+      parameters:
+        - description: The id of the conversation to delete
+          in: path
+          name: conversationId
+          required: true
+          schema:
+            format: int64
+            type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationDeleteSchema'
+          description: The conversation was successfully deleted
+      summary: Delete a past conversation
+      tags:
+        - conversations
+    get:
+      description: Retrieve a conversation
+      operationId: retrieveConversation
+      parameters:
+        - description: The id of the conversation to retrieve
+          in: path
+          name: conversationId
+          required: true
+          schema:
+            format: int64
+            type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ConversationSchema'
+                type: array
+                x-go-type: '[]*ConversationSchema'
+          description: A past conversation
+      summary: Retrieve a past conversation
+      tags:
+        - conversations
+    put:
+      description: Update the TTL for a conversation
+      operationId: updateConversation
+      parameters:
+        - description: The id of the conversation to update
+          in: path
+          name: conversationId
+          required: true
+          schema:
+            format: int64
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationUpdateSchema'
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationUpdateSchema'
+          description: The conversation was successfully updated
+      summary: Update the TTL for a past conversation
       tags:
         - conversations
   /conversations/models:

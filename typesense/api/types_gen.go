@@ -176,6 +176,11 @@ type CollectionUpdateSchema struct {
 	Fields []Field `json:"fields"`
 }
 
+// ConversationDeleteSchema defines model for ConversationDeleteSchema.
+type ConversationDeleteSchema struct {
+	Id *int `json:"id,omitempty"`
+}
+
 // ConversationModelResponse defines model for ConversationModelResponse.
 type ConversationModelResponse struct {
 	// AccountId LLM service's account ID (only applicable for Cloudflare)
@@ -222,9 +227,15 @@ type ConversationModelSchema struct {
 // ConversationSchema defines model for ConversationSchema.
 type ConversationSchema struct {
 	Conversation *[]map[string]interface{} `json:"conversation,omitempty"`
-	Id           *int                      `json:"id,omitempty"`
+	Id           int                       `json:"id"`
 	LastUpdated  *int                      `json:"last_updated,omitempty"`
 
+	// Ttl Time to live. Conversations are stored by default for 24 hours, and then purged.
+	Ttl int `json:"ttl"`
+}
+
+// ConversationUpdateSchema defines model for ConversationUpdateSchema.
+type ConversationUpdateSchema struct {
 	// Ttl Time to live. Conversations are stored by default for 24 hours, and then purged.
 	Ttl *int `json:"ttl,omitempty"`
 }
@@ -1224,6 +1235,9 @@ type UpsertSearchSynonymJSONRequestBody = SearchSynonymSchema
 
 // CreateConversationModelJSONRequestBody defines body for CreateConversationModel for application/json ContentType.
 type CreateConversationModelJSONRequestBody = ConversationModelSchema
+
+// UpdateConversationJSONRequestBody defines body for UpdateConversation for application/json ContentType.
+type UpdateConversationJSONRequestBody = ConversationUpdateSchema
 
 // CreateKeyJSONRequestBody defines body for CreateKey for application/json ContentType.
 type CreateKeyJSONRequestBody = ApiKeySchema
