@@ -202,6 +202,14 @@ type ClientInterface interface {
 
 	UpsertSearchSynonym(ctx context.Context, collectionName string, synonymId string, body UpsertSearchSynonymJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// RetrieveAllConversationModels request
+	RetrieveAllConversationModels(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateConversationModelWithBody request with any body
+	CreateConversationModelWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateConversationModel(ctx context.Context, body CreateConversationModelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// Debug request
 	Debug(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -750,6 +758,42 @@ func (c *Client) UpsertSearchSynonymWithBody(ctx context.Context, collectionName
 
 func (c *Client) UpsertSearchSynonym(ctx context.Context, collectionName string, synonymId string, body UpsertSearchSynonymJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpsertSearchSynonymRequest(c.Server, collectionName, synonymId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RetrieveAllConversationModels(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrieveAllConversationModelsRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateConversationModelWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateConversationModelRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateConversationModel(ctx context.Context, body CreateConversationModelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateConversationModelRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -3342,6 +3386,73 @@ func NewUpsertSearchSynonymRequestWithBody(server string, collectionName string,
 	return req, nil
 }
 
+// NewRetrieveAllConversationModelsRequest generates requests for RetrieveAllConversationModels
+func NewRetrieveAllConversationModelsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/conversations/models")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateConversationModelRequest calls the generic CreateConversationModel builder with application/json body
+func NewCreateConversationModelRequest(server string, body CreateConversationModelJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateConversationModelRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateConversationModelRequestWithBody generates requests for CreateConversationModel with any type of body
+func NewCreateConversationModelRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/conversations/models")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewDebugRequest generates requests for Debug
 func NewDebugRequest(server string) (*http.Request, error) {
 	var err error
@@ -5023,6 +5134,14 @@ type ClientWithResponsesInterface interface {
 
 	UpsertSearchSynonymWithResponse(ctx context.Context, collectionName string, synonymId string, body UpsertSearchSynonymJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertSearchSynonymResponse, error)
 
+	// RetrieveAllConversationModelsWithResponse request
+	RetrieveAllConversationModelsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllConversationModelsResponse, error)
+
+	// CreateConversationModelWithBodyWithResponse request with any body
+	CreateConversationModelWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateConversationModelResponse, error)
+
+	CreateConversationModelWithResponse(ctx context.Context, body CreateConversationModelJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateConversationModelResponse, error)
+
 	// DebugWithResponse request
 	DebugWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DebugResponse, error)
 
@@ -5800,6 +5919,51 @@ func (r UpsertSearchSynonymResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r UpsertSearchSynonymResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RetrieveAllConversationModelsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *[]*ConversationModelResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r RetrieveAllConversationModelsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetrieveAllConversationModelsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateConversationModelResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *ConversationModelResponse
+	JSON400      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateConversationModelResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateConversationModelResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -6597,6 +6761,32 @@ func (c *ClientWithResponses) UpsertSearchSynonymWithResponse(ctx context.Contex
 		return nil, err
 	}
 	return ParseUpsertSearchSynonymResponse(rsp)
+}
+
+// RetrieveAllConversationModelsWithResponse request returning *RetrieveAllConversationModelsResponse
+func (c *ClientWithResponses) RetrieveAllConversationModelsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllConversationModelsResponse, error) {
+	rsp, err := c.RetrieveAllConversationModels(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetrieveAllConversationModelsResponse(rsp)
+}
+
+// CreateConversationModelWithBodyWithResponse request with arbitrary body returning *CreateConversationModelResponse
+func (c *ClientWithResponses) CreateConversationModelWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateConversationModelResponse, error) {
+	rsp, err := c.CreateConversationModelWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateConversationModelResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateConversationModelWithResponse(ctx context.Context, body CreateConversationModelJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateConversationModelResponse, error) {
+	rsp, err := c.CreateConversationModel(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateConversationModelResponse(rsp)
 }
 
 // DebugWithResponse request returning *DebugResponse
@@ -7817,6 +8007,65 @@ func ParseUpsertSearchSynonymResponse(rsp *http.Response) (*UpsertSearchSynonymR
 			return nil, err
 		}
 		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetrieveAllConversationModelsResponse parses an HTTP response from a RetrieveAllConversationModelsWithResponse call
+func ParseRetrieveAllConversationModelsResponse(rsp *http.Response) (*RetrieveAllConversationModelsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetrieveAllConversationModelsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []*ConversationModelResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateConversationModelResponse parses an HTTP response from a CreateConversationModelWithResponse call
+func ParseCreateConversationModelResponse(rsp *http.Response) (*CreateConversationModelResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateConversationModelResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest ConversationModelResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
 
 	}
 

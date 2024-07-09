@@ -176,6 +176,49 @@ type CollectionUpdateSchema struct {
 	Fields []Field `json:"fields"`
 }
 
+// ConversationModelResponse defines model for ConversationModelResponse.
+type ConversationModelResponse struct {
+	// AccountId LLM service's account ID (only applicable for Cloudflare)
+	AccountId *string `json:"account_id,omitempty"`
+
+	// ApiKey The LLM service's API Key
+	ApiKey string  `json:"api_key"`
+	Id     *string `json:"id,omitempty"`
+
+	// MaxBytes The maximum number of bytes to send to the LLM in every API call. Consult the LLM's documentation on the number of bytes supported in the context window.
+	MaxBytes int `json:"max_bytes"`
+
+	// ModelName Name of the LLM model offered by OpenAI, Cloudflare or vLLM
+	ModelName string `json:"model_name"`
+
+	// SystemPrompt The system prompt that contains special instructions to the LLM
+	SystemPrompt string `json:"system_prompt"`
+
+	// VllmUrl URL of vLLM service
+	VllmUrl *string `json:"vllm_url,omitempty"`
+}
+
+// ConversationModelSchema defines model for ConversationModelSchema.
+type ConversationModelSchema struct {
+	// AccountId LLM service's account ID (only applicable for Cloudflare)
+	AccountId *string `json:"account_id,omitempty"`
+
+	// ApiKey The LLM service's API Key
+	ApiKey string `json:"api_key"`
+
+	// MaxBytes The maximum number of bytes to send to the LLM in every API call. Consult the LLM's documentation on the number of bytes supported in the context window.
+	MaxBytes int `json:"max_bytes"`
+
+	// ModelName Name of the LLM model offered by OpenAI, Cloudflare or vLLM
+	ModelName string `json:"model_name"`
+
+	// SystemPrompt The system prompt that contains special instructions to the LLM
+	SystemPrompt string `json:"system_prompt"`
+
+	// VllmUrl URL of vLLM service
+	VllmUrl *string `json:"vllm_url,omitempty"`
+}
+
 // FacetCounts defines model for FacetCounts.
 type FacetCounts struct {
 	Counts *[]struct {
@@ -1163,6 +1206,9 @@ type UpsertSearchOverrideJSONRequestBody = SearchOverrideSchema
 
 // UpsertSearchSynonymJSONRequestBody defines body for UpsertSearchSynonym for application/json ContentType.
 type UpsertSearchSynonymJSONRequestBody = SearchSynonymSchema
+
+// CreateConversationModelJSONRequestBody defines body for CreateConversationModel for application/json ContentType.
+type CreateConversationModelJSONRequestBody = ConversationModelSchema
 
 // CreateKeyJSONRequestBody defines body for CreateKey for application/json ContentType.
 type CreateKeyJSONRequestBody = ApiKeySchema

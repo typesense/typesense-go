@@ -256,6 +256,41 @@ components:
       required:
         - fields
       type: object
+    ConversationModelResponse:
+      allOf:
+        - $ref: '#/components/schemas/ConversationModelSchema'
+        - properties:
+            id:
+              readOnly: true
+              type: string
+          type: object
+    ConversationModelSchema:
+      properties:
+        account_id:
+          description: LLM service's account ID (only applicable for Cloudflare)
+          type: string
+        api_key:
+          description: The LLM service's API Key
+          type: string
+        max_bytes:
+          description: |
+            The maximum number of bytes to send to the LLM in every API call. Consult the LLM's documentation on the number of bytes supported in the context window.
+          type: integer
+        model_name:
+          description: Name of the LLM model offered by OpenAI, Cloudflare or vLLM
+          type: string
+        system_prompt:
+          description: The system prompt that contains special instructions to the LLM
+          type: string
+        vllm_url:
+          description: URL of vLLM service
+          type: string
+      required:
+        - model_name
+        - api_key
+        - system_prompt
+        - max_bytes
+      type: object
     ErrorResponse:
       properties:
         message:
@@ -2420,6 +2455,46 @@ paths:
       summary: Create or update a synonym
       tags:
         - documents
+  /conversations/models:
+    get:
+      description: Retrieve all conversation models
+      operationId: retrieveAllConversationModels
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ConversationModelResponse'
+                type: array
+                x-go-type: '[]*ConversationModelResponse'
+          description: List of all conversation models
+      summary: List all conversation models
+      tags:
+        - conversations
+    post:
+      description: Create a Conversation Model
+      operationId: createConversationModel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationModelSchema'
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationModelResponse'
+          description: Created Conversation Model
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Bad request, see error message for details
+      tags:
+        - conversations
   /debug:
     get:
       description: Print debugging information
@@ -3122,3 +3197,8 @@ tags:
       description: Find out more
       url: https://typesense.org/docs/26.0/api/search.html#presets
     name: presets
+  - description: Conversational Search (RAG)
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/docs/26.0/api/conversational-search-rag.html
+    name: conversations
