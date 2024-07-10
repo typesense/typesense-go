@@ -213,8 +213,8 @@ type ConversationModelSchema struct {
 	AccountId *string `json:"account_id,omitempty"`
 
 	// ApiKey The LLM service's API Key
-	ApiKey string  `json:"api_key"`
-	Id     *string `json:"id,omitempty"`
+	ApiKey string `json:"api_key"`
+	Id     string `json:"id"`
 
 	// MaxBytes The maximum number of bytes to send to the LLM in every API call. Consult the LLM's documentation on the number of bytes supported in the context window.
 	MaxBytes int `json:"max_bytes"`

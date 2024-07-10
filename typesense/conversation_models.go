@@ -8,7 +8,7 @@ import (
 
 // ConversationModelsInterface is a type for ConversationModels API operations
 type ConversationModelsInterface interface {
-	Create(ctx context.Context, conversationModelCreateSchema *api.ConversationModelCreateSchema) (*api.ConversationModelSchema, error)
+	Create(ctx context.Context, conversationModelCreateSchema *api.ConversationModelCreateSchema) (*api.ConversationModelCreateSchema, error)
 	Retrieve(ctx context.Context) ([]*api.ConversationModelSchema, error)
 }
 
@@ -17,7 +17,7 @@ type conversationModels struct {
 	apiClient APIClientInterface
 }
 
-func (c *conversationModels) Create(ctx context.Context, conversationModelCreateSchema *api.ConversationModelCreateSchema) (*api.ConversationModelSchema, error) {
+func (c *conversationModels) Create(ctx context.Context, conversationModelCreateSchema *api.ConversationModelCreateSchema) (*api.ConversationModelCreateSchema, error) {
 	response, err := c.apiClient.CreateConversationModelWithResponse(ctx, api.CreateConversationModelJSONRequestBody(*conversationModelCreateSchema))
 	if err != nil {
 		return nil, err

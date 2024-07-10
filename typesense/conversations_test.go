@@ -24,6 +24,13 @@ func validateRequestMetadata(t *testing.T, r *http.Request, expectedEndpoint str
 		t.Fatal("Invalid HTTP method!")
 	}
 }
+
+func jsonEncode(t *testing.T, v any) []byte {
+	t.Helper()
+	data, err := json.Marshal(v)
+	assert.NoError(t, err)
+	return data
+}
 func TestConversationsRetrieveAllConversations(t *testing.T) {
 	expectedData := api.ConversationsRetrieveSchema{
 		Conversations: []*api.ConversationSchema{
@@ -39,8 +46,7 @@ func TestConversationsRetrieveAllConversations(t *testing.T) {
 	}
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/conversations", http.MethodGet)
-		data, err := json.Marshal(expectedData)
-		assert.NoError(t, err)
+		data := jsonEncode(t, expectedData)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(data)

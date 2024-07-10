@@ -998,7 +998,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConversationModelSchema'
+                $ref: '#/components/schemas/ConversationModelCreateSchema'
           description: Created Conversation Model
         400:
           content:
@@ -3250,7 +3250,6 @@ components:
         - $ref: '#/components/schemas/ConversationModelSchema'
         - properties:
             id:
-              readOnly: true
               type: string
     PresetsRetrieveSchema:
       type: object

@@ -2,7 +2,6 @@ package typesense
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"testing"
 
@@ -22,8 +21,7 @@ func TestConversationRetrieveConversation(t *testing.T) {
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/conversations/123", http.MethodGet)
-		data, err := json.Marshal(expectedData)
-		assert.NoError(t, err)
+		data := jsonEncode(t, expectedData)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -53,8 +51,8 @@ func TestConversationUpdateConversation(t *testing.T) {
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/conversations/123", http.MethodPut)
-		data, err := json.Marshal(expectedData)
-		assert.NoError(t, err)
+		data := jsonEncode(t, expectedData)
+
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(data)
@@ -87,8 +85,8 @@ func TestConversationDeleteConversation(t *testing.T) {
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/conversations/123", http.MethodDelete)
-		data, err := json.Marshal(expectedData)
-		assert.NoError(t, err)
+		data := jsonEncode(t, expectedData)
+
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(data)
