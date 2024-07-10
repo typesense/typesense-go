@@ -3215,10 +3215,14 @@ components:
         ttl:
           description: Time to live. Conversations are stored by default for 24 hours, and then purged.
           type: integer
+      required:
+        - ttl
     ConversationDeleteSchema:
       properties:
         id:
           type: integer
+      required:
+        - id
     ConversationsRetrieveSchema:
       type: object
       required:

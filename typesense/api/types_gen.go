@@ -178,7 +178,7 @@ type CollectionUpdateSchema struct {
 
 // ConversationDeleteSchema defines model for ConversationDeleteSchema.
 type ConversationDeleteSchema struct {
-	Id *int `json:"id,omitempty"`
+	Id int `json:"id"`
 }
 
 // ConversationModelCreateSchema defines model for ConversationModelCreateSchema.
@@ -242,7 +242,7 @@ type ConversationSchema struct {
 // ConversationUpdateSchema defines model for ConversationUpdateSchema.
 type ConversationUpdateSchema struct {
 	// Ttl Time to live. Conversations are stored by default for 24 hours, and then purged.
-	Ttl *int `json:"ttl,omitempty"`
+	Ttl int `json:"ttl"`
 }
 
 // ConversationsRetrieveSchema defines model for ConversationsRetrieveSchema.

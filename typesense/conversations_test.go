@@ -15,6 +15,15 @@ func newTestServerAndClient(handler func(w http.ResponseWriter, r *http.Request)
 	server := httptest.NewServer(http.HandlerFunc(handler))
 	return server, NewClient(WithServer(server.URL))
 }
+
+func validateRequestMetadata(t *testing.T, r *http.Request, expectedEndpoint string, expectedMethod string) {
+	if r.RequestURI != expectedEndpoint {
+		t.Fatal("Invalid request endpoint!")
+	}
+	if r.Method != expectedMethod {
+		t.Fatal("Invalid HTTP method!")
+	}
+}
 func TestConversationsRetrieveAllConversations(t *testing.T) {
 	expectedData := api.ConversationsRetrieveSchema{
 		Conversations: []*api.ConversationSchema{
@@ -29,9 +38,7 @@ func TestConversationsRetrieveAllConversations(t *testing.T) {
 		},
 	}
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
-		if r.RequestURI != "/conversations" {
-			t.Fatal("Invalid request endpoint!")
-		}
+		validateRequestMetadata(t, r, "/conversations", http.MethodGet)
 		data, err := json.Marshal(expectedData)
 		assert.NoError(t, err)
 		w.Header().Set("Content-Type", "application/json")
@@ -47,9 +54,7 @@ func TestConversationsRetrieveAllConversations(t *testing.T) {
 
 func TestConversationsRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
-		if r.RequestURI != "/conversations" {
-			t.Fatal("Invalid request endpoint!")
-		}
+		validateRequestMetadata(t, r, "/conversations", http.MethodGet)
 		w.WriteHeader(http.StatusConflict)
 	})
 	defer server.Close()
