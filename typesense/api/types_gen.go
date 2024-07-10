@@ -181,8 +181,8 @@ type ConversationDeleteSchema struct {
 	Id int `json:"id"`
 }
 
-// ConversationModelCreateSchema defines model for ConversationModelCreateSchema.
-type ConversationModelCreateSchema struct {
+// ConversationModelCreateAndUpdateSchema defines model for ConversationModelCreateAndUpdateSchema.
+type ConversationModelCreateAndUpdateSchema struct {
 	// AccountId LLM service's account ID (only applicable for Cloudflare)
 	AccountId *string `json:"account_id,omitempty"`
 
@@ -204,7 +204,7 @@ type ConversationModelCreateSchema struct {
 
 // ConversationModelDeleteSchema defines model for ConversationModelDeleteSchema.
 type ConversationModelDeleteSchema struct {
-	Id *string `json:"id,omitempty"`
+	Id string `json:"id"`
 }
 
 // ConversationModelSchema defines model for ConversationModelSchema.
@@ -1239,10 +1239,10 @@ type UpsertSearchOverrideJSONRequestBody = SearchOverrideSchema
 type UpsertSearchSynonymJSONRequestBody = SearchSynonymSchema
 
 // CreateConversationModelJSONRequestBody defines body for CreateConversationModel for application/json ContentType.
-type CreateConversationModelJSONRequestBody = ConversationModelCreateSchema
+type CreateConversationModelJSONRequestBody = ConversationModelCreateAndUpdateSchema
 
 // UpdateConversationModelJSONRequestBody defines body for UpdateConversationModel for application/json ContentType.
-type UpdateConversationModelJSONRequestBody = ConversationModelCreateSchema
+type UpdateConversationModelJSONRequestBody = ConversationModelCreateAndUpdateSchema
 
 // UpdateConversationJSONRequestBody defines body for UpdateConversation for application/json ContentType.
 type UpdateConversationJSONRequestBody = ConversationUpdateSchema

@@ -8,7 +8,7 @@ import (
 
 type ConversationModelInterface interface {
 	Retrieve(ctx context.Context) (*api.ConversationModelSchema, error)
-	Update(ctx context.Context, model *api.ConversationModelCreateSchema) (*api.ConversationModelCreateSchema, error)
+	Update(ctx context.Context, model *api.ConversationModelCreateAndUpdateSchema) (*api.ConversationModelCreateAndUpdateSchema, error)
 	Delete(ctx context.Context) (*api.ConversationModelDeleteSchema, error)
 }
 
@@ -28,8 +28,8 @@ func (c *conversationModel) Retrieve(ctx context.Context) (*api.ConversationMode
 	return response.JSON200, nil
 }
 
-func (c *conversationModel) Update(ctx context.Context, model *api.ConversationModelCreateSchema) (*api.ConversationModelCreateSchema, error) {
-	response, err := c.apiClient.UpdateConversationModelWithResponse(ctx, c.modelId, api.UpdateConversationModelJSONRequestBody(*model))
+func (c *conversationModel) Update(ctx context.Context, conversationModelCreateAndUpdateSchema *api.ConversationModelCreateAndUpdateSchema) (*api.ConversationModelCreateAndUpdateSchema, error) {
+	response, err := c.apiClient.UpdateConversationModelWithResponse(ctx, c.modelId, api.UpdateConversationModelJSONRequestBody(*conversationModelCreateAndUpdateSchema))
 	if err != nil {
 		return nil, err
 	}

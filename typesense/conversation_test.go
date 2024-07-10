@@ -2,6 +2,7 @@ package typesense
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"testing"
 
@@ -51,8 +52,14 @@ func TestConversationUpdateConversation(t *testing.T) {
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/conversations/123", http.MethodPut)
-		data := jsonEncode(t, expectedData)
 
+		var reqBody api.ConversationUpdateSchema
+		err := json.NewDecoder(r.Body).Decode(&reqBody)
+
+		assert.NoError(t, err)
+		assert.Equal(t, expectedData, &reqBody)
+
+		data := jsonEncode(t, expectedData)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(data)

@@ -6387,7 +6387,7 @@ func (r RetrieveAllConversationModelsResponse) StatusCode() int {
 type CreateConversationModelResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *ConversationModelCreateSchema
+	JSON201      *ConversationModelCreateAndUpdateSchema
 	JSON400      *ApiResponse
 }
 
@@ -6454,7 +6454,7 @@ func (r RetrieveConversationModelResponse) StatusCode() int {
 type UpdateConversationModelResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *ConversationModelCreateSchema
+	JSON200      *ConversationModelCreateAndUpdateSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -8728,7 +8728,7 @@ func ParseCreateConversationModelResponse(rsp *http.Response) (*CreateConversati
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest ConversationModelCreateSchema
+		var dest ConversationModelCreateAndUpdateSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -8813,7 +8813,7 @@ func ParseUpdateConversationModelResponse(rsp *http.Response) (*UpdateConversati
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ConversationModelCreateSchema
+		var dest ConversationModelCreateAndUpdateSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

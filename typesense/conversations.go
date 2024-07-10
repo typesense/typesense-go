@@ -10,6 +10,7 @@ import (
 type ConversationsInterface interface {
 	Retrieve(ctx context.Context) ([]*api.ConversationSchema, error)
 	Models() ConversationModelsInterface
+	Model(modelId string) ConversationModelInterface
 }
 
 // conversations is internal implementation of ConversationsInterface
