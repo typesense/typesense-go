@@ -231,9 +231,9 @@ type ConversationModelSchema struct {
 
 // ConversationSchema defines model for ConversationSchema.
 type ConversationSchema struct {
-	Conversation *[]map[string]interface{} `json:"conversation,omitempty"`
-	Id           int                       `json:"id"`
-	LastUpdated  *int                      `json:"last_updated,omitempty"`
+	Conversation []map[string]interface{} `json:"conversation"`
+	Id           int                      `json:"id"`
+	LastUpdated  int                      `json:"last_updated"`
 
 	// Ttl Time to live. Conversations are stored by default for 24 hours, and then purged.
 	Ttl int `json:"ttl"`

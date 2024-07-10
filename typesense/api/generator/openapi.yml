@@ -927,6 +927,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ConversationUpdateSchema'
+        required: true
       parameters:
         - name: conversationId
           in: path
@@ -991,6 +992,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ConversationModelCreateSchema'
+        required: true
       responses:
         201:
           content:
@@ -1035,6 +1037,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ConversationModelCreateSchema'
+        required: true
       parameters:
         - name: modelId
           in: path
@@ -3204,6 +3207,8 @@ components:
       type: object
       required:
         - id
+        - conversation
+        - last_updated
         - ttl
     ConversationUpdateSchema:
       properties:
