@@ -577,6 +577,7 @@ components:
           items:
             $ref: '#/components/schemas/PresetSchema'
           type: array
+          x-go-type: '[]*PresetSchema'
       required:
         - presets
       type: object

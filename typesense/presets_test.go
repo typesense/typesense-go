@@ -11,22 +11,21 @@ import (
 )
 
 func TestPresetsRetrieveAsSearchParameters(t *testing.T) {
-	expectedData := &api.PresetsRetrieveSchema{
-		Presets: []api.PresetSchema{
-			{
-				Name: "test",
-			},
+	expectedData := []*api.PresetSchema{
+		{
+			Name: "test",
 		},
 	}
+
 	presetValue := api.SearchParameters{Q: "Hello"}
 
-	expectedData.Presets[0].Value.FromSearchParameters(presetValue)
+	expectedData[0].Value.FromSearchParameters(presetValue)
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/presets", http.MethodGet)
 		data := jsonEncode(t, map[string][]map[string]any{
 			"presets": {{
-				"name":  expectedData.Presets[0].Name,
+				"name":  expectedData[0].Name,
 				"value": presetValue,
 			}},
 		})
@@ -40,22 +39,21 @@ func TestPresetsRetrieveAsSearchParameters(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expectedData, res)
 
-	parsedRes, err := res.Presets[0].Value.AsSearchParameters()
+	parsedRes, err := res[0].Value.AsSearchParameters()
 	assert.NoError(t, err)
 
-	parsedData, err := expectedData.Presets[0].Value.AsSearchParameters()
+	parsedData, err := expectedData[0].Value.AsSearchParameters()
 	assert.NoError(t, err)
 
 	assert.Equal(t, parsedData, parsedRes)
 }
 func TestPresetsRetrieveAsMultiSearchSearchesParameter(t *testing.T) {
-	expectedData := &api.PresetsRetrieveSchema{
-		Presets: []api.PresetSchema{
-			{
-				Name: "test",
-			},
+	expectedData := []*api.PresetSchema{
+		{
+			Name: "test",
 		},
 	}
+
 	presetValue := api.MultiSearchSearchesParameter{
 		Searches: []api.MultiSearchCollectionParameters{
 			{
@@ -64,13 +62,13 @@ func TestPresetsRetrieveAsMultiSearchSearchesParameter(t *testing.T) {
 		},
 	}
 
-	expectedData.Presets[0].Value.FromMultiSearchSearchesParameter(presetValue)
+	expectedData[0].Value.FromMultiSearchSearchesParameter(presetValue)
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/presets", http.MethodGet)
 		data := jsonEncode(t, map[string][]map[string]any{
 			"presets": {{
-				"name":  expectedData.Presets[0].Name,
+				"name":  expectedData[0].Name,
 				"value": presetValue,
 			}},
 		})
@@ -84,10 +82,10 @@ func TestPresetsRetrieveAsMultiSearchSearchesParameter(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expectedData, res)
 
-	parsedRes, err := res.Presets[0].Value.AsMultiSearchSearchesParameter()
+	parsedRes, err := res[0].Value.AsMultiSearchSearchesParameter()
 	assert.NoError(t, err)
 
-	parsedData, err := expectedData.Presets[0].Value.AsMultiSearchSearchesParameter()
+	parsedData, err := expectedData[0].Value.AsMultiSearchSearchesParameter()
 	assert.NoError(t, err)
 
 	assert.Equal(t, parsedData.Searches[0], parsedRes.Searches[0])

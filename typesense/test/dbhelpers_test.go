@@ -278,6 +278,50 @@ func newCollectionAlias(collectionName string, name string) *api.CollectionAlias
 	}
 }
 
+func newPresetFromSearchParametersUpsertSchema() *api.PresetUpsertSchema {
+	preset := &api.PresetUpsertSchema{}
+	preset.Value.FromSearchParameters(api.SearchParameters{
+		Q: "hello",
+	})
+	return preset
+}
+
+func newPresetFromSearchParameters(presetName string) *api.PresetSchema {
+	preset := &api.PresetSchema{
+		Name: presetName,
+	}
+	preset.Value.FromSearchParameters(api.SearchParameters{
+		Q: "hello",
+	})
+	return preset
+}
+
+func newPresetFromMultiSearchSearchesParameterUpsertSchema() *api.PresetUpsertSchema {
+	preset := &api.PresetUpsertSchema{}
+	preset.Value.FromMultiSearchSearchesParameter(api.MultiSearchSearchesParameter{
+		Searches: []api.MultiSearchCollectionParameters{
+			{
+				Collection: "test",
+			},
+		},
+	})
+	return preset
+}
+
+func newPresetFromMultiSearchSearchesParameter(presetName string) *api.PresetSchema {
+	preset := &api.PresetSchema{
+		Name: presetName,
+	}
+	preset.Value.FromMultiSearchSearchesParameter(api.MultiSearchSearchesParameter{
+		Searches: []api.MultiSearchCollectionParameters{
+			{
+				Collection: "test",
+			},
+		},
+	})
+	return preset
+}
+
 func createNewCollection(t *testing.T, namePrefix string) string {
 	t.Helper()
 	collectionName := newUUIDName(namePrefix)

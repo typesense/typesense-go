@@ -554,7 +554,7 @@ type PresetUpsertSchema_Value struct {
 
 // PresetsRetrieveSchema defines model for PresetsRetrieveSchema.
 type PresetsRetrieveSchema struct {
-	Presets []PresetSchema `json:"presets"`
+	Presets []*PresetSchema `json:"presets"`
 }
 
 // SearchGroupedHit defines model for SearchGroupedHit.

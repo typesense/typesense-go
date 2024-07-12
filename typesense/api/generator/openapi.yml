@@ -2898,6 +2898,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PresetSchema'
+          x-go-type: '[]*PresetSchema'
     PresetDeleteSchema:
       type: object
       required:
