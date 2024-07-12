@@ -562,6 +562,46 @@ func (mr *MockAPIClientInterfaceMockRecorder) DeleteKeyWithResponse(ctx, keyId a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteKeyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteKeyWithResponse), varargs...)
 }
 
+// DeletePreset mocks base method.
+func (m *MockAPIClientInterface) DeletePreset(ctx context.Context, presetId string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, presetId}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeletePreset", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeletePreset indicates an expected call of DeletePreset.
+func (mr *MockAPIClientInterfaceMockRecorder) DeletePreset(ctx, presetId any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, presetId}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePreset", reflect.TypeOf((*MockAPIClientInterface)(nil).DeletePreset), varargs...)
+}
+
+// DeletePresetWithResponse mocks base method.
+func (m *MockAPIClientInterface) DeletePresetWithResponse(ctx context.Context, presetId string, reqEditors ...api.RequestEditorFn) (*api.DeletePresetResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, presetId}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeletePresetWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.DeletePresetResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeletePresetWithResponse indicates an expected call of DeletePresetWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) DeletePresetWithResponse(ctx, presetId any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, presetId}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePresetWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).DeletePresetWithResponse), varargs...)
+}
+
 // DeleteSearchOverride mocks base method.
 func (m *MockAPIClientInterface) DeleteSearchOverride(ctx context.Context, collectionName, overrideId string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -1402,6 +1442,46 @@ func (mr *MockAPIClientInterfaceMockRecorder) MultiSearchWithResponse(ctx, param
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MultiSearchWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).MultiSearchWithResponse), varargs...)
 }
 
+// RetrieveAllPresets mocks base method.
+func (m *MockAPIClientInterface) RetrieveAllPresets(ctx context.Context, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveAllPresets", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveAllPresets indicates an expected call of RetrieveAllPresets.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAllPresets(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveAllPresets", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveAllPresets), varargs...)
+}
+
+// RetrieveAllPresetsWithResponse mocks base method.
+func (m *MockAPIClientInterface) RetrieveAllPresetsWithResponse(ctx context.Context, reqEditors ...api.RequestEditorFn) (*api.RetrieveAllPresetsResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveAllPresetsWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.RetrieveAllPresetsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveAllPresetsWithResponse indicates an expected call of RetrieveAllPresetsWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAllPresetsWithResponse(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveAllPresetsWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveAllPresetsWithResponse), varargs...)
+}
+
 // RetrieveAnalyticsRule mocks base method.
 func (m *MockAPIClientInterface) RetrieveAnalyticsRule(ctx context.Context, ruleName string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -1480,6 +1560,46 @@ func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAnalyticsRulesWithResponse
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveAnalyticsRulesWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveAnalyticsRulesWithResponse), varargs...)
+}
+
+// RetrievePreset mocks base method.
+func (m *MockAPIClientInterface) RetrievePreset(ctx context.Context, presetId string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, presetId}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrievePreset", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrievePreset indicates an expected call of RetrievePreset.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrievePreset(ctx, presetId any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, presetId}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrievePreset", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrievePreset), varargs...)
+}
+
+// RetrievePresetWithResponse mocks base method.
+func (m *MockAPIClientInterface) RetrievePresetWithResponse(ctx context.Context, presetId string, reqEditors ...api.RequestEditorFn) (*api.RetrievePresetResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, presetId}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrievePresetWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.RetrievePresetResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrievePresetWithResponse indicates an expected call of RetrievePresetWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrievePresetWithResponse(ctx, presetId any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, presetId}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrievePresetWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrievePresetWithResponse), varargs...)
 }
 
 // RetrieveStopwordsSet mocks base method.
@@ -2040,6 +2160,86 @@ func (mr *MockAPIClientInterfaceMockRecorder) UpsertAnalyticsRuleWithResponse(ct
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, ruleName, body}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertAnalyticsRuleWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertAnalyticsRuleWithResponse), varargs...)
+}
+
+// UpsertPreset mocks base method.
+func (m *MockAPIClientInterface) UpsertPreset(ctx context.Context, presetId string, body api.UpsertPresetJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, presetId, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpsertPreset", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpsertPreset indicates an expected call of UpsertPreset.
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertPreset(ctx, presetId, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, presetId, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertPreset", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertPreset), varargs...)
+}
+
+// UpsertPresetWithBody mocks base method.
+func (m *MockAPIClientInterface) UpsertPresetWithBody(ctx context.Context, presetId, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, presetId, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpsertPresetWithBody", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpsertPresetWithBody indicates an expected call of UpsertPresetWithBody.
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertPresetWithBody(ctx, presetId, contentType, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, presetId, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertPresetWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertPresetWithBody), varargs...)
+}
+
+// UpsertPresetWithBodyWithResponse mocks base method.
+func (m *MockAPIClientInterface) UpsertPresetWithBodyWithResponse(ctx context.Context, presetId, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*api.UpsertPresetResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, presetId, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpsertPresetWithBodyWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.UpsertPresetResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpsertPresetWithBodyWithResponse indicates an expected call of UpsertPresetWithBodyWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertPresetWithBodyWithResponse(ctx, presetId, contentType, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, presetId, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertPresetWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertPresetWithBodyWithResponse), varargs...)
+}
+
+// UpsertPresetWithResponse mocks base method.
+func (m *MockAPIClientInterface) UpsertPresetWithResponse(ctx context.Context, presetId string, body api.UpsertPresetJSONRequestBody, reqEditors ...api.RequestEditorFn) (*api.UpsertPresetResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, presetId, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpsertPresetWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.UpsertPresetResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpsertPresetWithResponse indicates an expected call of UpsertPresetWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertPresetWithResponse(ctx, presetId, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, presetId, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertPresetWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertPresetWithResponse), varargs...)
 }
 
 // UpsertSearchOverride mocks base method.

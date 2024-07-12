@@ -56,6 +56,10 @@ func (c *Client) Operations() OperationsInterface {
 	return &operations{apiClient: c.apiClient}
 }
 
+func (c *Client) Presets() PresetsInterface {
+	return &presets{apiClient: c.apiClient}
+}
+
 type HTTPError struct {
 	Status int
 	Body   []byte

@@ -184,7 +184,7 @@ components:
         token_separators:
           default: []
           description: |
-            List of symbols or special characters to be used for  splitting the text into individual words in addition to space and new-line characters.
+            List of symbols or special characters to be used for splitting the text into individual words in addition to space and new-line characters.
           items:
             maxLength: 1
             minLength: 1
@@ -344,7 +344,7 @@ components:
       properties:
         cache_ttl:
           description: |
-            The duration (in seconds) that determines how long the search query is cached.  This value can be set on a per-query basis. Default: 60.
+            The duration (in seconds) that determines how long the search query is cached. This value can be set on a per-query basis. Default: 60.
           type: integer
         drop_tokens_threshold:
           description: |
@@ -365,7 +365,7 @@ components:
           type: string
         exhaustive_search:
           description: |
-            Setting this to true will make Typesense consider all prefixes and typo  corrections of the words in the query without stopping early when enough results are found  (drop_tokens_threshold and typo_tokens_threshold configurations are ignored).
+            Setting this to true will make Typesense consider all prefixes and typo corrections of the words in the query without stopping early when enough results are found (drop_tokens_threshold and typo_tokens_threshold configurations are ignored).
           type: boolean
         facet_by:
           description: A list of fields that will be used for faceting your results on. Separate multiple fields with a comma.
@@ -375,7 +375,7 @@ components:
           type: string
         facet_strategy:
           description: |
-            Choose the underlying faceting strategy used. Comma separated string of allows values:  exhaustive, top_values or automatic (default).
+            Choose the underlying faceting strategy used. Comma separated string of allows values: exhaustive, top_values or automatic (default).
           type: string
         filter_by:
           description: Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
@@ -403,7 +403,7 @@ components:
           type: string
         highlight_fields:
           description: |
-            A list of custom fields that must be highlighted even if you don't query  for them
+            A list of custom fields that must be highlighted even if you don't query for them
           type: string
         highlight_full_fields:
           description: List of fields which should be highlighted fully without snippeting
@@ -420,7 +420,7 @@ components:
           type: string
         limit:
           description: |
-            Number of hits to fetch. Can be used as an alternative to the per_page parameter.  Default: 10.
+            Number of hits to fetch. Can be used as an alternative to the per_page parameter. Default: 10.
           type: integer
         max_extra_prefix:
           description: There are also 2 parameters that allow you to control the extent of infix searching max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before or after the query that can be present in the token. For example query "K2100" has 2 extra symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
@@ -433,11 +433,11 @@ components:
           type: integer
         min_len_1typo:
           description: |
-            Minimum word length for 1-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
+            Minimum word length for 1-typo correction to be applied. The value of num_typos is still treated as the maximum allowed typos.
           type: integer
         min_len_2typo:
           description: |
-            Minimum word length for 2-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
+            Minimum word length for 2-typo correction to be applied. The value of num_typos is still treated as the maximum allowed typos.
           type: integer
         num_typos:
           description: |
@@ -455,12 +455,12 @@ components:
         pinned_hits:
           description: |
             A list of records to unconditionally include in the search results at specific positions. An example use case would be to feature or promote certain items on the top of search results. A list of `record_id:hit_position`. Eg: to include a record with ID 123 at Position 1 and another record with ID 456 at Position 5, you'd specify `123:1,456:5`.
-            You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and  finally `hidden_hits`.
+            You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
           type: string
         pre_segmented_query:
           default: false
           description: |
-            You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself  before indexing and querying.
+            You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself before indexing and querying.
             Set this parameter to true to do the same
           type: boolean
         prefix:
@@ -504,7 +504,7 @@ components:
           type: integer
         search_cutoff_ms:
           description: |
-            Typesense will attempt to return results early if the cutoff time has elapsed.  This is not a strict guarantee and facet computation is not bound by this parameter.
+            Typesense will attempt to return results early if the cutoff time has elapsed. This is not a strict guarantee and facet computation is not bound by this parameter.
           type: integer
         snippet_threshold:
           description: |
@@ -546,6 +546,36 @@ components:
           type: array
       required:
         - searches
+      type: object
+    PresetDeleteSchema:
+      properties:
+        name:
+          type: string
+      required:
+        - name
+      type: object
+    PresetSchema:
+      properties:
+        name:
+          type: string
+        value:
+          $ref: '#/components/schemas/PresetUpsertSchema'
+      required:
+        - name
+        - value
+      type: object
+    PresetUpsertSchema:
+      oneOf:
+        - $ref: '#/components/schemas/SearchParameters'
+        - $ref: '#/components/schemas/MultiSearchSearchesParameter'
+    PresetsRetrieveSchema:
+      properties:
+        presets:
+          items:
+            $ref: '#/components/schemas/PresetSchema'
+          type: array
+      required:
+        - presets
       type: object
     ScopedKeyParameters:
       properties:
@@ -697,7 +727,7 @@ components:
       properties:
         cache_ttl:
           description: |
-            The duration (in seconds) that determines how long the search query is cached.  This value can be set on a per-query basis. Default: 60.
+            The duration (in seconds) that determines how long the search query is cached. This value can be set on a per-query basis. Default: 60.
           type: integer
         drop_tokens_threshold:
           description: |
@@ -723,7 +753,7 @@ components:
           type: string
         exhaustive_search:
           description: |
-            Setting this to true will make Typesense consider all prefixes and typo  corrections of the words in the query without stopping early when enough results are found  (drop_tokens_threshold and typo_tokens_threshold configurations are ignored).
+            Setting this to true will make Typesense consider all prefixes and typo corrections of the words in the query without stopping early when enough results are found (drop_tokens_threshold and typo_tokens_threshold configurations are ignored).
           type: boolean
         facet_by:
           description: A list of fields that will be used for faceting your results on. Separate multiple fields with a comma.
@@ -733,7 +763,7 @@ components:
           type: string
         facet_strategy:
           description: |
-            Choose the underlying faceting strategy used. Comma separated string of allows values:  exhaustive, top_values or automatic (default).
+            Choose the underlying faceting strategy used. Comma separated string of allows values: exhaustive, top_values or automatic (default).
           type: string
         filter_by:
           description: Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
@@ -761,7 +791,7 @@ components:
           type: string
         highlight_fields:
           description: |
-            A list of custom fields that must be highlighted even if you don't query  for them
+            A list of custom fields that must be highlighted even if you don't query for them
           type: string
         highlight_full_fields:
           description: List of fields which should be highlighted fully without snippeting
@@ -778,7 +808,7 @@ components:
           type: string
         limit:
           description: |
-            Number of hits to fetch. Can be used as an alternative to the per_page parameter.  Default: 10.
+            Number of hits to fetch. Can be used as an alternative to the per_page parameter. Default: 10.
           type: integer
         max_candidates:
           description: |
@@ -795,11 +825,11 @@ components:
           type: integer
         min_len_1typo:
           description: |
-            Minimum word length for 1-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
+            Minimum word length for 1-typo correction to be applied. The value of num_typos is still treated as the maximum allowed typos.
           type: integer
         min_len_2typo:
           description: |
-            Minimum word length for 2-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
+            Minimum word length for 2-typo correction to be applied. The value of num_typos is still treated as the maximum allowed typos.
           type: integer
         num_typos:
           description: |
@@ -817,11 +847,11 @@ components:
         pinned_hits:
           description: |
             A list of records to unconditionally include in the search results at specific positions. An example use case would be to feature or promote certain items on the top of search results. A list of `record_id:hit_position`. Eg: to include a record with ID 123 at Position 1 and another record with ID 456 at Position 5, you'd specify `123:1,456:5`.
-            You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and  finally `hidden_hits`.
+            You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
           type: string
         pre_segmented_query:
           description: |
-            You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself  before indexing and querying.
+            You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself before indexing and querying.
             Set this parameter to true to do the same
           type: boolean
         prefix:
@@ -865,7 +895,7 @@ components:
           type: integer
         search_cutoff_ms:
           description: |
-            Typesense will attempt to return results early if the cutoff time has elapsed.  This is not a strict guarantee and facet computation is not bound by this parameter.
+            Typesense will attempt to return results early if the cutoff time has elapsed. This is not a strict guarantee and facet computation is not bound by this parameter.
           type: integer
         snippet_threshold:
           description: |
@@ -2700,6 +2730,109 @@ paths:
       summary: Triggers a follower node to initiate the raft voting process, which triggers leader re-election.
       tags:
         - operations
+  /presets:
+    get:
+      description: Retrieve the details of all presets
+      operationId: retrieveAllPresets
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresetsRetrieveSchema'
+          description: Presets fetched.
+      summary: Retrieves all presets.
+      tags:
+        - presets
+  /presets/{presetId}:
+    delete:
+      description: Permanently deletes a preset, given it's name.
+      operationId: deletePreset
+      parameters:
+        - description: The ID of the preset to delete.
+          example: listing_view
+          in: path
+          name: presetId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresetDeleteSchema'
+          description: Preset deleted.
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Preset not found.
+      summary: Delete a preset.
+      tags:
+        - presets
+    get:
+      description: Retrieve the details of a preset, given it's name.
+      operationId: retrievePreset
+      parameters:
+        - description: The ID of the preset to retrieve.
+          example: listing_view
+          in: path
+          name: presetId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresetSchema'
+          description: Preset fetched.
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Preset not found.
+      summary: Retrieves a preset.
+      tags:
+        - presets
+    put:
+      description: Create or update an existing preset.
+      operationId: upsertPreset
+      parameters:
+        - description: The name of the preset set to upsert.
+          example: listing_view
+          in: path
+          name: presetId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresetUpsertSchema'
+        description: The stopwords set to upsert.
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresetSchema'
+          description: Preset successfully upserted.
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Bad request, see error message for details.
+      summary: Upserts a preset.
+      tags:
+        - presets
   /stopwords:
     get:
       description: Retrieve the details of all stopwords sets
@@ -2850,3 +2983,8 @@ tags:
       description: Find out more
       url: https://typesense.org/docs/26.0/api/stopwords.html
     name: stopwords
+  - description: Store and reference search parameters
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/docs/26.0/api/search.html#presets
+    name: presets

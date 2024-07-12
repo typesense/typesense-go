@@ -233,6 +233,20 @@ type ClientInterface interface {
 	// Vote request
 	Vote(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// RetrieveAllPresets request
+	RetrieveAllPresets(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeletePreset request
+	DeletePreset(ctx context.Context, presetId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RetrievePreset request
+	RetrievePreset(ctx context.Context, presetId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpsertPresetWithBody request with any body
+	UpsertPresetWithBody(ctx context.Context, presetId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpsertPreset(ctx context.Context, presetId string, body UpsertPresetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// RetrieveStopwordsSets request
 	RetrieveStopwordsSets(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -862,6 +876,66 @@ func (c *Client) TakeSnapshot(ctx context.Context, params *TakeSnapshotParams, r
 
 func (c *Client) Vote(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewVoteRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RetrieveAllPresets(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrieveAllPresetsRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeletePreset(ctx context.Context, presetId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeletePresetRequest(c.Server, presetId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RetrievePreset(ctx context.Context, presetId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrievePresetRequest(c.Server, presetId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpsertPresetWithBody(ctx context.Context, presetId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpsertPresetRequestWithBody(c.Server, presetId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpsertPreset(ctx context.Context, presetId string, body UpsertPresetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpsertPresetRequest(c.Server, presetId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -4321,6 +4395,148 @@ func NewVoteRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
+// NewRetrieveAllPresetsRequest generates requests for RetrieveAllPresets
+func NewRetrieveAllPresetsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/presets")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewDeletePresetRequest generates requests for DeletePreset
+func NewDeletePresetRequest(server string, presetId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "presetId", runtime.ParamLocationPath, presetId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/presets/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRetrievePresetRequest generates requests for RetrievePreset
+func NewRetrievePresetRequest(server string, presetId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "presetId", runtime.ParamLocationPath, presetId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/presets/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpsertPresetRequest calls the generic UpsertPreset builder with application/json body
+func NewUpsertPresetRequest(server string, presetId string, body UpsertPresetJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpsertPresetRequestWithBody(server, presetId, "application/json", bodyReader)
+}
+
+// NewUpsertPresetRequestWithBody generates requests for UpsertPreset with any type of body
+func NewUpsertPresetRequestWithBody(server string, presetId string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "presetId", runtime.ParamLocationPath, presetId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/presets/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewRetrieveStopwordsSetsRequest generates requests for RetrieveStopwordsSets
 func NewRetrieveStopwordsSetsRequest(server string) (*http.Request, error) {
 	var err error
@@ -4649,6 +4865,20 @@ type ClientWithResponsesInterface interface {
 
 	// VoteWithResponse request
 	VoteWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*VoteResponse, error)
+
+	// RetrieveAllPresetsWithResponse request
+	RetrieveAllPresetsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllPresetsResponse, error)
+
+	// DeletePresetWithResponse request
+	DeletePresetWithResponse(ctx context.Context, presetId string, reqEditors ...RequestEditorFn) (*DeletePresetResponse, error)
+
+	// RetrievePresetWithResponse request
+	RetrievePresetWithResponse(ctx context.Context, presetId string, reqEditors ...RequestEditorFn) (*RetrievePresetResponse, error)
+
+	// UpsertPresetWithBodyWithResponse request with any body
+	UpsertPresetWithBodyWithResponse(ctx context.Context, presetId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpsertPresetResponse, error)
+
+	UpsertPresetWithResponse(ctx context.Context, presetId string, body UpsertPresetJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertPresetResponse, error)
 
 	// RetrieveStopwordsSetsWithResponse request
 	RetrieveStopwordsSetsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveStopwordsSetsResponse, error)
@@ -5588,6 +5818,97 @@ func (r VoteResponse) StatusCode() int {
 	return 0
 }
 
+type RetrieveAllPresetsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *PresetsRetrieveSchema
+}
+
+// Status returns HTTPResponse.Status
+func (r RetrieveAllPresetsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetrieveAllPresetsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeletePresetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *PresetDeleteSchema
+	JSON404      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r DeletePresetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeletePresetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RetrievePresetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *PresetSchema
+	JSON404      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r RetrievePresetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetrievePresetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpsertPresetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *PresetSchema
+	JSON400      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r UpsertPresetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpsertPresetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type RetrieveStopwordsSetsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -6135,6 +6456,50 @@ func (c *ClientWithResponses) VoteWithResponse(ctx context.Context, reqEditors .
 		return nil, err
 	}
 	return ParseVoteResponse(rsp)
+}
+
+// RetrieveAllPresetsWithResponse request returning *RetrieveAllPresetsResponse
+func (c *ClientWithResponses) RetrieveAllPresetsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllPresetsResponse, error) {
+	rsp, err := c.RetrieveAllPresets(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetrieveAllPresetsResponse(rsp)
+}
+
+// DeletePresetWithResponse request returning *DeletePresetResponse
+func (c *ClientWithResponses) DeletePresetWithResponse(ctx context.Context, presetId string, reqEditors ...RequestEditorFn) (*DeletePresetResponse, error) {
+	rsp, err := c.DeletePreset(ctx, presetId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeletePresetResponse(rsp)
+}
+
+// RetrievePresetWithResponse request returning *RetrievePresetResponse
+func (c *ClientWithResponses) RetrievePresetWithResponse(ctx context.Context, presetId string, reqEditors ...RequestEditorFn) (*RetrievePresetResponse, error) {
+	rsp, err := c.RetrievePreset(ctx, presetId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetrievePresetResponse(rsp)
+}
+
+// UpsertPresetWithBodyWithResponse request with arbitrary body returning *UpsertPresetResponse
+func (c *ClientWithResponses) UpsertPresetWithBodyWithResponse(ctx context.Context, presetId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpsertPresetResponse, error) {
+	rsp, err := c.UpsertPresetWithBody(ctx, presetId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpsertPresetResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpsertPresetWithResponse(ctx context.Context, presetId string, body UpsertPresetJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertPresetResponse, error) {
+	rsp, err := c.UpsertPreset(ctx, presetId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpsertPresetResponse(rsp)
 }
 
 // RetrieveStopwordsSetsWithResponse request returning *RetrieveStopwordsSetsResponse
@@ -7474,6 +7839,131 @@ func ParseVoteResponse(rsp *http.Response) (*VoteResponse, error) {
 			return nil, err
 		}
 		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetrieveAllPresetsResponse parses an HTTP response from a RetrieveAllPresetsWithResponse call
+func ParseRetrieveAllPresetsResponse(rsp *http.Response) (*RetrieveAllPresetsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetrieveAllPresetsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PresetsRetrieveSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeletePresetResponse parses an HTTP response from a DeletePresetWithResponse call
+func ParseDeletePresetResponse(rsp *http.Response) (*DeletePresetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeletePresetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PresetDeleteSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetrievePresetResponse parses an HTTP response from a RetrievePresetWithResponse call
+func ParseRetrievePresetResponse(rsp *http.Response) (*RetrievePresetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetrievePresetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PresetSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpsertPresetResponse parses an HTTP response from a UpsertPresetWithResponse call
+func ParseUpsertPresetResponse(rsp *http.Response) (*UpsertPresetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpsertPresetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PresetSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
 
 	}
 
