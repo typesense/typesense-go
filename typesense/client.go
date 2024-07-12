@@ -60,6 +60,10 @@ func (c *Client) Presets() PresetsInterface {
 	return &presets{apiClient: c.apiClient}
 }
 
+func (c *Client) Preset(presetName string) PresetInterface {
+	return &preset{apiClient: c.apiClient, presetName: presetName}
+}
+
 type HTTPError struct {
 	Status int
 	Body   []byte

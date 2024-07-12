@@ -15,8 +15,8 @@ type presets struct {
 	apiClient APIClientInterface
 }
 
-func (a *presets) Retrieve(ctx context.Context) (*api.PresetsRetrieveSchema, error) {
-	response, err := a.apiClient.RetrieveAllPresetsWithResponse(ctx)
+func (p *presets) Retrieve(ctx context.Context) (*api.PresetsRetrieveSchema, error) {
+	response, err := p.apiClient.RetrieveAllPresetsWithResponse(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -26,8 +26,8 @@ func (a *presets) Retrieve(ctx context.Context) (*api.PresetsRetrieveSchema, err
 	return response.JSON200, nil
 }
 
-func (a *presets) Delete(ctx context.Context, presetName string, presetValue *api.PresetUpsertSchema) (*api.PresetSchema, error) {
-	response, err := a.apiClient.UpsertPresetWithResponse(ctx, presetName, *presetValue)
+func (p *presets) Delete(ctx context.Context, presetName string, presetValue *api.PresetUpsertSchema) (*api.PresetSchema, error) {
+	response, err := p.apiClient.UpsertPresetWithResponse(ctx, presetName, *presetValue)
 	if err != nil {
 		return nil, err
 	}
