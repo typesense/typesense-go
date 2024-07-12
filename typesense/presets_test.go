@@ -18,11 +18,18 @@ func TestPresetsRetrieveAsSearchParameters(t *testing.T) {
 			},
 		},
 	}
-	expectedData.Presets[0].Value.FromSearchParameters(api.SearchParameters{Q: "Hello"})
+	presetValue := api.SearchParameters{Q: "Hello"}
+
+	expectedData.Presets[0].Value.FromSearchParameters(presetValue)
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/presets", http.MethodGet)
-		data := jsonEncode(t, expectedData)
+		data := jsonEncode(t, map[string][]map[string]any{
+			"presets": {{
+				"name":  expectedData.Presets[0].Name,
+				"value": presetValue,
+			}},
+		})
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(data)
@@ -31,6 +38,7 @@ func TestPresetsRetrieveAsSearchParameters(t *testing.T) {
 
 	res, err := client.Presets().Retrieve(context.Background())
 	assert.NoError(t, err)
+	assert.Equal(t, expectedData, res)
 
 	parsedRes, err := res.Presets[0].Value.AsSearchParameters()
 	assert.NoError(t, err)
@@ -48,17 +56,24 @@ func TestPresetsRetrieveAsMultiSearchSearchesParameter(t *testing.T) {
 			},
 		},
 	}
-	expectedData.Presets[0].Value.FromMultiSearchSearchesParameter(api.MultiSearchSearchesParameter{
+	presetValue := api.MultiSearchSearchesParameter{
 		Searches: []api.MultiSearchCollectionParameters{
 			{
 				Collection: "test",
 			},
 		},
-	})
+	}
+
+	expectedData.Presets[0].Value.FromMultiSearchSearchesParameter(presetValue)
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/presets", http.MethodGet)
-		data := jsonEncode(t, expectedData)
+		data := jsonEncode(t, map[string][]map[string]any{
+			"presets": {{
+				"name":  expectedData.Presets[0].Name,
+				"value": presetValue,
+			}},
+		})
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(data)
@@ -67,6 +82,7 @@ func TestPresetsRetrieveAsMultiSearchSearchesParameter(t *testing.T) {
 
 	res, err := client.Presets().Retrieve(context.Background())
 	assert.NoError(t, err)
+	assert.Equal(t, expectedData, res)
 
 	parsedRes, err := res.Presets[0].Value.AsMultiSearchSearchesParameter()
 	assert.NoError(t, err)
@@ -89,9 +105,11 @@ func TestPresetsRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 }
 
 func TestPresetsUpsert(t *testing.T) {
-	var expectedData api.PresetUpsertSchema
+	expectedData := &api.PresetUpsertSchema{}
 
-	expectedData.Value.FromSearchParameters(api.SearchParameters{Q: "Xin chao"})
+	presetValue := api.SearchParameters{Q: "Xin chao"}
+
+	expectedData.Value.FromSearchParameters(presetValue)
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/presets/test", http.MethodPut)
@@ -100,13 +118,11 @@ func TestPresetsUpsert(t *testing.T) {
 		err := json.NewDecoder(r.Body).Decode(&reqBody)
 
 		assert.NoError(t, err)
-		assert.Equal(t, expectedData, reqBody)
+		assert.Equal(t, *expectedData, reqBody)
 
 		data := jsonEncode(t, map[string]any{
-			"name": "test",
-			"value": api.SearchParameters{
-				Q: "Xin chao",
-			},
+			"name":  "test",
+			"value": presetValue,
 		})
 
 		w.Header().Set("Content-Type", "application/json")
@@ -115,9 +131,10 @@ func TestPresetsUpsert(t *testing.T) {
 	})
 	defer server.Close()
 
-	res, err := client.Presets().Upsert(context.Background(), "test", &expectedData)
+	res, err := client.Presets().Upsert(context.Background(), "test", expectedData)
 	assert.NoError(t, err)
-	assert.Equal(t, res.Name, "test")
+	assert.Equal(t, "test", res.Name)
+	assert.EqualValues(t, expectedData.Value, res.Value)
 
 	parsedRes, err := res.Value.AsSearchParameters()
 	assert.NoError(t, err)
