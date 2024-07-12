@@ -534,11 +534,21 @@ type PresetDeleteSchema struct {
 // PresetSchema defines model for PresetSchema.
 type PresetSchema struct {
 	Name  string             `json:"name"`
-	Value PresetUpsertSchema `json:"value"`
+	Value PresetSchema_Value `json:"value"`
+}
+
+// PresetSchema_Value defines model for PresetSchema.Value.
+type PresetSchema_Value struct {
+	union json.RawMessage
 }
 
 // PresetUpsertSchema defines model for PresetUpsertSchema.
 type PresetUpsertSchema struct {
+	Value PresetUpsertSchema_Value `json:"value"`
+}
+
+// PresetUpsertSchema_Value defines model for PresetUpsertSchema.Value.
+type PresetUpsertSchema_Value struct {
 	union json.RawMessage
 }
 
@@ -1107,22 +1117,22 @@ type UpsertPresetJSONRequestBody = PresetUpsertSchema
 // UpsertStopwordsSetJSONRequestBody defines body for UpsertStopwordsSet for application/json ContentType.
 type UpsertStopwordsSetJSONRequestBody = StopwordsSetUpsertSchema
 
-// AsSearchParameters returns the union data inside the PresetUpsertSchema as a SearchParameters
-func (t PresetUpsertSchema) AsSearchParameters() (SearchParameters, error) {
+// AsSearchParameters returns the union data inside the PresetSchema_Value as a SearchParameters
+func (t PresetSchema_Value) AsSearchParameters() (SearchParameters, error) {
 	var body SearchParameters
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromSearchParameters overwrites any union data inside the PresetUpsertSchema as the provided SearchParameters
-func (t *PresetUpsertSchema) FromSearchParameters(v SearchParameters) error {
+// FromSearchParameters overwrites any union data inside the PresetSchema_Value as the provided SearchParameters
+func (t *PresetSchema_Value) FromSearchParameters(v SearchParameters) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeSearchParameters performs a merge with any union data inside the PresetUpsertSchema, using the provided SearchParameters
-func (t *PresetUpsertSchema) MergeSearchParameters(v SearchParameters) error {
+// MergeSearchParameters performs a merge with any union data inside the PresetSchema_Value, using the provided SearchParameters
+func (t *PresetSchema_Value) MergeSearchParameters(v SearchParameters) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -1133,22 +1143,22 @@ func (t *PresetUpsertSchema) MergeSearchParameters(v SearchParameters) error {
 	return err
 }
 
-// AsMultiSearchSearchesParameter returns the union data inside the PresetUpsertSchema as a MultiSearchSearchesParameter
-func (t PresetUpsertSchema) AsMultiSearchSearchesParameter() (MultiSearchSearchesParameter, error) {
+// AsMultiSearchSearchesParameter returns the union data inside the PresetSchema_Value as a MultiSearchSearchesParameter
+func (t PresetSchema_Value) AsMultiSearchSearchesParameter() (MultiSearchSearchesParameter, error) {
 	var body MultiSearchSearchesParameter
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromMultiSearchSearchesParameter overwrites any union data inside the PresetUpsertSchema as the provided MultiSearchSearchesParameter
-func (t *PresetUpsertSchema) FromMultiSearchSearchesParameter(v MultiSearchSearchesParameter) error {
+// FromMultiSearchSearchesParameter overwrites any union data inside the PresetSchema_Value as the provided MultiSearchSearchesParameter
+func (t *PresetSchema_Value) FromMultiSearchSearchesParameter(v MultiSearchSearchesParameter) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeMultiSearchSearchesParameter performs a merge with any union data inside the PresetUpsertSchema, using the provided MultiSearchSearchesParameter
-func (t *PresetUpsertSchema) MergeMultiSearchSearchesParameter(v MultiSearchSearchesParameter) error {
+// MergeMultiSearchSearchesParameter performs a merge with any union data inside the PresetSchema_Value, using the provided MultiSearchSearchesParameter
+func (t *PresetSchema_Value) MergeMultiSearchSearchesParameter(v MultiSearchSearchesParameter) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -1159,12 +1169,74 @@ func (t *PresetUpsertSchema) MergeMultiSearchSearchesParameter(v MultiSearchSear
 	return err
 }
 
-func (t PresetUpsertSchema) MarshalJSON() ([]byte, error) {
+func (t PresetSchema_Value) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-func (t *PresetUpsertSchema) UnmarshalJSON(b []byte) error {
+func (t *PresetSchema_Value) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsSearchParameters returns the union data inside the PresetUpsertSchema_Value as a SearchParameters
+func (t PresetUpsertSchema_Value) AsSearchParameters() (SearchParameters, error) {
+	var body SearchParameters
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromSearchParameters overwrites any union data inside the PresetUpsertSchema_Value as the provided SearchParameters
+func (t *PresetUpsertSchema_Value) FromSearchParameters(v SearchParameters) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeSearchParameters performs a merge with any union data inside the PresetUpsertSchema_Value, using the provided SearchParameters
+func (t *PresetUpsertSchema_Value) MergeSearchParameters(v SearchParameters) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsMultiSearchSearchesParameter returns the union data inside the PresetUpsertSchema_Value as a MultiSearchSearchesParameter
+func (t PresetUpsertSchema_Value) AsMultiSearchSearchesParameter() (MultiSearchSearchesParameter, error) {
+	var body MultiSearchSearchesParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromMultiSearchSearchesParameter overwrites any union data inside the PresetUpsertSchema_Value as the provided MultiSearchSearchesParameter
+func (t *PresetUpsertSchema_Value) FromMultiSearchSearchesParameter(v MultiSearchSearchesParameter) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeMultiSearchSearchesParameter performs a merge with any union data inside the PresetUpsertSchema_Value, using the provided MultiSearchSearchesParameter
+func (t *PresetUpsertSchema_Value) MergeMultiSearchSearchesParameter(v MultiSearchSearchesParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t PresetUpsertSchema_Value) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *PresetUpsertSchema_Value) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }

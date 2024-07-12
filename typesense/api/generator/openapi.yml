@@ -2873,19 +2873,22 @@ components:
       example: |
         {"stopwords": [{"id": "countries", "stopwords": ["Germany", "France", "Italy"], "locale": "en"}]}
     PresetUpsertSchema:
-      oneOf:
-        - $ref: '#/components/schemas/SearchParameters'
-        - $ref: '#/components/schemas/MultiSearchSearchesParameter'
-    PresetSchema:
-      type: object
-      required:
-        - name
-        - value
       properties:
-        name:
-          type: string
         value:
-          $ref: '#/components/schemas/PresetUpsertSchema'
+          oneOf:
+            - $ref: '#/components/schemas/SearchParameters'
+            - $ref: '#/components/schemas/MultiSearchSearchesParameter'
+      required:
+        - value
+    PresetSchema:
+      allOf:
+        - $ref: '#/components/schemas/PresetUpsertSchema'
+        - type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
     PresetsRetrieveSchema:
       type: object
       required:

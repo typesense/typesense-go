@@ -8,7 +8,7 @@ import (
 
 type PresetsInterface interface {
 	Retrieve(ctx context.Context) (*api.PresetsRetrieveSchema, error)
-	Delete(ctx context.Context, presetName string, presetValue *api.PresetUpsertSchema) (*api.PresetSchema, error)
+	Upsert(ctx context.Context, presetName string, presetValue *api.PresetUpsertSchema) (*api.PresetSchema, error)
 }
 
 type presets struct {
@@ -26,7 +26,7 @@ func (p *presets) Retrieve(ctx context.Context) (*api.PresetsRetrieveSchema, err
 	return response.JSON200, nil
 }
 
-func (p *presets) Delete(ctx context.Context, presetName string, presetValue *api.PresetUpsertSchema) (*api.PresetSchema, error) {
+func (p *presets) Upsert(ctx context.Context, presetName string, presetValue *api.PresetUpsertSchema) (*api.PresetSchema, error) {
 	response, err := p.apiClient.UpsertPresetWithResponse(ctx, presetName, *presetValue)
 	if err != nil {
 		return nil, err

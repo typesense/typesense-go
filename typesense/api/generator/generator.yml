@@ -555,19 +555,22 @@ components:
         - name
       type: object
     PresetSchema:
-      properties:
-        name:
-          type: string
-        value:
-          $ref: '#/components/schemas/PresetUpsertSchema'
-      required:
-        - name
-        - value
-      type: object
+      allOf:
+        - $ref: '#/components/schemas/PresetUpsertSchema'
+        - properties:
+            name:
+              type: string
+          required:
+            - name
+          type: object
     PresetUpsertSchema:
-      oneOf:
-        - $ref: '#/components/schemas/SearchParameters'
-        - $ref: '#/components/schemas/MultiSearchSearchesParameter'
+      properties:
+        value:
+          oneOf:
+            - $ref: '#/components/schemas/SearchParameters'
+            - $ref: '#/components/schemas/MultiSearchSearchesParameter'
+      required:
+        - value
     PresetsRetrieveSchema:
       properties:
         presets:
