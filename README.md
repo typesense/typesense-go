@@ -75,7 +75,7 @@ You can also find some examples in [integration tests](https://github.com/typese
 
 In `v2.0.0`+, the client allows you to define a document struct to be used type for some of the document operations.
 
-To do that, you've to use `typesense.GenericCollection`: 
+To do that, you've to use `typesense.GenericCollection`:
 
 ```go
 type companyDocument struct {
@@ -380,6 +380,40 @@ client.Collection("products").Synonyms().Retrieve(context.Background())
 
 ```go
 client.Collection("products").Synonym("coat-synonyms").Delete(context.Background())
+```
+
+### Create or update a preset
+
+```go
+preset := &api.PresetUpsertSchema{}
+preset.Value.FromMultiSearchSearchesParameter(api.MultiSearchSearchesParameter{
+		Searches: []api.MultiSearchCollectionParameters{
+			{
+				Collection: "books",
+			},
+		},
+	})
+// or: preset.Value.FromSearchParameters(api.SearchParameters{Q: "Books"})
+
+client.Presets().Upsert(context.Background(), "listing-view-preset", preset)
+```
+
+### Retrieve a preset
+
+```go
+client.Preset("listing-view-preset").Retrieve(context.Background())
+```
+
+### List all presets
+
+```go
+client.Presets().Retrieve(context.Background())
+```
+
+### Delete a preset
+
+```go
+client.Preset("listing-view-preset").Delete(context.Background())
 ```
 
 ### Create snapshot (for backups)
