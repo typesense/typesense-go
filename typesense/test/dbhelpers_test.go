@@ -348,6 +348,21 @@ func createNewKey(t *testing.T) *api.ApiKey {
 	return result
 }
 
+func createNewPreset(t *testing.T, presetValueIsFromSearchParameters ...bool) (string, *api.PresetSchema) {
+	t.Helper()
+	presetName := newUUIDName("preset-test")
+	presetSchema := newPresetFromMultiSearchSearchesParameterUpsertSchema()
+
+	if len(presetValueIsFromSearchParameters) > 0 {
+		presetSchema = newPresetFromSearchParametersUpsertSchema()
+	}
+
+	result, err := typesenseClient.Presets().Upsert(context.Background(), presetName, presetSchema)
+
+	require.NoError(t, err)
+	return presetName, result
+}
+
 func retrieveDocuments(t *testing.T, collectionName string, docIDs ...string) []map[string]interface{} {
 	results := make([]map[string]interface{}, len(docIDs))
 	for i, docID := range docIDs {

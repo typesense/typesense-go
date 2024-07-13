@@ -9,7 +9,7 @@ jobs:
     docker:
       - image: golangci/golangci-lint:v1.33-alpine
     environment:
-      GO111MODULE: "on"
+      GO111MODULE: 'on'
     steps:
       - checkout
       - restore_cache:
@@ -21,12 +21,12 @@ jobs:
       - save_cache:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
-            - "/go/pkg/mod"
+            - '/go/pkg/mod'
       - run:
           name: golangci-lint
           command: golangci-lint run -v
       - run:
-          name: Install revive 
+          name: Install revive
           command: cd / && go get -u github.com/mgechev/revive@v1.0.2 && cd -
       - run:
           name: revive
@@ -35,7 +35,7 @@ jobs:
     docker:
       - image: cimg/go:1.17.5
       - name: db
-        image: typesense/typesense:0.23.0
+        image: typesense/typesense:26.0
         command: /opt/typesense-server --data-dir=/tmp --api-key=test_key
     steps:
       - checkout
@@ -48,13 +48,13 @@ jobs:
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
-            - "/home/circleci/go/pkg/mod"
+            - '/home/circleci/go/pkg/mod'
       - run:
           name: Run tests
           environment:
-            CGO_ENABLED: "0"
-            TYPESENSE_URL: "http://db:8108"
-            TYPESENSE_API_KEY: "test_key"
+            CGO_ENABLED: '0'
+            TYPESENSE_URL: 'http://db:8108'
+            TYPESENSE_API_KEY: 'test_key'
           command: |
             mkdir -p /tmp/test-reports
             gotestsum --junitfile /tmp/test-reports/unit-tests.xml -- -tags=integration ./...

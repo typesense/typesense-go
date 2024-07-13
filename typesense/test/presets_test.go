@@ -38,11 +38,6 @@ func TestPresetsUpsertValueFromSearchParameters(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, parsedExpected, parsedResult)
-
-	result, err = typesenseClient.Preset(presetID).Retrieve(context.Background())
-
-	require.NoError(t, err)
-	require.Equal(t, expectedResult, result)
 }
 
 func TestPresetsUpsertValueFromMultiSearchSearchesParameter(t *testing.T) {
@@ -64,11 +59,6 @@ func TestPresetsUpsertValueFromMultiSearchSearchesParameter(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, parsedExpected, parsedResult)
-
-	result, err = typesenseClient.Preset(presetID).Retrieve(context.Background())
-
-	require.NoError(t, err)
-	require.Equal(t, expectedResult, result)
 }
 
 func TestPresetsRetrievePresetFromSearchParameters(t *testing.T) {
