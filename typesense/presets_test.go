@@ -102,7 +102,7 @@ func TestPresetsRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestPresetsUpsert(t *testing.T) {
+func TestPresetsFromSearchParametersUpsert(t *testing.T) {
 	expectedData := &api.PresetUpsertSchema{}
 
 	presetValue := api.SearchParameters{Q: "Xin chao"}
@@ -138,6 +138,53 @@ func TestPresetsUpsert(t *testing.T) {
 	assert.NoError(t, err)
 
 	parsedData, err := expectedData.Value.AsSearchParameters()
+	assert.NoError(t, err)
+
+	assert.Equal(t, parsedData, parsedRes)
+}
+
+func TestPresetsFromMultiSearchSearchesParameterUpsert(t *testing.T) {
+	expectedData := &api.PresetUpsertSchema{}
+
+	presetValue := api.MultiSearchSearchesParameter{
+		Searches: []api.MultiSearchCollectionParameters{
+			{
+				Collection: "test",
+			},
+		},
+	}
+
+	expectedData.Value.FromMultiSearchSearchesParameter(presetValue)
+
+	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
+		validateRequestMetadata(t, r, "/presets/test", http.MethodPut)
+
+		var reqBody api.PresetUpsertSchema
+		err := json.NewDecoder(r.Body).Decode(&reqBody)
+
+		assert.NoError(t, err)
+		assert.Equal(t, *expectedData, reqBody)
+
+		data := jsonEncode(t, map[string]any{
+			"name":  "test",
+			"value": presetValue,
+		})
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(data)
+	})
+	defer server.Close()
+
+	res, err := client.Presets().Upsert(context.Background(), "test", expectedData)
+	assert.NoError(t, err)
+	assert.Equal(t, "test", res.Name)
+	assert.EqualValues(t, expectedData.Value, res.Value)
+
+	parsedRes, err := res.Value.AsMultiSearchSearchesParameter()
+	assert.NoError(t, err)
+
+	parsedData, err := expectedData.Value.AsMultiSearchSearchesParameter()
 	assert.NoError(t, err)
 
 	assert.Equal(t, parsedData, parsedRes)
