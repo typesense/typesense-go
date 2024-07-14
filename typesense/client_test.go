@@ -41,6 +41,8 @@ func TestClientConfigOptions(t *testing.T) {
 			name:    "WithDefaultConfig",
 			options: []ClientOption{},
 			verify: func(t *testing.T, client *Client) {
+				assert.Equal(t, defaultRetryInterval, client.apiConfig.RetryInterval)
+				assert.Equal(t, defaultHealthcheckInterval, client.apiConfig.HealthcheckInterval)
 				assert.Equal(t, defaultConnectionTimeout, client.apiConfig.ConnectionTimeout)
 				assert.Equal(t, defaultCircuitBreakerName, client.apiConfig.CircuitBreakerName)
 				assert.Equal(t, circuit.DefaultGoBreakerMaxRequests, client.apiConfig.CircuitBreakerMaxRequests)
@@ -62,6 +64,58 @@ func TestClientConfigOptions(t *testing.T) {
 				assert.Equal(t, "http://example.com", client.apiConfig.ServerURL)
 				apiClient := getAPIClient(t, client.apiClient)
 				assert.Equal(t, "http://example.com/", apiClient.Server)
+			},
+		},
+		{
+			name: "WithNearestNode",
+			options: []ClientOption{
+				WithNearestNode("http://localhost:8108"),
+			},
+			verify: func(t *testing.T, client *Client) {
+				assert.Equal(t, "http://localhost:8108", client.apiConfig.NearestNode)
+				apiClient := getAPIClient(t, client.apiClient)
+				assert.Equal(t, "http://localhost:8108/", apiClient.Server)
+			},
+		},
+		{
+			name: "WithNodes",
+			options: []ClientOption{
+				WithNodes([]string{"http://localhost:3000", "http://localhost:3001"}),
+			},
+			verify: func(t *testing.T, client *Client) {
+				assert.Equal(t, []string{"http://localhost:3000", "http://localhost:3001"}, client.apiConfig.Nodes)
+				apiClient := getAPIClient(t, client.apiClient)
+				assert.Equal(t, "http://localhost:3000/", apiClient.Server)
+			},
+		},
+		{
+			name: "WithNumRetries",
+			options: []ClientOption{
+				WithNumRetries(10),
+			},
+			verify: func(t *testing.T, client *Client) {
+				assert.Equal(t, 10, client.apiConfig.NumRetries)
+				assert.NotNil(t, client.apiClient)
+			},
+		},
+		{
+			name: "WithRetryInterval",
+			options: []ClientOption{
+				WithRetryInterval(10 * time.Second),
+			},
+			verify: func(t *testing.T, client *Client) {
+				assert.Equal(t, 10*time.Second, client.apiConfig.RetryInterval)
+				assert.NotNil(t, client.apiClient)
+			},
+		},
+		{
+			name: "WithHealthcheckInterval",
+			options: []ClientOption{
+				WithHealthcheckInterval(10 * time.Second),
+			},
+			verify: func(t *testing.T, client *Client) {
+				assert.Equal(t, 10*time.Second, client.apiConfig.HealthcheckInterval)
+				assert.NotNil(t, client.apiClient)
 			},
 		},
 		{

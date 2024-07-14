@@ -66,12 +66,19 @@ func (e *HTTPError) Error() string {
 }
 
 const (
-	defaultConnectionTimeout  = 5 * time.Second
-	defaultCircuitBreakerName = "typesenseClient"
+	defaultRetryInterval       = 100 * time.Millisecond
+	defaultHealthcheckInterval = 1 * time.Minute
+	defaultConnectionTimeout   = 5 * time.Second
+	defaultCircuitBreakerName  = "typesenseClient"
 )
 
 type ClientConfig struct {
 	ServerURL                   string
+	NearestNode                 string // optional
+	Nodes                       []string
+	NumRetries                  int
+	RetryInterval               time.Duration
+	HealthcheckInterval         time.Duration
 	APIKey                      string
 	ConnectionTimeout           time.Duration
 	CircuitBreakerName          string
@@ -95,6 +102,45 @@ func WithAPIClient(apiClient APIClientInterface) ClientOption {
 func WithServer(serverURL string) ClientOption {
 	return func(c *Client) {
 		c.apiConfig.ServerURL = serverURL
+	}
+}
+
+// WithNearestNode sets the Load Balanced endpoint.
+func WithNearestNode(URL string) ClientOption {
+	return func(c *Client) {
+		c.apiConfig.NearestNode = URL
+	}
+}
+
+// WithNodes sets multiple hostnames to load balance reads & writes across all nodes.
+func WithNodes(URLs []string) ClientOption {
+	return func(c *Client) {
+		c.apiConfig.Nodes = URLs
+	}
+}
+
+// WithNumRetries sets the number of retries per request.
+// Default value is the number of nodes (+1 if nearestNode is specified).
+func WithNumRetries(num int) ClientOption {
+	return func(c *Client) {
+		c.apiConfig.NumRetries = num
+	}
+}
+
+// WithRetryInterval sets the wait time between each retry.
+// Default value is 100 milliseconds.
+func WithRetryInterval(duration time.Duration) ClientOption {
+	return func(c *Client) {
+		c.apiConfig.RetryInterval = duration
+	}
+}
+
+// WithHealthcheckInterval sets the wait time for an unhealthy node to become healthy again.
+// A node is marked as unhealthy if its response status code is 5xx or has an error (e.g. timeout).
+// Default value is 1 minute.
+func WithHealthcheckInterval(duration time.Duration) ClientOption {
+	return func(c *Client) {
+		c.apiConfig.HealthcheckInterval = duration
 	}
 }
 
@@ -174,6 +220,11 @@ func WithCircuitBreakerOnStateChange(onStateChange circuit.GoBreakerOnStateChang
 func WithClientConfig(config *ClientConfig) ClientOption {
 	return func(c *Client) {
 		c.apiConfig.ServerURL = config.ServerURL
+		c.apiConfig.NearestNode = config.NearestNode
+		c.apiConfig.Nodes = config.Nodes
+		c.apiConfig.NumRetries = config.NumRetries
+		c.apiConfig.RetryInterval = config.RetryInterval
+		c.apiConfig.HealthcheckInterval = config.HealthcheckInterval
 		c.apiConfig.APIKey = config.APIKey
 		c.apiConfig.ConnectionTimeout = config.ConnectionTimeout
 		c.apiConfig.CircuitBreakerName = config.CircuitBreakerName
@@ -187,6 +238,8 @@ func WithClientConfig(config *ClientConfig) ClientOption {
 
 func NewClient(opts ...ClientOption) *Client {
 	c := &Client{apiConfig: &ClientConfig{
+		RetryInterval:             defaultRetryInterval,
+		HealthcheckInterval:       defaultHealthcheckInterval,
 		ConnectionTimeout:         defaultConnectionTimeout,
 		CircuitBreakerName:        defaultCircuitBreakerName,
 		CircuitBreakerMaxRequests: circuit.DefaultGoBreakerMaxRequests,
@@ -208,12 +261,29 @@ func NewClient(opts ...ClientOption) *Client {
 			circuit.WithGoBreakerOnStateChange(c.apiConfig.CircuitBreakerOnStateChange),
 		)
 		httpClient := circuit.NewHTTPClient(
-			circuit.WithHTTPRequestDoer(&http.Client{
-				Timeout: c.apiConfig.ConnectionTimeout,
-			}),
+			circuit.WithHTTPRequestDoer(
+				NewApiCall(
+					&http.Client{
+						Timeout: c.apiConfig.ConnectionTimeout,
+					},
+					c.apiConfig,
+				)),
 			circuit.WithCircuitBreaker(cb),
 		)
-		apiClient, _ := api.NewClientWithResponses(c.apiConfig.ServerURL,
+		serverURL := ""
+
+		switch {
+		case c.apiConfig.ServerURL != "":
+			serverURL = c.apiConfig.ServerURL
+		case c.apiConfig.NearestNode != "":
+			serverURL = c.apiConfig.NearestNode
+		default:
+			if len(c.apiConfig.Nodes) != 0 {
+				serverURL = c.apiConfig.Nodes[0]
+			}
+		}
+
+		apiClient, _ := api.NewClientWithResponses(serverURL,
 			api.WithAPIKey(c.apiConfig.APIKey),
 			api.WithHTTPClient(httpClient))
 		c.apiClient = apiClient
