@@ -122,7 +122,7 @@ type CollectionResponse struct {
 	// SymbolsToIndex List of symbols or special characters to be indexed.
 	SymbolsToIndex *[]string `json:"symbols_to_index,omitempty"`
 
-	// TokenSeparators List of symbols or special characters to be used for  splitting the text into individual words in addition to space and new-line characters.
+	// TokenSeparators List of symbols or special characters to be used for splitting the text into individual words in addition to space and new-line characters.
 	TokenSeparators *[]string `json:"token_separators,omitempty"`
 }
 
@@ -143,7 +143,7 @@ type CollectionSchema struct {
 	// SymbolsToIndex List of symbols or special characters to be indexed.
 	SymbolsToIndex *[]string `json:"symbols_to_index,omitempty"`
 
-	// TokenSeparators List of symbols or special characters to be used for  splitting the text into individual words in addition to space and new-line characters.
+	// TokenSeparators List of symbols or special characters to be used for splitting the text into individual words in addition to space and new-line characters.
 	TokenSeparators *[]string `json:"token_separators,omitempty"`
 }
 
@@ -153,12 +153,87 @@ type CollectionUpdateSchema struct {
 	Fields []Field `json:"fields"`
 }
 
+// ConversationDeleteSchema defines model for ConversationDeleteSchema.
+type ConversationDeleteSchema struct {
+	Id int `json:"id"`
+}
+
+// ConversationModelCreateAndUpdateSchema defines model for ConversationModelCreateAndUpdateSchema.
+type ConversationModelCreateAndUpdateSchema struct {
+	// AccountId LLM service's account ID (only applicable for Cloudflare)
+	AccountId *string `json:"account_id,omitempty"`
+
+	// ApiKey The LLM service's API Key
+	ApiKey string `json:"api_key"`
+
+	// MaxBytes The maximum number of bytes to send to the LLM in every API call. Consult the LLM's documentation on the number of bytes supported in the context window.
+	MaxBytes int `json:"max_bytes"`
+
+	// ModelName Name of the LLM model offered by OpenAI, Cloudflare or vLLM
+	ModelName string `json:"model_name"`
+
+	// SystemPrompt The system prompt that contains special instructions to the LLM
+	SystemPrompt *string `json:"system_prompt,omitempty"`
+
+	// VllmUrl URL of vLLM service
+	VllmUrl *string `json:"vllm_url,omitempty"`
+}
+
+// ConversationModelDeleteSchema defines model for ConversationModelDeleteSchema.
+type ConversationModelDeleteSchema struct {
+	Id string `json:"id"`
+}
+
+// ConversationModelSchema defines model for ConversationModelSchema.
+type ConversationModelSchema struct {
+	// AccountId LLM service's account ID (only applicable for Cloudflare)
+	AccountId *string `json:"account_id,omitempty"`
+
+	// ApiKey The LLM service's API Key
+	ApiKey string `json:"api_key"`
+	Id     string `json:"id"`
+
+	// MaxBytes The maximum number of bytes to send to the LLM in every API call. Consult the LLM's documentation on the number of bytes supported in the context window.
+	MaxBytes int `json:"max_bytes"`
+
+	// ModelName Name of the LLM model offered by OpenAI, Cloudflare or vLLM
+	ModelName string `json:"model_name"`
+
+	// SystemPrompt The system prompt that contains special instructions to the LLM
+	SystemPrompt *string `json:"system_prompt,omitempty"`
+
+	// VllmUrl URL of vLLM service
+	VllmUrl *string `json:"vllm_url,omitempty"`
+}
+
+// ConversationSchema defines model for ConversationSchema.
+type ConversationSchema struct {
+	Conversation []map[string]interface{} `json:"conversation"`
+	Id           int                      `json:"id"`
+	LastUpdated  int                      `json:"last_updated"`
+
+	// Ttl Time to live. Conversations are stored by default for 24 hours, and then purged.
+	Ttl int `json:"ttl"`
+}
+
+// ConversationUpdateSchema defines model for ConversationUpdateSchema.
+type ConversationUpdateSchema struct {
+	// Ttl Time to live. Conversations are stored by default for 24 hours, and then purged.
+	Ttl int `json:"ttl"`
+}
+
+// ConversationsRetrieveSchema defines model for ConversationsRetrieveSchema.
+type ConversationsRetrieveSchema struct {
+	Conversations []*ConversationSchema `json:"conversations"`
+}
+
 // FacetCounts defines model for FacetCounts.
 type FacetCounts struct {
 	Counts *[]struct {
-		Count       *int    `json:"count,omitempty"`
-		Highlighted *string `json:"highlighted,omitempty"`
-		Value       *string `json:"value,omitempty"`
+		Count       *int                    `json:"count,omitempty"`
+		Highlighted *string                 `json:"highlighted,omitempty"`
+		Parent      *map[string]interface{} `json:"parent,omitempty"`
+		Value       *string                 `json:"value,omitempty"`
 	} `json:"counts,omitempty"`
 	FieldName *string `json:"field_name,omitempty"`
 	Stats     *struct {
@@ -203,7 +278,7 @@ type HealthStatus struct {
 
 // MultiSearchCollectionParameters defines model for MultiSearchCollectionParameters.
 type MultiSearchCollectionParameters struct {
-	// CacheTtl The duration (in seconds) that determines how long the search query is cached.  This value can be set on a per-query basis. Default: 60.
+	// CacheTtl The duration (in seconds) that determines how long the search query is cached. This value can be set on a per-query basis. Default: 60.
 	CacheTtl *int `json:"cache_ttl,omitempty"`
 
 	// Collection The collection to search in.
@@ -221,7 +296,7 @@ type MultiSearchCollectionParameters struct {
 	// ExcludeFields List of fields from the document to exclude in the search result
 	ExcludeFields *string `json:"exclude_fields,omitempty"`
 
-	// ExhaustiveSearch Setting this to true will make Typesense consider all prefixes and typo  corrections of the words in the query without stopping early when enough results are found  (drop_tokens_threshold and typo_tokens_threshold configurations are ignored).
+	// ExhaustiveSearch Setting this to true will make Typesense consider all prefixes and typo corrections of the words in the query without stopping early when enough results are found (drop_tokens_threshold and typo_tokens_threshold configurations are ignored).
 	ExhaustiveSearch *bool `json:"exhaustive_search,omitempty"`
 
 	// FacetBy A list of fields that will be used for faceting your results on. Separate multiple fields with a comma.
@@ -230,7 +305,10 @@ type MultiSearchCollectionParameters struct {
 	// FacetQuery Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
 	FacetQuery *string `json:"facet_query,omitempty"`
 
-	// FacetStrategy Choose the underlying faceting strategy used. Comma separated string of allows values:  exhaustive, top_values or automatic (default).
+	// FacetReturnParent Comma separated string of nested facet fields whose parent object should be returned in facet response.
+	FacetReturnParent *string `json:"facet_return_parent,omitempty"`
+
+	// FacetStrategy Choose the underlying faceting strategy used. Comma separated string of allows values: exhaustive, top_values or automatic (default).
 	FacetStrategy *string `json:"facet_strategy,omitempty"`
 
 	// FilterBy Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
@@ -252,7 +330,7 @@ type MultiSearchCollectionParameters struct {
 	// HighlightEndTag The end tag used for the highlighted snippets. Default: `</mark>`
 	HighlightEndTag *string `json:"highlight_end_tag,omitempty"`
 
-	// HighlightFields A list of custom fields that must be highlighted even if you don't query  for them
+	// HighlightFields A list of custom fields that must be highlighted even if you don't query for them
 	HighlightFields *string `json:"highlight_fields,omitempty"`
 
 	// HighlightFullFields List of fields which should be highlighted fully without snippeting
@@ -267,7 +345,7 @@ type MultiSearchCollectionParameters struct {
 	// Infix If infix index is enabled for this field, infix searching can be done on a per-field basis by sending a comma separated string parameter called infix to the search query. This parameter can have 3 values; `off` infix search is disabled, which is default `always` infix search is performed along with regular search `fallback` infix search is performed if regular search does not produce results
 	Infix *string `json:"infix,omitempty"`
 
-	// Limit Number of hits to fetch. Can be used as an alternative to the per_page parameter.  Default: 10.
+	// Limit Number of hits to fetch. Can be used as an alternative to the per_page parameter. Default: 10.
 	Limit *int `json:"limit,omitempty"`
 
 	// MaxExtraPrefix There are also 2 parameters that allow you to control the extent of infix searching max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before or after the query that can be present in the token. For example query "K2100" has 2 extra symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
@@ -279,10 +357,10 @@ type MultiSearchCollectionParameters struct {
 	// MaxFacetValues Maximum number of facet values to be returned.
 	MaxFacetValues *int `json:"max_facet_values,omitempty"`
 
-	// MinLen1typo Minimum word length for 1-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
+	// MinLen1typo Minimum word length for 1-typo correction to be applied. The value of num_typos is still treated as the maximum allowed typos.
 	MinLen1typo *int `json:"min_len_1typo,omitempty"`
 
-	// MinLen2typo Minimum word length for 2-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
+	// MinLen2typo Minimum word length for 2-typo correction to be applied. The value of num_typos is still treated as the maximum allowed typos.
 	MinLen2typo *int `json:"min_len_2typo,omitempty"`
 
 	// NumTypos The number of typographical errors (1 or 2) that would be tolerated. Default: 2
@@ -291,6 +369,9 @@ type MultiSearchCollectionParameters struct {
 	// Offset Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
 	Offset *int `json:"offset,omitempty"`
 
+	// OverrideTags Comma separated list of tags to trigger the curations rules that match the tags.
+	OverrideTags *string `json:"override_tags,omitempty"`
+
 	// Page Results from this specific page number would be fetched.
 	Page *int `json:"page,omitempty"`
 
@@ -298,10 +379,10 @@ type MultiSearchCollectionParameters struct {
 	PerPage *int `json:"per_page,omitempty"`
 
 	// PinnedHits A list of records to unconditionally include in the search results at specific positions. An example use case would be to feature or promote certain items on the top of search results. A list of `record_id:hit_position`. Eg: to include a record with ID 123 at Position 1 and another record with ID 456 at Position 5, you'd specify `123:1,456:5`.
-	// You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and  finally `hidden_hits`.
+	// You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
 	PinnedHits *string `json:"pinned_hits,omitempty"`
 
-	// PreSegmentedQuery You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself  before indexing and querying.
+	// PreSegmentedQuery You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself before indexing and querying.
 	// Set this parameter to true to do the same
 	PreSegmentedQuery *bool `json:"pre_segmented_query,omitempty"`
 
@@ -335,7 +416,7 @@ type MultiSearchCollectionParameters struct {
 	// RemoteEmbeddingTimeoutMs Timeout (in milliseconds) for fetching remote embeddings.
 	RemoteEmbeddingTimeoutMs *int `json:"remote_embedding_timeout_ms,omitempty"`
 
-	// SearchCutoffMs Typesense will attempt to return results early if the cutoff time has elapsed.  This is not a strict guarantee and facet computation is not bound by this parameter.
+	// SearchCutoffMs Typesense will attempt to return results early if the cutoff time has elapsed. This is not a strict guarantee and facet computation is not bound by this parameter.
 	SearchCutoffMs *int `json:"search_cutoff_ms,omitempty"`
 
 	// SnippetThreshold Field values under this length will be fully highlighted, instead of showing a snippet of relevant portion. Default: 30
@@ -359,7 +440,7 @@ type MultiSearchCollectionParameters struct {
 
 // MultiSearchParameters Parameters for the multi search API.
 type MultiSearchParameters struct {
-	// CacheTtl The duration (in seconds) that determines how long the search query is cached.  This value can be set on a per-query basis. Default: 60.
+	// CacheTtl The duration (in seconds) that determines how long the search query is cached. This value can be set on a per-query basis. Default: 60.
 	CacheTtl *int `json:"cache_ttl,omitempty"`
 
 	// DropTokensThreshold If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
@@ -374,7 +455,7 @@ type MultiSearchParameters struct {
 	// ExcludeFields List of fields from the document to exclude in the search result
 	ExcludeFields *string `json:"exclude_fields,omitempty"`
 
-	// ExhaustiveSearch Setting this to true will make Typesense consider all prefixes and typo  corrections of the words in the query without stopping early when enough results are found  (drop_tokens_threshold and typo_tokens_threshold configurations are ignored).
+	// ExhaustiveSearch Setting this to true will make Typesense consider all prefixes and typo corrections of the words in the query without stopping early when enough results are found (drop_tokens_threshold and typo_tokens_threshold configurations are ignored).
 	ExhaustiveSearch *bool `json:"exhaustive_search,omitempty"`
 
 	// FacetBy A list of fields that will be used for faceting your results on. Separate multiple fields with a comma.
@@ -383,7 +464,10 @@ type MultiSearchParameters struct {
 	// FacetQuery Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
 	FacetQuery *string `json:"facet_query,omitempty"`
 
-	// FacetStrategy Choose the underlying faceting strategy used. Comma separated string of allows values:  exhaustive, top_values or automatic (default).
+	// FacetReturnParent Comma separated string of nested facet fields whose parent object should be returned in facet response.
+	FacetReturnParent *string `json:"facet_return_parent,omitempty"`
+
+	// FacetStrategy Choose the underlying faceting strategy used. Comma separated string of allows values: exhaustive, top_values or automatic (default).
 	FacetStrategy *string `json:"facet_strategy,omitempty"`
 
 	// FilterBy Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
@@ -405,7 +489,7 @@ type MultiSearchParameters struct {
 	// HighlightEndTag The end tag used for the highlighted snippets. Default: `</mark>`
 	HighlightEndTag *string `json:"highlight_end_tag,omitempty"`
 
-	// HighlightFields A list of custom fields that must be highlighted even if you don't query  for them
+	// HighlightFields A list of custom fields that must be highlighted even if you don't query for them
 	HighlightFields *string `json:"highlight_fields,omitempty"`
 
 	// HighlightFullFields List of fields which should be highlighted fully without snippeting
@@ -420,7 +504,7 @@ type MultiSearchParameters struct {
 	// Infix If infix index is enabled for this field, infix searching can be done on a per-field basis by sending a comma separated string parameter called infix to the search query. This parameter can have 3 values; `off` infix search is disabled, which is default `always` infix search is performed along with regular search `fallback` infix search is performed if regular search does not produce results
 	Infix *string `json:"infix,omitempty"`
 
-	// Limit Number of hits to fetch. Can be used as an alternative to the per_page parameter.  Default: 10.
+	// Limit Number of hits to fetch. Can be used as an alternative to the per_page parameter. Default: 10.
 	Limit *int `json:"limit,omitempty"`
 
 	// MaxExtraPrefix There are also 2 parameters that allow you to control the extent of infix searching max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before or after the query that can be present in the token. For example query "K2100" has 2 extra symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
@@ -432,10 +516,10 @@ type MultiSearchParameters struct {
 	// MaxFacetValues Maximum number of facet values to be returned.
 	MaxFacetValues *int `json:"max_facet_values,omitempty"`
 
-	// MinLen1typo Minimum word length for 1-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
+	// MinLen1typo Minimum word length for 1-typo correction to be applied. The value of num_typos is still treated as the maximum allowed typos.
 	MinLen1typo *int `json:"min_len_1typo,omitempty"`
 
-	// MinLen2typo Minimum word length for 2-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
+	// MinLen2typo Minimum word length for 2-typo correction to be applied. The value of num_typos is still treated as the maximum allowed typos.
 	MinLen2typo *int `json:"min_len_2typo,omitempty"`
 
 	// NumTypos The number of typographical errors (1 or 2) that would be tolerated. Default: 2
@@ -444,6 +528,9 @@ type MultiSearchParameters struct {
 	// Offset Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
 	Offset *int `json:"offset,omitempty"`
 
+	// OverrideTags Comma separated list of tags to trigger the curations rules that match the tags.
+	OverrideTags *string `json:"override_tags,omitempty"`
+
 	// Page Results from this specific page number would be fetched.
 	Page *int `json:"page,omitempty"`
 
@@ -451,10 +538,10 @@ type MultiSearchParameters struct {
 	PerPage *int `json:"per_page,omitempty"`
 
 	// PinnedHits A list of records to unconditionally include in the search results at specific positions. An example use case would be to feature or promote certain items on the top of search results. A list of `record_id:hit_position`. Eg: to include a record with ID 123 at Position 1 and another record with ID 456 at Position 5, you'd specify `123:1,456:5`.
-	// You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and  finally `hidden_hits`.
+	// You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
 	PinnedHits *string `json:"pinned_hits,omitempty"`
 
-	// PreSegmentedQuery You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself  before indexing and querying.
+	// PreSegmentedQuery You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself before indexing and querying.
 	// Set this parameter to true to do the same
 	PreSegmentedQuery *bool `json:"pre_segmented_query,omitempty"`
 
@@ -488,7 +575,7 @@ type MultiSearchParameters struct {
 	// RemoteEmbeddingTimeoutMs Timeout (in milliseconds) for fetching remote embeddings.
 	RemoteEmbeddingTimeoutMs *int `json:"remote_embedding_timeout_ms,omitempty"`
 
-	// SearchCutoffMs Typesense will attempt to return results early if the cutoff time has elapsed.  This is not a strict guarantee and facet computation is not bound by this parameter.
+	// SearchCutoffMs Typesense will attempt to return results early if the cutoff time has elapsed. This is not a strict guarantee and facet computation is not bound by this parameter.
 	SearchCutoffMs *int `json:"search_cutoff_ms,omitempty"`
 
 	// SnippetThreshold Field values under this length will be fully highlighted, instead of showing a snippet of relevant portion. Default: 30
@@ -589,6 +676,9 @@ type SearchOverrideRule struct {
 
 	// Query Indicates what search queries should be overridden
 	Query string `json:"query"`
+
+	// Tags List of tags.
+	Tags *[]string `json:"tags,omitempty"`
 }
 
 // SearchOverrideRuleMatch Indicates whether the match on the query term should be `exact` or `contains`. If we want to match all queries that contained the word `apple`, we will use the `contains` match instead.
@@ -766,6 +856,7 @@ type SearchCollectionParams struct {
 	ExhaustiveSearch              *bool   `form:"exhaustive_search,omitempty" json:"exhaustive_search,omitempty"`
 	FacetBy                       *string `form:"facet_by,omitempty" json:"facet_by,omitempty"`
 	FacetQuery                    *string `form:"facet_query,omitempty" json:"facet_query,omitempty"`
+	FacetReturnParent             *string `form:"facet_return_parent,omitempty" json:"facet_return_parent,omitempty"`
 	FacetStrategy                 *string `form:"facet_strategy,omitempty" json:"facet_strategy,omitempty"`
 	FilterBy                      *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
 	GroupBy                       *string `form:"group_by,omitempty" json:"group_by,omitempty"`
@@ -787,6 +878,7 @@ type SearchCollectionParams struct {
 	MinLen2typo                   *int    `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
 	NumTypos                      *string `form:"num_typos,omitempty" json:"num_typos,omitempty"`
 	Offset                        *int    `form:"offset,omitempty" json:"offset,omitempty"`
+	OverrideTags                  *string `form:"override_tags,omitempty" json:"override_tags,omitempty"`
 	Page                          *int    `form:"page,omitempty" json:"page,omitempty"`
 	PerPage                       *int    `form:"per_page,omitempty" json:"per_page,omitempty"`
 	PinnedHits                    *string `form:"pinned_hits,omitempty" json:"pinned_hits,omitempty"`
@@ -825,6 +917,7 @@ type MultiSearchParams struct {
 	ExhaustiveSearch              *bool   `form:"exhaustive_search,omitempty" json:"exhaustive_search,omitempty"`
 	FacetBy                       *string `form:"facet_by,omitempty" json:"facet_by,omitempty"`
 	FacetQuery                    *string `form:"facet_query,omitempty" json:"facet_query,omitempty"`
+	FacetReturnParent             *string `form:"facet_return_parent,omitempty" json:"facet_return_parent,omitempty"`
 	FacetStrategy                 *string `form:"facet_strategy,omitempty" json:"facet_strategy,omitempty"`
 	FilterBy                      *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
 	GroupBy                       *string `form:"group_by,omitempty" json:"group_by,omitempty"`
@@ -846,6 +939,7 @@ type MultiSearchParams struct {
 	MinLen2typo                   *int    `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
 	NumTypos                      *string `form:"num_typos,omitempty" json:"num_typos,omitempty"`
 	Offset                        *int    `form:"offset,omitempty" json:"offset,omitempty"`
+	OverrideTags                  *string `form:"override_tags,omitempty" json:"override_tags,omitempty"`
 	Page                          *int    `form:"page,omitempty" json:"page,omitempty"`
 	PerPage                       *int    `form:"per_page,omitempty" json:"per_page,omitempty"`
 	PinnedHits                    *string `form:"pinned_hits,omitempty" json:"pinned_hits,omitempty"`
@@ -905,6 +999,15 @@ type UpsertSearchOverrideJSONRequestBody = SearchOverrideSchema
 
 // UpsertSearchSynonymJSONRequestBody defines body for UpsertSearchSynonym for application/json ContentType.
 type UpsertSearchSynonymJSONRequestBody = SearchSynonymSchema
+
+// CreateConversationModelJSONRequestBody defines body for CreateConversationModel for application/json ContentType.
+type CreateConversationModelJSONRequestBody = ConversationModelCreateAndUpdateSchema
+
+// UpdateConversationModelJSONRequestBody defines body for UpdateConversationModel for application/json ContentType.
+type UpdateConversationModelJSONRequestBody = ConversationModelCreateAndUpdateSchema
+
+// UpdateConversationJSONRequestBody defines body for UpdateConversation for application/json ContentType.
+type UpdateConversationJSONRequestBody = ConversationUpdateSchema
 
 // CreateKeyJSONRequestBody defines body for CreateKey for application/json ContentType.
 type CreateKeyJSONRequestBody = ApiKeySchema

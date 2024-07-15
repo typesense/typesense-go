@@ -202,6 +202,86 @@ func (mr *MockAPIClientInterfaceMockRecorder) CreateCollectionWithResponse(ctx, 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCollectionWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).CreateCollectionWithResponse), varargs...)
 }
 
+// CreateConversationModel mocks base method.
+func (m *MockAPIClientInterface) CreateConversationModel(ctx context.Context, body api.CreateConversationModelJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateConversationModel", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateConversationModel indicates an expected call of CreateConversationModel.
+func (mr *MockAPIClientInterfaceMockRecorder) CreateConversationModel(ctx, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateConversationModel", reflect.TypeOf((*MockAPIClientInterface)(nil).CreateConversationModel), varargs...)
+}
+
+// CreateConversationModelWithBody mocks base method.
+func (m *MockAPIClientInterface) CreateConversationModelWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateConversationModelWithBody", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateConversationModelWithBody indicates an expected call of CreateConversationModelWithBody.
+func (mr *MockAPIClientInterfaceMockRecorder) CreateConversationModelWithBody(ctx, contentType, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateConversationModelWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).CreateConversationModelWithBody), varargs...)
+}
+
+// CreateConversationModelWithBodyWithResponse mocks base method.
+func (m *MockAPIClientInterface) CreateConversationModelWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*api.CreateConversationModelResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateConversationModelWithBodyWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.CreateConversationModelResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateConversationModelWithBodyWithResponse indicates an expected call of CreateConversationModelWithBodyWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) CreateConversationModelWithBodyWithResponse(ctx, contentType, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateConversationModelWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).CreateConversationModelWithBodyWithResponse), varargs...)
+}
+
+// CreateConversationModelWithResponse mocks base method.
+func (m *MockAPIClientInterface) CreateConversationModelWithResponse(ctx context.Context, body api.CreateConversationModelJSONRequestBody, reqEditors ...api.RequestEditorFn) (*api.CreateConversationModelResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateConversationModelWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.CreateConversationModelResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateConversationModelWithResponse indicates an expected call of CreateConversationModelWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) CreateConversationModelWithResponse(ctx, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateConversationModelWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).CreateConversationModelWithResponse), varargs...)
+}
+
 // CreateKey mocks base method.
 func (m *MockAPIClientInterface) CreateKey(ctx context.Context, body api.CreateKeyJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -440,6 +520,86 @@ func (mr *MockAPIClientInterfaceMockRecorder) DeleteCollectionWithResponse(ctx, 
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, collectionName}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCollectionWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteCollectionWithResponse), varargs...)
+}
+
+// DeleteConversation mocks base method.
+func (m *MockAPIClientInterface) DeleteConversation(ctx context.Context, conversationId int64, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, conversationId}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteConversation", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteConversation indicates an expected call of DeleteConversation.
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteConversation(ctx, conversationId any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, conversationId}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteConversation", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteConversation), varargs...)
+}
+
+// DeleteConversationModel mocks base method.
+func (m *MockAPIClientInterface) DeleteConversationModel(ctx context.Context, modelId string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, modelId}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteConversationModel", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteConversationModel indicates an expected call of DeleteConversationModel.
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteConversationModel(ctx, modelId any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, modelId}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteConversationModel", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteConversationModel), varargs...)
+}
+
+// DeleteConversationModelWithResponse mocks base method.
+func (m *MockAPIClientInterface) DeleteConversationModelWithResponse(ctx context.Context, modelId string, reqEditors ...api.RequestEditorFn) (*api.DeleteConversationModelResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, modelId}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteConversationModelWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.DeleteConversationModelResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteConversationModelWithResponse indicates an expected call of DeleteConversationModelWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteConversationModelWithResponse(ctx, modelId any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, modelId}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteConversationModelWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteConversationModelWithResponse), varargs...)
+}
+
+// DeleteConversationWithResponse mocks base method.
+func (m *MockAPIClientInterface) DeleteConversationWithResponse(ctx context.Context, conversationId int64, reqEditors ...api.RequestEditorFn) (*api.DeleteConversationResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, conversationId}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteConversationWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.DeleteConversationResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteConversationWithResponse indicates an expected call of DeleteConversationWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteConversationWithResponse(ctx, conversationId any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, conversationId}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteConversationWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteConversationWithResponse), varargs...)
 }
 
 // DeleteDocument mocks base method.
@@ -1402,6 +1562,86 @@ func (mr *MockAPIClientInterfaceMockRecorder) MultiSearchWithResponse(ctx, param
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MultiSearchWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).MultiSearchWithResponse), varargs...)
 }
 
+// RetrieveAllConversationModels mocks base method.
+func (m *MockAPIClientInterface) RetrieveAllConversationModels(ctx context.Context, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveAllConversationModels", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveAllConversationModels indicates an expected call of RetrieveAllConversationModels.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAllConversationModels(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveAllConversationModels", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveAllConversationModels), varargs...)
+}
+
+// RetrieveAllConversationModelsWithResponse mocks base method.
+func (m *MockAPIClientInterface) RetrieveAllConversationModelsWithResponse(ctx context.Context, reqEditors ...api.RequestEditorFn) (*api.RetrieveAllConversationModelsResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveAllConversationModelsWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.RetrieveAllConversationModelsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveAllConversationModelsWithResponse indicates an expected call of RetrieveAllConversationModelsWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAllConversationModelsWithResponse(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveAllConversationModelsWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveAllConversationModelsWithResponse), varargs...)
+}
+
+// RetrieveAllConversations mocks base method.
+func (m *MockAPIClientInterface) RetrieveAllConversations(ctx context.Context, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveAllConversations", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveAllConversations indicates an expected call of RetrieveAllConversations.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAllConversations(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveAllConversations", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveAllConversations), varargs...)
+}
+
+// RetrieveAllConversationsWithResponse mocks base method.
+func (m *MockAPIClientInterface) RetrieveAllConversationsWithResponse(ctx context.Context, reqEditors ...api.RequestEditorFn) (*api.RetrieveAllConversationsResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveAllConversationsWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.RetrieveAllConversationsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveAllConversationsWithResponse indicates an expected call of RetrieveAllConversationsWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAllConversationsWithResponse(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveAllConversationsWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveAllConversationsWithResponse), varargs...)
+}
+
 // RetrieveAnalyticsRule mocks base method.
 func (m *MockAPIClientInterface) RetrieveAnalyticsRule(ctx context.Context, ruleName string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -1480,6 +1720,86 @@ func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAnalyticsRulesWithResponse
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveAnalyticsRulesWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveAnalyticsRulesWithResponse), varargs...)
+}
+
+// RetrieveConversation mocks base method.
+func (m *MockAPIClientInterface) RetrieveConversation(ctx context.Context, conversationId int64, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, conversationId}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveConversation", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveConversation indicates an expected call of RetrieveConversation.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveConversation(ctx, conversationId any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, conversationId}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveConversation", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveConversation), varargs...)
+}
+
+// RetrieveConversationModel mocks base method.
+func (m *MockAPIClientInterface) RetrieveConversationModel(ctx context.Context, modelId string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, modelId}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveConversationModel", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveConversationModel indicates an expected call of RetrieveConversationModel.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveConversationModel(ctx, modelId any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, modelId}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveConversationModel", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveConversationModel), varargs...)
+}
+
+// RetrieveConversationModelWithResponse mocks base method.
+func (m *MockAPIClientInterface) RetrieveConversationModelWithResponse(ctx context.Context, modelId string, reqEditors ...api.RequestEditorFn) (*api.RetrieveConversationModelResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, modelId}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveConversationModelWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.RetrieveConversationModelResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveConversationModelWithResponse indicates an expected call of RetrieveConversationModelWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveConversationModelWithResponse(ctx, modelId any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, modelId}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveConversationModelWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveConversationModelWithResponse), varargs...)
+}
+
+// RetrieveConversationWithResponse mocks base method.
+func (m *MockAPIClientInterface) RetrieveConversationWithResponse(ctx context.Context, conversationId int64, reqEditors ...api.RequestEditorFn) (*api.RetrieveConversationResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, conversationId}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveConversationWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.RetrieveConversationResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveConversationWithResponse indicates an expected call of RetrieveConversationWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveConversationWithResponse(ctx, conversationId any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, conversationId}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveConversationWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveConversationWithResponse), varargs...)
 }
 
 // RetrieveStopwordsSet mocks base method.
@@ -1720,6 +2040,166 @@ func (mr *MockAPIClientInterfaceMockRecorder) UpdateCollectionWithResponse(ctx, 
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, collectionName, body}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCollectionWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpdateCollectionWithResponse), varargs...)
+}
+
+// UpdateConversation mocks base method.
+func (m *MockAPIClientInterface) UpdateConversation(ctx context.Context, conversationId int64, body api.UpdateConversationJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, conversationId, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateConversation", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateConversation indicates an expected call of UpdateConversation.
+func (mr *MockAPIClientInterfaceMockRecorder) UpdateConversation(ctx, conversationId, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, conversationId, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateConversation", reflect.TypeOf((*MockAPIClientInterface)(nil).UpdateConversation), varargs...)
+}
+
+// UpdateConversationModel mocks base method.
+func (m *MockAPIClientInterface) UpdateConversationModel(ctx context.Context, modelId string, body api.UpdateConversationModelJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, modelId, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateConversationModel", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateConversationModel indicates an expected call of UpdateConversationModel.
+func (mr *MockAPIClientInterfaceMockRecorder) UpdateConversationModel(ctx, modelId, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, modelId, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateConversationModel", reflect.TypeOf((*MockAPIClientInterface)(nil).UpdateConversationModel), varargs...)
+}
+
+// UpdateConversationModelWithBody mocks base method.
+func (m *MockAPIClientInterface) UpdateConversationModelWithBody(ctx context.Context, modelId, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, modelId, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateConversationModelWithBody", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateConversationModelWithBody indicates an expected call of UpdateConversationModelWithBody.
+func (mr *MockAPIClientInterfaceMockRecorder) UpdateConversationModelWithBody(ctx, modelId, contentType, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, modelId, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateConversationModelWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).UpdateConversationModelWithBody), varargs...)
+}
+
+// UpdateConversationModelWithBodyWithResponse mocks base method.
+func (m *MockAPIClientInterface) UpdateConversationModelWithBodyWithResponse(ctx context.Context, modelId, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*api.UpdateConversationModelResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, modelId, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateConversationModelWithBodyWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.UpdateConversationModelResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateConversationModelWithBodyWithResponse indicates an expected call of UpdateConversationModelWithBodyWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) UpdateConversationModelWithBodyWithResponse(ctx, modelId, contentType, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, modelId, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateConversationModelWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpdateConversationModelWithBodyWithResponse), varargs...)
+}
+
+// UpdateConversationModelWithResponse mocks base method.
+func (m *MockAPIClientInterface) UpdateConversationModelWithResponse(ctx context.Context, modelId string, body api.UpdateConversationModelJSONRequestBody, reqEditors ...api.RequestEditorFn) (*api.UpdateConversationModelResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, modelId, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateConversationModelWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.UpdateConversationModelResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateConversationModelWithResponse indicates an expected call of UpdateConversationModelWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) UpdateConversationModelWithResponse(ctx, modelId, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, modelId, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateConversationModelWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpdateConversationModelWithResponse), varargs...)
+}
+
+// UpdateConversationWithBody mocks base method.
+func (m *MockAPIClientInterface) UpdateConversationWithBody(ctx context.Context, conversationId int64, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, conversationId, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateConversationWithBody", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateConversationWithBody indicates an expected call of UpdateConversationWithBody.
+func (mr *MockAPIClientInterfaceMockRecorder) UpdateConversationWithBody(ctx, conversationId, contentType, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, conversationId, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateConversationWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).UpdateConversationWithBody), varargs...)
+}
+
+// UpdateConversationWithBodyWithResponse mocks base method.
+func (m *MockAPIClientInterface) UpdateConversationWithBodyWithResponse(ctx context.Context, conversationId int64, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*api.UpdateConversationResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, conversationId, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateConversationWithBodyWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.UpdateConversationResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateConversationWithBodyWithResponse indicates an expected call of UpdateConversationWithBodyWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) UpdateConversationWithBodyWithResponse(ctx, conversationId, contentType, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, conversationId, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateConversationWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpdateConversationWithBodyWithResponse), varargs...)
+}
+
+// UpdateConversationWithResponse mocks base method.
+func (m *MockAPIClientInterface) UpdateConversationWithResponse(ctx context.Context, conversationId int64, body api.UpdateConversationJSONRequestBody, reqEditors ...api.RequestEditorFn) (*api.UpdateConversationResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, conversationId, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateConversationWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.UpdateConversationResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateConversationWithResponse indicates an expected call of UpdateConversationWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) UpdateConversationWithResponse(ctx, conversationId, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, conversationId, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateConversationWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpdateConversationWithResponse), varargs...)
 }
 
 // UpdateDocument mocks base method.

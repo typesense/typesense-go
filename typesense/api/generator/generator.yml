@@ -184,7 +184,7 @@ components:
         token_separators:
           default: []
           description: |
-            List of symbols or special characters to be used for  splitting the text into individual words in addition to space and new-line characters.
+            List of symbols or special characters to be used for splitting the text into individual words in addition to space and new-line characters.
           items:
             maxLength: 1
             minLength: 1
@@ -214,6 +214,90 @@ components:
       required:
         - fields
       type: object
+    ConversationDeleteSchema:
+      properties:
+        id:
+          type: integer
+      required:
+        - id
+    ConversationModelCreateAndUpdateSchema:
+      properties:
+        account_id:
+          description: LLM service's account ID (only applicable for Cloudflare)
+          type: string
+        api_key:
+          description: The LLM service's API Key
+          type: string
+        max_bytes:
+          description: |
+            The maximum number of bytes to send to the LLM in every API call. Consult the LLM's documentation on the number of bytes supported in the context window.
+          type: integer
+        model_name:
+          description: Name of the LLM model offered by OpenAI, Cloudflare or vLLM
+          type: string
+        system_prompt:
+          description: The system prompt that contains special instructions to the LLM
+          type: string
+        vllm_url:
+          description: URL of vLLM service
+          type: string
+      required:
+        - model_name
+        - api_key
+        - max_bytes
+      type: object
+    ConversationModelDeleteSchema:
+      properties:
+        id:
+          type: string
+      required:
+        - id
+      type: object
+    ConversationModelSchema:
+      allOf:
+        - $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
+        - properties:
+            id:
+              type: string
+          required:
+            - id
+          type: object
+    ConversationSchema:
+      properties:
+        conversation:
+          items:
+            type: object
+          type: array
+        id:
+          type: integer
+        last_updated:
+          type: integer
+        ttl:
+          description: Time to live. Conversations are stored by default for 24 hours, and then purged.
+          type: integer
+      required:
+        - id
+        - conversation
+        - last_updated
+        - ttl
+      type: object
+    ConversationUpdateSchema:
+      properties:
+        ttl:
+          description: Time to live. Conversations are stored by default for 24 hours, and then purged.
+          type: integer
+      required:
+        - ttl
+    ConversationsRetrieveSchema:
+      properties:
+        conversations:
+          items:
+            $ref: '#/components/schemas/ConversationSchema'
+          type: array
+          x-go-type: '[]*ConversationSchema'
+      required:
+        - conversations
+      type: object
     ErrorResponse:
       properties:
         message:
@@ -228,6 +312,8 @@ components:
                 type: integer
               highlighted:
                 type: string
+              parent:
+                type: object
               value:
                 type: string
             type: object
@@ -344,7 +430,7 @@ components:
       properties:
         cache_ttl:
           description: |
-            The duration (in seconds) that determines how long the search query is cached.  This value can be set on a per-query basis. Default: 60.
+            The duration (in seconds) that determines how long the search query is cached. This value can be set on a per-query basis. Default: 60.
           type: integer
         drop_tokens_threshold:
           description: |
@@ -365,7 +451,7 @@ components:
           type: string
         exhaustive_search:
           description: |
-            Setting this to true will make Typesense consider all prefixes and typo  corrections of the words in the query without stopping early when enough results are found  (drop_tokens_threshold and typo_tokens_threshold configurations are ignored).
+            Setting this to true will make Typesense consider all prefixes and typo corrections of the words in the query without stopping early when enough results are found (drop_tokens_threshold and typo_tokens_threshold configurations are ignored).
           type: boolean
         facet_by:
           description: A list of fields that will be used for faceting your results on. Separate multiple fields with a comma.
@@ -373,9 +459,13 @@ components:
         facet_query:
           description: Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
           type: string
+        facet_return_parent:
+          description: |
+            Comma separated string of nested facet fields whose parent object should be returned in facet response.
+          type: string
         facet_strategy:
           description: |
-            Choose the underlying faceting strategy used. Comma separated string of allows values:  exhaustive, top_values or automatic (default).
+            Choose the underlying faceting strategy used. Comma separated string of allows values: exhaustive, top_values or automatic (default).
           type: string
         filter_by:
           description: Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
@@ -403,7 +493,7 @@ components:
           type: string
         highlight_fields:
           description: |
-            A list of custom fields that must be highlighted even if you don't query  for them
+            A list of custom fields that must be highlighted even if you don't query for them
           type: string
         highlight_full_fields:
           description: List of fields which should be highlighted fully without snippeting
@@ -420,7 +510,7 @@ components:
           type: string
         limit:
           description: |
-            Number of hits to fetch. Can be used as an alternative to the per_page parameter.  Default: 10.
+            Number of hits to fetch. Can be used as an alternative to the per_page parameter. Default: 10.
           type: integer
         max_extra_prefix:
           description: There are also 2 parameters that allow you to control the extent of infix searching max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before or after the query that can be present in the token. For example query "K2100" has 2 extra symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
@@ -433,11 +523,11 @@ components:
           type: integer
         min_len_1typo:
           description: |
-            Minimum word length for 1-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
+            Minimum word length for 1-typo correction to be applied. The value of num_typos is still treated as the maximum allowed typos.
           type: integer
         min_len_2typo:
           description: |
-            Minimum word length for 2-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
+            Minimum word length for 2-typo correction to be applied. The value of num_typos is still treated as the maximum allowed typos.
           type: integer
         num_typos:
           description: |
@@ -446,6 +536,9 @@ components:
         offset:
           description: Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
           type: integer
+        override_tags:
+          description: Comma separated list of tags to trigger the curations rules that match the tags.
+          type: string
         page:
           description: Results from this specific page number would be fetched.
           type: integer
@@ -455,12 +548,12 @@ components:
         pinned_hits:
           description: |
             A list of records to unconditionally include in the search results at specific positions. An example use case would be to feature or promote certain items on the top of search results. A list of `record_id:hit_position`. Eg: to include a record with ID 123 at Position 1 and another record with ID 456 at Position 5, you'd specify `123:1,456:5`.
-            You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and  finally `hidden_hits`.
+            You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
           type: string
         pre_segmented_query:
           default: false
           description: |
-            You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself  before indexing and querying.
+            You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself before indexing and querying.
             Set this parameter to true to do the same
           type: boolean
         prefix:
@@ -504,7 +597,7 @@ components:
           type: integer
         search_cutoff_ms:
           description: |
-            Typesense will attempt to return results early if the cutoff time has elapsed.  This is not a strict guarantee and facet computation is not bound by this parameter.
+            Typesense will attempt to return results early if the cutoff time has elapsed. This is not a strict guarantee and facet computation is not bound by this parameter.
           type: integer
         snippet_threshold:
           description: |
@@ -654,6 +747,11 @@ components:
         query:
           description: Indicates what search queries should be overridden
           type: string
+        tags:
+          description: List of tags.
+          items:
+            type: string
+          type: array
       required:
         - query
         - match
@@ -697,7 +795,7 @@ components:
       properties:
         cache_ttl:
           description: |
-            The duration (in seconds) that determines how long the search query is cached.  This value can be set on a per-query basis. Default: 60.
+            The duration (in seconds) that determines how long the search query is cached. This value can be set on a per-query basis. Default: 60.
           type: integer
         drop_tokens_threshold:
           description: |
@@ -723,7 +821,7 @@ components:
           type: string
         exhaustive_search:
           description: |
-            Setting this to true will make Typesense consider all prefixes and typo  corrections of the words in the query without stopping early when enough results are found  (drop_tokens_threshold and typo_tokens_threshold configurations are ignored).
+            Setting this to true will make Typesense consider all prefixes and typo corrections of the words in the query without stopping early when enough results are found (drop_tokens_threshold and typo_tokens_threshold configurations are ignored).
           type: boolean
         facet_by:
           description: A list of fields that will be used for faceting your results on. Separate multiple fields with a comma.
@@ -731,9 +829,13 @@ components:
         facet_query:
           description: Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
           type: string
+        facet_return_parent:
+          description: |
+            Comma separated string of nested facet fields whose parent object should be returned in facet response.
+          type: string
         facet_strategy:
           description: |
-            Choose the underlying faceting strategy used. Comma separated string of allows values:  exhaustive, top_values or automatic (default).
+            Choose the underlying faceting strategy used. Comma separated string of allows values: exhaustive, top_values or automatic (default).
           type: string
         filter_by:
           description: Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
@@ -761,7 +863,7 @@ components:
           type: string
         highlight_fields:
           description: |
-            A list of custom fields that must be highlighted even if you don't query  for them
+            A list of custom fields that must be highlighted even if you don't query for them
           type: string
         highlight_full_fields:
           description: List of fields which should be highlighted fully without snippeting
@@ -778,7 +880,7 @@ components:
           type: string
         limit:
           description: |
-            Number of hits to fetch. Can be used as an alternative to the per_page parameter.  Default: 10.
+            Number of hits to fetch. Can be used as an alternative to the per_page parameter. Default: 10.
           type: integer
         max_candidates:
           description: |
@@ -795,11 +897,11 @@ components:
           type: integer
         min_len_1typo:
           description: |
-            Minimum word length for 1-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
+            Minimum word length for 1-typo correction to be applied. The value of num_typos is still treated as the maximum allowed typos.
           type: integer
         min_len_2typo:
           description: |
-            Minimum word length for 2-typo correction to be applied.  The value of num_typos is still treated as the maximum allowed typos.
+            Minimum word length for 2-typo correction to be applied. The value of num_typos is still treated as the maximum allowed typos.
           type: integer
         num_typos:
           description: |
@@ -808,6 +910,9 @@ components:
         offset:
           description: Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
           type: integer
+        override_tags:
+          description: Comma separated list of tags to trigger the curations rules that match the tags.
+          type: string
         page:
           description: Results from this specific page number would be fetched.
           type: integer
@@ -817,11 +922,11 @@ components:
         pinned_hits:
           description: |
             A list of records to unconditionally include in the search results at specific positions. An example use case would be to feature or promote certain items on the top of search results. A list of `record_id:hit_position`. Eg: to include a record with ID 123 at Position 1 and another record with ID 456 at Position 5, you'd specify `123:1,456:5`.
-            You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and  finally `hidden_hits`.
+            You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
           type: string
         pre_segmented_query:
           description: |
-            You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself  before indexing and querying.
+            You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself before indexing and querying.
             Set this parameter to true to do the same
           type: boolean
         prefix:
@@ -865,7 +970,7 @@ components:
           type: integer
         search_cutoff_ms:
           description: |
-            Typesense will attempt to return results early if the cutoff time has elapsed.  This is not a strict guarantee and facet computation is not bound by this parameter.
+            Typesense will attempt to return results early if the cutoff time has elapsed. This is not a strict guarantee and facet computation is not bound by this parameter.
           type: integer
         snippet_threshold:
           description: |
@@ -1851,6 +1956,10 @@ paths:
           schema:
             type: string
         - in: query
+          name: facet_return_parent
+          schema:
+            type: string
+        - in: query
           name: facet_strategy
           schema:
             type: string
@@ -1934,6 +2043,10 @@ paths:
           name: offset
           schema:
             type: integer
+        - in: query
+          name: override_tags
+          schema:
+            type: string
         - in: query
           name: page
           schema:
@@ -2296,6 +2409,201 @@ paths:
       summary: Create or update a synonym
       tags:
         - documents
+  /conversations:
+    get:
+      description: Retrieve all past conversations
+      operationId: retrieveAllConversations
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationsRetrieveSchema'
+          description: List of all past conversations
+      summary: List all past conversations
+      tags:
+        - conversations
+  /conversations/{conversationId}:
+    delete:
+      description: Delete a past conversation
+      operationId: deleteConversation
+      parameters:
+        - description: The id of the conversation to delete
+          in: path
+          name: conversationId
+          required: true
+          schema:
+            format: int64
+            type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationDeleteSchema'
+          description: The conversation was successfully deleted
+      summary: Delete a past conversation
+      tags:
+        - conversations
+    get:
+      description: Retrieve a conversation
+      operationId: retrieveConversation
+      parameters:
+        - description: The id of the conversation to retrieve
+          in: path
+          name: conversationId
+          required: true
+          schema:
+            format: int64
+            type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ConversationSchema'
+                type: array
+                x-go-type: '[]*ConversationSchema'
+          description: A past conversation
+      summary: Retrieve a past conversation
+      tags:
+        - conversations
+    put:
+      description: Update the TTL for a conversation
+      operationId: updateConversation
+      parameters:
+        - description: The id of the conversation to update
+          in: path
+          name: conversationId
+          required: true
+          schema:
+            format: int64
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationUpdateSchema'
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationUpdateSchema'
+          description: The conversation was successfully updated
+      summary: Update the TTL for a past conversation
+      tags:
+        - conversations
+  /conversations/models:
+    get:
+      description: Retrieve all conversation models
+      operationId: retrieveAllConversationModels
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ConversationModelSchema'
+                type: array
+                x-go-type: '[]*ConversationModelSchema'
+          description: List of all conversation models
+      summary: List all conversation models
+      tags:
+        - conversations
+    post:
+      description: Create a Conversation Model
+      operationId: createConversationModel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
+        required: true
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
+          description: Created Conversation Model
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Bad request, see error message for details
+      tags:
+        - conversations
+  /conversations/models/{modelId}:
+    delete:
+      description: Delete a conversation model
+      operationId: deleteConversationModel
+      parameters:
+        - description: The id of the conversation model to delete
+          in: path
+          name: modelId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationModelDeleteSchema'
+          description: The conversation model was successfully deleted
+      summary: Delete a conversation model
+      tags:
+        - conversations
+    get:
+      description: Retrieve a conversation model
+      operationId: retrieveConversationModel
+      parameters:
+        - description: The id of the conversation model to retrieve
+          in: path
+          name: modelId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationModelSchema'
+          description: A conversation model
+      summary: Retrieve a conversation model
+      tags:
+        - conversations
+    put:
+      description: Update a conversation model
+      operationId: updateConversationModel
+      parameters:
+        - description: The id of the conversation model to update
+          in: path
+          name: modelId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
+          description: The conversation model was successfully updated
+      summary: Update a conversation model
+      tags:
+        - conversations
   /debug:
     get:
       description: Print debugging information
@@ -2473,6 +2781,10 @@ paths:
           schema:
             type: string
         - in: query
+          name: facet_return_parent
+          schema:
+            type: string
+        - in: query
           name: facet_strategy
           schema:
             type: string
@@ -2556,6 +2868,10 @@ paths:
           name: offset
           schema:
             type: integer
+        - in: query
+          name: override_tags
+          schema:
+            type: string
         - in: query
           name: page
           schema:
@@ -2850,3 +3166,8 @@ tags:
       description: Find out more
       url: https://typesense.org/docs/26.0/api/stopwords.html
     name: stopwords
+  - description: Conversational Search (RAG)
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/docs/26.0/api/conversational-search-rag.html
+    name: conversations
