@@ -43,6 +43,23 @@ client := typesense.NewClient(
 	)
 ```
 
+New client with multi-node configuration options:
+
+```go
+client := typesense.NewClient(
+		typesense.WithNearestNode("https://xxx.a1.typesense.net:443"),
+		typesense.WithNodes([]string{
+			"https://xxx-1.a1.typesense.net:443",
+			"https://xxx-2.a1.typesense.net:443",
+			"https://xxx-3.a1.typesense.net:443",
+		}),
+		typesense.WithAPIKey("<API_KEY>"),
+		typesense.WithNumRetries(5),
+		typesense.WithRetryInterval(1*time.Second),
+		typesense.WithHealthcheckInterval(2*time.Minute),
+	)
+```
+
 You can also find some examples in [integration tests](https://github.com/typesense/typesense-go/tree/master/typesense/test).
 
 ### Create a collection
