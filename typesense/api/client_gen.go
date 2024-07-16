@@ -2089,6 +2089,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 		}
 
+		if params.FacetReturnParent != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "facet_return_parent", runtime.ParamLocationQuery, *params.FacetReturnParent); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.FacetStrategy != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "facet_strategy", runtime.ParamLocationQuery, *params.FacetStrategy); err != nil {
@@ -2425,6 +2441,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 		}
 
+		if params.OverrideTags != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "override_tags", runtime.ParamLocationQuery, *params.OverrideTags); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.Page != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
@@ -2692,6 +2724,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 		if params.SplitJoinTokens != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "split_join_tokens", runtime.ParamLocationQuery, *params.SplitJoinTokens); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Stopwords != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "stopwords", runtime.ParamLocationQuery, *params.Stopwords); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -3622,6 +3670,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 		}
 
+		if params.FacetReturnParent != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "facet_return_parent", runtime.ParamLocationQuery, *params.FacetReturnParent); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.FacetStrategy != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "facet_strategy", runtime.ParamLocationQuery, *params.FacetStrategy); err != nil {
@@ -3958,6 +4022,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 		}
 
+		if params.OverrideTags != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "override_tags", runtime.ParamLocationQuery, *params.OverrideTags); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.Page != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
@@ -4233,6 +4313,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 		if params.SplitJoinTokens != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "split_join_tokens", runtime.ParamLocationQuery, *params.SplitJoinTokens); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Stopwords != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "stopwords", runtime.ParamLocationQuery, *params.Stopwords); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err

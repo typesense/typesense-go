@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
   title: Typesense API
-  description: 'An open source search engine for building delightful search experiences.'
-  version: 0.25.0
+  description: "An open source search engine for building delightful search experiences."
+  version: '26.0'
 externalDocs:
   description: Find out more about Typsesense
   url: https://typesense.org
@@ -51,7 +51,6 @@ tags:
     externalDocs:
       description: Find out more
       url: https://typesense.org/docs/26.0/api/search.html#presets
-
 paths:
   /collections:
     get:
@@ -70,9 +69,9 @@ paths:
             application/json:
               schema:
                 type: array
-                x-go-type: '[]*CollectionResponse'
+                x-go-type: "[]*CollectionResponse"
                 items:
-                  $ref: '#/components/schemas/CollectionResponse'
+                  $ref: "#/components/schemas/CollectionResponse"
     post:
       tags:
         - collections
@@ -86,7 +85,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CollectionSchema'
+              $ref: "#/components/schemas/CollectionSchema"
         required: true
       responses:
         201:
@@ -94,19 +93,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CollectionResponse'
+                $ref: "#/components/schemas/CollectionResponse"
         400:
           description: Bad request, see error message for details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
         409:
           description: Collection already exists
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
   /collections/{collectionName}:
     get:
       tags:
@@ -127,18 +126,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CollectionResponse'
+                $ref: "#/components/schemas/CollectionResponse"
         404:
           description: Collection not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
     patch:
       tags:
         - collections
       summary: Update a collection
-      description: Update a collection's schema to modify the fields and their types.
+      description:
+        Update a collection's schema to modify the fields and their types.
       operationId: updateCollection
       parameters:
         - name: collectionName
@@ -152,7 +152,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CollectionUpdateSchema'
+              $ref: "#/components/schemas/CollectionUpdateSchema"
         required: true
       responses:
         200:
@@ -160,19 +160,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CollectionUpdateSchema'
+                $ref: "#/components/schemas/CollectionUpdateSchema"
         400:
           description: Bad request, see error message for details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
         404:
           description: The collection was not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
     delete:
       tags:
         - collections
@@ -194,13 +194,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CollectionResponse'
+                $ref: "#/components/schemas/CollectionResponse"
         404:
           description: Collection not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
   /collections/{collectionName}/documents:
     post:
       tags:
@@ -232,7 +232,7 @@ paths:
             schema:
               type: object
               description: Can be any key-value pair
-              x-go-type: 'interface{}'
+              x-go-type: "interface{}"
         required: true
       responses:
         201:
@@ -247,7 +247,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
     patch:
       tags:
         - documents
@@ -271,10 +271,11 @@ paths:
             properties:
               filter_by:
                 type: string
-                example: 'num_employees:>100 && country: [USA, UK]'
+                example: "num_employees:>100 && country: [USA, UK]"
       responses:
         '200':
-          description: The response contains a single field, `num_updated`, indicating the number of documents affected.
+          description:
+            The response contains a single field, `num_updated`, indicating the number of documents affected.
           content:
             application/json:
               schema:
@@ -305,7 +306,7 @@ paths:
             schema:
               type: object
               description: Can be any key-value pair
-              x-go-type: 'interface{}'
+              x-go-type: "interface{}"
         required: true
     delete:
       tags:
@@ -331,7 +332,7 @@ paths:
             properties:
               filter_by:
                 type: string
-                example: 'num_employees:>100 && country: [USA, UK]'
+                example: "num_employees:>100 && country: [USA, UK]"
               batch_size:
                 description:
                   Batch size parameter controls the number of documents that should be deleted
@@ -355,7 +356,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
   /collections/{collectionName}/documents/search:
     get:
       tags:
@@ -374,26 +375,26 @@ paths:
           required: true
           in: query
           schema:
-            $ref: '#/components/schemas/SearchParameters'
+            $ref: "#/components/schemas/SearchParameters"
       responses:
         200:
           description: Search results
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchResult'
+                $ref: "#/components/schemas/SearchResult"
         400:
           description: Bad request, see error message for details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
         404:
           description: The collection or field was not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
   /collections/{collectionName}/overrides:
     get:
       tags:
@@ -414,7 +415,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchOverridesResponse'
+                $ref: "#/components/schemas/SearchOverridesResponse"
   /collections/{collectionName}/overrides/{overrideId}:
     get:
       tags:
@@ -442,7 +443,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchOverride'
+                $ref: "#/components/schemas/SearchOverride"
     put:
       tags:
         - documents
@@ -470,7 +471,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SearchOverrideSchema'
+              $ref: "#/components/schemas/SearchOverrideSchema"
         required: true
       responses:
         200:
@@ -478,13 +479,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchOverride'
+                $ref: "#/components/schemas/SearchOverride"
         404:
           description: Search override not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
     delete:
       tags:
         - documents
@@ -510,13 +511,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchOverride'
+                $ref: "#/components/schemas/SearchOverride"
         404:
           description: Search override not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
   /collections/{collectionName}/synonyms:
     get:
       tags:
@@ -536,13 +537,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchSynonymsResponse'
+                $ref: "#/components/schemas/SearchSynonymsResponse"
         404:
           description: Search synonyms was not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
   /collections/{collectionName}/synonyms/{synonymId}:
     get:
       tags:
@@ -569,13 +570,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchSynonym'
+                $ref: "#/components/schemas/SearchSynonym"
         404:
           description: Search synonym was not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
     put:
       tags:
         - documents
@@ -600,7 +601,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SearchSynonymSchema'
+              $ref: "#/components/schemas/SearchSynonymSchema"
         required: true
       responses:
         200:
@@ -608,13 +609,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchSynonym'
+                $ref: "#/components/schemas/SearchSynonym"
         404:
           description: Search synonym was not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
     delete:
       tags:
         - documents
@@ -639,13 +640,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchSynonym'
+                $ref: "#/components/schemas/SearchSynonym"
         404:
           description: Search synonym not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
   /collections/{collectionName}/documents/export:
     get:
@@ -697,7 +698,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
   /collections/{collectionName}/documents/import:
     post:
       tags:
@@ -761,13 +762,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
         404:
           description: The collection was not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
   /collections/{collectionName}/documents/{documentId}:
     get:
       tags:
@@ -801,7 +802,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
     patch:
       tags:
         - documents
@@ -830,7 +831,7 @@ paths:
             schema:
               type: object
               description: Can be any key-value pair
-              x-go-type: 'interface{}'
+              x-go-type: "interface{}"
         required: true
       responses:
         200:
@@ -845,7 +846,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
     delete:
       tags:
         - documents
@@ -878,7 +879,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
   /keys:
     get:
       tags:
@@ -891,7 +892,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiKeysResponse'
+                $ref: "#/components/schemas/ApiKeysResponse"
     post:
       tags:
         - keys
@@ -907,26 +908,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ApiKeySchema'
+              $ref: "#/components/schemas/ApiKeySchema"
       responses:
         201:
           description: Created API key
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiKey'
+                $ref: "#/components/schemas/ApiKey"
         400:
           description: Bad request, see error message for details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
         409:
           description: API key generation conflict
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
   /keys/{keyId}:
     get:
       tags:
@@ -951,13 +952,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiKey'
+                $ref: "#/components/schemas/ApiKey"
         404:
           description: The key was not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
     delete:
       tags:
         - keys
@@ -977,19 +978,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiKey'
+                $ref: "#/components/schemas/ApiKey"
         400:
           description: Bad request, see error message for details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
         404:
           description: Key not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
   /aliases:
     get:
       tags:
@@ -1003,7 +1004,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CollectionAliasesResponse'
+                $ref: "#/components/schemas/CollectionAliasesResponse"
   /aliases/{aliasName}:
     put:
       tags:
@@ -1028,26 +1029,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CollectionAliasSchema'
+              $ref: "#/components/schemas/CollectionAliasSchema"
       responses:
         200:
           description: The collection alias was created/updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CollectionAlias'
+                $ref: "#/components/schemas/CollectionAlias"
         400:
           description: Bad request, see error message for details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
         404:
           description: Alias not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
     get:
       tags:
         - collections
@@ -1067,13 +1068,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CollectionAlias'
+                $ref: "#/components/schemas/CollectionAlias"
         404:
           description: The alias was not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
     delete:
       tags:
         - collections
@@ -1092,13 +1093,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CollectionAlias'
+                $ref: "#/components/schemas/CollectionAlias"
         404:
           description: Alias not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
   /debug:
     get:
       tags:
@@ -1129,7 +1130,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HealthStatus'
+                $ref: "#/components/schemas/HealthStatus"
   /operations/snapshot:
     post:
       tags:
@@ -1153,7 +1154,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessStatus'
+                $ref: "#/components/schemas/SuccessStatus"
   /operations/vote:
     post:
       tags:
@@ -1170,7 +1171,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessStatus'
+                $ref: "#/components/schemas/SuccessStatus"
   /multi_search:
     post:
       operationId: multiSearch
@@ -1185,38 +1186,39 @@ paths:
           required: true
           in: query
           schema:
-            $ref: '#/components/schemas/MultiSearchParameters'
+            $ref: "#/components/schemas/MultiSearchParameters"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MultiSearchSearchesParameter'
+              $ref: "#/components/schemas/MultiSearchSearchesParameter"
       responses:
         200:
           description: Search results
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MultiSearchResult'
+                $ref: "#/components/schemas/MultiSearchResult"
         400:
           description: Bad request, see error message for details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
   /analytics/rules:
     post:
       tags:
         - analytics
       summary: Creates an analytics rule
-      description: When an analytics rule is created, we give it a name and describe the type, the source collections and the destination collection.
+      description:
+        When an analytics rule is created, we give it a name and describe the type, the source collections and the destination collection.
       operationId: createAnalyticsRule
       requestBody:
         description: The Analytics rule to be created
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnalyticsRuleSchema'
+              $ref: "#/components/schemas/AnalyticsRuleSchema"
         required: true
       responses:
         201:
@@ -1224,18 +1226,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsRuleSchema'
+                $ref: "#/components/schemas/AnalyticsRuleSchema"
         400:
           description: Bad request, see error message for details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
     get:
       tags:
         - analytics
       summary: Retrieves all analytics rules
-      description: Retrieve the details of all analytics rules
+      description:
+        Retrieve the details of all analytics rules
       operationId: retrieveAnalyticsRules
       responses:
         200:
@@ -1243,13 +1246,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsRulesRetrieveSchema'
+                $ref: "#/components/schemas/AnalyticsRulesRetrieveSchema"
   /analytics/rules/{ruleName}:
     put:
       tags:
         - analytics
       summary: Upserts an analytics rule
-      description: Upserts an analytics rule with the given name.
+      description:
+        Upserts an analytics rule with the given name.
       operationId: upsertAnalyticsRule
       parameters:
         - in: path
@@ -1263,7 +1267,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnalyticsRuleSchema'
+              $ref: "#/components/schemas/AnalyticsRuleSchema"
         required: true
       responses:
         201:
@@ -1271,18 +1275,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsRuleSchema'
+                $ref: "#/components/schemas/AnalyticsRuleSchema"
         400:
           description: Bad request, see error message for details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
     get:
       tags:
         - analytics
       summary: Retrieves an analytics rule
-      description: Retrieve the details of an analytics rule, given it's name
+      description:
+        Retrieve the details of an analytics rule, given it's name
       operationId: retrieveAnalyticsRule
       parameters:
         - in: path
@@ -1297,18 +1302,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsRuleSchema'
+                $ref: "#/components/schemas/AnalyticsRuleSchema"
         404:
           description: Analytics rule not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
     delete:
       tags:
         - analytics
       summary: Delete an analytics rule
-      description: Permanently deletes an analytics rule, given it's name
+      description:
+        Permanently deletes an analytics rule, given it's name
       operationId: deleteAnalyticsRule
       parameters:
         - in: path
@@ -1323,19 +1329,20 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsRuleSchema'
+                $ref: "#/components/schemas/AnalyticsRuleSchema"
         404:
           description: Analytics rule not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
   /stopwords:
     get:
       tags:
         - stopwords
       summary: Retrieves all stopwords sets.
-      description: Retrieve the details of all stopwords sets
+      description:
+        Retrieve the details of all stopwords sets
       operationId: retrieveStopwordsSets
       responses:
         200:
@@ -1343,13 +1350,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StopwordsSetRetrieveSchema'
+                $ref: "#/components/schemas/StopwordsSetRetrieveSchema"
   /stopwords/{setId}:
     put:
       tags:
         - stopwords
       summary: Upserts a stopwords set.
-      description: When an analytics rule is created, we give it a name and describe the type, the source collections and the destination collection.
+      description:
+        When an analytics rule is created, we give it a name and describe the type, the source collections and the destination collection.
       operationId: upsertStopwordsSet
       parameters:
         - in: path
@@ -1364,7 +1372,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/StopwordsSetUpsertSchema'
+              $ref: "#/components/schemas/StopwordsSetUpsertSchema"
         required: true
       responses:
         200:
@@ -1372,18 +1380,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StopwordsSetSchema'
+                $ref: "#/components/schemas/StopwordsSetSchema"
         400:
           description: Bad request, see error message for details.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
     get:
       tags:
         - stopwords
       summary: Retrieves a stopwords set.
-      description: Retrieve the details of a stopwords set, given it's name.
+      description:
+        Retrieve the details of a stopwords set, given it's name.
       operationId: retrieveStopwordsSet
       parameters:
         - in: path
@@ -1399,18 +1408,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StopwordsSetRetrieveSchema'
+                $ref: "#/components/schemas/StopwordsSetRetrieveSchema"
         404:
           description: Stopwords set not found.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
     delete:
       tags:
         - stopwords
       summary: Delete a stopwords set.
-      description: Permanently deletes a stopwords set, given it's name.
+      description:
+        Permanently deletes a stopwords set, given it's name.
       operationId: deleteStopwordsSet
       parameters:
         - in: path
@@ -1439,7 +1449,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
   /presets:
     get:
       tags:
@@ -1569,7 +1579,7 @@ components:
               type: string
               facet: true
           items:
-            $ref: '#/components/schemas/Field'
+            $ref: "#/components/schemas/Field"
         default_sorting_field:
           type: string
           description:
@@ -1577,7 +1587,7 @@ components:
             the search results are ranked when a sort_by clause is not provided during
             searching. This field must indicate some kind of popularity.
           example: num_employees # Go with the first field name listed above to produce sane defaults
-          default: ''
+          default: ""
         token_separators:
           type: array
           description: >
@@ -1591,12 +1601,12 @@ components:
             maxLength: 1
           default: []
         enable_nested_fields:
-          type: boolean
-          description:
-            Enables experimental support at a collection level for nested object or object array fields.
-            This field is only available if the Typesense server is version `0.24.0.rcn34` or later.
-          default: false
-          example: true
+            type: boolean
+            description:
+              Enables experimental support at a collection level for nested object or object array fields.
+              This field is only available if the Typesense server is version `0.24.0.rcn34` or later.
+            default: false
+            example: true
         symbols_to_index:
           type: array
           description: >
@@ -1627,10 +1637,10 @@ components:
               type: string
               facet: true
           items:
-            $ref: '#/components/schemas/Field'
+            $ref: "#/components/schemas/Field"
     CollectionResponse:
       allOf:
-        - $ref: '#/components/schemas/CollectionSchema'
+        - $ref: "#/components/schemas/CollectionSchema"
         - type: object
           required:
             - num_documents
@@ -1743,16 +1753,16 @@ components:
       properties:
         aliases:
           type: array
-          x-go-type: '[]*CollectionAlias'
+          x-go-type: "[]*CollectionAlias"
           items:
-            $ref: '#/components/schemas/CollectionAlias'
+            $ref: "#/components/schemas/CollectionAlias"
     SearchResult:
       type: object
       properties:
         facet_counts:
           type: array
           items:
-            $ref: '#/components/schemas/FacetCounts'
+            $ref: "#/components/schemas/FacetCounts"
         found:
           type: integer
           description: The number of documents found
@@ -1771,12 +1781,12 @@ components:
         grouped_hits:
           type: array
           items:
-            $ref: '#/components/schemas/SearchGroupedHit'
+            $ref: "#/components/schemas/SearchGroupedHit"
         hits:
           type: array
           description: The documents that matched the search query
           items:
-            $ref: '#/components/schemas/SearchResultHit'
+            $ref: "#/components/schemas/SearchResultHit"
         request_params:
           type: object
           required:
@@ -1806,7 +1816,7 @@ components:
           type: array
           description: The documents that matched the search query
           items:
-            $ref: '#/components/schemas/SearchResultHit'
+            $ref: "#/components/schemas/SearchResultHit"
     SearchResultHit:
       type: object
       properties:
@@ -1814,7 +1824,7 @@ components:
           type: array
           description: (Deprecated) Contains highlighted portions of the search fields
           items:
-            $ref: '#/components/schemas/SearchHighlight'
+            $ref: "#/components/schemas/SearchHighlight"
         highlight:
           type: object
           description: Highlighted version of the matching document
@@ -1842,7 +1852,7 @@ components:
             field: company_name
             snippet: <mark>Stark</mark> Industries
         document:
-          id: '124'
+          id: "124"
           company_name: Stark Industries
           num_employees: 5215
           country: USA
@@ -1889,26 +1899,26 @@ components:
           type: array
           items:
             type: object
-            x-go-type: 'interface{}'
+            x-go-type: "interface{}"
     SearchOverrideSchema:
       type: object
       required:
         - rule
       properties:
         rule:
-          $ref: '#/components/schemas/SearchOverrideRule'
+          $ref: "#/components/schemas/SearchOverrideRule"
         includes:
           type: array
           description:
             List of document `id`s that should be included in the search results with their
             corresponding `position`s.
           items:
-            $ref: '#/components/schemas/SearchOverrideInclude'
+            $ref: "#/components/schemas/SearchOverrideInclude"
         excludes:
           type: array
           description: List of document `id`s that should be excluded from the search results.
           items:
-            $ref: '#/components/schemas/SearchOverrideExclude'
+            $ref: "#/components/schemas/SearchOverrideExclude"
         filter_by:
           type: string
           description: >
@@ -1919,7 +1929,7 @@ components:
             Indicates whether search query tokens that exist in the override's rule should be removed from the search query.
     SearchOverride:
       allOf:
-        - $ref: '#/components/schemas/SearchOverrideSchema'
+        - $ref: "#/components/schemas/SearchOverrideSchema"
         - type: object
           required:
             - id
@@ -1945,6 +1955,11 @@ components:
           enum:
             - exact
             - contains
+        tags:
+          type: array
+          description: List of tags.
+          items:
+            type: string
     SearchOverrideInclude:
       type: object
       required:
@@ -1972,9 +1987,9 @@ components:
       properties:
         overrides:
           type: array
-          x-go-type: '[]*SearchOverride'
+          x-go-type: "[]*SearchOverride"
           items:
-            $ref: '#/components/schemas/SearchOverride'
+            $ref: "#/components/schemas/SearchOverride"
     SearchSynonymSchema:
       type: object
       required:
@@ -1990,7 +2005,7 @@ components:
             type: string
     SearchSynonym:
       allOf:
-        - $ref: '#/components/schemas/SearchSynonymSchema'
+        - $ref: "#/components/schemas/SearchSynonymSchema"
         - type: object
           required:
             - id
@@ -2005,9 +2020,9 @@ components:
       properties:
         synonyms:
           type: array
-          x-go-type: '[]*SearchSynonym'
+          x-go-type: "[]*SearchSynonym"
           items:
-            $ref: '#/components/schemas/SearchSynonym'
+            $ref: "#/components/schemas/SearchSynonym"
     HealthStatus:
       type: object
       required:
@@ -2053,7 +2068,7 @@ components:
           format: int64
     ApiKey:
       allOf:
-        - $ref: '#/components/schemas/ApiKeySchema'
+        - $ref: "#/components/schemas/ApiKeySchema"
         - type: object
           properties:
             id:
@@ -2070,9 +2085,9 @@ components:
       properties:
         keys:
           type: array
-          x-go-type: '[]*ApiKey'
+          x-go-type: "[]*ApiKey"
           items:
-            $ref: '#/components/schemas/ApiKey'
+            $ref: "#/components/schemas/ApiKey"
     ScopedKeyParameters:
       type: object
       properties:
@@ -2099,7 +2114,7 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/SearchResult'
+            $ref: "#/components/schemas/SearchResult"
     SearchParameters:
       type: object
       required:
@@ -2143,8 +2158,8 @@ components:
             If infix index is enabled for this field, infix searching can be done on a per-field
             basis by sending a comma separated string parameter called infix to the search query.
             This parameter can have 3 values; `off` infix search is disabled, which is default
-            `always` infix search is performed along with regular search
-            `fallback` infix search is performed if regular search does not produce results
+             `always` infix search is performed along with regular search
+             `fallback` infix search is performed if regular search does not produce results
           type: string
 
         max_extra_prefix:
@@ -2168,7 +2183,7 @@ components:
             Filter conditions for refining youropen api validator search results. Separate
             multiple conditions with &&.
           type: string
-          example: 'num_employees:>100 && country: [USA, UK]'
+          example: "num_employees:>100 && country: [USA, UK]"
 
         sort_by:
           description:
@@ -2211,7 +2226,7 @@ components:
           type: integer
 
         per_page:
-          description: 'Number of results to fetch per page. Default: 10'
+          description: "Number of results to fetch per page. Default: 10"
           type: integer
 
         limit:
@@ -2317,6 +2332,10 @@ components:
             You could also use the Overrides feature to override search results based
             on rules. Overrides are applied first, followed by `pinned_hits` and
             finally `hidden_hits`.
+          type: string
+
+        override_tags:
+          description: Comma separated list of tags to trigger the curations rules that match the tags.
           type: string
 
         highlight_fields:
@@ -2427,6 +2446,15 @@ components:
             Choose the underlying faceting strategy used. Comma separated string of allows values:
             exhaustive, top_values or automatic (default).
           type: string
+        stopwords:
+          description: >
+            Name of the stopwords set to apply for this search,
+            the keywords present in the set will be removed from the search query.
+          type: string
+        facet_return_parent:
+          description: >
+            Comma separated string of nested facet fields whose parent object should be returned in facet response.
+          type: string
 
     MultiSearchParameters:
       description: >
@@ -2469,8 +2497,8 @@ components:
             If infix index is enabled for this field, infix searching can be done on a per-field
             basis by sending a comma separated string parameter called infix to the search query.
             This parameter can have 3 values; `off` infix search is disabled, which is default
-            `always` infix search is performed along with regular search
-            `fallback` infix search is performed if regular search does not produce results
+             `always` infix search is performed along with regular search
+             `fallback` infix search is performed if regular search does not produce results
           type: string
 
         max_extra_prefix:
@@ -2494,7 +2522,7 @@ components:
             Filter conditions for refining youropen api validator search results. Separate
             multiple conditions with &&.
           type: string
-          example: 'num_employees:>100 && country: [USA, UK]'
+          example: "num_employees:>100 && country: [USA, UK]"
 
         sort_by:
           description:
@@ -2536,7 +2564,7 @@ components:
           type: integer
 
         per_page:
-          description: 'Number of results to fetch per page. Default: 10'
+          description: "Number of results to fetch per page. Default: 10"
           type: integer
 
         limit:
@@ -2635,6 +2663,10 @@ components:
             You could also use the Overrides feature to override search results based
             on rules. Overrides are applied first, followed by `pinned_hits` and
             finally `hidden_hits`.
+          type: string
+
+        override_tags:
+          description: Comma separated list of tags to trigger the curations rules that match the tags.
           type: string
 
         highlight_fields:
@@ -2738,6 +2770,15 @@ components:
             Choose the underlying faceting strategy used. Comma separated string of allows values:
             exhaustive, top_values or automatic (default).
           type: string
+        stopwords:
+          description: >
+            Name of the stopwords set to apply for this search,
+            the keywords present in the set will be removed from the search query.
+          type: string
+        facet_return_parent:
+          description: >
+            Comma separated string of nested facet fields whose parent object should be returned in facet response.
+          type: string
     MultiSearchSearchesParameter:
       type: object
       required:
@@ -2746,10 +2787,10 @@ components:
         searches:
           type: array
           items:
-            $ref: '#/components/schemas/MultiSearchCollectionParameters'
+            $ref: "#/components/schemas/MultiSearchCollectionParameters"
     MultiSearchCollectionParameters:
       allOf:
-        - $ref: '#/components/schemas/MultiSearchParameters'
+        - $ref: "#/components/schemas/MultiSearchParameters"
         - type: object
           required:
             - collection
@@ -2772,6 +2813,8 @@ components:
                 type: string
               value:
                 type: string
+              parent:
+                type: object
         field_name:
           type: string
         stats:
@@ -2803,7 +2846,7 @@ components:
         type:
           type: string
         params:
-          $ref: '#/components/schemas/AnalyticsRuleParameters'
+          $ref: "#/components/schemas/AnalyticsRuleParameters"
     AnalyticsRuleParameters:
       type: object
       required:
@@ -2831,7 +2874,7 @@ components:
         rules:
           type: array
           items:
-            $ref: '#/components/schemas/AnalyticsRuleSchema'
+            $ref: "#/components/schemas/AnalyticsRuleSchema"
     StopwordsSetUpsertSchema:
       type: object
       properties:
@@ -2867,7 +2910,7 @@ components:
         stopwords:
           type: array
           items:
-            $ref: '#/components/schemas/StopwordsSetSchema'
+            $ref: "#/components/schemas/StopwordsSetSchema"
       required:
         - stopwords
       example: |

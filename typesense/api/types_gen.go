@@ -162,9 +162,10 @@ type CollectionUpdateSchema struct {
 // FacetCounts defines model for FacetCounts.
 type FacetCounts struct {
 	Counts *[]struct {
-		Count       *int    `json:"count,omitempty"`
-		Highlighted *string `json:"highlighted,omitempty"`
-		Value       *string `json:"value,omitempty"`
+		Count       *int                    `json:"count,omitempty"`
+		Highlighted *string                 `json:"highlighted,omitempty"`
+		Parent      *map[string]interface{} `json:"parent,omitempty"`
+		Value       *string                 `json:"value,omitempty"`
 	} `json:"counts,omitempty"`
 	FieldName *string `json:"field_name,omitempty"`
 	Stats     *struct {
@@ -236,6 +237,9 @@ type MultiSearchCollectionParameters struct {
 	// FacetQuery Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
 	FacetQuery *string `json:"facet_query,omitempty"`
 
+	// FacetReturnParent Comma separated string of nested facet fields whose parent object should be returned in facet response.
+	FacetReturnParent *string `json:"facet_return_parent,omitempty"`
+
 	// FacetStrategy Choose the underlying faceting strategy used. Comma separated string of allows values: exhaustive, top_values or automatic (default).
 	FacetStrategy *string `json:"facet_strategy,omitempty"`
 
@@ -297,6 +301,9 @@ type MultiSearchCollectionParameters struct {
 	// Offset Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
 	Offset *int `json:"offset,omitempty"`
 
+	// OverrideTags Comma separated list of tags to trigger the curations rules that match the tags.
+	OverrideTags *string `json:"override_tags,omitempty"`
+
 	// Page Results from this specific page number would be fetched.
 	Page *int `json:"page,omitempty"`
 
@@ -349,6 +356,9 @@ type MultiSearchCollectionParameters struct {
 
 	// SortBy A list of numerical fields and their corresponding sort orders that will be used for ordering your results. Up to 3 sort fields can be specified. The text similarity score is exposed as a special `_text_match` field that you can use in the list of sorting fields. If no `sort_by` parameter is specified, results are sorted by `_text_match:desc,default_sorting_field:desc`
 	SortBy *string `json:"sort_by,omitempty"`
+
+	// Stopwords Name of the stopwords set to apply for this search, the keywords present in the set will be removed from the search query.
+	Stopwords *string `json:"stopwords,omitempty"`
 
 	// TextMatchType In a multi-field matching context, this parameter determines how the representative text match score of a record is calculated. Possible values are max_score (default) or max_weight.
 	TextMatchType *string `json:"text_match_type,omitempty"`
@@ -389,6 +399,9 @@ type MultiSearchParameters struct {
 	// FacetQuery Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
 	FacetQuery *string `json:"facet_query,omitempty"`
 
+	// FacetReturnParent Comma separated string of nested facet fields whose parent object should be returned in facet response.
+	FacetReturnParent *string `json:"facet_return_parent,omitempty"`
+
 	// FacetStrategy Choose the underlying faceting strategy used. Comma separated string of allows values: exhaustive, top_values or automatic (default).
 	FacetStrategy *string `json:"facet_strategy,omitempty"`
 
@@ -450,6 +463,9 @@ type MultiSearchParameters struct {
 	// Offset Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
 	Offset *int `json:"offset,omitempty"`
 
+	// OverrideTags Comma separated list of tags to trigger the curations rules that match the tags.
+	OverrideTags *string `json:"override_tags,omitempty"`
+
 	// Page Results from this specific page number would be fetched.
 	Page *int `json:"page,omitempty"`
 
@@ -502,6 +518,9 @@ type MultiSearchParameters struct {
 
 	// SortBy A list of numerical fields and their corresponding sort orders that will be used for ordering your results. Up to 3 sort fields can be specified. The text similarity score is exposed as a special `_text_match` field that you can use in the list of sorting fields. If no `sort_by` parameter is specified, results are sorted by `_text_match:desc,default_sorting_field:desc`
 	SortBy *string `json:"sort_by,omitempty"`
+
+	// Stopwords Name of the stopwords set to apply for this search, the keywords present in the set will be removed from the search query.
+	Stopwords *string `json:"stopwords,omitempty"`
 
 	// TextMatchType In a multi-field matching context, this parameter determines how the representative text match score of a record is calculated. Possible values are max_score (default) or max_weight.
 	TextMatchType *string `json:"text_match_type,omitempty"`
@@ -626,6 +645,9 @@ type SearchOverrideRule struct {
 
 	// Query Indicates what search queries should be overridden
 	Query string `json:"query"`
+
+	// Tags List of tags.
+	Tags *[]string `json:"tags,omitempty"`
 }
 
 // SearchOverrideRuleMatch Indicates whether the match on the query term should be `exact` or `contains`. If we want to match all queries that contained the word `apple`, we will use the `contains` match instead.
@@ -680,6 +702,9 @@ type SearchParameters struct {
 
 	// FacetQuery Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
 	FacetQuery *string `json:"facet_query,omitempty"`
+
+	// FacetReturnParent Comma separated string of nested facet fields whose parent object should be returned in facet response.
+	FacetReturnParent *string `json:"facet_return_parent,omitempty"`
 
 	// FacetStrategy Choose the underlying faceting strategy used. Comma separated string of allows values: exhaustive, top_values or automatic (default).
 	FacetStrategy *string `json:"facet_strategy,omitempty"`
@@ -745,6 +770,9 @@ type SearchParameters struct {
 	// Offset Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
 	Offset *int `json:"offset,omitempty"`
 
+	// OverrideTags Comma separated list of tags to trigger the curations rules that match the tags.
+	OverrideTags *string `json:"override_tags,omitempty"`
+
 	// Page Results from this specific page number would be fetched.
 	Page *int `json:"page,omitempty"`
 
@@ -800,6 +828,9 @@ type SearchParameters struct {
 
 	// SplitJoinTokens Treat space as typo: search for q=basket ball if q=basketball is not found or vice-versa. Splitting/joining of tokens will only be attempted if the original query produces no results. To always trigger this behavior, set value to `always``. To disable, set value to `off`. Default is `fallback`.
 	SplitJoinTokens *string `json:"split_join_tokens,omitempty"`
+
+	// Stopwords Name of the stopwords set to apply for this search, the keywords present in the set will be removed from the search query.
+	Stopwords *string `json:"stopwords,omitempty"`
 
 	// TextMatchType In a multi-field matching context, this parameter determines how the representative text match score of a record is calculated. Possible values are max_score (default) or max_weight.
 	TextMatchType *string `json:"text_match_type,omitempty"`
@@ -965,6 +996,7 @@ type SearchCollectionParams struct {
 	ExhaustiveSearch              *bool   `form:"exhaustive_search,omitempty" json:"exhaustive_search,omitempty"`
 	FacetBy                       *string `form:"facet_by,omitempty" json:"facet_by,omitempty"`
 	FacetQuery                    *string `form:"facet_query,omitempty" json:"facet_query,omitempty"`
+	FacetReturnParent             *string `form:"facet_return_parent,omitempty" json:"facet_return_parent,omitempty"`
 	FacetStrategy                 *string `form:"facet_strategy,omitempty" json:"facet_strategy,omitempty"`
 	FilterBy                      *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
 	GroupBy                       *string `form:"group_by,omitempty" json:"group_by,omitempty"`
@@ -986,6 +1018,7 @@ type SearchCollectionParams struct {
 	MinLen2typo                   *int    `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
 	NumTypos                      *string `form:"num_typos,omitempty" json:"num_typos,omitempty"`
 	Offset                        *int    `form:"offset,omitempty" json:"offset,omitempty"`
+	OverrideTags                  *string `form:"override_tags,omitempty" json:"override_tags,omitempty"`
 	Page                          *int    `form:"page,omitempty" json:"page,omitempty"`
 	PerPage                       *int    `form:"per_page,omitempty" json:"per_page,omitempty"`
 	PinnedHits                    *string `form:"pinned_hits,omitempty" json:"pinned_hits,omitempty"`
@@ -1004,6 +1037,7 @@ type SearchCollectionParams struct {
 	SnippetThreshold              *int    `form:"snippet_threshold,omitempty" json:"snippet_threshold,omitempty"`
 	SortBy                        *string `form:"sort_by,omitempty" json:"sort_by,omitempty"`
 	SplitJoinTokens               *string `form:"split_join_tokens,omitempty" json:"split_join_tokens,omitempty"`
+	Stopwords                     *string `form:"stopwords,omitempty" json:"stopwords,omitempty"`
 	TextMatchType                 *string `form:"text_match_type,omitempty" json:"text_match_type,omitempty"`
 	TypoTokensThreshold           *int    `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
 	UseCache                      *bool   `form:"use_cache,omitempty" json:"use_cache,omitempty"`
@@ -1024,6 +1058,7 @@ type MultiSearchParams struct {
 	ExhaustiveSearch              *bool   `form:"exhaustive_search,omitempty" json:"exhaustive_search,omitempty"`
 	FacetBy                       *string `form:"facet_by,omitempty" json:"facet_by,omitempty"`
 	FacetQuery                    *string `form:"facet_query,omitempty" json:"facet_query,omitempty"`
+	FacetReturnParent             *string `form:"facet_return_parent,omitempty" json:"facet_return_parent,omitempty"`
 	FacetStrategy                 *string `form:"facet_strategy,omitempty" json:"facet_strategy,omitempty"`
 	FilterBy                      *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
 	GroupBy                       *string `form:"group_by,omitempty" json:"group_by,omitempty"`
@@ -1045,6 +1080,7 @@ type MultiSearchParams struct {
 	MinLen2typo                   *int    `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
 	NumTypos                      *string `form:"num_typos,omitempty" json:"num_typos,omitempty"`
 	Offset                        *int    `form:"offset,omitempty" json:"offset,omitempty"`
+	OverrideTags                  *string `form:"override_tags,omitempty" json:"override_tags,omitempty"`
 	Page                          *int    `form:"page,omitempty" json:"page,omitempty"`
 	PerPage                       *int    `form:"per_page,omitempty" json:"per_page,omitempty"`
 	PinnedHits                    *string `form:"pinned_hits,omitempty" json:"pinned_hits,omitempty"`
@@ -1063,6 +1099,7 @@ type MultiSearchParams struct {
 	SnippetThreshold              *int    `form:"snippet_threshold,omitempty" json:"snippet_threshold,omitempty"`
 	SortBy                        *string `form:"sort_by,omitempty" json:"sort_by,omitempty"`
 	SplitJoinTokens               *string `form:"split_join_tokens,omitempty" json:"split_join_tokens,omitempty"`
+	Stopwords                     *string `form:"stopwords,omitempty" json:"stopwords,omitempty"`
 	TextMatchType                 *string `form:"text_match_type,omitempty" json:"text_match_type,omitempty"`
 	TypoTokensThreshold           *int    `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
 	UseCache                      *bool   `form:"use_cache,omitempty" json:"use_cache,omitempty"`

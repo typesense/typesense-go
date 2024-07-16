@@ -228,6 +228,8 @@ components:
                 type: integer
               highlighted:
                 type: string
+              parent:
+                type: object
               value:
                 type: string
             type: object
@@ -373,6 +375,10 @@ components:
         facet_query:
           description: Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
           type: string
+        facet_return_parent:
+          description: |
+            Comma separated string of nested facet fields whose parent object should be returned in facet response.
+          type: string
         facet_strategy:
           description: |
             Choose the underlying faceting strategy used. Comma separated string of allows values: exhaustive, top_values or automatic (default).
@@ -446,6 +452,9 @@ components:
         offset:
           description: Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
           type: integer
+        override_tags:
+          description: Comma separated list of tags to trigger the curations rules that match the tags.
+          type: string
         page:
           description: Results from this specific page number would be fetched.
           type: integer
@@ -512,6 +521,10 @@ components:
           type: integer
         sort_by:
           description: A list of numerical fields and their corresponding sort orders that will be used for ordering your results. Up to 3 sort fields can be specified. The text similarity score is exposed as a special `_text_match` field that you can use in the list of sorting fields. If no `sort_by` parameter is specified, results are sorted by `_text_match:desc,default_sorting_field:desc`
+          type: string
+        stopwords:
+          description: |
+            Name of the stopwords set to apply for this search, the keywords present in the set will be removed from the search query.
           type: string
         text_match_type:
           description: In a multi-field matching context, this parameter determines how the representative text match score of a record is calculated. Possible values are max_score (default) or max_weight.
@@ -688,6 +701,11 @@ components:
         query:
           description: Indicates what search queries should be overridden
           type: string
+        tags:
+          description: List of tags.
+          items:
+            type: string
+          type: array
       required:
         - query
         - match
@@ -764,6 +782,10 @@ components:
           type: string
         facet_query:
           description: Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
+          type: string
+        facet_return_parent:
+          description: |
+            Comma separated string of nested facet fields whose parent object should be returned in facet response.
           type: string
         facet_strategy:
           description: |
@@ -842,6 +864,9 @@ components:
         offset:
           description: Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
           type: integer
+        override_tags:
+          description: Comma separated list of tags to trigger the curations rules that match the tags.
+          type: string
         page:
           description: Results from this specific page number would be fetched.
           type: integer
@@ -912,6 +937,10 @@ components:
         split_join_tokens:
           description: |
             Treat space as typo: search for q=basket ball if q=basketball is not found or vice-versa. Splitting/joining of tokens will only be attempted if the original query produces no results. To always trigger this behavior, set value to `always``. To disable, set value to `off`. Default is `fallback`.
+          type: string
+        stopwords:
+          description: |
+            Name of the stopwords set to apply for this search, the keywords present in the set will be removed from the search query.
           type: string
         text_match_type:
           description: In a multi-field matching context, this parameter determines how the representative text match score of a record is calculated. Possible values are max_score (default) or max_weight.
@@ -1110,7 +1139,7 @@ externalDocs:
 info:
   description: An open source search engine for building delightful search experiences.
   title: Typesense API
-  version: 0.25.0
+  version: "26.0"
 openapi: 3.0.3
 paths:
   /aliases:
@@ -1885,6 +1914,10 @@ paths:
           schema:
             type: string
         - in: query
+          name: facet_return_parent
+          schema:
+            type: string
+        - in: query
           name: facet_strategy
           schema:
             type: string
@@ -1969,6 +2002,10 @@ paths:
           schema:
             type: integer
         - in: query
+          name: override_tags
+          schema:
+            type: string
+        - in: query
           name: page
           schema:
             type: integer
@@ -2040,6 +2077,10 @@ paths:
             type: string
         - in: query
           name: split_join_tokens
+          schema:
+            type: string
+        - in: query
+          name: stopwords
           schema:
             type: string
         - in: query
@@ -2507,6 +2548,10 @@ paths:
           schema:
             type: string
         - in: query
+          name: facet_return_parent
+          schema:
+            type: string
+        - in: query
           name: facet_strategy
           schema:
             type: string
@@ -2591,6 +2636,10 @@ paths:
           schema:
             type: integer
         - in: query
+          name: override_tags
+          schema:
+            type: string
+        - in: query
           name: page
           schema:
             type: integer
@@ -2660,6 +2709,10 @@ paths:
             type: string
         - in: query
           name: split_join_tokens
+          schema:
+            type: string
+        - in: query
+          name: stopwords
           schema:
             type: string
         - in: query
