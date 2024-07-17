@@ -64,6 +64,10 @@ func (c *Client) Preset(presetName string) PresetInterface {
 	return &preset{apiClient: c.apiClient, presetName: presetName}
 }
 
+func (c *Client) Stopwords() StopwordsInterface {
+	return &stopwords{apiClient: c.apiClient}
+}
+
 type HTTPError struct {
 	Status int
 	Body   []byte
