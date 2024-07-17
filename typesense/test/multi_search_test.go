@@ -193,6 +193,7 @@ func TestMultiSearchVectorQuery(t *testing.T) {
 }
 
 func TestMultiSearchWithPreset(t *testing.T) {
+	t.Cleanup(presetsCleanUp)
 	collectionName1 := createNewCollection(t, "companies")
 	collectionName2 := createNewCollection(t, "companies")
 	documents := []interface{}{
