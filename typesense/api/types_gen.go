@@ -1028,8 +1028,8 @@ type SearchCollectionParams struct {
 	PrioritizeExactMatch          *bool   `form:"prioritize_exact_match,omitempty" json:"prioritize_exact_match,omitempty"`
 	PrioritizeNumMatchingFields   *bool   `form:"prioritize_num_matching_fields,omitempty" json:"prioritize_num_matching_fields,omitempty"`
 	PrioritizeTokenPosition       *bool   `form:"prioritize_token_position,omitempty" json:"prioritize_token_position,omitempty"`
-	Q                             string  `form:"q" json:"q"`
-	QueryBy                       string  `form:"query_by" json:"query_by"`
+	Q                             *string `form:"q,omitempty" json:"q,omitempty"`
+	QueryBy                       *string `form:"query_by,omitempty" json:"query_by,omitempty"`
 	QueryByWeights                *string `form:"query_by_weights,omitempty" json:"query_by_weights,omitempty"`
 	RemoteEmbeddingNumTries       *int    `form:"remote_embedding_num_tries,omitempty" json:"remote_embedding_num_tries,omitempty"`
 	RemoteEmbeddingTimeoutMs      *int    `form:"remote_embedding_timeout_ms,omitempty" json:"remote_embedding_timeout_ms,omitempty"`

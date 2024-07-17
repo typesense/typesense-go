@@ -129,8 +129,8 @@ doc, err := typesense.GenericCollection[*companyDocument](typesenseClient, colle
 
 ```go
 	searchParameters := &api.SearchCollectionParams{
-		Q:        "stark",
-		QueryBy:  "company_name",
+		Q:        pointer.String("stark"),
+		QueryBy:  pointer.String("company_name"),
 		FilterBy: pointer.String("num_employees:>100"),
 		SortBy:   &([]string{"num_employees:desc"}),
 	}
@@ -142,8 +142,8 @@ for the supporting multiple `QueryBy` params, you can add `,` after each field
 
 ```go
 	searchParameters := &api.SearchCollectionParams{
-		Q:        "stark",
-		QueryBy:  "company_name, country",
+		Q:        pointer.String("stark"),
+		QueryBy:  pointer.String("company_name, country"),
 		FilterBy: pointer.String("num_employees:>100"),
 		SortBy:   &([]string{"num_employees:desc"}),
 	}

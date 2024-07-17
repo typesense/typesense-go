@@ -212,9 +212,6 @@ func unwrapSearchParameters(m *yml) {
 	for _, obj := range sortedSlice(searchParameters) {
 		newMap := make(yml)
 		newMap["name"] = obj.Key
-		if obj.Key == "q" || obj.Key == "query_by" {
-			newMap["required"] = true
-		}
 		newMap["in"] = query
 		newMap["schema"] = make(yml)
 		if obj.Value.(yml)["oneOf"] == nil {
