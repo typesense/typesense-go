@@ -15,8 +15,8 @@ type stopwords struct {
 	apiClient APIClientInterface
 }
 
-func (p *stopwords) Retrieve(ctx context.Context) ([]api.StopwordsSetSchema, error) {
-	response, err := p.apiClient.RetrieveStopwordsSetsWithResponse(ctx)
+func (s *stopwords) Retrieve(ctx context.Context) ([]api.StopwordsSetSchema, error) {
+	response, err := s.apiClient.RetrieveStopwordsSetsWithResponse(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -26,8 +26,8 @@ func (p *stopwords) Retrieve(ctx context.Context) ([]api.StopwordsSetSchema, err
 	return response.JSON200.Stopwords, nil
 }
 
-func (p *stopwords) Upsert(ctx context.Context, stopwordsSetId string, stopwordssetUpsertSchema *api.StopwordsSetUpsertSchema) (*api.StopwordsSetSchema, error) {
-	response, err := p.apiClient.UpsertStopwordsSetWithResponse(ctx, stopwordsSetId, *stopwordssetUpsertSchema)
+func (s *stopwords) Upsert(ctx context.Context, stopwordsSetId string, stopwordssetUpsertSchema *api.StopwordsSetUpsertSchema) (*api.StopwordsSetSchema, error) {
+	response, err := s.apiClient.UpsertStopwordsSetWithResponse(ctx, stopwordsSetId, *stopwordssetUpsertSchema)
 	if err != nil {
 		return nil, err
 	}

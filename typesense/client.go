@@ -68,6 +68,10 @@ func (c *Client) Stopwords() StopwordsInterface {
 	return &stopwords{apiClient: c.apiClient}
 }
 
+func (c *Client) Stopword(stopwordsSetId string) StopwordInterface {
+	return &stopword{apiClient: c.apiClient, stopwordsSetId: stopwordsSetId}
+}
+
 type HTTPError struct {
 	Status int
 	Body   []byte

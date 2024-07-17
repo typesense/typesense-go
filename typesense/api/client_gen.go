@@ -6016,7 +6016,7 @@ func (r UpsertPresetResponse) StatusCode() int {
 type RetrieveStopwordsSetsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *StopwordsSetRetrieveSchema
+	JSON200      *StopwordsSetsRetrieveAllSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -8089,7 +8089,7 @@ func ParseRetrieveStopwordsSetsResponse(rsp *http.Response) (*RetrieveStopwordsS
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest StopwordsSetRetrieveSchema
+		var dest StopwordsSetsRetrieveAllSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

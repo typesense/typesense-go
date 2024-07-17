@@ -1083,12 +1083,10 @@ components:
       type: object
     StopwordsSetRetrieveSchema:
       example: |
-        {"stopwords": [{"id": "countries", "stopwords": ["Germany", "France", "Italy"], "locale": "en"}]}
+        {"stopwords": {"id": "countries", "stopwords": ["Germany", "France", "Italy"], "locale": "en"}}
       properties:
         stopwords:
-          items:
-            $ref: '#/components/schemas/StopwordsSetSchema'
-          type: array
+          $ref: '#/components/schemas/StopwordsSetSchema'
       required:
         - stopwords
       type: object
@@ -1117,6 +1115,17 @@ components:
         stopwords:
           items:
             type: string
+          type: array
+      required:
+        - stopwords
+      type: object
+    StopwordsSetsRetrieveAllSchema:
+      example: |
+        {"stopwords": [{"id": "countries", "stopwords": ["Germany", "France", "Italy"], "locale": "en"}]}
+      properties:
+        stopwords:
+          items:
+            $ref: '#/components/schemas/StopwordsSetSchema'
           type: array
       required:
         - stopwords
@@ -2897,7 +2906,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StopwordsSetRetrieveSchema'
+                $ref: '#/components/schemas/StopwordsSetsRetrieveAllSchema'
           description: Stopwords sets fetched.
       summary: Retrieves all stopwords sets.
       tags:

@@ -920,7 +920,7 @@ type SearchSynonymsResponse struct {
 
 // StopwordsSetRetrieveSchema defines model for StopwordsSetRetrieveSchema.
 type StopwordsSetRetrieveSchema struct {
-	Stopwords []StopwordsSetSchema `json:"stopwords"`
+	Stopwords StopwordsSetSchema `json:"stopwords"`
 }
 
 // StopwordsSetSchema defines model for StopwordsSetSchema.
@@ -934,6 +934,11 @@ type StopwordsSetSchema struct {
 type StopwordsSetUpsertSchema struct {
 	Locale    *string  `json:"locale,omitempty"`
 	Stopwords []string `json:"stopwords"`
+}
+
+// StopwordsSetsRetrieveAllSchema defines model for StopwordsSetsRetrieveAllSchema.
+type StopwordsSetsRetrieveAllSchema struct {
+	Stopwords []StopwordsSetSchema `json:"stopwords"`
 }
 
 // SuccessStatus defines model for SuccessStatus.
