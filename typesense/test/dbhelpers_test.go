@@ -278,6 +278,50 @@ func newCollectionAlias(collectionName string, name string) *api.CollectionAlias
 	}
 }
 
+func newPresetFromSearchParametersUpsertSchema() *api.PresetUpsertSchema {
+	preset := &api.PresetUpsertSchema{}
+	preset.Value.FromSearchParameters(api.SearchParameters{
+		Q: "hello",
+	})
+	return preset
+}
+
+func newPresetFromSearchParameters(presetName string) *api.PresetSchema {
+	preset := &api.PresetSchema{
+		Name: presetName,
+	}
+	preset.Value.FromSearchParameters(api.SearchParameters{
+		Q: "hello",
+	})
+	return preset
+}
+
+func newPresetFromMultiSearchSearchesParameterUpsertSchema() *api.PresetUpsertSchema {
+	preset := &api.PresetUpsertSchema{}
+	preset.Value.FromMultiSearchSearchesParameter(api.MultiSearchSearchesParameter{
+		Searches: []api.MultiSearchCollectionParameters{
+			{
+				Collection: "test",
+			},
+		},
+	})
+	return preset
+}
+
+func newPresetFromMultiSearchSearchesParameter(presetName string) *api.PresetSchema {
+	preset := &api.PresetSchema{
+		Name: presetName,
+	}
+	preset.Value.FromMultiSearchSearchesParameter(api.MultiSearchSearchesParameter{
+		Searches: []api.MultiSearchCollectionParameters{
+			{
+				Collection: "test",
+			},
+		},
+	})
+	return preset
+}
+
 func createNewCollection(t *testing.T, namePrefix string) string {
 	t.Helper()
 	collectionName := newUUIDName(namePrefix)
@@ -302,6 +346,21 @@ func createNewKey(t *testing.T) *api.ApiKey {
 
 	require.NoError(t, err)
 	return result
+}
+
+func createNewPreset(t *testing.T, presetValueIsFromSearchParameters ...bool) (string, *api.PresetSchema) {
+	t.Helper()
+	presetName := newUUIDName("preset-test")
+	presetSchema := newPresetFromMultiSearchSearchesParameterUpsertSchema()
+
+	if len(presetValueIsFromSearchParameters) > 0 {
+		presetSchema = newPresetFromSearchParametersUpsertSchema()
+	}
+
+	result, err := typesenseClient.Presets().Upsert(context.Background(), presetName, presetSchema)
+
+	require.NoError(t, err)
+	return presetName, result
 }
 
 func retrieveDocuments(t *testing.T, collectionName string, docIDs ...string) []map[string]interface{} {

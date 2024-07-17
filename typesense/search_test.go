@@ -7,17 +7,17 @@ import (
 	"net/http"
 	"testing"
 
-	"go.uber.org/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/typesense/typesense-go/typesense/api"
 	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"github.com/typesense/typesense-go/typesense/mocks"
+	"go.uber.org/mock/gomock"
 )
 
 func newSearchParams() *api.SearchCollectionParams {
 	return &api.SearchCollectionParams{
-		Q:              "text",
-		QueryBy:        "company_name",
+		Q:              pointer.String("text"),
+		QueryBy:        pointer.String("company_name"),
 		Prefix:         pointer.String("true"),
 		FilterBy:       pointer.String("num_employees:=100"),
 		SortBy:         pointer.String("num_employees:desc"),

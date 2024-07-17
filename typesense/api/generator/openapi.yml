@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Typesense API
   description: "An open source search engine for building delightful search experiences."
-  version: 0.25.0
+  version: '26.0'
 externalDocs:
   description: Find out more about Typsesense
   url: https://typesense.org
@@ -46,7 +46,11 @@ tags:
     externalDocs:
       description: Find out more
       url: https://typesense.org/docs/26.0/api/stopwords.html
-
+  - name: presets
+    description: Store and reference search parameters
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/docs/26.0/api/search.html#presets
 paths:
   /collections:
     get:
@@ -1446,6 +1450,109 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
+  /presets:
+    get:
+      tags:
+        - presets
+      summary: Retrieves all presets.
+      description: Retrieve the details of all presets
+      operationId: retrieveAllPresets
+      responses:
+        200:
+          description: Presets fetched.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresetsRetrieveSchema'
+  /presets/{presetId}:
+    get:
+      tags:
+        - presets
+      summary: Retrieves a preset.
+      description: Retrieve the details of a preset, given it's name.
+      operationId: retrievePreset
+      parameters:
+        - in: path
+          name: presetId
+          description: The ID of the preset to retrieve.
+          schema:
+            type: string
+          required: true
+          example: listing_view
+      responses:
+        200:
+          description: Preset fetched.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresetSchema'
+        404:
+          description: Preset not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    put:
+      tags:
+        - presets
+      summary: Upserts a preset.
+      description: Create or update an existing preset.
+      operationId: upsertPreset
+      parameters:
+        - in: path
+          name: presetId
+          description: The name of the preset set to upsert.
+          schema:
+            type: string
+          required: true
+          example: listing_view
+      requestBody:
+        description: The stopwords set to upsert.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresetUpsertSchema'
+        required: true
+      responses:
+        200:
+          description: Preset successfully upserted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresetSchema'
+        400:
+          description: Bad request, see error message for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    delete:
+      tags:
+        - presets
+      summary: Delete a preset.
+      description: Permanently deletes a preset, given it's name.
+      operationId: deletePreset
+      parameters:
+        - in: path
+          name: presetId
+          description: The ID of the preset to delete.
+          schema:
+            type: string
+          required: true
+          example: listing_view
+      responses:
+        200:
+          description: Preset deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresetDeleteSchema'
+        404:
+          description: Preset not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
 components:
   schemas:
     CollectionSchema:
@@ -1484,7 +1591,7 @@ components:
         token_separators:
           type: array
           description: >
-            List of symbols or special characters to be used for 
+            List of symbols or special characters to be used for
             splitting the text into individual words in addition to space and new-line characters.
           items:
             type: string # characters only
@@ -1848,6 +1955,11 @@ components:
           enum:
             - exact
             - contains
+        tags:
+          type: array
+          description: List of tags.
+          items:
+            type: string
     SearchOverrideInclude:
       type: object
       required:
@@ -2030,7 +2142,7 @@ components:
 
         text_match_type:
           description:
-            In a multi-field matching context, this parameter determines how the representative text match 
+            In a multi-field matching context, this parameter determines how the representative text match
             score of a record is calculated. Possible values are max_score (default) or max_weight.
           type: string
 
@@ -2043,8 +2155,8 @@ components:
 
         infix:
           description:
-            If infix index is enabled for this field, infix searching can be done on a per-field 
-            basis by sending a comma separated string parameter called infix to the search query. 
+            If infix index is enabled for this field, infix searching can be done on a per-field
+            basis by sending a comma separated string parameter called infix to the search query.
             This parameter can have 3 values; `off` infix search is disabled, which is default
              `always` infix search is performed along with regular search
              `fallback` infix search is performed if regular search does not produce results
@@ -2052,17 +2164,17 @@ components:
 
         max_extra_prefix:
           description:
-            There are also 2 parameters that allow you to control the extent of infix searching 
-            max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before 
-            or after the query that can be present in the token. For example query "K2100" has 2 extra 
+            There are also 2 parameters that allow you to control the extent of infix searching
+            max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before
+            or after the query that can be present in the token. For example query "K2100" has 2 extra
             symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
           type: integer
 
         max_extra_suffix:
           description:
-            There are also 2 parameters that allow you to control the extent of infix searching 
-            max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before 
-            or after the query that can be present in the token. For example query "K2100" has 2 extra 
+            There are also 2 parameters that allow you to control the extent of infix searching
+            max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before
+            or after the query that can be present in the token. For example query "K2100" has 2 extra
             symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
           type: integer
 
@@ -2119,7 +2231,7 @@ components:
 
         limit:
           description: >
-            Number of hits to fetch. Can be used as an alternative to the per_page parameter. 
+            Number of hits to fetch. Can be used as an alternative to the per_page parameter.
             Default: 10.
           type: integer
 
@@ -2207,7 +2319,7 @@ components:
             you'd specify `123:1,456:5`.
 
             You could also use the Overrides feature to override search results based
-            on rules. Overrides are applied first, followed by `pinned_hits` and 
+            on rules. Overrides are applied first, followed by `pinned_hits` and
             finally `hidden_hits`.
           type: string
 
@@ -2222,9 +2334,13 @@ components:
             finally `hidden_hits`.
           type: string
 
+        override_tags:
+          description: Comma separated list of tags to trigger the curations rules that match the tags.
+          type: string
+
         highlight_fields:
           description: >
-            A list of custom fields that must be highlighted even if you don't query 
+            A list of custom fields that must be highlighted even if you don't query
             for them
           type: string
 
@@ -2239,7 +2355,7 @@ components:
         pre_segmented_query:
           description: >
             You can index content from any logographic language into Typesense if you
-            are able to segment / split the text into space-separated words yourself 
+            are able to segment / split the text into space-separated words yourself
             before indexing and querying.
 
             Set this parameter to true to do the same
@@ -2285,13 +2401,13 @@ components:
           default: true
         exhaustive_search:
           description: >
-            Setting this to true will make Typesense consider all prefixes and typo 
-            corrections of the words in the query without stopping early when enough results are found 
+            Setting this to true will make Typesense consider all prefixes and typo
+            corrections of the words in the query without stopping early when enough results are found
             (drop_tokens_threshold and typo_tokens_threshold configurations are ignored).
           type: boolean
         search_cutoff_ms:
           description: >
-            Typesense will attempt to return results early if the cutoff time has elapsed. 
+            Typesense will attempt to return results early if the cutoff time has elapsed.
             This is not a strict guarantee and facet computation is not bound by this parameter.
           type: integer
         use_cache:
@@ -2300,17 +2416,17 @@ components:
           type: boolean
         cache_ttl:
           description: >
-            The duration (in seconds) that determines how long the search query is cached. 
+            The duration (in seconds) that determines how long the search query is cached.
             This value can be set on a per-query basis. Default: 60.
           type: integer
         min_len_1typo:
           description: >
-            Minimum word length for 1-typo correction to be applied. 
+            Minimum word length for 1-typo correction to be applied.
             The value of num_typos is still treated as the maximum allowed typos.
           type: integer
         min_len_2typo:
           description: >
-            Minimum word length for 2-typo correction to be applied. 
+            Minimum word length for 2-typo correction to be applied.
             The value of num_typos is still treated as the maximum allowed typos.
           type: integer
         vector_query:
@@ -2327,8 +2443,17 @@ components:
           type: integer
         facet_strategy:
           description: >
-            Choose the underlying faceting strategy used. Comma separated string of allows values: 
+            Choose the underlying faceting strategy used. Comma separated string of allows values:
             exhaustive, top_values or automatic (default).
+          type: string
+        stopwords:
+          description: >
+            Name of the stopwords set to apply for this search,
+            the keywords present in the set will be removed from the search query.
+          type: string
+        facet_return_parent:
+          description: >
+            Comma separated string of nested facet fields whose parent object should be returned in facet response.
           type: string
 
     MultiSearchParameters:
@@ -2369,8 +2494,8 @@ components:
 
         infix:
           description:
-            If infix index is enabled for this field, infix searching can be done on a per-field 
-            basis by sending a comma separated string parameter called infix to the search query. 
+            If infix index is enabled for this field, infix searching can be done on a per-field
+            basis by sending a comma separated string parameter called infix to the search query.
             This parameter can have 3 values; `off` infix search is disabled, which is default
              `always` infix search is performed along with regular search
              `fallback` infix search is performed if regular search does not produce results
@@ -2378,17 +2503,17 @@ components:
 
         max_extra_prefix:
           description:
-            There are also 2 parameters that allow you to control the extent of infix searching 
-            max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before 
-            or after the query that can be present in the token. For example query "K2100" has 2 extra 
+            There are also 2 parameters that allow you to control the extent of infix searching
+            max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before
+            or after the query that can be present in the token. For example query "K2100" has 2 extra
             symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
           type: integer
 
         max_extra_suffix:
           description:
-            There are also 2 parameters that allow you to control the extent of infix searching 
-            max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before 
-            or after the query that can be present in the token. For example query "K2100" has 2 extra 
+            There are also 2 parameters that allow you to control the extent of infix searching
+            max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before
+            or after the query that can be present in the token. For example query "K2100" has 2 extra
             symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
           type: integer
 
@@ -2444,7 +2569,7 @@ components:
 
         limit:
           description: >
-            Number of hits to fetch. Can be used as an alternative to the per_page parameter. 
+            Number of hits to fetch. Can be used as an alternative to the per_page parameter.
             Default: 10.
           type: integer
 
@@ -2525,7 +2650,7 @@ components:
             you'd specify `123:1,456:5`.
 
             You could also use the Overrides feature to override search results based
-            on rules. Overrides are applied first, followed by `pinned_hits` and 
+            on rules. Overrides are applied first, followed by `pinned_hits` and
             finally `hidden_hits`.
           type: string
 
@@ -2540,16 +2665,20 @@ components:
             finally `hidden_hits`.
           type: string
 
+        override_tags:
+          description: Comma separated list of tags to trigger the curations rules that match the tags.
+          type: string
+
         highlight_fields:
           description: >
-            A list of custom fields that must be highlighted even if you don't query 
+            A list of custom fields that must be highlighted even if you don't query
             for them
           type: string
 
         pre_segmented_query:
           description: >
             You can index content from any logographic language into Typesense if you
-            are able to segment / split the text into space-separated words yourself 
+            are able to segment / split the text into space-separated words yourself
             before indexing and querying.
 
             Set this parameter to true to do the same
@@ -2596,13 +2725,13 @@ components:
 
         exhaustive_search:
           description: >
-            Setting this to true will make Typesense consider all prefixes and typo 
-            corrections of the words in the query without stopping early when enough results are found 
+            Setting this to true will make Typesense consider all prefixes and typo
+            corrections of the words in the query without stopping early when enough results are found
             (drop_tokens_threshold and typo_tokens_threshold configurations are ignored).
           type: boolean
         search_cutoff_ms:
           description: >
-            Typesense will attempt to return results early if the cutoff time has elapsed. 
+            Typesense will attempt to return results early if the cutoff time has elapsed.
             This is not a strict guarantee and facet computation is not bound by this parameter.
           type: integer
         use_cache:
@@ -2611,17 +2740,17 @@ components:
           type: boolean
         cache_ttl:
           description: >
-            The duration (in seconds) that determines how long the search query is cached. 
+            The duration (in seconds) that determines how long the search query is cached.
             This value can be set on a per-query basis. Default: 60.
           type: integer
         min_len_1typo:
           description: >
-            Minimum word length for 1-typo correction to be applied. 
+            Minimum word length for 1-typo correction to be applied.
             The value of num_typos is still treated as the maximum allowed typos.
           type: integer
         min_len_2typo:
           description: >
-            Minimum word length for 2-typo correction to be applied. 
+            Minimum word length for 2-typo correction to be applied.
             The value of num_typos is still treated as the maximum allowed typos.
           type: integer
         vector_query:
@@ -2638,8 +2767,17 @@ components:
           type: integer
         facet_strategy:
           description: >
-            Choose the underlying faceting strategy used. Comma separated string of allows values: 
+            Choose the underlying faceting strategy used. Comma separated string of allows values:
             exhaustive, top_values or automatic (default).
+          type: string
+        stopwords:
+          description: >
+            Name of the stopwords set to apply for this search,
+            the keywords present in the set will be removed from the search query.
+          type: string
+        facet_return_parent:
+          description: >
+            Comma separated string of nested facet fields whose parent object should be returned in facet response.
           type: string
     MultiSearchSearchesParameter:
       type: object
@@ -2675,6 +2813,8 @@ components:
                 type: string
               value:
                 type: string
+              parent:
+                type: object
         field_name:
           type: string
         stats:
@@ -2775,6 +2915,40 @@ components:
         - stopwords
       example: |
         {"stopwords": [{"id": "countries", "stopwords": ["Germany", "France", "Italy"], "locale": "en"}]}
+    PresetUpsertSchema:
+      properties:
+        value:
+          oneOf:
+            - $ref: '#/components/schemas/SearchParameters'
+            - $ref: '#/components/schemas/MultiSearchSearchesParameter'
+      required:
+        - value
+    PresetSchema:
+      allOf:
+        - $ref: '#/components/schemas/PresetUpsertSchema'
+        - type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
+    PresetsRetrieveSchema:
+      type: object
+      required:
+        - presets
+      properties:
+        presets:
+          type: array
+          items:
+            $ref: '#/components/schemas/PresetSchema'
+          x-go-type: '[]*PresetSchema'
+    PresetDeleteSchema:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
   securitySchemes:
     api_key_header:
       type: apiKey
