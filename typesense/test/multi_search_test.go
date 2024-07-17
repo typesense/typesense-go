@@ -271,3 +271,72 @@ func TestMultiSearchWithPreset(t *testing.T) {
 		require.Equal(t, *doc.Document, expectedDocs2[i])
 	}
 }
+
+func TestMultiSearchWithStopwords(t *testing.T) {
+	collectionName1 := createNewCollection(t, "companies")
+	collectionName2 := createNewCollection(t, "companies")
+	documents := []interface{}{
+		newDocument("123", withCompanyName("Company 1"), withNumEmployees(50)),
+		newDocument("125", withCompanyName("Company 2"), withNumEmployees(150)),
+		newDocument("127", withCompanyName("Company Stark Industries 3"), withNumEmployees(1000)),
+		newDocument("129", withCompanyName("Stark Industries 4"), withNumEmployees(1500)),
+	}
+
+	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
+	_, err := typesenseClient.Collection(collectionName1).Documents().Import(context.Background(), documents, params)
+	require.NoError(t, err)
+
+	_, err = typesenseClient.Collection(collectionName2).Documents().Import(context.Background(), documents, params)
+	require.NoError(t, err)
+
+	stopwordsSetID := newUUIDName("stopwordsSet-test")
+	upsertData := &api.StopwordsSetUpsertSchema{
+		Locale:    pointer.String("en"),
+		Stopwords: []string{"Stark Industries"},
+	}
+
+	_, err = typesenseClient.Stopwords().Upsert(context.Background(), stopwordsSetID, upsertData)
+	require.NoError(t, err)
+
+	searchParams := &api.MultiSearchParams{
+		QueryBy:   pointer.String("company_name"),
+		Stopwords: pointer.String(stopwordsSetID),
+	}
+
+	searches := api.MultiSearchSearchesParameter{
+		Searches: []api.MultiSearchCollectionParameters{
+			{
+				Q:          pointer.String("Company Stark"),
+				Collection: collectionName1,
+				SortBy:     pointer.String("num_employees:desc"),
+			},
+			{
+				Q:          pointer.String("Stark"),
+				Collection: collectionName2,
+			},
+		},
+	}
+
+	expectedDocs1 := []map[string]interface{}{
+		newDocumentResponse("127", withResponseCompanyName("Company Stark Industries 3"),
+			withResponseNumEmployees(1000)),
+		newDocumentResponse("125", withResponseCompanyName("Company 2"),
+			withResponseNumEmployees(150)),
+		newDocumentResponse("123", withResponseCompanyName("Company 1"),
+			withResponseNumEmployees(50)),
+	}
+
+	result, err := typesenseClient.MultiSearch.Perform(context.Background(), searchParams, searches)
+	require.NoError(t, err)
+
+	require.Equal(t, 2, len(result.Results))
+
+	// Check first result
+	require.Equal(t, len(expectedDocs1), len(*result.Results[0].Hits), "Number of docs in first result did not equal")
+	for i, doc := range *result.Results[0].Hits {
+		require.Equal(t, *doc.Document, expectedDocs1[i])
+	}
+
+	// Check second result
+	require.Equal(t, 0, len(*result.Results[1].Hits), "Number of docs in second result did not equal")
+}
