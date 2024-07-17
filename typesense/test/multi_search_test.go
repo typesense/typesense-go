@@ -27,23 +27,24 @@ func TestMultiSearch(t *testing.T) {
 	_, err := typesenseClient.Collection(collectionName1).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
-	_, err = typesenseClient.Collection(collectionName1).Documents().Import(context.Background(), documents, params)
+	_, err = typesenseClient.Collection(collectionName2).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
 	searchParams := &api.MultiSearchParams{
 		FilterBy: pointer.String("num_employees:>100"),
-		Q:        pointer.String("Company"),
 		QueryBy:  pointer.String("company_name"),
 	}
 
 	searches := api.MultiSearchSearchesParameter{
 		Searches: []api.MultiSearchCollectionParameters{
 			{
+				Q:          pointer.String("Company"),
 				Collection: collectionName1,
 				FilterBy:   pointer.String("num_employees:>100"),
 				SortBy:     pointer.String("num_employees:desc"),
 			},
 			{
+				Q:          pointer.String("Company"),
 				Collection: collectionName1,
 				FilterBy:   pointer.String("num_employees:>1000"),
 			},
@@ -70,6 +71,7 @@ func TestMultiSearch(t *testing.T) {
 	require.Equal(t, 3, len(result.Results))
 
 	// Check first result
+	require.Equal(t, len(expectedDocs1), len(*result.Results[0].Hits), "Number of docs in first result did not equal")
 	for i, doc := range *result.Results[0].Hits {
 		require.Equal(t, *doc.Document, expectedDocs1[i])
 	}
@@ -78,6 +80,7 @@ func TestMultiSearch(t *testing.T) {
 	require.Equal(t, 0, len(*result.Results[1].Hits))
 
 	// Check third result
+	require.Equal(t, len(expectedDocs2), len(*result.Results[2].Hits), "Number of docs in third result did not equal")
 	for i, doc := range *result.Results[2].Hits {
 		require.Equal(t, *doc.Document, expectedDocs2[i])
 	}
@@ -208,17 +211,19 @@ func TestMultiSearchWithPreset(t *testing.T) {
 	_, err := typesenseClient.Collection(collectionName1).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
-	_, err = typesenseClient.Collection(collectionName1).Documents().Import(context.Background(), documents, params)
+	_, err = typesenseClient.Collection(collectionName2).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
 	searches := api.MultiSearchSearchesParameter{
 		Searches: []api.MultiSearchCollectionParameters{
 			{
+				Q:          pointer.String("Company"),
 				Collection: collectionName1,
 				FilterBy:   pointer.String("num_employees:>100"),
 				SortBy:     pointer.String("num_employees:desc"),
 			},
 			{
+				Q:          pointer.String("Company"),
 				Collection: collectionName1,
 				FilterBy:   pointer.String("num_employees:>1000"),
 			},
@@ -239,7 +244,6 @@ func TestMultiSearchWithPreset(t *testing.T) {
 
 	searchParams := &api.MultiSearchParams{
 		FilterBy: pointer.String("num_employees:>100"),
-		Q:        pointer.String("Company"),
 		QueryBy:  pointer.String("company_name"),
 		Preset:   &presetName,
 	}
@@ -259,6 +263,7 @@ func TestMultiSearchWithPreset(t *testing.T) {
 	require.Equal(t, 3, len(result.Results))
 
 	// Check first result
+	require.Equal(t, len(expectedDocs1), len(*result.Results[0].Hits), "Number of docs in first result did not equal")
 	for i, doc := range *result.Results[0].Hits {
 		require.Equal(t, *doc.Document, expectedDocs1[i])
 	}
@@ -267,6 +272,7 @@ func TestMultiSearchWithPreset(t *testing.T) {
 	require.Equal(t, 0, len(*result.Results[1].Hits))
 
 	// Check third result
+	require.Equal(t, len(expectedDocs2), len(*result.Results[2].Hits), "Number of docs in third result did not equal")
 	for i, doc := range *result.Results[2].Hits {
 		require.Equal(t, *doc.Document, expectedDocs2[i])
 	}
