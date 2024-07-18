@@ -9,11 +9,11 @@ import (
 	"strings"
 	"testing"
 
-	"go.uber.org/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"github.com/typesense/typesense-go/typesense/api"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
-	"github.com/typesense/typesense-go/typesense/mocks"
+	"github.com/typesense/typesense-go/v2/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense/api/pointer"
+	"github.com/typesense/typesense-go/v2/typesense/mocks"
+	"go.uber.org/mock/gomock"
 )
 
 func createNewDocument(docIDs ...string) interface{} {

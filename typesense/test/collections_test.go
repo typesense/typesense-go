@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/typesense/typesense-go/typesense/api"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
+	"github.com/typesense/typesense-go/v2/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense/api/pointer"
 )
 
 func TestCollectionCreate(t *testing.T) {

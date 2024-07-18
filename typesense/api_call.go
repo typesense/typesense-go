@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/typesense/typesense-go/typesense/api/circuit"
+	"github.com/typesense/typesense-go/v2/typesense/api/circuit"
 )
 
 type ApiCall struct {
