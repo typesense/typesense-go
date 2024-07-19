@@ -8,10 +8,10 @@ import (
 
 	"github.com/typesense/typesense-go/typesense/api/pointer"
 
-	"go.uber.org/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/typesense/typesense-go/typesense/api"
 	"github.com/typesense/typesense-go/typesense/mocks"
+	"go.uber.org/mock/gomock"
 )
 
 func TestSearchOverrideRetrieve(t *testing.T) {

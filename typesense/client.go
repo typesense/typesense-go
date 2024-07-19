@@ -114,16 +114,16 @@ func WithServer(serverURL string) ClientOption {
 }
 
 // WithNearestNode sets the Load Balanced endpoint.
-func WithNearestNode(URL string) ClientOption {
+func WithNearestNode(nodeURL string) ClientOption {
 	return func(c *Client) {
-		c.apiConfig.NearestNode = URL
+		c.apiConfig.NearestNode = nodeURL
 	}
 }
 
 // WithNodes sets multiple hostnames to load balance reads & writes across all nodes.
-func WithNodes(URLs []string) ClientOption {
+func WithNodes(nodeURLs []string) ClientOption {
 	return func(c *Client) {
-		c.apiConfig.Nodes = URLs
+		c.apiConfig.Nodes = nodeURLs
 	}
 }
 
@@ -270,7 +270,7 @@ func NewClient(opts ...ClientOption) *Client {
 		)
 		httpClient := circuit.NewHTTPClient(
 			circuit.WithHTTPRequestDoer(
-				NewApiCall(
+				NewAPICall(
 					&http.Client{
 						Timeout: c.apiConfig.ConnectionTimeout,
 					},

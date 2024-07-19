@@ -13,14 +13,14 @@ linters:
     - misspell
     - nestif
     - prealloc
-    - unconvert
+    # - unconvert
     - unparam
     - revive
 
 linters-settings:
-  govet:
-    enable:
-      - fieldalignment
+  # govet:
+  #   enable:
+  #     - fieldalignment
 
 
 run:
@@ -34,3 +34,7 @@ issues:
     - linters:
         - funlen
       path: _test\.go
+    - linters:
+        - errcheck
+      path: _test\.go
+

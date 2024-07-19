@@ -25,7 +25,7 @@ type MapKV struct {
 }
 
 func sortedSlice(params map[string]interface{}) []MapKV {
-	var kvs []MapKV
+	kvs := []MapKV{}
 
 	for k, v := range params {
 		kvs = append(kvs, MapKV{k, v})
