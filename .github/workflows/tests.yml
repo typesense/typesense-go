@@ -1,6 +1,12 @@
-name: tests
+name: Test
 
-on: [push, pull_request]
+on:
+  push:
+    paths-ignore:
+      - '**/*.md'
+  pull_request:
+    paths-ignore:
+      - '**/*.md'
 
 jobs:
   lint:
@@ -10,10 +16,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21.x'
-
-      - name: Install dependencies
-        run: go mod download
+          go-version: 'stable'
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
@@ -44,7 +47,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21.x'
+          go-version: 'stable'
 
       - name: Install dependencies
         run: go mod download
@@ -56,12 +59,5 @@ jobs:
         env:
           TYPESENSE_URL: 'http://localhost:8108'
           TYPESENSE_API_KEY: 'test_key'
-        run: |
-          mkdir -p /tmp/test-reports
-          go run gotest.tools/gotestsum@latest --junitfile /tmp/test-reports/unit-tests.xml -- -tags=integration ./...
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: test-reports
-          path: /tmp/test-reports/
-          retention-days: 1
+          CGO_ENABLED: 1
+        run: go run gotest.tools/gotestsum@latest --format github-actions -- -tags=integration ./... -race -shuffle=on
