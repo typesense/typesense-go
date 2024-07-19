@@ -9,16 +9,19 @@ linters:
     - gocyclo
     - gofmt
     - goimports
-    - golint
     - gosec
-    - maligned
     - misspell
     - nestif
     - prealloc
     - unconvert
     - unparam
-  disable:
-    - structcheck
+    - revive
+
+linters-settings:
+  govet:
+    enable:
+      - fieldalignment
+
 
 run:
   timeout: 3m

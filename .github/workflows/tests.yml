@@ -9,25 +9,6 @@ on:
       - '**/*.md'
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: 'stable'
-
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: v1.59
-
-      - name: Install revive
-        run: cd / && go get -u github.com/mgechev/revive@v1.3.7 && cd -
-      - name: revive
-        run: revive -config .revive.toml -formatter friendly ./...
-
   test:
     runs-on: ubuntu-latest
     services:
@@ -42,8 +23,10 @@ jobs:
           TYPESENSE_API_KEY: 'test_key'
           TYPESENSE_ENABLE_CORS: true
           TYPESENSE_URL: 'http://localhost:8108'
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
