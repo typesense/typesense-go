@@ -11,7 +11,7 @@ Go client for the Typesense API: https://github.com/typesense/typesense
 ## Installation
 
 ```
-go get github.com/typesense/typesense-go/v2
+go get github.com/typesense/typesense-go/v2/typesense
 ```
 
 ## Usage
