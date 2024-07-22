@@ -1,3 +1,4 @@
+//go:build integration && docker
 // +build integration,docker
 
 package test
@@ -12,8 +13,8 @@ import (
 
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
-	"github.com/typesense/typesense-go/typesense"
-	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense"
+	"github.com/typesense/typesense-go/v2/typesense/api"
 )
 
 var typesenseC testcontainers.Container

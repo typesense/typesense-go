@@ -3,7 +3,7 @@ package typesense
 import (
 	"context"
 
-	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense/api"
 )
 
 // SynonymInterface is a type for Search Synonym API operations

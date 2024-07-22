@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense/api"
 )
 
 func TestPresetsRetrieveAsSearchParameters(t *testing.T) {

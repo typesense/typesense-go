@@ -3,7 +3,7 @@ package typesense
 import (
 	"context"
 
-	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense/api"
 )
 
 type OperationsInterface interface {
