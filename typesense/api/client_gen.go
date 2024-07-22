@@ -222,6 +222,9 @@ type ClientInterface interface {
 	// GetKey request
 	GetKey(ctx context.Context, keyId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// RetrieveMetrics request
+	RetrieveMetrics(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// MultiSearchWithBody request with any body
 	MultiSearchWithBody(ctx context.Context, params *MultiSearchParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -831,6 +834,18 @@ func (c *Client) DeleteKey(ctx context.Context, keyId int64, reqEditors ...Reque
 
 func (c *Client) GetKey(ctx context.Context, keyId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetKeyRequest(c.Server, keyId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RetrieveMetrics(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrieveMetricsRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -3516,6 +3531,33 @@ func NewGetKeyRequest(server string, keyId int64) (*http.Request, error) {
 	return req, nil
 }
 
+// NewRetrieveMetricsRequest generates requests for RetrieveMetrics
+func NewRetrieveMetricsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/metrics.json")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewMultiSearchRequest calls the generic MultiSearch builder with application/json body
 func NewMultiSearchRequest(server string, params *MultiSearchParams, body MultiSearchJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -5001,6 +5043,9 @@ type ClientWithResponsesInterface interface {
 	// GetKeyWithResponse request
 	GetKeyWithResponse(ctx context.Context, keyId int64, reqEditors ...RequestEditorFn) (*GetKeyResponse, error)
 
+	// RetrieveMetricsWithResponse request
+	RetrieveMetricsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveMetricsResponse, error)
+
 	// MultiSearchWithBodyWithResponse request with any body
 	MultiSearchWithBodyWithResponse(ctx context.Context, params *MultiSearchParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*MultiSearchResponse, error)
 
@@ -5900,6 +5945,28 @@ func (r GetKeyResponse) StatusCode() int {
 	return 0
 }
 
+type RetrieveMetricsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *map[string]interface{}
+}
+
+// Status returns HTTPResponse.Status
+func (r RetrieveMetricsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetrieveMetricsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type MultiSearchResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -6592,6 +6659,15 @@ func (c *ClientWithResponses) GetKeyWithResponse(ctx context.Context, keyId int6
 		return nil, err
 	}
 	return ParseGetKeyResponse(rsp)
+}
+
+// RetrieveMetricsWithResponse request returning *RetrieveMetricsResponse
+func (c *ClientWithResponses) RetrieveMetricsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveMetricsResponse, error) {
+	rsp, err := c.RetrieveMetrics(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetrieveMetricsResponse(rsp)
 }
 
 // MultiSearchWithBodyWithResponse request with arbitrary body returning *MultiSearchResponse
@@ -7934,6 +8010,32 @@ func ParseGetKeyResponse(rsp *http.Response) (*GetKeyResponse, error) {
 			return nil, err
 		}
 		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetrieveMetricsResponse parses an HTTP response from a RetrieveMetricsWithResponse call
+func ParseRetrieveMetricsResponse(rsp *http.Response) (*RetrieveMetricsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetrieveMetricsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]interface{}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
 
 	}
 

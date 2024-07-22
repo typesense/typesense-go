@@ -40,12 +40,7 @@ tags:
     description: Manage Typesense cluster
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/0.23.0/api/#cluster-operations
-  - name: stats
-    description: Get stats about API endpoints.
-    externalDocs:
-      description: Find out more
-      url: https://typesense.org/docs/26.0/api/cluster-operations.html#api-stats
+      url: https://typesense.org/docs/26.0/api/cluster-operations.html
   - name: stopwords
     description: Manage stopwords sets
     externalDocs:
@@ -1341,10 +1336,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
+  /metrics.json:
+    get:
+      tags:
+        - operations
+      summary: Get current RAM, CPU, Disk & Network usage metrics.
+      description:
+        Retrieve the metrics.
+      operationId: retrieveMetrics
+      responses:
+        200:
+          description: Metrics fetched.
+          content:
+            application/json:
+              schema:
+                type: object
   /stats.json:
     get:
       tags:
-        - stats
+        - operations
       summary: Get stats about API endpoints.
       description:
         Retrieve the stats about API endpoints.
@@ -2900,41 +2910,43 @@ components:
       properties:
         delete_latency_ms:
           type: number
-          format: float
+          format: double
         delete_requests_per_second:
           type: number
-          format: float
+          format: double
         import_latency_ms:
           type: number
-          format: float
+          format: double
         import_requests_per_second:
           type: number
-          format: float
+          format: double
         latency_ms:
           type: object
+          x-go-type: "map[string]float64"
         overloaded_requests_per_second:
           type: number
-          format: float
+          format: double
         pending_write_batches:
           type: number
-          format: float
+          format: double
         requests_per_second:
           type: object
+          x-go-type: "map[string]float64"
         search_latency_ms:
           type: number
-          format: float
+          format: double
         search_requests_per_second:
           type: number
-          format: float
+          format: double
         total_requests_per_second:
           type: number
-          format: float
+          format: double
         write_latency_ms:
           type: number
-          format: float
+          format: double
         write_requests_per_second:
           type: number
-          format: float
+          format: double
     StopwordsSetUpsertSchema:
       type: object
       properties:

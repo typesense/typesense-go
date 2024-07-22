@@ -12,23 +12,23 @@ import (
 
 func TestStatsRetrieve(t *testing.T) {
 	expectedData := &api.APIStatsResponse{
-		DeleteLatencyMs:         pointer.Float32(10.5),
-		DeleteRequestsPerSecond: pointer.Float32(5.0),
-		ImportLatencyMs:         pointer.Float32(9.5),
-		ImportRequestsPerSecond: pointer.Float32(9.5),
-		LatencyMs: &map[string]interface{}{
-			"GET /stats.json": 0.0,
+		DeleteLatencyMs:         pointer.Float64(10.5),
+		DeleteRequestsPerSecond: pointer.Float64(5.0),
+		ImportLatencyMs:         pointer.Float64(3.7142857142857144),
+		ImportRequestsPerSecond: pointer.Float64(9.5),
+		LatencyMs: &map[string]float64{
+			"GET /stats.json": *pointer.Float64(32.5),
 		},
-		OverloadedRequestsPerSecond: pointer.Float32(9.5),
-		PendingWriteBatches:         pointer.Float32(9.5),
-		RequestsPerSecond: &map[string]interface{}{
-			"GET /stats.json": pointer.Float32(3.3),
+		OverloadedRequestsPerSecond: pointer.Float64(9.5),
+		PendingWriteBatches:         pointer.Float64(9.5),
+		RequestsPerSecond: &map[string]float64{
+			"GET /stats.json": *pointer.Float64(0.1111111111111111),
 		},
-		SearchLatencyMs:         pointer.Float32(9.5),
-		SearchRequestsPerSecond: pointer.Float32(9.5),
-		TotalRequestsPerSecond:  pointer.Float32(3.3),
-		WriteLatencyMs:          pointer.Float32(9.5),
-		WriteRequestsPerSecond:  pointer.Float32(9.5),
+		SearchLatencyMs:         pointer.Float64(9.5),
+		SearchRequestsPerSecond: pointer.Float64(9.5),
+		TotalRequestsPerSecond:  pointer.Float64(3.3),
+		WriteLatencyMs:          pointer.Float64(9.5),
+		WriteRequestsPerSecond:  pointer.Float64(9.5),
 	}
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {

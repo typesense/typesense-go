@@ -3,41 +3,43 @@ components:
     APIStatsResponse:
       properties:
         delete_latency_ms:
-          format: float
+          format: double
           type: number
         delete_requests_per_second:
-          format: float
+          format: double
           type: number
         import_latency_ms:
-          format: float
+          format: double
           type: number
         import_requests_per_second:
-          format: float
+          format: double
           type: number
         latency_ms:
           type: object
+          x-go-type: map[string]float64
         overloaded_requests_per_second:
-          format: float
+          format: double
           type: number
         pending_write_batches:
-          format: float
+          format: double
           type: number
         requests_per_second:
           type: object
+          x-go-type: map[string]float64
         search_latency_ms:
-          format: float
+          format: double
           type: number
         search_requests_per_second:
-          format: float
+          format: double
           type: number
         total_requests_per_second:
-          format: float
+          format: double
           type: number
         write_latency_ms:
-          format: float
+          format: double
           type: number
         write_requests_per_second:
-          format: float
+          format: double
           type: number
       type: object
     AnalyticsRuleParameters:
@@ -2553,6 +2555,20 @@ paths:
       summary: Retrieve (metadata about) a key
       tags:
         - keys
+  /metrics.json:
+    get:
+      description: Retrieve the metrics.
+      operationId: retrieveMetrics
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+          description: Metrics fetched.
+      summary: Get current RAM, CPU, Disk & Network usage metrics.
+      tags:
+        - operations
   /multi_search:
     post:
       description: This is especially useful to avoid round-trip network latencies incurred otherwise if each of these requests are sent in separate HTTP requests. You can also use this feature to do a federated search across multiple collections in a single HTTP request.
@@ -2950,7 +2966,7 @@ paths:
           description: Stats fetched.
       summary: Get stats about API endpoints.
       tags:
-        - stats
+        - operations
   /stopwords:
     get:
       description: Retrieve the details of all stopwords sets
@@ -3094,13 +3110,8 @@ tags:
   - description: Manage Typesense cluster
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/0.23.0/api/#cluster-operations
+      url: https://typesense.org/docs/26.0/api/cluster-operations.html
     name: operations
-  - description: Get stats about API endpoints.
-    externalDocs:
-      description: Find out more
-      url: https://typesense.org/docs/26.0/api/cluster-operations.html#api-stats
-    name: stats
   - description: Manage stopwords sets
     externalDocs:
       description: Find out more

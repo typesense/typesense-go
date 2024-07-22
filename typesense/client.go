@@ -76,6 +76,10 @@ func (c *Client) Stats() StatsInterface {
 	return &stats{apiClient: c.apiClient}
 }
 
+func (c *Client) Metrics() MetricsInterface {
+	return &metrics{apiClient: c.apiClient}
+}
+
 type HTTPError struct {
 	Status int
 	Body   []byte
