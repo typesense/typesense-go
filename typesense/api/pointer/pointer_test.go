@@ -20,9 +20,8 @@ func TestPointerValues(t *testing.T) {
 	assert.NotNil(t, Float32(9.5))
 	assert.Equal(t, expectedFloat32, *Float32(9.5))
 
-	var expectedFloat64 float64 = 9.5
 	assert.NotNil(t, Float64(9.5))
-	assert.Equal(t, expectedFloat64, *Float64(9.5))
+	assert.Equal(t, 9.5, *Float64(9.5))
 
 	v := struct{ field string }{field: "abc"}
 	assert.NotNil(t, Interface(v))

@@ -8,7 +8,7 @@ import (
 
 type StopwordsInterface interface {
 	Retrieve(ctx context.Context) ([]api.StopwordsSetSchema, error)
-	Upsert(ctx context.Context, stopwordsSetId string, stopwordssetUpsertSchema *api.StopwordsSetUpsertSchema) (*api.StopwordsSetSchema, error)
+	Upsert(ctx context.Context, stopwordsSetId string, stopwordsSetUpsertSchema *api.StopwordsSetUpsertSchema) (*api.StopwordsSetSchema, error)
 }
 
 type stopwords struct {
@@ -26,8 +26,8 @@ func (s *stopwords) Retrieve(ctx context.Context) ([]api.StopwordsSetSchema, err
 	return response.JSON200.Stopwords, nil
 }
 
-func (s *stopwords) Upsert(ctx context.Context, stopwordsSetId string, stopwordssetUpsertSchema *api.StopwordsSetUpsertSchema) (*api.StopwordsSetSchema, error) {
-	response, err := s.apiClient.UpsertStopwordsSetWithResponse(ctx, stopwordsSetId, *stopwordssetUpsertSchema)
+func (s *stopwords) Upsert(ctx context.Context, stopwordsSetId string, stopwordsSetUpsertSchema *api.StopwordsSetUpsertSchema) (*api.StopwordsSetSchema, error) {
+	response, err := s.apiClient.UpsertStopwordsSetWithResponse(ctx, stopwordsSetId, *stopwordsSetUpsertSchema)
 	if err != nil {
 		return nil, err
 	}
