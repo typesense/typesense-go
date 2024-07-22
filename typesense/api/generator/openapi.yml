@@ -41,6 +41,11 @@ tags:
     externalDocs:
       description: Find out more
       url: https://typesense.org/docs/0.23.0/api/#cluster-operations
+  - name: stats
+    description: Get stats about API endpoints.
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/docs/26.0/api/cluster-operations.html#api-stats
   - name: stopwords
     description: Manage stopwords sets
     externalDocs:
@@ -1336,6 +1341,21 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
+  /stats.json:
+    get:
+      tags:
+        - stats
+      summary: Get stats about API endpoints.
+      description:
+        Retrieve the stats about API endpoints.
+      operationId: retrieveAPIStats
+      responses:
+        200:
+          description: Stats fetched.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/APIStatsResponse"
   /stopwords:
     get:
       tags:
@@ -2875,6 +2895,46 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AnalyticsRuleSchema"
+    APIStatsResponse:
+      type: object
+      properties:
+        delete_latency_ms:
+          type: number
+          format: float
+        delete_requests_per_second:
+          type: number
+          format: float
+        import_latency_ms:
+          type: number
+          format: float
+        import_requests_per_second:
+          type: number
+          format: float
+        latency_ms:
+          type: object
+        overloaded_requests_per_second:
+          type: number
+          format: float
+        pending_write_batches:
+          type: number
+          format: float
+        requests_per_second:
+          type: object
+        search_latency_ms:
+          type: number
+          format: float
+        search_requests_per_second:
+          type: number
+          format: float
+        total_requests_per_second:
+          type: number
+          format: float
+        write_latency_ms:
+          type: number
+          format: float
+        write_requests_per_second:
+          type: number
+          format: float
     StopwordsSetUpsertSchema:
       type: object
       properties:

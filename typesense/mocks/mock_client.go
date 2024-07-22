@@ -1442,6 +1442,46 @@ func (mr *MockAPIClientInterfaceMockRecorder) MultiSearchWithResponse(ctx, param
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MultiSearchWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).MultiSearchWithResponse), varargs...)
 }
 
+// RetrieveAPIStats mocks base method.
+func (m *MockAPIClientInterface) RetrieveAPIStats(ctx context.Context, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveAPIStats", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveAPIStats indicates an expected call of RetrieveAPIStats.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAPIStats(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveAPIStats", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveAPIStats), varargs...)
+}
+
+// RetrieveAPIStatsWithResponse mocks base method.
+func (m *MockAPIClientInterface) RetrieveAPIStatsWithResponse(ctx context.Context, reqEditors ...api.RequestEditorFn) (*api.RetrieveAPIStatsResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveAPIStatsWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.RetrieveAPIStatsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveAPIStatsWithResponse indicates an expected call of RetrieveAPIStatsWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAPIStatsWithResponse(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveAPIStatsWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveAPIStatsWithResponse), varargs...)
+}
+
 // RetrieveAllPresets mocks base method.
 func (m *MockAPIClientInterface) RetrieveAllPresets(ctx context.Context, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()

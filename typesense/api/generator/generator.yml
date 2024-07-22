@@ -1,5 +1,45 @@
 components:
   schemas:
+    APIStatsResponse:
+      properties:
+        delete_latency_ms:
+          format: float
+          type: number
+        delete_requests_per_second:
+          format: float
+          type: number
+        import_latency_ms:
+          format: float
+          type: number
+        import_requests_per_second:
+          format: float
+          type: number
+        latency_ms:
+          type: object
+        overloaded_requests_per_second:
+          format: float
+          type: number
+        pending_write_batches:
+          format: float
+          type: number
+        requests_per_second:
+          type: object
+        search_latency_ms:
+          format: float
+          type: number
+        search_requests_per_second:
+          format: float
+          type: number
+        total_requests_per_second:
+          format: float
+          type: number
+        write_latency_ms:
+          format: float
+          type: number
+        write_requests_per_second:
+          format: float
+          type: number
+      type: object
     AnalyticsRuleParameters:
       properties:
         destination:
@@ -2897,6 +2937,20 @@ paths:
       summary: Upserts a preset.
       tags:
         - presets
+  /stats.json:
+    get:
+      description: Retrieve the stats about API endpoints.
+      operationId: retrieveAPIStats
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIStatsResponse'
+          description: Stats fetched.
+      summary: Get stats about API endpoints.
+      tags:
+        - stats
   /stopwords:
     get:
       description: Retrieve the details of all stopwords sets
@@ -3042,6 +3096,11 @@ tags:
       description: Find out more
       url: https://typesense.org/docs/0.23.0/api/#cluster-operations
     name: operations
+  - description: Get stats about API endpoints.
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/docs/26.0/api/cluster-operations.html#api-stats
+    name: stats
   - description: Manage stopwords sets
     externalDocs:
       description: Find out more
