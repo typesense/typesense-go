@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package test
@@ -7,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/typesense/typesense-go/typesense"
+	"github.com/typesense/typesense-go/v2/typesense"
 )
 
 var typesenseClient *typesense.Client

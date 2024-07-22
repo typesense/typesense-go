@@ -34,7 +34,7 @@ func TestGoBreakerSettingsOptions(t *testing.T) {
 		return counts.Requests > 10 &&
 			(float64(counts.TotalFailures)/float64(counts.Requests)) > 0.4
 	}
-	onStateChange := func(name string, from gobreaker.State, to gobreaker.State) {}
+	onStateChange := func(_ string, _ gobreaker.State, _ gobreaker.State) {}
 	tests := []struct {
 		name    string
 		options []GoBreakerOption

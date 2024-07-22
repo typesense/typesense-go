@@ -7,8 +7,8 @@ import (
 
 	"github.com/sony/gobreaker"
 	"github.com/stretchr/testify/assert"
-	"github.com/typesense/typesense-go/typesense/api"
-	"github.com/typesense/typesense-go/typesense/api/circuit"
+	"github.com/typesense/typesense-go/v2/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense/api/circuit"
 )
 
 func TestHttpError(t *testing.T) {
@@ -31,7 +31,7 @@ func TestClientConfigOptions(t *testing.T) {
 		return counts.Requests > 10 &&
 			(float64(counts.TotalFailures)/float64(counts.Requests)) > 0.4
 	}
-	onStateChange := func(name string, from gobreaker.State, to gobreaker.State) {}
+	onStateChange := func(_ string, _ gobreaker.State, _ gobreaker.State) {}
 	tests := []struct {
 		name    string
 		options []ClientOption

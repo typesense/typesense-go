@@ -5,10 +5,10 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/typesense/typesense-go/typesense/api/circuit"
+	"github.com/typesense/typesense-go/v2/typesense/api/circuit"
 )
 
-type ApiCall struct {
+type APICall struct {
 	client               circuit.HTTPRequestDoer
 	nearestNode          *Node
 	nodes                []Node
@@ -32,10 +32,10 @@ const (
 	UNHEALTHY = false
 )
 
-type ApiCallOption func(*ApiCall)
+type APICallOption func(*APICall)
 
-func NewApiCall(client circuit.HTTPRequestDoer, config *ClientConfig) *ApiCall {
-	apiCall := &ApiCall{
+func NewAPICall(client circuit.HTTPRequestDoer, config *ClientConfig) *APICall {
+	apiCall := &APICall{
 		currentNodeIndex:     -1,
 		healthcheckInterval:  config.HealthcheckInterval,
 		client:               client,
@@ -56,7 +56,7 @@ func NewApiCall(client circuit.HTTPRequestDoer, config *ClientConfig) *ApiCall {
 	return apiCall
 }
 
-func (a *ApiCall) Do(req *http.Request) (*http.Response, error) {
+func (a *APICall) Do(req *http.Request) (*http.Response, error) {
 	// Default is to not load balance for backward compatibility
 	if len(a.nodes) == 0 {
 		res, err := a.client.Do(req)
@@ -73,7 +73,7 @@ func (a *ApiCall) Do(req *http.Request) (*http.Response, error) {
 
 		response, err := a.client.Do(req)
 
-		// If conection timeouts or status 5xx, retry
+		// If connection timeouts or status 5xx, retry with the next node
 		if err != nil || response.StatusCode >= 500 {
 			lastResponse = response
 			lastError = err
@@ -92,7 +92,7 @@ func (a *ApiCall) Do(req *http.Request) (*http.Response, error) {
 	return lastResponse, lastError
 }
 
-func (a *ApiCall) getNextNode() *Node {
+func (a *APICall) getNextNode() *Node {
 	if a.nearestNode != nil && (a.nearestNode.isHealthy || a.nodeDueForHealthcheck(a.nearestNode)) {
 		return a.nearestNode
 	}
@@ -110,7 +110,7 @@ func (a *ApiCall) getNextNode() *Node {
 	return candidateNode
 }
 
-func (a *ApiCall) initializeNodesMetadata(config *ClientConfig) {
+func (a *APICall) initializeNodesMetadata(config *ClientConfig) {
 	if config.NearestNode != "" {
 		a.nearestNode = &Node{index: "nearestNode", url: config.NearestNode}
 		setNodeHealthCheck(a.nearestNode, HEALTHY)
@@ -121,8 +121,8 @@ func (a *ApiCall) initializeNodesMetadata(config *ClientConfig) {
 	}
 }
 
-func replaceRequestHostname(req *http.Request, URL string) {
-	newURL, _ := url.Parse(URL)
+func replaceRequestHostname(req *http.Request, urlToReplace string) {
+	newURL, _ := url.Parse(urlToReplace)
 
 	req.URL.Scheme = newURL.Scheme
 	req.URL.Host = newURL.Host
@@ -134,6 +134,6 @@ func setNodeHealthCheck(node *Node, isHealthy bool) {
 	node.lastAccessTimestamp = apiCallTimeNow().UnixMilli()
 }
 
-func (a *ApiCall) nodeDueForHealthcheck(node *Node) bool {
+func (a *APICall) nodeDueForHealthcheck(node *Node) bool {
 	return apiCallTimeNow().UnixMilli()-node.lastAccessTimestamp > a.healthcheckInterval.Milliseconds()
 }

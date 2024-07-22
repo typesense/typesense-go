@@ -5,7 +5,7 @@ package circuit
 import (
 	"net/http"
 
-	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense/api"
 )
 
 type HTTPRequestDoer interface {
