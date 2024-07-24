@@ -1,6 +1,8 @@
 package typesense
 
 import (
+	"context"
+	"errors"
 	"net/http"
 	"net/url"
 	"time"
@@ -72,6 +74,11 @@ func (a *APICall) Do(req *http.Request) (*http.Response, error) {
 		replaceRequestHostname(req, node.url)
 
 		response, err := a.client.Do(req)
+
+		// return early if request is aborted
+		if errors.Is(err, context.Canceled) {
+			return nil, err
+		}
 
 		// If connection timeouts or status 5xx, retry with the next node
 		if err != nil || response.StatusCode >= 500 {
