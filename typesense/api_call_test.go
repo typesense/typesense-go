@@ -1,6 +1,7 @@
 package typesense
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -31,6 +32,10 @@ func newAPICall(apiConfig *ClientConfig) *APICall {
 	)
 }
 
+func appendHistory(history *[]string, r *http.Request) {
+	*history = append(*history, "http://"+r.Host)
+}
+
 func instantiateServers(handlers []serverHandler) ([]*httptest.Server, []string) {
 	servers := make([]*httptest.Server, 0, len(handlers))
 	serverURLs := make([]string, 0, len(handlers))
@@ -55,11 +60,11 @@ func TestApiCallDoesNotRetryWhenStatusCodeIs3xxOr4xx(t *testing.T) {
 
 	servers, serverURLs := instantiateServers([]serverHandler{
 		func(w http.ResponseWriter, r *http.Request) {
-			requestURLHistory = append(requestURLHistory, "http://"+r.Host)
+			appendHistory(&requestURLHistory, r)
 			w.WriteHeader(301)
 		},
 		func(w http.ResponseWriter, r *http.Request) {
-			requestURLHistory = append(requestURLHistory, "http://"+r.Host)
+			appendHistory(&requestURLHistory, r)
 			w.WriteHeader(409)
 		},
 	})
@@ -113,13 +118,13 @@ func TestApiCallSelectNextNodeWhenTimeOut(t *testing.T) {
 
 	servers, serverURLs := instantiateServers([]serverHandler{
 		func(_ http.ResponseWriter, r *http.Request) {
-			requestURLHistory = append(requestURLHistory, "http://"+r.Host)
+			appendHistory(&requestURLHistory, r)
 		},
 		func(_ http.ResponseWriter, r *http.Request) {
-			requestURLHistory = append(requestURLHistory, "http://"+r.Host)
+			appendHistory(&requestURLHistory, r)
 		},
 		func(_ http.ResponseWriter, r *http.Request) {
-			requestURLHistory = append(requestURLHistory, "http://"+r.Host)
+			appendHistory(&requestURLHistory, r)
 		},
 	})
 	for _, server := range servers {
@@ -147,7 +152,7 @@ func TestApiCallRemoveAndAddUnhealthyNodeIntoRotation(t *testing.T) {
 
 	servers, serverURLs := instantiateServers([]serverHandler{
 		func(w http.ResponseWriter, r *http.Request) {
-			requestURLHistory = append(requestURLHistory, "http://"+r.Host)
+			appendHistory(&requestURLHistory, r)
 			if count > 1 {
 				// will response successful code after 2 failed request
 				w.WriteHeader(201)
@@ -157,11 +162,11 @@ func TestApiCallRemoveAndAddUnhealthyNodeIntoRotation(t *testing.T) {
 			}
 		},
 		func(w http.ResponseWriter, r *http.Request) {
-			requestURLHistory = append(requestURLHistory, "http://"+r.Host)
+			appendHistory(&requestURLHistory, r)
 			w.WriteHeader(501)
 		},
 		func(w http.ResponseWriter, r *http.Request) {
-			requestURLHistory = append(requestURLHistory, "http://"+r.Host)
+			appendHistory(&requestURLHistory, r)
 			w.WriteHeader(202)
 		},
 	})
@@ -221,7 +226,7 @@ func TestApiCallWithNearestNode(t *testing.T) {
 
 	servers, serverURLs := instantiateServers([]serverHandler{
 		func(w http.ResponseWriter, r *http.Request) {
-			requestURLHistory = append(requestURLHistory, "http://"+r.Host)
+			appendHistory(&requestURLHistory, r)
 			if count > 1 {
 				// will response successful code after 2 failed request
 				w.WriteHeader(201)
@@ -231,15 +236,15 @@ func TestApiCallWithNearestNode(t *testing.T) {
 			}
 		},
 		func(w http.ResponseWriter, r *http.Request) {
-			requestURLHistory = append(requestURLHistory, "http://"+r.Host)
+			appendHistory(&requestURLHistory, r)
 			w.WriteHeader(502)
 		},
 		func(w http.ResponseWriter, r *http.Request) {
-			requestURLHistory = append(requestURLHistory, "http://"+r.Host)
+			appendHistory(&requestURLHistory, r)
 			w.WriteHeader(503)
 		},
 		func(w http.ResponseWriter, r *http.Request) {
-			requestURLHistory = append(requestURLHistory, "http://"+r.Host)
+			appendHistory(&requestURLHistory, r)
 			w.WriteHeader(202)
 		},
 	})
@@ -348,4 +353,42 @@ func TestApiCallCanReplaceRequestHostName(t *testing.T) {
 	assert.Equal(t, 200, res.StatusCode)
 
 	assert.Equal(t, serverURLs[0]+"/collections/1?test=1", lastRequestURL)
+}
+
+func TestApiCallCanAbortRequest(t *testing.T) {
+	requestURLHistory := make([]string, 0)
+	ctx, cancel := context.WithCancel(context.Background())
+
+	servers, serverURLs := instantiateServers([]serverHandler{
+		func(w http.ResponseWriter, r *http.Request) {
+			appendHistory(&requestURLHistory, r)
+			w.WriteHeader(http.StatusBadGateway)
+		},
+		func(w http.ResponseWriter, r *http.Request) {
+			appendHistory(&requestURLHistory, r)
+			w.WriteHeader(http.StatusBadGateway)
+		},
+		func(_ http.ResponseWriter, r *http.Request) {
+			appendHistory(&requestURLHistory, r)
+			cancel()
+		},
+		func(_ http.ResponseWriter, r *http.Request) {
+			appendHistory(&requestURLHistory, r)
+		},
+	})
+	for _, server := range servers {
+		defer server.Close()
+	}
+
+	client := NewClient(
+		WithNearestNode(serverURLs[0]),
+		WithNodes(serverURLs[1:]),
+		WithRetryInterval(0),
+	)
+
+	res, err := client.Collections().Retrieve(ctx)
+
+	assert.ErrorIs(t, err, context.Canceled)
+	assert.Nil(t, res)
+	assert.Equal(t, requestURLHistory, serverURLs[:3])
 }
