@@ -32,6 +32,23 @@ const (
 	Reject         ImportDocumentsParamsDirtyValues = "reject"
 )
 
+// APIStatsResponse defines model for APIStatsResponse.
+type APIStatsResponse struct {
+	DeleteLatencyMs             *float64            `json:"delete_latency_ms,omitempty"`
+	DeleteRequestsPerSecond     *float64            `json:"delete_requests_per_second,omitempty"`
+	ImportLatencyMs             *float64            `json:"import_latency_ms,omitempty"`
+	ImportRequestsPerSecond     *float64            `json:"import_requests_per_second,omitempty"`
+	LatencyMs                   *map[string]float64 `json:"latency_ms,omitempty"`
+	OverloadedRequestsPerSecond *float64            `json:"overloaded_requests_per_second,omitempty"`
+	PendingWriteBatches         *float64            `json:"pending_write_batches,omitempty"`
+	RequestsPerSecond           *map[string]float64 `json:"requests_per_second,omitempty"`
+	SearchLatencyMs             *float64            `json:"search_latency_ms,omitempty"`
+	SearchRequestsPerSecond     *float64            `json:"search_requests_per_second,omitempty"`
+	TotalRequestsPerSecond      *float64            `json:"total_requests_per_second,omitempty"`
+	WriteLatencyMs              *float64            `json:"write_latency_ms,omitempty"`
+	WriteRequestsPerSecond      *float64            `json:"write_requests_per_second,omitempty"`
+}
+
 // AnalyticsRuleParameters defines model for AnalyticsRuleParameters.
 type AnalyticsRuleParameters struct {
 	Destination struct {
@@ -920,7 +937,7 @@ type SearchSynonymsResponse struct {
 
 // StopwordsSetRetrieveSchema defines model for StopwordsSetRetrieveSchema.
 type StopwordsSetRetrieveSchema struct {
-	Stopwords []StopwordsSetSchema `json:"stopwords"`
+	Stopwords StopwordsSetSchema `json:"stopwords"`
 }
 
 // StopwordsSetSchema defines model for StopwordsSetSchema.
@@ -934,6 +951,11 @@ type StopwordsSetSchema struct {
 type StopwordsSetUpsertSchema struct {
 	Locale    *string  `json:"locale,omitempty"`
 	Stopwords []string `json:"stopwords"`
+}
+
+// StopwordsSetsRetrieveAllSchema defines model for StopwordsSetsRetrieveAllSchema.
+type StopwordsSetsRetrieveAllSchema struct {
+	Stopwords []StopwordsSetSchema `json:"stopwords"`
 }
 
 // SuccessStatus defines model for SuccessStatus.

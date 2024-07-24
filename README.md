@@ -399,6 +399,34 @@ client.Collection("products").Synonyms().Retrieve(context.Background())
 client.Collection("products").Synonym("coat-synonyms").Delete(context.Background())
 ```
 
+### Create or update a stopwords set
+
+```go
+	stopwords := &api.StopwordsSetUpsertSchema{
+		Locale:    pointer.String("en"),
+		Stopwords: []string{"Germany", "France", "Italy", "United States"},
+	}
+	client.Stopwords().Upsert(context.Background(), "stopword_set1", stopwords)
+```
+
+### Retrieve a stopwords set
+
+```go
+client.Stopword("stopword_set1").Retrieve(context.Background())
+```
+
+### List all stopwords sets
+
+```go
+client.Stopwords().Retrieve(context.Background())
+```
+
+### Delete a stopwords set
+
+```go
+client.Stopword("stopword_set1").Delete(context.Background())
+```
+
 ### Create or update a preset
 
 ```go
@@ -443,6 +471,18 @@ client.Operations().Snapshot(context.Background(), "/tmp/typesense-data-snapshot
 
 ```go
 client.Operations().Vote(context.Background())
+```
+
+### Cluster Metrics
+
+```go
+client.Metrics().Retrieve(context.Background())
+```
+
+### API Stats
+
+```go
+client.Stats().Retrieve(context.Background())
 ```
 
 ## Contributing

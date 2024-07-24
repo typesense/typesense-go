@@ -222,6 +222,9 @@ type ClientInterface interface {
 	// GetKey request
 	GetKey(ctx context.Context, keyId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// RetrieveMetrics request
+	RetrieveMetrics(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// MultiSearchWithBody request with any body
 	MultiSearchWithBody(ctx context.Context, params *MultiSearchParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -246,6 +249,9 @@ type ClientInterface interface {
 	UpsertPresetWithBody(ctx context.Context, presetId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	UpsertPreset(ctx context.Context, presetId string, body UpsertPresetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RetrieveAPIStats request
+	RetrieveAPIStats(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RetrieveStopwordsSets request
 	RetrieveStopwordsSets(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -838,6 +844,18 @@ func (c *Client) GetKey(ctx context.Context, keyId int64, reqEditors ...RequestE
 	return c.Client.Do(req)
 }
 
+func (c *Client) RetrieveMetrics(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrieveMetricsRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) MultiSearchWithBody(ctx context.Context, params *MultiSearchParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewMultiSearchRequestWithBody(c.Server, params, contentType, body)
 	if err != nil {
@@ -936,6 +954,18 @@ func (c *Client) UpsertPresetWithBody(ctx context.Context, presetId string, cont
 
 func (c *Client) UpsertPreset(ctx context.Context, presetId string, body UpsertPresetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpsertPresetRequest(c.Server, presetId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RetrieveAPIStats(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrieveAPIStatsRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -3501,6 +3531,33 @@ func NewGetKeyRequest(server string, keyId int64) (*http.Request, error) {
 	return req, nil
 }
 
+// NewRetrieveMetricsRequest generates requests for RetrieveMetrics
+func NewRetrieveMetricsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/metrics.json")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewMultiSearchRequest calls the generic MultiSearch builder with application/json body
 func NewMultiSearchRequest(server string, params *MultiSearchParams, body MultiSearchJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -4641,6 +4698,33 @@ func NewUpsertPresetRequestWithBody(server string, presetId string, contentType 
 	return req, nil
 }
 
+// NewRetrieveAPIStatsRequest generates requests for RetrieveAPIStats
+func NewRetrieveAPIStatsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/stats.json")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewRetrieveStopwordsSetsRequest generates requests for RetrieveStopwordsSets
 func NewRetrieveStopwordsSetsRequest(server string) (*http.Request, error) {
 	var err error
@@ -4959,6 +5043,9 @@ type ClientWithResponsesInterface interface {
 	// GetKeyWithResponse request
 	GetKeyWithResponse(ctx context.Context, keyId int64, reqEditors ...RequestEditorFn) (*GetKeyResponse, error)
 
+	// RetrieveMetricsWithResponse request
+	RetrieveMetricsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveMetricsResponse, error)
+
 	// MultiSearchWithBodyWithResponse request with any body
 	MultiSearchWithBodyWithResponse(ctx context.Context, params *MultiSearchParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*MultiSearchResponse, error)
 
@@ -4983,6 +5070,9 @@ type ClientWithResponsesInterface interface {
 	UpsertPresetWithBodyWithResponse(ctx context.Context, presetId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpsertPresetResponse, error)
 
 	UpsertPresetWithResponse(ctx context.Context, presetId string, body UpsertPresetJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertPresetResponse, error)
+
+	// RetrieveAPIStatsWithResponse request
+	RetrieveAPIStatsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAPIStatsResponse, error)
 
 	// RetrieveStopwordsSetsWithResponse request
 	RetrieveStopwordsSetsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveStopwordsSetsResponse, error)
@@ -5855,6 +5945,28 @@ func (r GetKeyResponse) StatusCode() int {
 	return 0
 }
 
+type RetrieveMetricsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *map[string]interface{}
+}
+
+// Status returns HTTPResponse.Status
+func (r RetrieveMetricsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetrieveMetricsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type MultiSearchResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -6013,10 +6125,32 @@ func (r UpsertPresetResponse) StatusCode() int {
 	return 0
 }
 
+type RetrieveAPIStatsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *APIStatsResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r RetrieveAPIStatsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetrieveAPIStatsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type RetrieveStopwordsSetsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *StopwordsSetRetrieveSchema
+	JSON200      *StopwordsSetsRetrieveAllSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -6527,6 +6661,15 @@ func (c *ClientWithResponses) GetKeyWithResponse(ctx context.Context, keyId int6
 	return ParseGetKeyResponse(rsp)
 }
 
+// RetrieveMetricsWithResponse request returning *RetrieveMetricsResponse
+func (c *ClientWithResponses) RetrieveMetricsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveMetricsResponse, error) {
+	rsp, err := c.RetrieveMetrics(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetrieveMetricsResponse(rsp)
+}
+
 // MultiSearchWithBodyWithResponse request with arbitrary body returning *MultiSearchResponse
 func (c *ClientWithResponses) MultiSearchWithBodyWithResponse(ctx context.Context, params *MultiSearchParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*MultiSearchResponse, error) {
 	rsp, err := c.MultiSearchWithBody(ctx, params, contentType, body, reqEditors...)
@@ -6604,6 +6747,15 @@ func (c *ClientWithResponses) UpsertPresetWithResponse(ctx context.Context, pres
 		return nil, err
 	}
 	return ParseUpsertPresetResponse(rsp)
+}
+
+// RetrieveAPIStatsWithResponse request returning *RetrieveAPIStatsResponse
+func (c *ClientWithResponses) RetrieveAPIStatsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAPIStatsResponse, error) {
+	rsp, err := c.RetrieveAPIStats(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetrieveAPIStatsResponse(rsp)
 }
 
 // RetrieveStopwordsSetsWithResponse request returning *RetrieveStopwordsSetsResponse
@@ -7864,6 +8016,32 @@ func ParseGetKeyResponse(rsp *http.Response) (*GetKeyResponse, error) {
 	return response, nil
 }
 
+// ParseRetrieveMetricsResponse parses an HTTP response from a RetrieveMetricsWithResponse call
+func ParseRetrieveMetricsResponse(rsp *http.Response) (*RetrieveMetricsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetrieveMetricsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]interface{}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseMultiSearchResponse parses an HTTP response from a MultiSearchWithResponse call
 func ParseMultiSearchResponse(rsp *http.Response) (*MultiSearchResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -8074,6 +8252,32 @@ func ParseUpsertPresetResponse(rsp *http.Response) (*UpsertPresetResponse, error
 	return response, nil
 }
 
+// ParseRetrieveAPIStatsResponse parses an HTTP response from a RetrieveAPIStatsWithResponse call
+func ParseRetrieveAPIStatsResponse(rsp *http.Response) (*RetrieveAPIStatsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetrieveAPIStatsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest APIStatsResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseRetrieveStopwordsSetsResponse parses an HTTP response from a RetrieveStopwordsSetsWithResponse call
 func ParseRetrieveStopwordsSetsResponse(rsp *http.Response) (*RetrieveStopwordsSetsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -8089,7 +8293,7 @@ func ParseRetrieveStopwordsSetsResponse(rsp *http.Response) (*RetrieveStopwordsS
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest StopwordsSetRetrieveSchema
+		var dest StopwordsSetsRetrieveAllSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
