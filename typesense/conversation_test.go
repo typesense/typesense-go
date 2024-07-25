@@ -7,30 +7,33 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense/api"
 )
 
 func TestConversationRetrieveConversation(t *testing.T) {
-	expectedData := []*api.ConversationSchema{{
-		Id: 1,
+	expectedData := &api.ConversationSchema{
+		Id: "123",
 		Conversation: []map[string]any{
-			{"any": "any"},
-		},
+			{
+				"user": "can you suggest an action series",
+			},
+			{
+				"assistant": "...",
+			}},
 		LastUpdated: 12,
 		Ttl:         34,
-	}}
+	}
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/conversations/123", http.MethodGet)
 		data := jsonEncode(t, expectedData)
 
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
 		w.Write(data)
 	})
 	defer server.Close()
 
-	res, err := client.Conversation(123).Retrieve(context.Background())
+	res, err := client.Conversation(expectedData.Id).Retrieve(context.Background())
 	assert.NoError(t, err)
 	assert.Equal(t, expectedData, res)
 }
@@ -42,11 +45,14 @@ func TestConversationRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	})
 	defer server.Close()
 
-	_, err := client.Conversation(123).Retrieve(context.Background())
-	assert.Error(t, err)
+	_, err := client.Conversation("123").Retrieve(context.Background())
+	assert.ErrorContains(t, err, "status: 409")
 }
 func TestConversationUpdateConversation(t *testing.T) {
-	expectedData := &api.ConversationUpdateSchema{
+	expectedData := &api.ConversationSchema{
+		Id: "123",
+	}
+	updateData := &api.ConversationUpdateSchema{
 		Ttl: 3000,
 	}
 
@@ -57,16 +63,15 @@ func TestConversationUpdateConversation(t *testing.T) {
 		err := json.NewDecoder(r.Body).Decode(&reqBody)
 
 		assert.NoError(t, err)
-		assert.Equal(t, expectedData, &reqBody)
+		assert.Equal(t, updateData, &reqBody)
 
 		data := jsonEncode(t, expectedData)
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
 		w.Write(data)
 	})
 	defer server.Close()
 
-	res, err := client.Conversation(123).Update(context.Background(), expectedData)
+	res, err := client.Conversation("123").Update(context.Background(), updateData)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedData, res)
@@ -79,15 +84,15 @@ func TestConversationUpdateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	})
 	defer server.Close()
 
-	_, err := client.Conversation(123).Update(context.Background(), &api.ConversationUpdateSchema{
+	_, err := client.Conversation("123").Update(context.Background(), &api.ConversationUpdateSchema{
 		Ttl: 0,
 	})
-	assert.Error(t, err)
+	assert.ErrorContains(t, err, "status: 409")
 }
 
 func TestConversationDeleteConversation(t *testing.T) {
-	expectedData := &api.ConversationDeleteSchema{
-		Id: 123,
+	expectedData := &api.ConversationSchema{
+		Id: "123",
 	}
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
@@ -95,12 +100,11 @@ func TestConversationDeleteConversation(t *testing.T) {
 		data := jsonEncode(t, expectedData)
 
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
 		w.Write(data)
 	})
 	defer server.Close()
 
-	res, err := client.Conversation(123).Delete(context.Background())
+	res, err := client.Conversation("123").Delete(context.Background())
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedData, res)
@@ -113,6 +117,6 @@ func TestConversationDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	})
 	defer server.Close()
 
-	_, err := client.Conversation(123).Delete(context.Background())
-	assert.Error(t, err)
+	_, err := client.Conversation("123").Delete(context.Background())
+	assert.ErrorContains(t, err, "status: 409")
 }

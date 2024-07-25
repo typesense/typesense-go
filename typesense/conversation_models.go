@@ -3,12 +3,12 @@ package typesense
 import (
 	"context"
 
-	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense/api"
 )
 
 // ConversationModelsInterface is a type for ConversationModels API operations
 type ConversationModelsInterface interface {
-	Create(ctx context.Context, conversationModelCreateAndUpdateSchema *api.ConversationModelCreateAndUpdateSchema) (*api.ConversationModelCreateAndUpdateSchema, error)
+	Create(ctx context.Context, conversationModelCreateAndUpdateSchema *api.ConversationModelCreateAndUpdateSchema) (*api.ConversationModelSchema, error)
 	Retrieve(ctx context.Context) ([]*api.ConversationModelSchema, error)
 }
 
@@ -17,7 +17,7 @@ type conversationModels struct {
 	apiClient APIClientInterface
 }
 
-func (c *conversationModels) Create(ctx context.Context, conversationModelCreateAndUpdateSchema *api.ConversationModelCreateAndUpdateSchema) (*api.ConversationModelCreateAndUpdateSchema, error) {
+func (c *conversationModels) Create(ctx context.Context, conversationModelCreateAndUpdateSchema *api.ConversationModelCreateAndUpdateSchema) (*api.ConversationModelSchema, error) {
 	response, err := c.apiClient.CreateConversationModelWithResponse(ctx, api.CreateConversationModelJSONRequestBody(*conversationModelCreateAndUpdateSchema))
 	if err != nil {
 		return nil, err

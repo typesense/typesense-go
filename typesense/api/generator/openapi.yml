@@ -51,6 +51,11 @@ tags:
     externalDocs:
       description: Find out more
       url: https://typesense.org/docs/26.0/api/search.html#presets
+  - name: conversations
+    description: Conversational Search (RAG)
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/docs/26.0/api/conversational-search-rag.html
 paths:
   /collections:
     get:
@@ -879,202 +884,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
-  /conversations:
-    get:
-      description: Retrieve all past conversations
-      operationId: retrieveAllConversations
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConversationsRetrieveSchema'
-          description: List of all past conversations
-      summary: List all past conversations
-      tags:
-        - conversations
-  /conversations/{conversationId}:
-    get:
-      description: Retrieve a conversation
-      operationId: retrieveConversation
-      parameters:
-        - name: conversationId
-          in: path
-          description: The id of the conversation to retrieve
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/ConversationSchema'
-                type: array
-                x-go-type: '[]*ConversationSchema'
-          description: A past conversation
-      summary: Retrieve a past conversation
-      tags:
-        - conversations
-    put:
-      description: Update the TTL for a conversation
-      operationId: updateConversation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConversationUpdateSchema'
-        required: true
-      parameters:
-        - name: conversationId
-          in: path
-          description: The id of the conversation to update
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConversationUpdateSchema'
-          description: The conversation was successfully updated
-      summary: Update the TTL for a past conversation
-      tags:
-        - conversations
-    delete:
-      description: Delete a past conversation
-      operationId: deleteConversation
-      parameters:
-        - name: conversationId
-          in: path
-          description: The id of the conversation to delete
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConversationDeleteSchema'
-          description: The conversation was successfully deleted
-      summary: Delete a past conversation
-      tags:
-        - conversations
-  /conversations/models:
-    get:
-      description: Retrieve all conversation models
-      operationId: retrieveAllConversationModels
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/ConversationModelSchema'
-                type: array
-                x-go-type: '[]*ConversationModelSchema'
-          description: List of all conversation models
-      summary: List all conversation models
-      tags:
-        - conversations
-    post:
-      description: Create a Conversation Model
-      operationId: createConversationModel
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
-        required: true
-      responses:
-        201:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
-          description: Created Conversation Model
-        400:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-          description: Bad request, see error message for details
-      tags:
-        - conversations
-  /conversations/models/{modelId}:
-    get:
-      description: Retrieve a conversation model
-      operationId: retrieveConversationModel
-      parameters:
-        - name: modelId
-          in: path
-          description: The id of the conversation model to retrieve
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConversationModelSchema'
-          description: A conversation model
-      summary: Retrieve a conversation model
-      tags:
-        - conversations
-    put:
-      description: Update a conversation model
-      operationId: updateConversationModel
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
-        required: true
-      parameters:
-        - name: modelId
-          in: path
-          description: The id of the conversation model to update
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
-          description: The conversation model was successfully updated
-      summary: Update a conversation model
-      tags:
-        - conversations
-    delete:
-      description: Delete a conversation model
-      operationId: deleteConversationModel
-      parameters:
-        - name: modelId
-          in: path
-          description: The id of the conversation model to delete
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConversationModelDeleteSchema'
-          description: The conversation model was successfully deleted
-      summary: Delete a conversation model
-      tags:
-        - conversations
+                $ref: "#/components/schemas/ApiResponse"
   /keys:
     get:
       tags:
@@ -1778,6 +1588,198 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+  /conversations:
+    get:
+      description: Retrieve all past conversations
+      operationId: retrieveAllConversations
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConversationSchema'
+                x-go-type: "[]*ConversationSchema"
+          description: A list of all past conversations
+      summary: List all past conversations
+      tags:
+        - conversations
+  /conversations/{conversationId}:
+    get:
+      description: Retrieve a conversation
+      operationId: retrieveConversation
+      parameters:
+        - name: conversationId
+          in: path
+          description: The id of the conversation to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationSchema'
+          description: A past conversation
+      summary: Retrieve a past conversation
+      tags:
+        - conversations
+    put:
+      description: Update the TTL for a conversation
+      operationId: updateConversation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationUpdateSchema'
+        required: true
+      parameters:
+        - name: conversationId
+          in: path
+          description: The id of the conversation to update
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationSchema'
+          description: The conversation was successfully updated
+      summary: Update the TTL for a past conversation
+      tags:
+        - conversations
+    delete:
+      description: Delete a past conversation
+      operationId: deleteConversation
+      parameters:
+        - name: conversationId
+          in: path
+          description: The id of the conversation to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationSchema'
+          description: The conversation was successfully deleted
+      summary: Delete a past conversation
+      tags:
+        - conversations
+  /conversations/models:
+    get:
+      description: Retrieve all conversation models
+      operationId: retrieveAllConversationModels
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ConversationModelSchema'
+                type: array
+                x-go-type: '[]*ConversationModelSchema'
+          description: List of all conversation models
+      summary: List all conversation models
+      tags:
+        - conversations
+    post:
+      description: Create a Conversation Model
+      operationId: createConversationModel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
+        required: true
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationModelSchema'
+          description: Created Conversation Model
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Bad request, see error message for details
+      tags:
+        - conversations
+  /conversations/models/{modelId}:
+    get:
+      description: Retrieve a conversation model
+      operationId: retrieveConversationModel
+      parameters:
+        - name: modelId
+          in: path
+          description: The id of the conversation model to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationModelSchema'
+          description: A conversation model
+      summary: Retrieve a conversation model
+      tags:
+        - conversations
+    put:
+      description: Update a conversation model
+      operationId: updateConversationModel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
+        required: true
+      parameters:
+        - name: modelId
+          in: path
+          description: The id of the conversation model to update
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
+          description: The conversation model was successfully updated
+      summary: Update a conversation model
+      tags:
+        - conversations
+    delete:
+      description: Delete a conversation model
+      operationId: deleteConversationModel
+      parameters:
+        - name: modelId
+          in: path
+          description: The id of the conversation model to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationModelSchema'
+          description: The conversation model was successfully deleted
+      summary: Delete a conversation model
+      tags:
+        - conversations
 components:
   schemas:
     CollectionSchema:
@@ -3191,10 +3193,44 @@ components:
         - stopwords
       example: |
         {"stopwords": [{"id": "countries", "stopwords": ["Germany", "France", "Italy"], "locale": "en"}]}
+    PresetUpsertSchema:
+      properties:
+        value:
+          oneOf:
+            - $ref: '#/components/schemas/SearchParameters'
+            - $ref: '#/components/schemas/MultiSearchSearchesParameter'
+      required:
+        - value
+    PresetSchema:
+      allOf:
+        - $ref: '#/components/schemas/PresetUpsertSchema'
+        - type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
+    PresetsRetrieveSchema:
+      type: object
+      required:
+        - presets
+      properties:
+        presets:
+          type: array
+          items:
+            $ref: '#/components/schemas/PresetSchema'
+          x-go-type: '[]*PresetSchema'
+    PresetDeleteSchema:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
     ConversationSchema:
       properties:
         id:
-          type: integer
+          type: string
         conversation:
           items:
             type: object
@@ -3223,34 +3259,31 @@ components:
           type: integer
       required:
         - id
-    ConversationsRetrieveSchema:
-      type: object
-      required:
-        - conversations
-      properties:
-        conversations:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConversationSchema'
-          x-go-type: '[]*ConversationSchema'
     ConversationModelCreateAndUpdateSchema:
       properties:
-        value:
-          oneOf:
-            - $ref: '#/components/schemas/SearchParameters'
-            - $ref: '#/components/schemas/MultiSearchSearchesParameter'
+        model_name:
+          description: Name of the LLM model offered by OpenAI, Cloudflare or vLLM
+          type: string
+        api_key:
+          description: The LLM service's API Key
+          type: string
+        account_id:
+          description: LLM service's account ID (only applicable for Cloudflare)
+          type: string
+        system_prompt:
+          description: The system prompt that contains special instructions to the LLM
+          type: string
+        max_bytes:
+          description: |
+            The maximum number of bytes to send to the LLM in every API call. Consult the LLM's documentation on the number of bytes supported in the context window.
+          type: integer
+        vllm_url:
+          description: URL of vLLM service
+          type: string
       required:
         - model_name
         - api_key
-        - system_prompt
         - max_bytes
-      type: object
-    ConversationModelDeleteSchema:
-      properties:
-        id:
-          type: string
-      required:
-        - id
       type: object
     ConversationModelSchema:
       allOf:
@@ -3258,23 +3291,9 @@ components:
         - properties:
             id:
               type: string
-    PresetsRetrieveSchema:
-      type: object
-      required:
-        - presets
-      properties:
-        presets:
-          type: array
-          items:
-            $ref: '#/components/schemas/PresetSchema'
-          x-go-type: '[]*PresetSchema'
-    PresetDeleteSchema:
-      type: object
-      required:
-        - name
-      properties:
-        name:
-          type: string
+          type: object
+          required:
+            - id
   securitySchemes:
     api_key_header:
       type: apiKey

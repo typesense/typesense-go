@@ -225,15 +225,15 @@ type ClientInterface interface {
 	UpdateConversationModel(ctx context.Context, modelId string, body UpdateConversationModelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteConversation request
-	DeleteConversation(ctx context.Context, conversationId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteConversation(ctx context.Context, conversationId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RetrieveConversation request
-	RetrieveConversation(ctx context.Context, conversationId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+	RetrieveConversation(ctx context.Context, conversationId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateConversationWithBody request with any body
-	UpdateConversationWithBody(ctx context.Context, conversationId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateConversationWithBody(ctx context.Context, conversationId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateConversation(ctx context.Context, conversationId int64, body UpdateConversationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateConversation(ctx context.Context, conversationId string, body UpdateConversationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Debug request
 	Debug(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -889,7 +889,7 @@ func (c *Client) UpdateConversationModel(ctx context.Context, modelId string, bo
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteConversation(ctx context.Context, conversationId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteConversation(ctx context.Context, conversationId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteConversationRequest(c.Server, conversationId)
 	if err != nil {
 		return nil, err
@@ -901,7 +901,7 @@ func (c *Client) DeleteConversation(ctx context.Context, conversationId int64, r
 	return c.Client.Do(req)
 }
 
-func (c *Client) RetrieveConversation(ctx context.Context, conversationId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RetrieveConversation(ctx context.Context, conversationId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRetrieveConversationRequest(c.Server, conversationId)
 	if err != nil {
 		return nil, err
@@ -913,7 +913,7 @@ func (c *Client) RetrieveConversation(ctx context.Context, conversationId int64,
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateConversationWithBody(ctx context.Context, conversationId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpdateConversationWithBody(ctx context.Context, conversationId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateConversationRequestWithBody(c.Server, conversationId, contentType, body)
 	if err != nil {
 		return nil, err
@@ -925,7 +925,7 @@ func (c *Client) UpdateConversationWithBody(ctx context.Context, conversationId 
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateConversation(ctx context.Context, conversationId int64, body UpdateConversationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpdateConversation(ctx context.Context, conversationId string, body UpdateConversationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateConversationRequest(c.Server, conversationId, body)
 	if err != nil {
 		return nil, err
@@ -3729,7 +3729,7 @@ func NewUpdateConversationModelRequestWithBody(server string, modelId string, co
 }
 
 // NewDeleteConversationRequest generates requests for DeleteConversation
-func NewDeleteConversationRequest(server string, conversationId int64) (*http.Request, error) {
+func NewDeleteConversationRequest(server string, conversationId string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -3763,7 +3763,7 @@ func NewDeleteConversationRequest(server string, conversationId int64) (*http.Re
 }
 
 // NewRetrieveConversationRequest generates requests for RetrieveConversation
-func NewRetrieveConversationRequest(server string, conversationId int64) (*http.Request, error) {
+func NewRetrieveConversationRequest(server string, conversationId string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -3797,7 +3797,7 @@ func NewRetrieveConversationRequest(server string, conversationId int64) (*http.
 }
 
 // NewUpdateConversationRequest calls the generic UpdateConversation builder with application/json body
-func NewUpdateConversationRequest(server string, conversationId int64, body UpdateConversationJSONRequestBody) (*http.Request, error) {
+func NewUpdateConversationRequest(server string, conversationId string, body UpdateConversationJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
@@ -3808,7 +3808,7 @@ func NewUpdateConversationRequest(server string, conversationId int64, body Upda
 }
 
 // NewUpdateConversationRequestWithBody generates requests for UpdateConversation with any type of body
-func NewUpdateConversationRequestWithBody(server string, conversationId int64, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateConversationRequestWithBody(server string, conversationId string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -5547,15 +5547,15 @@ type ClientWithResponsesInterface interface {
 	UpdateConversationModelWithResponse(ctx context.Context, modelId string, body UpdateConversationModelJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateConversationModelResponse, error)
 
 	// DeleteConversationWithResponse request
-	DeleteConversationWithResponse(ctx context.Context, conversationId int64, reqEditors ...RequestEditorFn) (*DeleteConversationResponse, error)
+	DeleteConversationWithResponse(ctx context.Context, conversationId string, reqEditors ...RequestEditorFn) (*DeleteConversationResponse, error)
 
 	// RetrieveConversationWithResponse request
-	RetrieveConversationWithResponse(ctx context.Context, conversationId int64, reqEditors ...RequestEditorFn) (*RetrieveConversationResponse, error)
+	RetrieveConversationWithResponse(ctx context.Context, conversationId string, reqEditors ...RequestEditorFn) (*RetrieveConversationResponse, error)
 
 	// UpdateConversationWithBodyWithResponse request with any body
-	UpdateConversationWithBodyWithResponse(ctx context.Context, conversationId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateConversationResponse, error)
+	UpdateConversationWithBodyWithResponse(ctx context.Context, conversationId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateConversationResponse, error)
 
-	UpdateConversationWithResponse(ctx context.Context, conversationId int64, body UpdateConversationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateConversationResponse, error)
+	UpdateConversationWithResponse(ctx context.Context, conversationId string, body UpdateConversationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateConversationResponse, error)
 
 	// DebugWithResponse request
 	DebugWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DebugResponse, error)
@@ -6343,7 +6343,7 @@ func (r UpsertSearchSynonymResponse) StatusCode() int {
 type RetrieveAllConversationsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *ConversationsRetrieveSchema
+	JSON200      *[]*ConversationSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -6387,7 +6387,7 @@ func (r RetrieveAllConversationModelsResponse) StatusCode() int {
 type CreateConversationModelResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *ConversationModelCreateAndUpdateSchema
+	JSON201      *ConversationModelSchema
 	JSON400      *ApiResponse
 }
 
@@ -6410,7 +6410,7 @@ func (r CreateConversationModelResponse) StatusCode() int {
 type DeleteConversationModelResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *ConversationModelDeleteSchema
+	JSON200      *ConversationModelSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -6476,7 +6476,7 @@ func (r UpdateConversationModelResponse) StatusCode() int {
 type DeleteConversationResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *ConversationDeleteSchema
+	JSON200      *ConversationSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -6498,7 +6498,7 @@ func (r DeleteConversationResponse) StatusCode() int {
 type RetrieveConversationResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *[]*ConversationSchema
+	JSON200      *ConversationSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -6520,7 +6520,7 @@ func (r RetrieveConversationResponse) StatusCode() int {
 type UpdateConversationResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *ConversationUpdateSchema
+	JSON200      *ConversationSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -7403,7 +7403,7 @@ func (c *ClientWithResponses) UpdateConversationModelWithResponse(ctx context.Co
 }
 
 // DeleteConversationWithResponse request returning *DeleteConversationResponse
-func (c *ClientWithResponses) DeleteConversationWithResponse(ctx context.Context, conversationId int64, reqEditors ...RequestEditorFn) (*DeleteConversationResponse, error) {
+func (c *ClientWithResponses) DeleteConversationWithResponse(ctx context.Context, conversationId string, reqEditors ...RequestEditorFn) (*DeleteConversationResponse, error) {
 	rsp, err := c.DeleteConversation(ctx, conversationId, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -7412,7 +7412,7 @@ func (c *ClientWithResponses) DeleteConversationWithResponse(ctx context.Context
 }
 
 // RetrieveConversationWithResponse request returning *RetrieveConversationResponse
-func (c *ClientWithResponses) RetrieveConversationWithResponse(ctx context.Context, conversationId int64, reqEditors ...RequestEditorFn) (*RetrieveConversationResponse, error) {
+func (c *ClientWithResponses) RetrieveConversationWithResponse(ctx context.Context, conversationId string, reqEditors ...RequestEditorFn) (*RetrieveConversationResponse, error) {
 	rsp, err := c.RetrieveConversation(ctx, conversationId, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -7421,7 +7421,7 @@ func (c *ClientWithResponses) RetrieveConversationWithResponse(ctx context.Conte
 }
 
 // UpdateConversationWithBodyWithResponse request with arbitrary body returning *UpdateConversationResponse
-func (c *ClientWithResponses) UpdateConversationWithBodyWithResponse(ctx context.Context, conversationId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateConversationResponse, error) {
+func (c *ClientWithResponses) UpdateConversationWithBodyWithResponse(ctx context.Context, conversationId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateConversationResponse, error) {
 	rsp, err := c.UpdateConversationWithBody(ctx, conversationId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -7429,7 +7429,7 @@ func (c *ClientWithResponses) UpdateConversationWithBodyWithResponse(ctx context
 	return ParseUpdateConversationResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateConversationWithResponse(ctx context.Context, conversationId int64, body UpdateConversationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateConversationResponse, error) {
+func (c *ClientWithResponses) UpdateConversationWithResponse(ctx context.Context, conversationId string, body UpdateConversationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateConversationResponse, error) {
 	rsp, err := c.UpdateConversation(ctx, conversationId, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -8676,7 +8676,7 @@ func ParseRetrieveAllConversationsResponse(rsp *http.Response) (*RetrieveAllConv
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ConversationsRetrieveSchema
+		var dest []*ConversationSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -8728,7 +8728,7 @@ func ParseCreateConversationModelResponse(rsp *http.Response) (*CreateConversati
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest ConversationModelCreateAndUpdateSchema
+		var dest ConversationModelSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -8761,7 +8761,7 @@ func ParseDeleteConversationModelResponse(rsp *http.Response) (*DeleteConversati
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ConversationModelDeleteSchema
+		var dest ConversationModelSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -8839,7 +8839,7 @@ func ParseDeleteConversationResponse(rsp *http.Response) (*DeleteConversationRes
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ConversationDeleteSchema
+		var dest ConversationSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -8865,7 +8865,7 @@ func ParseRetrieveConversationResponse(rsp *http.Response) (*RetrieveConversatio
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []*ConversationSchema
+		var dest ConversationSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -8891,7 +8891,7 @@ func ParseUpdateConversationResponse(rsp *http.Response) (*UpdateConversationRes
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ConversationUpdateSchema
+		var dest ConversationSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

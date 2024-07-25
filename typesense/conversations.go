@@ -3,7 +3,7 @@ package typesense
 import (
 	"context"
 
-	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense/api"
 )
 
 // ConversationsInterface is a type for Conversations API operations
@@ -26,7 +26,7 @@ func (c *conversations) Retrieve(ctx context.Context) ([]*api.ConversationSchema
 	if response.JSON200 == nil {
 		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
-	return response.JSON200.Conversations, nil
+	return *response.JSON200, nil
 }
 
 func (c *conversations) Models() ConversationModelsInterface {

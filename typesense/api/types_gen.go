@@ -176,11 +176,6 @@ type CollectionUpdateSchema struct {
 	Fields []Field `json:"fields"`
 }
 
-// ConversationDeleteSchema defines model for ConversationDeleteSchema.
-type ConversationDeleteSchema struct {
-	Id int `json:"id"`
-}
-
 // ConversationModelCreateAndUpdateSchema defines model for ConversationModelCreateAndUpdateSchema.
 type ConversationModelCreateAndUpdateSchema struct {
 	// AccountId LLM service's account ID (only applicable for Cloudflare)
@@ -200,11 +195,6 @@ type ConversationModelCreateAndUpdateSchema struct {
 
 	// VllmUrl URL of vLLM service
 	VllmUrl *string `json:"vllm_url,omitempty"`
-}
-
-// ConversationModelDeleteSchema defines model for ConversationModelDeleteSchema.
-type ConversationModelDeleteSchema struct {
-	Id string `json:"id"`
 }
 
 // ConversationModelSchema defines model for ConversationModelSchema.
@@ -232,7 +222,7 @@ type ConversationModelSchema struct {
 // ConversationSchema defines model for ConversationSchema.
 type ConversationSchema struct {
 	Conversation []map[string]interface{} `json:"conversation"`
-	Id           int                      `json:"id"`
+	Id           string                   `json:"id"`
 	LastUpdated  int                      `json:"last_updated"`
 
 	// Ttl Time to live. Conversations are stored by default for 24 hours, and then purged.
@@ -243,11 +233,6 @@ type ConversationSchema struct {
 type ConversationUpdateSchema struct {
 	// Ttl Time to live. Conversations are stored by default for 24 hours, and then purged.
 	Ttl int `json:"ttl"`
-}
-
-// ConversationsRetrieveSchema defines model for ConversationsRetrieveSchema.
-type ConversationsRetrieveSchema struct {
-	Conversations []*ConversationSchema `json:"conversations"`
 }
 
 // FacetCounts defines model for FacetCounts.

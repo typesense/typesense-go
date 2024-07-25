@@ -7,17 +7,17 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense/api/pointer"
 )
 
 func TestConversationModelRetrieve(t *testing.T) {
-	accountId, systemPrompt := "CLOUDFLARE_ACCOUNT_ID", "..."
 	expectedData := &api.ConversationModelSchema{
 		Id:           "123",
 		ModelName:    "cf/mistral/mistral-7b-instruct-v0.1",
 		ApiKey:       "CLOUDFLARE_API_KEY",
-		AccountId:    &accountId,
-		SystemPrompt: &systemPrompt,
+		AccountId:    pointer.String("CLOUDFLARE_ACCOUNT_ID"),
+		SystemPrompt: pointer.String("..."),
 		MaxBytes:     16384,
 	}
 
@@ -25,7 +25,6 @@ func TestConversationModelRetrieve(t *testing.T) {
 		validateRequestMetadata(t, r, "/conversations/models/123", http.MethodGet)
 		data := jsonEncode(t, expectedData)
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
 		w.Write(data)
 	})
 	defer server.Close()
@@ -38,21 +37,20 @@ func TestConversationModelRetrieve(t *testing.T) {
 func TestConversationModelRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/conversations/models/123", http.MethodGet)
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusConflict)
 	})
 	defer server.Close()
 
 	_, err := client.Conversations().Model("123").Retrieve(context.Background())
-	assert.Error(t, err)
+	assert.ErrorContains(t, err, "status: 409")
 }
 
 func TestConversationModelUpdate(t *testing.T) {
-	accountId, systemPrompt := "CLOUDFLARE_ACCOUNT_ID", "..."
 	expectedData := &api.ConversationModelCreateAndUpdateSchema{
 		ModelName:    "cf/mistral/mistral-7b-instruct-v0.1",
 		ApiKey:       "CLOUDFLARE_API_KEY",
-		AccountId:    &accountId,
-		SystemPrompt: &systemPrompt,
+		AccountId:    pointer.String("CLOUDFLARE_ACCOUNT_ID"),
+		SystemPrompt: pointer.String("..."),
 		MaxBytes:     16384,
 	}
 
@@ -67,7 +65,6 @@ func TestConversationModelUpdate(t *testing.T) {
 
 		data := jsonEncode(t, expectedData)
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
 		w.Write(data)
 	})
 	defer server.Close()
@@ -87,11 +84,11 @@ func TestConversationModelUpdateOnHttpStatusErrorCodeReturnsError(t *testing.T) 
 	_, err := client.Conversations().Model("123").Update(context.Background(), &api.ConversationModelCreateAndUpdateSchema{
 		ModelName: "cf/mistral/mistral-7b-instruct-v0.1",
 	})
-	assert.Error(t, err)
+	assert.ErrorContains(t, err, "status: 409")
 }
 
 func TestConversationModelDelete(t *testing.T) {
-	expectedData := &api.ConversationModelDeleteSchema{
+	expectedData := &api.ConversationModelSchema{
 		Id: "123",
 	}
 
@@ -100,7 +97,6 @@ func TestConversationModelDelete(t *testing.T) {
 
 		data := jsonEncode(t, expectedData)
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
 		w.Write(data)
 	})
 	defer server.Close()
@@ -118,5 +114,5 @@ func TestConversationModelDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) 
 	defer server.Close()
 
 	_, err := client.Conversations().Model("123").Delete(context.Background())
-	assert.Error(t, err)
+	assert.ErrorContains(t, err, "status: 409")
 }

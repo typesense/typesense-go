@@ -3,13 +3,13 @@ package typesense
 import (
 	"context"
 
-	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense/api"
 )
 
 type ConversationModelInterface interface {
 	Retrieve(ctx context.Context) (*api.ConversationModelSchema, error)
 	Update(ctx context.Context, model *api.ConversationModelCreateAndUpdateSchema) (*api.ConversationModelCreateAndUpdateSchema, error)
-	Delete(ctx context.Context) (*api.ConversationModelDeleteSchema, error)
+	Delete(ctx context.Context) (*api.ConversationModelSchema, error)
 }
 
 type conversationModel struct {
@@ -39,7 +39,7 @@ func (c *conversationModel) Update(ctx context.Context, conversationModelCreateA
 	return response.JSON200, nil
 }
 
-func (c *conversationModel) Delete(ctx context.Context) (*api.ConversationModelDeleteSchema, error) {
+func (c *conversationModel) Delete(ctx context.Context) (*api.ConversationModelSchema, error) {
 	response, err := c.apiClient.DeleteConversationModelWithResponse(ctx, c.modelId)
 	if err != nil {
 		return nil, err

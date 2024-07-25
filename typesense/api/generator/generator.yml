@@ -288,13 +288,6 @@ components:
         - api_key
         - max_bytes
       type: object
-    ConversationModelDeleteSchema:
-      properties:
-        id:
-          type: string
-      required:
-        - id
-      type: object
     ConversationModelSchema:
       allOf:
         - $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
@@ -311,7 +304,7 @@ components:
             type: object
           type: array
         id:
-          type: integer
+          type: string
         last_updated:
           type: integer
         ttl:
@@ -330,16 +323,6 @@ components:
           type: integer
       required:
         - ttl
-    ConversationsRetrieveSchema:
-      properties:
-        conversations:
-          items:
-            $ref: '#/components/schemas/ConversationSchema'
-          type: array
-          x-go-type: '[]*ConversationSchema'
-      required:
-        - conversations
-      type: object
     ErrorResponse:
       properties:
         message:
@@ -2513,8 +2496,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConversationsRetrieveSchema'
-          description: List of all past conversations
+                items:
+                  $ref: '#/components/schemas/ConversationSchema'
+                type: array
+                x-go-type: '[]*ConversationSchema'
+          description: A list of all past conversations
       summary: List all past conversations
       tags:
         - conversations
@@ -2528,14 +2514,13 @@ paths:
           name: conversationId
           required: true
           schema:
-            format: int64
-            type: integer
+            type: string
       responses:
         200:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConversationDeleteSchema'
+                $ref: '#/components/schemas/ConversationSchema'
           description: The conversation was successfully deleted
       summary: Delete a past conversation
       tags:
@@ -2549,17 +2534,13 @@ paths:
           name: conversationId
           required: true
           schema:
-            format: int64
-            type: integer
+            type: string
       responses:
         200:
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/ConversationSchema'
-                type: array
-                x-go-type: '[]*ConversationSchema'
+                $ref: '#/components/schemas/ConversationSchema'
           description: A past conversation
       summary: Retrieve a past conversation
       tags:
@@ -2573,8 +2554,7 @@ paths:
           name: conversationId
           required: true
           schema:
-            format: int64
-            type: integer
+            type: string
       requestBody:
         content:
           application/json:
@@ -2586,7 +2566,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConversationUpdateSchema'
+                $ref: '#/components/schemas/ConversationSchema'
           description: The conversation was successfully updated
       summary: Update the TTL for a past conversation
       tags:
@@ -2622,7 +2602,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
+                $ref: '#/components/schemas/ConversationModelSchema'
           description: Created Conversation Model
         400:
           content:
@@ -2648,7 +2628,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConversationModelDeleteSchema'
+                $ref: '#/components/schemas/ConversationModelSchema'
           description: The conversation model was successfully deleted
       summary: Delete a conversation model
       tags:
