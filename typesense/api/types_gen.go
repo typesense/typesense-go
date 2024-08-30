@@ -168,6 +168,9 @@ type CollectionSchema struct {
 
 	// TokenSeparators List of symbols or special characters to be used for splitting the text into individual words in addition to space and new-line characters.
 	TokenSeparators *[]string `json:"token_separators,omitempty"`
+
+	// The dirty_values parameter determines what Typesense should do when the type of a particular field being indexed does not match the previously inferred type for that field, or the one defined in the collection's schema.
+	DirtyValues *string `json:"dirty_values,omitempty"`
 }
 
 // CollectionUpdateSchema defines model for CollectionUpdateSchema.
