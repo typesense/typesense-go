@@ -14,8 +14,8 @@ import (
 func TestConversationModelRetrieve(t *testing.T) {
 	expectedData := &api.ConversationModelSchema{
 		Id:           "123",
-		ModelName:    "cf/mistral/mistral-7b-instruct-v0.1",
-		ApiKey:       "CLOUDFLARE_API_KEY",
+		ModelName:    "cloudflare/@cf/mistral/mistral-7b-instruct-v0.1",
+		ApiKey:       pointer.String("CLOUDFLARE_API_KEY"),
 		AccountId:    pointer.String("CLOUDFLARE_ACCOUNT_ID"),
 		SystemPrompt: pointer.String("..."),
 		MaxBytes:     16384,
@@ -46,22 +46,30 @@ func TestConversationModelRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T
 }
 
 func TestConversationModelUpdate(t *testing.T) {
-	expectedData := &api.ConversationModelCreateAndUpdateSchema{
-		ModelName:    "cf/mistral/mistral-7b-instruct-v0.1",
-		ApiKey:       "CLOUDFLARE_API_KEY",
+	model := &api.ConversationModelUpdateSchema{
+		ModelName:    pointer.String("cf/mistral/mistral-7b-instruct-v0.1"),
+		ApiKey:       pointer.String("CLOUDFLARE_API_KEY"),
 		AccountId:    pointer.String("CLOUDFLARE_ACCOUNT_ID"),
 		SystemPrompt: pointer.String("..."),
-		MaxBytes:     16384,
+		MaxBytes:     pointer.Int(16384),
+	}
+	expectedData := &api.ConversationModelSchema{
+		Id:           "123",
+		ModelName:    *model.ModelName,
+		ApiKey:       model.ApiKey,
+		AccountId:    model.AccountId,
+		SystemPrompt: model.SystemPrompt,
+		MaxBytes:     *model.MaxBytes,
 	}
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/conversations/models/123", http.MethodPut)
 
-		var reqBody api.ConversationModelCreateAndUpdateSchema
+		var reqBody api.ConversationModelUpdateSchema
 		err := json.NewDecoder(r.Body).Decode(&reqBody)
 
 		assert.NoError(t, err)
-		assert.Equal(t, expectedData, &reqBody)
+		assert.Equal(t, model, &reqBody)
 
 		data := jsonEncode(t, expectedData)
 		w.Header().Set("Content-Type", "application/json")
@@ -69,7 +77,7 @@ func TestConversationModelUpdate(t *testing.T) {
 	})
 	defer server.Close()
 
-	res, err := client.Conversations().Model("123").Update(context.Background(), expectedData)
+	res, err := client.Conversations().Model("123").Update(context.Background(), model)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedData, res)
 }
@@ -81,15 +89,20 @@ func TestConversationModelUpdateOnHttpStatusErrorCodeReturnsError(t *testing.T) 
 	})
 	defer server.Close()
 
-	_, err := client.Conversations().Model("123").Update(context.Background(), &api.ConversationModelCreateAndUpdateSchema{
-		ModelName: "cf/mistral/mistral-7b-instruct-v0.1",
-	})
+	_, err := client.Conversations().Model("123").Update(context.Background(), &api.ConversationModelUpdateSchema{})
 	assert.ErrorContains(t, err, "status: 409")
 }
 
 func TestConversationModelDelete(t *testing.T) {
 	expectedData := &api.ConversationModelSchema{
-		Id: "123",
+		Id:                "123",
+		ModelName:         "cf/mistral/mistral-7b-instruct-v0.1",
+		ApiKey:            pointer.String("CLOUDFLARE_API_KEY"),
+		AccountId:         pointer.String("CLOUDFLARE_ACCOUNT_ID"),
+		SystemPrompt:      pointer.String("..."),
+		MaxBytes:          16384,
+		HistoryCollection: "conversation-store",
+		Ttl:               pointer.Int(10000),
 	}
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {

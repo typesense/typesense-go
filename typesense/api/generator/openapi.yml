@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Typesense API
   description: "An open source search engine for building delightful search experiences."
-  version: '26.0'
+  version: '27.0'
 externalDocs:
   description: Find out more about Typsesense
   url: https://typesense.org
@@ -28,7 +28,7 @@ tags:
     description: Typesense can aggregate search queries for both analytics purposes and for query suggestions.
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/0.25.0/api/analytics-query-suggestions.html
+      url: https://typesense.org/docs/26.0/api/analytics-query-suggestions.html
   - name: keys
     description: Manage API Keys with fine-grain access control
     externalDocs:
@@ -55,7 +55,7 @@ tags:
     description: Conversational Search (RAG)
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/26.0/api/conversational-search-rag.html
+      url: https://typesense.org/docs/27.0/api/conversational-search-rag.html
 paths:
   /collections:
     get:
@@ -230,6 +230,16 @@ paths:
             example: upsert
             enum:
               - upsert
+        - name: dirty_values
+          in: query
+          description: Dealing with Dirty Data
+          schema:
+            type: string
+            enum:
+              - coerce_or_reject
+              - coerce_or_drop
+              - drop
+              - reject
       requestBody:
         description: The document object to be indexed
         content:
@@ -334,6 +344,8 @@ paths:
           in: query
           schema:
             type: object
+            required:
+              - filter_by
             properties:
               filter_by:
                 type: string
@@ -344,6 +356,8 @@ paths:
                   at a time. A larger value will speed up deletions, but will impact performance
                   of other operations running on the server.
                 type: integer
+              ignore_not_found:
+                type: boolean
       responses:
         200:
           description: Documents successfully deleted
@@ -671,9 +685,6 @@ paths:
           in: query
           schema:
             type: object
-            required:
-              - include_fields
-              - exclude_fields
             properties:
               filter_by:
                 description:
@@ -728,8 +739,19 @@ paths:
             properties:
               action:
                 type: string
+                enum:
+                  - create
+                  - update
+                  - upsert
+                  - emplace
               batch_size:
                 type: integer
+              return_id:
+                type: boolean
+                description:
+                  Returning the id of the imported documents. If you want the
+                  import response to return the ingested document's id in the
+                  response, you can use the return_id parameter.
               dirty_values:
                 type: string
                 enum:
@@ -739,6 +761,8 @@ paths:
                   - reject
               remote_embedding_batch_size:
                 type: integer
+              return_doc:
+                type: boolean
       requestBody:
         description: The json array of documents or the JSONL file to import
         content:
@@ -885,6 +909,114 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
+  /conversations/models:
+    get:
+      description: Retrieve all conversation models
+      operationId: retrieveAllConversationModels
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ConversationModelSchema'
+                type: array
+                x-go-type: '[]*ConversationModelSchema'
+          description: List of all conversation models
+      summary: List all conversation models
+      tags:
+        - conversations
+    post:
+      description: Create a Conversation Model
+      operationId: createConversationModel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationModelCreateSchema'
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationModelSchema'
+          description: Created Conversation Model
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Bad request, see error message for details
+      tags:
+        - conversations
+  /conversations/models/{modelId}:
+    get:
+      description: Retrieve a conversation model
+      operationId: retrieveConversationModel
+      parameters:
+        - name: modelId
+          in: path
+          description: The id of the conversation model to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationModelSchema'
+          description: A conversation model
+      summary: Retrieve a conversation model
+      tags:
+        - conversations
+    put:
+      description: Update a conversation model
+      operationId: updateConversationModel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationModelUpdateSchema'
+        required: true
+      parameters:
+        - name: modelId
+          in: path
+          description: The id of the conversation model to update
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationModelSchema'
+          description: The conversation model was successfully updated
+      summary: Update a conversation model
+      tags:
+        - conversations
+    delete:
+      description: Delete a conversation model
+      operationId: deleteConversationModel
+      parameters:
+        - name: modelId
+          in: path
+          description: The id of the conversation model to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationModelSchema'
+          description: The conversation model was successfully deleted
+      summary: Delete a conversation model
+      tags:
+        - conversations
   /keys:
     get:
       tags:
@@ -1210,6 +1342,33 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
+  /analytics/events:
+    post:
+      tags:
+        - analytics
+      summary: Create an analytics event
+      description: Sending events for analytics e.g rank search results based on popularity.
+      operationId: createAnalyticsEvent
+      requestBody:
+        description: The Analytics event to be created
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyticsEventCreateSchema'
+        required: true
+      responses:
+        201:
+          description: Analytics event successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsEventCreateResponse'
+        400:
+          description: Bad request, see error message for details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
   /analytics/rules:
     post:
       tags:
@@ -1272,10 +1431,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AnalyticsRuleSchema"
+              $ref: "#/components/schemas/AnalyticsRuleUpsertSchema"
         required: true
       responses:
-        201:
+        200:
           description: Analytics rule successfully upserted
           content:
             application/json:
@@ -1334,7 +1493,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AnalyticsRuleSchema"
+                $ref: "#/components/schemas/AnalyticsRuleDeleteResponse"
         404:
           description: Analytics rule not found
           content:
@@ -1588,198 +1747,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
-  /conversations:
-    get:
-      description: Retrieve all past conversations
-      operationId: retrieveAllConversations
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ConversationSchema'
-                x-go-type: "[]*ConversationSchema"
-          description: A list of all past conversations
-      summary: List all past conversations
-      tags:
-        - conversations
-  /conversations/{conversationId}:
-    get:
-      description: Retrieve a conversation
-      operationId: retrieveConversation
-      parameters:
-        - name: conversationId
-          in: path
-          description: The id of the conversation to retrieve
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConversationSchema'
-          description: A past conversation
-      summary: Retrieve a past conversation
-      tags:
-        - conversations
-    put:
-      description: Update the TTL for a conversation
-      operationId: updateConversation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConversationUpdateSchema'
-        required: true
-      parameters:
-        - name: conversationId
-          in: path
-          description: The id of the conversation to update
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConversationSchema'
-          description: The conversation was successfully updated
-      summary: Update the TTL for a past conversation
-      tags:
-        - conversations
-    delete:
-      description: Delete a past conversation
-      operationId: deleteConversation
-      parameters:
-        - name: conversationId
-          in: path
-          description: The id of the conversation to delete
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConversationSchema'
-          description: The conversation was successfully deleted
-      summary: Delete a past conversation
-      tags:
-        - conversations
-  /conversations/models:
-    get:
-      description: Retrieve all conversation models
-      operationId: retrieveAllConversationModels
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/ConversationModelSchema'
-                type: array
-                x-go-type: '[]*ConversationModelSchema'
-          description: List of all conversation models
-      summary: List all conversation models
-      tags:
-        - conversations
-    post:
-      description: Create a Conversation Model
-      operationId: createConversationModel
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
-        required: true
-      responses:
-        201:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConversationModelSchema'
-          description: Created Conversation Model
-        400:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-          description: Bad request, see error message for details
-      tags:
-        - conversations
-  /conversations/models/{modelId}:
-    get:
-      description: Retrieve a conversation model
-      operationId: retrieveConversationModel
-      parameters:
-        - name: modelId
-          in: path
-          description: The id of the conversation model to retrieve
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConversationModelSchema'
-          description: A conversation model
-      summary: Retrieve a conversation model
-      tags:
-        - conversations
-    put:
-      description: Update a conversation model
-      operationId: updateConversationModel
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
-        required: true
-      parameters:
-        - name: modelId
-          in: path
-          description: The id of the conversation model to update
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
-          description: The conversation model was successfully updated
-      summary: Update a conversation model
-      tags:
-        - conversations
-    delete:
-      description: Delete a conversation model
-      operationId: deleteConversationModel
-      parameters:
-        - name: modelId
-          in: path
-          description: The id of the conversation model to delete
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConversationModelSchema'
-          description: The conversation model was successfully deleted
-      summary: Delete a conversation model
-      tags:
-        - conversations
 components:
   schemas:
     CollectionSchema:
@@ -1845,6 +1812,8 @@ components:
             minLength: 1
             maxLength: 1
           default: []
+        voice_query_model:
+          $ref: "#/components/schemas/VoiceQueryModelCollectionConfig"
     CollectionUpdateSchema:
       required:
         - fields
@@ -1925,6 +1894,10 @@ components:
           type: boolean
           example: true
           # omitting default value since we want it to be null
+        store:
+          type: boolean
+          description: >
+            Whether to store the image on disk.
         embed:
           type: object
           required:
@@ -1952,6 +1925,14 @@ components:
                   type: string
                 project_id:
                   type: string
+    VoiceQueryModelCollectionConfig:
+      type: object
+      description: >
+        Configuration for the voice query model
+      properties:
+        model_name:
+          type: string
+          example: "ts/whisper/base.en"
     CollectionAliasSchema:
       type: object
       required:
@@ -2027,7 +2008,31 @@ components:
               type: string
             per_page:
               type: integer
-
+            voice_query:
+              type: object
+              properties:
+                transcribed_query:
+                  type: string
+        conversation:
+          $ref: "#/components/schemas/SearchResultConversation"
+    SearchResultConversation:
+      type: object
+      required:
+        - answer
+        - conversation_history
+        - conversation_id
+        - query
+      properties:
+        answer:
+          type: string
+        conversation_history:
+          type: array
+          items:
+            type: object
+        conversation_id:
+          type: string
+        query:
+          type: string
     SearchGroupedHit:
       type: object
       required:
@@ -2154,6 +2159,37 @@ components:
           type: boolean
           description: >
             Indicates whether search query tokens that exist in the override's rule should be removed from the search query.
+        metadata:
+          type: object
+          description: >
+            Return a custom JSON object in the Search API response, when this rule is triggered. This can can be used to display a pre-defined message (eg: a promotion banner) on the front-end when a particular rule is triggered.
+        sort_by:
+          type: string
+          description: >
+            A sort by clause that is applied to any search query that matches the override rule.
+        replace_query:
+          type: string
+          description: >
+            Replaces the current search query with this value, when the search query matches the override rule.
+        filter_curated_hits:
+          type: boolean
+          description: >
+            When set to true, the filter conditions of the query is applied to the curated records as well.
+            Default: false.
+        effective_from_ts:
+          type: integer
+          description: >
+            A Unix timestamp that indicates the date/time from which the override will be active. You can use this to create override rules that start applying from a future point in time.
+        effective_to_ts:
+          type: integer
+          description: >
+            A Unix timestamp that indicates the date/time until which the override will be active. You can use this to create override rules that stop applying after a period of time.
+        stop_processing:
+          type: boolean
+          description: >
+            When set to true, override processing will stop at the first matching rule. When set to false override processing will continue and multiple override actions will be triggered in sequence.
+            Overrides are processed in the lexical sort order of their id field.
+            Default: true.
     SearchOverride:
       allOf:
         - $ref: "#/components/schemas/SearchOverrideSchema"
@@ -2166,10 +2202,12 @@ components:
               readOnly: true
     SearchOverrideRule:
       type: object
-      required:
-        - query
-        - match
       properties:
+        tags:
+          type: array
+          description: List of tag values to associate with this override rule.
+          items:
+            type: string
         query:
           type: string
           description: Indicates what search queries should be overridden
@@ -2182,11 +2220,10 @@ components:
           enum:
             - exact
             - contains
-        tags:
-          type: array
-          description: List of tags.
-          items:
-            type: string
+        filter_by:
+          type: string
+          description: >
+            Indicates that the override should apply when the filter_by parameter in a search query exactly matches the string specified here (including backticks, spaces, brackets, etc).
     SearchOverrideInclude:
       type: object
       required:
@@ -2228,6 +2265,14 @@ components:
         synonyms:
           type: array
           description: Array of words that should be considered as synonyms.
+          items:
+            type: string
+        locale:
+          type: string
+          description: Locale for the synonym, leave blank to use the standard tokenizer.
+        symbols_to_index:
+          type: array
+          description: By default, special characters are dropped from synonyms. Use this attribute to specify which special characters should be indexed as is.
           items:
             type: string
     SearchSynonym:
@@ -2342,6 +2387,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SearchResult"
+        conversation:
+          $ref: "#/components/schemas/SearchResultConversation"
     SearchParameters:
       type: object
       required:
@@ -2479,6 +2526,13 @@ components:
             set as `K` then only the top K hits in each group are returned in the response.
             Default: 3
           type: integer
+
+        group_missing_values:
+          description: >
+            Setting this parameter to true will place all documents that have a null value in the group_by field, into a single group.
+            Setting this parameter to false, will cause each document with a null value in the group_by field to not be grouped with other documents.
+            Default: true
+          type: boolean
 
         include_fields:
           description: List of fields from the document to include in the search result
@@ -2682,6 +2736,22 @@ components:
           description: >
             Comma separated string of nested facet fields whose parent object should be returned in facet response.
           type: string
+        voice_query:
+          description: >
+            The base64 encoded audio file in 16 khz 16-bit WAV format.
+          type: string
+        conversation:
+          description: >
+            Enable conversational search.
+          type: boolean
+        conversation_model_id:
+          description: >
+             The Id of Conversation Model to be used.
+          type: string
+        conversation_id:
+          description: >
+            The Id of a previous conversation to continue, this tells Typesense to include prior context when communicating with the LLM.
+          type: string
 
     MultiSearchParameters:
       description: >
@@ -2817,6 +2887,13 @@ components:
             set as `K` then only the top K hits in each group are returned in the response.
             Default: 3
           type: integer
+
+        group_missing_values:
+          description: >
+            Setting this parameter to true will place all documents that have a null value in the group_by field, into a single group.
+            Setting this parameter to false, will cause each document with a null value in the group_by field to not be grouped with other documents.
+            Default: true
+          type: boolean
 
         include_fields:
           description: List of fields from the document to include in the search result
@@ -3006,6 +3083,22 @@ components:
           description: >
             Comma separated string of nested facet fields whose parent object should be returned in facet response.
           type: string
+        voice_query:
+          description: >
+            The base64 encoded audio file in 16 khz 16-bit WAV format.
+          type: string
+        conversation:
+          description: >
+            Enable conversational search.
+          type: boolean
+        conversation_model_id:
+          description: >
+             The Id of Conversation Model to be used.
+          type: string
+        conversation_id:
+          description: >
+            The Id of a previous conversation to continue, this tells Typesense to include prior context when communicating with the LLM.
+          type: string
     MultiSearchSearchesParameter:
       type: object
       required:
@@ -3061,17 +3154,38 @@ components:
             avg:
               type: number
               format: double
-    AnalyticsRuleSchema:
+    AnalyticsEventCreateResponse:
       type: object
       required:
+        - ok
+      properties:
+        ok:
+          type: boolean
+    AnalyticsEventCreateSchema:
+      type: object
+      required:
+        - type
         - name
+        - data
+      properties:
+        type:
+          type: string
+        name:
+          type: string
+        data:
+          type: object
+    AnalyticsRuleUpsertSchema:
+      type: object
+      required:
         - type
         - params
       properties:
-        name:
-          type: string
         type:
           type: string
+          enum:
+            - popular_queries
+            - nohits_queries
+            - counter
         params:
           $ref: "#/components/schemas/AnalyticsRuleParameters"
     AnalyticsRuleParameters:
@@ -3079,22 +3193,65 @@ components:
       required:
         - source
         - destination
-        - limit
       properties:
         source:
-          type: object
-          properties:
-            collections:
-              type: array
-              items:
-                type: string
+          $ref: '#/components/schemas/AnalyticsRuleParametersSource'
         destination:
-          type: object
-          properties:
-            collection:
-              type: string
+          $ref: '#/components/schemas/AnalyticsRuleParametersDestination'
         limit:
           type: integer
+        expand_query:
+          type: boolean
+    AnalyticsRuleParametersSource:
+      type: object
+      required:
+        - collections
+      properties:
+        collections:
+          type: array
+          items:
+            type: string
+        events:
+          type: array
+          items:
+            type: object
+            required:
+              - type
+              - weight
+              - name
+            properties:
+              type:
+                type: string
+              weight:
+                type: number
+                format: float
+              name:
+                type: string
+    AnalyticsRuleParametersDestination:
+      type: object
+      required:
+        - collection
+      properties:
+        collection:
+          type: string
+        counter_field:
+          type: string
+    AnalyticsRuleDeleteResponse:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+    AnalyticsRuleSchema:
+      allOf:
+        - $ref: '#/components/schemas/AnalyticsRuleUpsertSchema'
+        - type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
     AnalyticsRulesRetrieveSchema:
       type: object
       properties:
@@ -3102,6 +3259,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AnalyticsRuleSchema"
+          x-go-type: '[]*AnalyticsRuleSchema'
     APIStatsResponse:
       type: object
       properties:
@@ -3227,52 +3385,70 @@ components:
       properties:
         name:
           type: string
-    ConversationSchema:
+    DocumentIndexParameters:
+      type: object
+      properties:
+        action:
+          type: string
+          enum:
+            - create
+            - update
+            - upsert
+            - emplace
+        dirty_values:
+          type: string
+          enum:
+            - coerce_or_reject
+            - coerce_or_drop
+            - drop
+            - reject
+    ConversationModelCreateSchema:
+      required:
+        - model_name
+        - max_bytes
+      allOf:
+        - $ref: '#/components/schemas/ConversationModelUpdateSchema'
+        - type: object
+          required:
+            - model_name
+            - max_bytes
+            - history_collection
+          properties:
+            model_name:
+              description: Name of the LLM model offered by OpenAI, Cloudflare or vLLM
+              type: string
+            max_bytes:
+              description: |
+                The maximum number of bytes to send to the LLM in every API call. Consult the LLM's documentation on the number of bytes supported in the context window.
+              type: integer
+            history_collection:
+              type: string
+              description: Typesense collection that stores the historical conversations
+    ConversationModelUpdateSchema:
+      type: object
       properties:
         id:
           type: string
-        conversation:
-          items:
-            type: object
-          type: array
-        last_updated:
-          type: integer
-        ttl:
-          description: Time to live. Conversations are stored by default for 24 hours, and then purged.
-          type: integer
-      type: object
-      required:
-        - id
-        - conversation
-        - last_updated
-        - ttl
-    ConversationUpdateSchema:
-      properties:
-        ttl:
-          description: Time to live. Conversations are stored by default for 24 hours, and then purged.
-          type: integer
-      required:
-        - ttl
-    ConversationDeleteSchema:
-      properties:
-        id:
-          type: integer
-      required:
-        - id
-    ConversationModelCreateAndUpdateSchema:
-      properties:
+          description: An explicit id for the model, otherwise the API will return a response with an auto-generated conversation model id.
         model_name:
           description: Name of the LLM model offered by OpenAI, Cloudflare or vLLM
           type: string
         api_key:
           description: The LLM service's API Key
           type: string
+        history_collection:
+          type: string
+          description: Typesense collection that stores the historical conversations
         account_id:
           description: LLM service's account ID (only applicable for Cloudflare)
           type: string
         system_prompt:
           description: The system prompt that contains special instructions to the LLM
           type: string
+        ttl:
+          type: integer
+          description: |
+            Time interval in seconds after which the messages would be deleted. Default: 86400 (24 hours)
         max_bytes:
           description: |
             The maximum number of bytes to send to the LLM in every API call. Consult the LLM's documentation on the number of bytes supported in the context window.
@@ -3280,20 +3456,16 @@ components:
         vllm_url:
           description: URL of vLLM service
           type: string
-      required:
-        - model_name
-        - api_key
-        - max_bytes
-      type: object
     ConversationModelSchema:
       allOf:
-        - $ref: '#/components/schemas/ConversationModelCreateAndUpdateSchema'
-        - properties:
-            id:
-              type: string
-          type: object
+        - $ref: '#/components/schemas/ConversationModelCreateSchema'
+        - type: object
           required:
             - id
+          properties:
+            id:
+              type: string
+              description: An explicit id for the model, otherwise the API will return a response with an auto-generated conversation model id.
   securitySchemes:
     api_key_header:
       type: apiKey

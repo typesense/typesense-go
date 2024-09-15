@@ -293,3 +293,54 @@ func TestMultiSearchOnApiClientError(t *testing.T) {
 	_, err := client.MultiSearch.Perform(context.Background(), params, newMultiSearchBodyParams())
 	assert.NotNil(t, err)
 }
+
+func TestMultiSearchRAG(t *testing.T) {
+	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
+		validateRequestMetadata(t, r, "/multi_search?q=can+you+suggest&conversation=true&conversation_model_id=conv-1&conversation_id=123", http.MethodPost)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`
+		{
+			"conversation": {
+				"answer": "Based on the context provided,...",
+				"conversation_history": [
+				{
+					"user": "can you suggest an action series"
+				},
+				{
+					"assistant": "Based on the context provided,..."
+				}
+				],
+				"conversation_id": "abc",
+				"query": "can you suggest"
+			},
+			"results": []
+		}`))
+	})
+	defer server.Close()
+
+	res, err := client.MultiSearch.Perform(context.Background(), &api.MultiSearchParams{
+		Q:                   pointer.String("can you suggest"),
+		Conversation:        pointer.True(),
+		ConversationModelId: pointer.String("conv-1"),
+		ConversationId:      pointer.String("123"),
+	}, api.MultiSearchSearchesParameter{
+		Searches: newMultiSearchBodyParams().Searches,
+	})
+
+	assert.NotNil(t, err)
+	assert.Equal(t, &api.MultiSearchResult{
+		Conversation: &api.SearchResultConversation{
+			Answer: "Based on the context provided,...",
+			ConversationHistory: []map[string]interface{}{
+				{
+					"user": "can you suggest an action series",
+				},
+				{
+					"assistant": "Based on the context provided,...",
+				},
+			},
+			ConversationId: "abc",
+			Query:          "can you suggest",
+		},
+	}, res)
+}

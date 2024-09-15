@@ -13,12 +13,14 @@ import (
 
 func TestConversationModelsRetrieve(t *testing.T) {
 	expectedData := []*api.ConversationModelSchema{{
-		Id:           "123",
-		ModelName:    "cf/mistral/mistral-7b-instruct-v0.1",
-		ApiKey:       "CLOUDFLARE_API_KEY",
-		AccountId:    pointer.String("CLOUDFLARE_ACCOUNT_ID"),
-		SystemPrompt: pointer.String("..."),
-		MaxBytes:     16384,
+		Id:                "123",
+		ModelName:         "cf/mistral/mistral-7b-instruct-v0.1",
+		ApiKey:            pointer.String("CLOUDFLARE_API_KEY"),
+		AccountId:         pointer.String("CLOUDFLARE_ACCOUNT_ID"),
+		SystemPrompt:      pointer.String("..."),
+		MaxBytes:          16384,
+		HistoryCollection: "conversation-store",
+		Ttl:               pointer.Int(10000),
 	}}
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
@@ -46,26 +48,30 @@ func TestConversationModelsRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.
 }
 
 func TestConversationModelsCreate(t *testing.T) {
-	model := &api.ConversationModelCreateAndUpdateSchema{
-		ModelName:    "cf/mistral/mistral-7b-instruct-v0.1",
-		ApiKey:       "CLOUDFLARE_API_KEY",
-		AccountId:    pointer.String("CLOUDFLARE_ACCOUNT_ID"),
-		SystemPrompt: pointer.String("..."),
-		MaxBytes:     16384,
+	model := &api.ConversationModelCreateSchema{
+		ModelName:         "cf/mistral/mistral-7b-instruct-v0.1",
+		ApiKey:            pointer.String("CLOUDFLARE_API_KEY"),
+		AccountId:         pointer.String("CLOUDFLARE_ACCOUNT_ID"),
+		SystemPrompt:      pointer.String("..."),
+		MaxBytes:          16384,
+		HistoryCollection: "conversation-store",
+		Ttl:               pointer.Int(10000),
 	}
 	expectedData := &api.ConversationModelSchema{
-		Id:           "123",
-		ModelName:    model.ModelName,
-		ApiKey:       model.ApiKey,
-		AccountId:    model.AccountId,
-		SystemPrompt: model.SystemPrompt,
-		MaxBytes:     model.MaxBytes,
+		Id:                "123",
+		ModelName:         model.ModelName,
+		ApiKey:            model.ApiKey,
+		AccountId:         model.AccountId,
+		SystemPrompt:      model.SystemPrompt,
+		MaxBytes:          model.MaxBytes,
+		HistoryCollection: model.HistoryCollection,
+		Ttl:               pointer.Int(10000),
 	}
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/conversations/models", http.MethodPost)
 
-		var reqBody api.ConversationModelCreateAndUpdateSchema
+		var reqBody api.ConversationModelCreateSchema
 		err := json.NewDecoder(r.Body).Decode(&reqBody)
 
 		assert.NoError(t, err)
@@ -90,6 +96,6 @@ func TestConversationModelsCreateOnHttpStatusErrorCodeReturnsError(t *testing.T)
 	})
 	defer server.Close()
 
-	_, err := client.Conversations().Models().Create(context.Background(), &api.ConversationModelCreateAndUpdateSchema{})
+	_, err := client.Conversations().Models().Create(context.Background(), &api.ConversationModelCreateSchema{})
 	assert.ErrorContains(t, err, "status: 409")
 }

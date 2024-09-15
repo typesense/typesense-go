@@ -338,3 +338,51 @@ func TestDocumentsExportOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	_, err := client.Collection("companies").Documents().Export(context.Background())
 	assert.NotNil(t, err)
 }
+
+func TestSingleCollectionSearchRAG(t *testing.T) {
+	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
+		validateRequestMetadata(t, r, "/collections/test/documents/search?q=can+you+suggest&conversation=true&conversation_model_id=conv-1&conversation_id=123", http.MethodPost)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`
+		{
+			"conversation": {
+				"answer": "Based on the context provided,...",
+				"conversation_history": [
+				{
+					"user": "can you suggest an action series"
+				},
+				{
+					"assistant": "Based on the context provided,..."
+				}
+				],
+				"conversation_id": "abc",
+				"query": "can you suggest"
+			}
+		}`))
+	})
+	defer server.Close()
+
+	res, err := client.Collection("test").Documents().Search(context.Background(), &api.SearchCollectionParams{
+		Q:                   pointer.String("can you suggest"),
+		Conversation:        pointer.True(),
+		ConversationModelId: pointer.String("conv-1"),
+		ConversationId:      pointer.String("123"),
+	})
+
+	assert.NotNil(t, err)
+	assert.Equal(t, &api.SearchResult{
+		Conversation: &api.SearchResultConversation{
+			Answer: "Based on the context provided,...",
+			ConversationHistory: []map[string]interface{}{
+				{
+					"user": "can you suggest an action series",
+				},
+				{
+					"assistant": "Based on the context provided,...",
+				},
+			},
+			ConversationId: "abc",
+			Query:          "can you suggest",
+		},
+	}, res)
+}

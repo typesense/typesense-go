@@ -103,6 +103,11 @@ type ClientInterface interface {
 
 	UpsertAlias(ctx context.Context, aliasName string, body UpsertAliasJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// CreateAnalyticsEventWithBody request with any body
+	CreateAnalyticsEventWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateAnalyticsEvent(ctx context.Context, body CreateAnalyticsEventJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// RetrieveAnalyticsRules request
 	RetrieveAnalyticsRules(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -202,9 +207,6 @@ type ClientInterface interface {
 
 	UpsertSearchSynonym(ctx context.Context, collectionName string, synonymId string, body UpsertSearchSynonymJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// RetrieveAllConversations request
-	RetrieveAllConversations(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// RetrieveAllConversationModels request
 	RetrieveAllConversationModels(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -223,17 +225,6 @@ type ClientInterface interface {
 	UpdateConversationModelWithBody(ctx context.Context, modelId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	UpdateConversationModel(ctx context.Context, modelId string, body UpdateConversationModelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// DeleteConversation request
-	DeleteConversation(ctx context.Context, conversationId string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// RetrieveConversation request
-	RetrieveConversation(ctx context.Context, conversationId string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// UpdateConversationWithBody request with any body
-	UpdateConversationWithBody(ctx context.Context, conversationId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	UpdateConversation(ctx context.Context, conversationId string, body UpdateConversationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Debug request
 	Debug(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -351,6 +342,30 @@ func (c *Client) UpsertAliasWithBody(ctx context.Context, aliasName string, cont
 
 func (c *Client) UpsertAlias(ctx context.Context, aliasName string, body UpsertAliasJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpsertAliasRequest(c.Server, aliasName, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateAnalyticsEventWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateAnalyticsEventRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateAnalyticsEvent(ctx context.Context, body CreateAnalyticsEventJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateAnalyticsEventRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -793,18 +808,6 @@ func (c *Client) UpsertSearchSynonym(ctx context.Context, collectionName string,
 	return c.Client.Do(req)
 }
 
-func (c *Client) RetrieveAllConversations(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewRetrieveAllConversationsRequest(c.Server)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
 func (c *Client) RetrieveAllConversationModels(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRetrieveAllConversationModelsRequest(c.Server)
 	if err != nil {
@@ -879,54 +882,6 @@ func (c *Client) UpdateConversationModelWithBody(ctx context.Context, modelId st
 
 func (c *Client) UpdateConversationModel(ctx context.Context, modelId string, body UpdateConversationModelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateConversationModelRequest(c.Server, modelId, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) DeleteConversation(ctx context.Context, conversationId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteConversationRequest(c.Server, conversationId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) RetrieveConversation(ctx context.Context, conversationId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewRetrieveConversationRequest(c.Server, conversationId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) UpdateConversationWithBody(ctx context.Context, conversationId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateConversationRequestWithBody(c.Server, conversationId, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) UpdateConversation(ctx context.Context, conversationId string, body UpdateConversationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateConversationRequest(c.Server, conversationId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1346,6 +1301,46 @@ func NewUpsertAliasRequestWithBody(server string, aliasName string, contentType 
 	}
 
 	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewCreateAnalyticsEventRequest calls the generic CreateAnalyticsEvent builder with application/json body
+func NewCreateAnalyticsEventRequest(server string, body CreateAnalyticsEventJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateAnalyticsEventRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateAnalyticsEventRequestWithBody generates requests for CreateAnalyticsEvent with any type of body
+func NewCreateAnalyticsEventRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/analytics/events")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
@@ -1780,6 +1775,22 @@ func NewDeleteDocumentsRequest(server string, collectionName string, params *Del
 
 		}
 
+		if params.IgnoreNotFound != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ignore_not_found", runtime.ParamLocationQuery, *params.IgnoreNotFound); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
@@ -1903,6 +1914,22 @@ func NewIndexDocumentRequestWithBody(server string, collectionName string, param
 		if params.Action != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "action", runtime.ParamLocationQuery, *params.Action); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.DirtyValues != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "dirty_values", runtime.ParamLocationQuery, *params.DirtyValues); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -2110,6 +2137,38 @@ func NewImportDocumentsRequestWithBody(server string, collectionName string, par
 
 		}
 
+		if params.ReturnDoc != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "return_doc", runtime.ParamLocationQuery, *params.ReturnDoc); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.ReturnId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "return_id", runtime.ParamLocationQuery, *params.ReturnId); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
@@ -2155,6 +2214,54 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 		if params.CacheTtl != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "cache_ttl", runtime.ParamLocationQuery, *params.CacheTtl); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Conversation != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "conversation", runtime.ParamLocationQuery, *params.Conversation); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.ConversationId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "conversation_id", runtime.ParamLocationQuery, *params.ConversationId); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.ConversationModelId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "conversation_model_id", runtime.ParamLocationQuery, *params.ConversationModelId); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -2363,6 +2470,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 		if params.GroupLimit != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "group_limit", runtime.ParamLocationQuery, *params.GroupLimit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.GroupMissingValues != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "group_missing_values", runtime.ParamLocationQuery, *params.GroupMissingValues); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -3019,6 +3142,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 		if params.VectorQuery != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "vector_query", runtime.ParamLocationQuery, *params.VectorQuery); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.VoiceQuery != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "voice_query", runtime.ParamLocationQuery, *params.VoiceQuery); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -3519,33 +3658,6 @@ func NewUpsertSearchSynonymRequestWithBody(server string, collectionName string,
 	return req, nil
 }
 
-// NewRetrieveAllConversationsRequest generates requests for RetrieveAllConversations
-func NewRetrieveAllConversationsRequest(server string) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/conversations")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
 // NewRetrieveAllConversationModelsRequest generates requests for RetrieveAllConversationModels
 func NewRetrieveAllConversationModelsRequest(server string) (*http.Request, error) {
 	var err error
@@ -3709,121 +3821,6 @@ func NewUpdateConversationModelRequestWithBody(server string, modelId string, co
 	}
 
 	operationPath := fmt.Sprintf("/conversations/models/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewDeleteConversationRequest generates requests for DeleteConversation
-func NewDeleteConversationRequest(server string, conversationId string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "conversationId", runtime.ParamLocationPath, conversationId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/conversations/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewRetrieveConversationRequest generates requests for RetrieveConversation
-func NewRetrieveConversationRequest(server string, conversationId string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "conversationId", runtime.ParamLocationPath, conversationId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/conversations/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewUpdateConversationRequest calls the generic UpdateConversation builder with application/json body
-func NewUpdateConversationRequest(server string, conversationId string, body UpdateConversationJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewUpdateConversationRequestWithBody(server, conversationId, "application/json", bodyReader)
-}
-
-// NewUpdateConversationRequestWithBody generates requests for UpdateConversation with any type of body
-func NewUpdateConversationRequestWithBody(server string, conversationId string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "conversationId", runtime.ParamLocationPath, conversationId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/conversations/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4108,6 +4105,54 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 		}
 
+		if params.Conversation != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "conversation", runtime.ParamLocationQuery, *params.Conversation); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.ConversationId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "conversation_id", runtime.ParamLocationQuery, *params.ConversationId); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.ConversationModelId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "conversation_model_id", runtime.ParamLocationQuery, *params.ConversationModelId); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.DropTokensThreshold != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "drop_tokens_threshold", runtime.ParamLocationQuery, *params.DropTokensThreshold); err != nil {
@@ -4303,6 +4348,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 		if params.GroupLimit != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "group_limit", runtime.ParamLocationQuery, *params.GroupLimit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.GroupMissingValues != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "group_missing_values", runtime.ParamLocationQuery, *params.GroupMissingValues); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -4972,6 +5033,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 		}
 
+		if params.VoiceQuery != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "voice_query", runtime.ParamLocationQuery, *params.VoiceQuery); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
@@ -5425,6 +5502,11 @@ type ClientWithResponsesInterface interface {
 
 	UpsertAliasWithResponse(ctx context.Context, aliasName string, body UpsertAliasJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertAliasResponse, error)
 
+	// CreateAnalyticsEventWithBodyWithResponse request with any body
+	CreateAnalyticsEventWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAnalyticsEventResponse, error)
+
+	CreateAnalyticsEventWithResponse(ctx context.Context, body CreateAnalyticsEventJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAnalyticsEventResponse, error)
+
 	// RetrieveAnalyticsRulesWithResponse request
 	RetrieveAnalyticsRulesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAnalyticsRulesResponse, error)
 
@@ -5524,9 +5606,6 @@ type ClientWithResponsesInterface interface {
 
 	UpsertSearchSynonymWithResponse(ctx context.Context, collectionName string, synonymId string, body UpsertSearchSynonymJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertSearchSynonymResponse, error)
 
-	// RetrieveAllConversationsWithResponse request
-	RetrieveAllConversationsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllConversationsResponse, error)
-
 	// RetrieveAllConversationModelsWithResponse request
 	RetrieveAllConversationModelsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllConversationModelsResponse, error)
 
@@ -5545,17 +5624,6 @@ type ClientWithResponsesInterface interface {
 	UpdateConversationModelWithBodyWithResponse(ctx context.Context, modelId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateConversationModelResponse, error)
 
 	UpdateConversationModelWithResponse(ctx context.Context, modelId string, body UpdateConversationModelJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateConversationModelResponse, error)
-
-	// DeleteConversationWithResponse request
-	DeleteConversationWithResponse(ctx context.Context, conversationId string, reqEditors ...RequestEditorFn) (*DeleteConversationResponse, error)
-
-	// RetrieveConversationWithResponse request
-	RetrieveConversationWithResponse(ctx context.Context, conversationId string, reqEditors ...RequestEditorFn) (*RetrieveConversationResponse, error)
-
-	// UpdateConversationWithBodyWithResponse request with any body
-	UpdateConversationWithBodyWithResponse(ctx context.Context, conversationId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateConversationResponse, error)
-
-	UpdateConversationWithResponse(ctx context.Context, conversationId string, body UpdateConversationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateConversationResponse, error)
 
 	// DebugWithResponse request
 	DebugWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DebugResponse, error)
@@ -5715,6 +5783,29 @@ func (r UpsertAliasResponse) StatusCode() int {
 	return 0
 }
 
+type CreateAnalyticsEventResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *AnalyticsEventCreateResponse
+	JSON400      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateAnalyticsEventResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateAnalyticsEventResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type RetrieveAnalyticsRulesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -5763,7 +5854,7 @@ func (r CreateAnalyticsRuleResponse) StatusCode() int {
 type DeleteAnalyticsRuleResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *AnalyticsRuleSchema
+	JSON200      *AnalyticsRuleDeleteResponse
 	JSON404      *ApiResponse
 }
 
@@ -5809,7 +5900,7 @@ func (r RetrieveAnalyticsRuleResponse) StatusCode() int {
 type UpsertAnalyticsRuleResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *AnalyticsRuleSchema
+	JSON200      *AnalyticsRuleSchema
 	JSON400      *ApiResponse
 }
 
@@ -6340,28 +6431,6 @@ func (r UpsertSearchSynonymResponse) StatusCode() int {
 	return 0
 }
 
-type RetrieveAllConversationsResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *[]*ConversationSchema
-}
-
-// Status returns HTTPResponse.Status
-func (r RetrieveAllConversationsResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r RetrieveAllConversationsResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
 type RetrieveAllConversationModelsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -6387,7 +6456,7 @@ func (r RetrieveAllConversationModelsResponse) StatusCode() int {
 type CreateConversationModelResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *ConversationModelSchema
+	JSON200      *ConversationModelSchema
 	JSON400      *ApiResponse
 }
 
@@ -6454,7 +6523,7 @@ func (r RetrieveConversationModelResponse) StatusCode() int {
 type UpdateConversationModelResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *ConversationModelCreateAndUpdateSchema
+	JSON200      *ConversationModelSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -6467,72 +6536,6 @@ func (r UpdateConversationModelResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r UpdateConversationModelResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type DeleteConversationResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ConversationSchema
-}
-
-// Status returns HTTPResponse.Status
-func (r DeleteConversationResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r DeleteConversationResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type RetrieveConversationResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ConversationSchema
-}
-
-// Status returns HTTPResponse.Status
-func (r RetrieveConversationResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r RetrieveConversationResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type UpdateConversationResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ConversationSchema
-}
-
-// Status returns HTTPResponse.Status
-func (r UpdateConversationResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r UpdateConversationResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -7017,6 +7020,23 @@ func (c *ClientWithResponses) UpsertAliasWithResponse(ctx context.Context, alias
 	return ParseUpsertAliasResponse(rsp)
 }
 
+// CreateAnalyticsEventWithBodyWithResponse request with arbitrary body returning *CreateAnalyticsEventResponse
+func (c *ClientWithResponses) CreateAnalyticsEventWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAnalyticsEventResponse, error) {
+	rsp, err := c.CreateAnalyticsEventWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateAnalyticsEventResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateAnalyticsEventWithResponse(ctx context.Context, body CreateAnalyticsEventJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAnalyticsEventResponse, error) {
+	rsp, err := c.CreateAnalyticsEvent(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateAnalyticsEventResponse(rsp)
+}
+
 // RetrieveAnalyticsRulesWithResponse request returning *RetrieveAnalyticsRulesResponse
 func (c *ClientWithResponses) RetrieveAnalyticsRulesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAnalyticsRulesResponse, error) {
 	rsp, err := c.RetrieveAnalyticsRules(ctx, reqEditors...)
@@ -7332,15 +7352,6 @@ func (c *ClientWithResponses) UpsertSearchSynonymWithResponse(ctx context.Contex
 	return ParseUpsertSearchSynonymResponse(rsp)
 }
 
-// RetrieveAllConversationsWithResponse request returning *RetrieveAllConversationsResponse
-func (c *ClientWithResponses) RetrieveAllConversationsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllConversationsResponse, error) {
-	rsp, err := c.RetrieveAllConversations(ctx, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseRetrieveAllConversationsResponse(rsp)
-}
-
 // RetrieveAllConversationModelsWithResponse request returning *RetrieveAllConversationModelsResponse
 func (c *ClientWithResponses) RetrieveAllConversationModelsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllConversationModelsResponse, error) {
 	rsp, err := c.RetrieveAllConversationModels(ctx, reqEditors...)
@@ -7400,41 +7411,6 @@ func (c *ClientWithResponses) UpdateConversationModelWithResponse(ctx context.Co
 		return nil, err
 	}
 	return ParseUpdateConversationModelResponse(rsp)
-}
-
-// DeleteConversationWithResponse request returning *DeleteConversationResponse
-func (c *ClientWithResponses) DeleteConversationWithResponse(ctx context.Context, conversationId string, reqEditors ...RequestEditorFn) (*DeleteConversationResponse, error) {
-	rsp, err := c.DeleteConversation(ctx, conversationId, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDeleteConversationResponse(rsp)
-}
-
-// RetrieveConversationWithResponse request returning *RetrieveConversationResponse
-func (c *ClientWithResponses) RetrieveConversationWithResponse(ctx context.Context, conversationId string, reqEditors ...RequestEditorFn) (*RetrieveConversationResponse, error) {
-	rsp, err := c.RetrieveConversation(ctx, conversationId, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseRetrieveConversationResponse(rsp)
-}
-
-// UpdateConversationWithBodyWithResponse request with arbitrary body returning *UpdateConversationResponse
-func (c *ClientWithResponses) UpdateConversationWithBodyWithResponse(ctx context.Context, conversationId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateConversationResponse, error) {
-	rsp, err := c.UpdateConversationWithBody(ctx, conversationId, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseUpdateConversationResponse(rsp)
-}
-
-func (c *ClientWithResponses) UpdateConversationWithResponse(ctx context.Context, conversationId string, body UpdateConversationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateConversationResponse, error) {
-	rsp, err := c.UpdateConversation(ctx, conversationId, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseUpdateConversationResponse(rsp)
 }
 
 // DebugWithResponse request returning *DebugResponse
@@ -7772,6 +7748,39 @@ func ParseUpsertAliasResponse(rsp *http.Response) (*UpsertAliasResponse, error) 
 	return response, nil
 }
 
+// ParseCreateAnalyticsEventResponse parses an HTTP response from a CreateAnalyticsEventWithResponse call
+func ParseCreateAnalyticsEventResponse(rsp *http.Response) (*CreateAnalyticsEventResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateAnalyticsEventResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest AnalyticsEventCreateResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseRetrieveAnalyticsRulesResponse parses an HTTP response from a RetrieveAnalyticsRulesWithResponse call
 func ParseRetrieveAnalyticsRulesResponse(rsp *http.Response) (*RetrieveAnalyticsRulesResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -7846,7 +7855,7 @@ func ParseDeleteAnalyticsRuleResponse(rsp *http.Response) (*DeleteAnalyticsRuleR
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest AnalyticsRuleSchema
+		var dest AnalyticsRuleDeleteResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -7911,12 +7920,12 @@ func ParseUpsertAnalyticsRuleResponse(rsp *http.Response) (*UpsertAnalyticsRuleR
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest AnalyticsRuleSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest ApiResponse
@@ -8661,32 +8670,6 @@ func ParseUpsertSearchSynonymResponse(rsp *http.Response) (*UpsertSearchSynonymR
 	return response, nil
 }
 
-// ParseRetrieveAllConversationsResponse parses an HTTP response from a RetrieveAllConversationsWithResponse call
-func ParseRetrieveAllConversationsResponse(rsp *http.Response) (*RetrieveAllConversationsResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &RetrieveAllConversationsResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []*ConversationSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	}
-
-	return response, nil
-}
-
 // ParseRetrieveAllConversationModelsResponse parses an HTTP response from a RetrieveAllConversationModelsWithResponse call
 func ParseRetrieveAllConversationModelsResponse(rsp *http.Response) (*RetrieveAllConversationModelsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -8727,12 +8710,12 @@ func ParseCreateConversationModelResponse(rsp *http.Response) (*CreateConversati
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest ConversationModelSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest ApiResponse
@@ -8813,85 +8796,7 @@ func ParseUpdateConversationModelResponse(rsp *http.Response) (*UpdateConversati
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ConversationModelCreateAndUpdateSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseDeleteConversationResponse parses an HTTP response from a DeleteConversationWithResponse call
-func ParseDeleteConversationResponse(rsp *http.Response) (*DeleteConversationResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &DeleteConversationResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ConversationSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseRetrieveConversationResponse parses an HTTP response from a RetrieveConversationWithResponse call
-func ParseRetrieveConversationResponse(rsp *http.Response) (*RetrieveConversationResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &RetrieveConversationResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ConversationSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseUpdateConversationResponse parses an HTTP response from a UpdateConversationWithResponse call
-func ParseUpdateConversationResponse(rsp *http.Response) (*UpdateConversationResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &UpdateConversationResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ConversationSchema
+		var dest ConversationModelSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

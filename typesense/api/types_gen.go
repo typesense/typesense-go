@@ -13,6 +13,20 @@ const (
 	Api_key_headerScopes = "api_key_header.Scopes"
 )
 
+// Defines values for AnalyticsRuleSchemaType.
+const (
+	AnalyticsRuleSchemaTypeCounter        AnalyticsRuleSchemaType = "counter"
+	AnalyticsRuleSchemaTypeNohitsQueries  AnalyticsRuleSchemaType = "nohits_queries"
+	AnalyticsRuleSchemaTypePopularQueries AnalyticsRuleSchemaType = "popular_queries"
+)
+
+// Defines values for AnalyticsRuleUpsertSchemaType.
+const (
+	AnalyticsRuleUpsertSchemaTypeCounter        AnalyticsRuleUpsertSchemaType = "counter"
+	AnalyticsRuleUpsertSchemaTypeNohitsQueries  AnalyticsRuleUpsertSchemaType = "nohits_queries"
+	AnalyticsRuleUpsertSchemaTypePopularQueries AnalyticsRuleUpsertSchemaType = "popular_queries"
+)
+
 // Defines values for SearchOverrideRuleMatch.
 const (
 	Contains SearchOverrideRuleMatch = "contains"
@@ -21,15 +35,31 @@ const (
 
 // Defines values for IndexDocumentParamsAction.
 const (
-	Upsert IndexDocumentParamsAction = "upsert"
+	IndexDocumentParamsActionUpsert IndexDocumentParamsAction = "upsert"
+)
+
+// Defines values for IndexDocumentParamsDirtyValues.
+const (
+	IndexDocumentParamsDirtyValuesCoerceOrDrop   IndexDocumentParamsDirtyValues = "coerce_or_drop"
+	IndexDocumentParamsDirtyValuesCoerceOrReject IndexDocumentParamsDirtyValues = "coerce_or_reject"
+	IndexDocumentParamsDirtyValuesDrop           IndexDocumentParamsDirtyValues = "drop"
+	IndexDocumentParamsDirtyValuesReject         IndexDocumentParamsDirtyValues = "reject"
+)
+
+// Defines values for ImportDocumentsParamsAction.
+const (
+	ImportDocumentsParamsActionCreate  ImportDocumentsParamsAction = "create"
+	ImportDocumentsParamsActionEmplace ImportDocumentsParamsAction = "emplace"
+	ImportDocumentsParamsActionUpdate  ImportDocumentsParamsAction = "update"
+	ImportDocumentsParamsActionUpsert  ImportDocumentsParamsAction = "upsert"
 )
 
 // Defines values for ImportDocumentsParamsDirtyValues.
 const (
-	CoerceOrDrop   ImportDocumentsParamsDirtyValues = "coerce_or_drop"
-	CoerceOrReject ImportDocumentsParamsDirtyValues = "coerce_or_reject"
-	Drop           ImportDocumentsParamsDirtyValues = "drop"
-	Reject         ImportDocumentsParamsDirtyValues = "reject"
+	ImportDocumentsParamsDirtyValuesCoerceOrDrop   ImportDocumentsParamsDirtyValues = "coerce_or_drop"
+	ImportDocumentsParamsDirtyValuesCoerceOrReject ImportDocumentsParamsDirtyValues = "coerce_or_reject"
+	ImportDocumentsParamsDirtyValuesDrop           ImportDocumentsParamsDirtyValues = "drop"
+	ImportDocumentsParamsDirtyValuesReject         ImportDocumentsParamsDirtyValues = "reject"
 )
 
 // APIStatsResponse defines model for APIStatsResponse.
@@ -49,27 +79,69 @@ type APIStatsResponse struct {
 	WriteRequestsPerSecond      *float64            `json:"write_requests_per_second,omitempty"`
 }
 
+// AnalyticsEventCreateResponse defines model for AnalyticsEventCreateResponse.
+type AnalyticsEventCreateResponse struct {
+	Ok bool `json:"ok"`
+}
+
+// AnalyticsEventCreateSchema defines model for AnalyticsEventCreateSchema.
+type AnalyticsEventCreateSchema struct {
+	Data map[string]interface{} `json:"data"`
+	Name string                 `json:"name"`
+	Type string                 `json:"type"`
+}
+
+// AnalyticsRuleDeleteResponse defines model for AnalyticsRuleDeleteResponse.
+type AnalyticsRuleDeleteResponse struct {
+	Name string `json:"name"`
+}
+
 // AnalyticsRuleParameters defines model for AnalyticsRuleParameters.
 type AnalyticsRuleParameters struct {
-	Destination struct {
-		Collection *string `json:"collection,omitempty"`
-	} `json:"destination"`
-	Limit  int `json:"limit"`
-	Source struct {
-		Collections *[]string `json:"collections,omitempty"`
-	} `json:"source"`
+	Destination AnalyticsRuleParametersDestination `json:"destination"`
+	ExpandQuery *bool                              `json:"expand_query,omitempty"`
+	Limit       *int                               `json:"limit,omitempty"`
+	Source      AnalyticsRuleParametersSource      `json:"source"`
+}
+
+// AnalyticsRuleParametersDestination defines model for AnalyticsRuleParametersDestination.
+type AnalyticsRuleParametersDestination struct {
+	Collection   string  `json:"collection"`
+	CounterField *string `json:"counter_field,omitempty"`
+}
+
+// AnalyticsRuleParametersSource defines model for AnalyticsRuleParametersSource.
+type AnalyticsRuleParametersSource struct {
+	Collections []string `json:"collections"`
+	Events      *[]struct {
+		Name   string  `json:"name"`
+		Type   string  `json:"type"`
+		Weight float32 `json:"weight"`
+	} `json:"events,omitempty"`
 }
 
 // AnalyticsRuleSchema defines model for AnalyticsRuleSchema.
 type AnalyticsRuleSchema struct {
 	Name   string                  `json:"name"`
 	Params AnalyticsRuleParameters `json:"params"`
-	Type   string                  `json:"type"`
+	Type   AnalyticsRuleSchemaType `json:"type"`
 }
+
+// AnalyticsRuleSchemaType defines model for AnalyticsRuleSchema.Type.
+type AnalyticsRuleSchemaType string
+
+// AnalyticsRuleUpsertSchema defines model for AnalyticsRuleUpsertSchema.
+type AnalyticsRuleUpsertSchema struct {
+	Params AnalyticsRuleParameters       `json:"params"`
+	Type   AnalyticsRuleUpsertSchemaType `json:"type"`
+}
+
+// AnalyticsRuleUpsertSchemaType defines model for AnalyticsRuleUpsertSchema.Type.
+type AnalyticsRuleUpsertSchemaType string
 
 // AnalyticsRulesRetrieveSchema defines model for AnalyticsRulesRetrieveSchema.
 type AnalyticsRulesRetrieveSchema struct {
-	Rules *[]AnalyticsRuleSchema `json:"rules,omitempty"`
+	Rules *[]*AnalyticsRuleSchema `json:"rules,omitempty"`
 }
 
 // ApiKey defines model for ApiKey.
@@ -147,6 +219,9 @@ type CollectionResponse struct {
 
 	// TokenSeparators List of symbols or special characters to be used for splitting the text into individual words in addition to space and new-line characters.
 	TokenSeparators *[]string `json:"token_separators,omitempty"`
+
+	// VoiceQueryModel Configuration for the voice query model
+	VoiceQueryModel *VoiceQueryModelCollectionConfig `json:"voice_query_model,omitempty"`
 }
 
 // CollectionSchema defines model for CollectionSchema.
@@ -168,6 +243,9 @@ type CollectionSchema struct {
 
 	// TokenSeparators List of symbols or special characters to be used for splitting the text into individual words in addition to space and new-line characters.
 	TokenSeparators *[]string `json:"token_separators,omitempty"`
+
+	// VoiceQueryModel Configuration for the voice query model
+	VoiceQueryModel *VoiceQueryModelCollectionConfig `json:"voice_query_model,omitempty"`
 }
 
 // CollectionUpdateSchema defines model for CollectionUpdateSchema.
@@ -176,13 +254,19 @@ type CollectionUpdateSchema struct {
 	Fields []Field `json:"fields"`
 }
 
-// ConversationModelCreateAndUpdateSchema defines model for ConversationModelCreateAndUpdateSchema.
-type ConversationModelCreateAndUpdateSchema struct {
+// ConversationModelCreateSchema defines model for ConversationModelCreateSchema.
+type ConversationModelCreateSchema struct {
 	// AccountId LLM service's account ID (only applicable for Cloudflare)
 	AccountId *string `json:"account_id,omitempty"`
 
 	// ApiKey The LLM service's API Key
-	ApiKey string `json:"api_key"`
+	ApiKey *string `json:"api_key,omitempty"`
+
+	// HistoryCollection Typesense collection that stores the historical conversations
+	HistoryCollection string `json:"history_collection"`
+
+	// Id An explicit id for the model, otherwise the API will return a response with an auto-generated conversation model id.
+	Id *string `json:"id,omitempty"`
 
 	// MaxBytes The maximum number of bytes to send to the LLM in every API call. Consult the LLM's documentation on the number of bytes supported in the context window.
 	MaxBytes int `json:"max_bytes"`
@@ -192,6 +276,9 @@ type ConversationModelCreateAndUpdateSchema struct {
 
 	// SystemPrompt The system prompt that contains special instructions to the LLM
 	SystemPrompt *string `json:"system_prompt,omitempty"`
+
+	// Ttl Time interval in seconds after which the messages would be deleted. Default: 86400 (24 hours)
+	Ttl *int `json:"ttl,omitempty"`
 
 	// VllmUrl URL of vLLM service
 	VllmUrl *string `json:"vllm_url,omitempty"`
@@ -203,8 +290,13 @@ type ConversationModelSchema struct {
 	AccountId *string `json:"account_id,omitempty"`
 
 	// ApiKey The LLM service's API Key
-	ApiKey string `json:"api_key"`
-	Id     string `json:"id"`
+	ApiKey *string `json:"api_key,omitempty"`
+
+	// HistoryCollection Typesense collection that stores the historical conversations
+	HistoryCollection string `json:"history_collection"`
+
+	// Id An explicit id for the model, otherwise the API will return a response with an auto-generated conversation model id.
+	Id string `json:"id"`
 
 	// MaxBytes The maximum number of bytes to send to the LLM in every API call. Consult the LLM's documentation on the number of bytes supported in the context window.
 	MaxBytes int `json:"max_bytes"`
@@ -215,24 +307,41 @@ type ConversationModelSchema struct {
 	// SystemPrompt The system prompt that contains special instructions to the LLM
 	SystemPrompt *string `json:"system_prompt,omitempty"`
 
+	// Ttl Time interval in seconds after which the messages would be deleted. Default: 86400 (24 hours)
+	Ttl *int `json:"ttl,omitempty"`
+
 	// VllmUrl URL of vLLM service
 	VllmUrl *string `json:"vllm_url,omitempty"`
 }
 
-// ConversationSchema defines model for ConversationSchema.
-type ConversationSchema struct {
-	Conversation []map[string]interface{} `json:"conversation"`
-	Id           string                   `json:"id"`
-	LastUpdated  int                      `json:"last_updated"`
+// ConversationModelUpdateSchema defines model for ConversationModelUpdateSchema.
+type ConversationModelUpdateSchema struct {
+	// AccountId LLM service's account ID (only applicable for Cloudflare)
+	AccountId *string `json:"account_id,omitempty"`
 
-	// Ttl Time to live. Conversations are stored by default for 24 hours, and then purged.
-	Ttl int `json:"ttl"`
-}
+	// ApiKey The LLM service's API Key
+	ApiKey *string `json:"api_key,omitempty"`
 
-// ConversationUpdateSchema defines model for ConversationUpdateSchema.
-type ConversationUpdateSchema struct {
-	// Ttl Time to live. Conversations are stored by default for 24 hours, and then purged.
-	Ttl int `json:"ttl"`
+	// HistoryCollection Typesense collection that stores the historical conversations
+	HistoryCollection *string `json:"history_collection,omitempty"`
+
+	// Id An explicit id for the model, otherwise the API will return a response with an auto-generated conversation model id.
+	Id *string `json:"id,omitempty"`
+
+	// MaxBytes The maximum number of bytes to send to the LLM in every API call. Consult the LLM's documentation on the number of bytes supported in the context window.
+	MaxBytes *int `json:"max_bytes,omitempty"`
+
+	// ModelName Name of the LLM model offered by OpenAI, Cloudflare or vLLM
+	ModelName *string `json:"model_name,omitempty"`
+
+	// SystemPrompt The system prompt that contains special instructions to the LLM
+	SystemPrompt *string `json:"system_prompt,omitempty"`
+
+	// Ttl Time interval in seconds after which the messages would be deleted. Default: 86400 (24 hours)
+	Ttl *int `json:"ttl,omitempty"`
+
+	// VllmUrl URL of vLLM service
+	VllmUrl *string `json:"vllm_url,omitempty"`
 }
 
 // FacetCounts defines model for FacetCounts.
@@ -276,7 +385,10 @@ type Field struct {
 	Optional  *bool   `json:"optional,omitempty"`
 	Reference *string `json:"reference,omitempty"`
 	Sort      *bool   `json:"sort,omitempty"`
-	Type      string  `json:"type"`
+
+	// Store Whether to store the image on disk.
+	Store *bool  `json:"store,omitempty"`
+	Type  string `json:"type"`
 }
 
 // HealthStatus defines model for HealthStatus.
@@ -292,6 +404,15 @@ type MultiSearchCollectionParameters struct {
 	// Collection The collection to search in.
 	Collection string `json:"collection"`
 
+	// Conversation Enable conversational search.
+	Conversation *bool `json:"conversation,omitempty"`
+
+	// ConversationId The Id of a previous conversation to continue, this tells Typesense to include prior context when communicating with the LLM.
+	ConversationId *string `json:"conversation_id,omitempty"`
+
+	// ConversationModelId The Id of Conversation Model to be used.
+	ConversationModelId *string `json:"conversation_model_id,omitempty"`
+
 	// DropTokensThreshold If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
 	DropTokensThreshold *int `json:"drop_tokens_threshold,omitempty"`
 
@@ -327,6 +448,9 @@ type MultiSearchCollectionParameters struct {
 
 	// GroupLimit Maximum number of hits to be returned for every group. If the `group_limit` is set as `K` then only the top K hits in each group are returned in the response. Default: 3
 	GroupLimit *int `json:"group_limit,omitempty"`
+
+	// GroupMissingValues Setting this parameter to true will place all documents that have a null value in the group_by field, into a single group. Setting this parameter to false, will cause each document with a null value in the group_by field to not be grouped with other documents. Default: true
+	GroupMissingValues *bool `json:"group_missing_values,omitempty"`
 
 	// HiddenHits A list of records to unconditionally hide from search results. A list of `record_id`s to hide. Eg: to hide records with IDs 123 and 456, you'd specify `123,456`.
 	// You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
@@ -447,6 +571,9 @@ type MultiSearchCollectionParameters struct {
 
 	// VectorQuery Vector query expression for fetching documents "closest" to a given query/document vector.
 	VectorQuery *string `json:"vector_query,omitempty"`
+
+	// VoiceQuery The base64 encoded audio file in 16 khz 16-bit WAV format.
+	VoiceQuery *string `json:"voice_query,omitempty"`
 }
 
 // MultiSearchParameters Parameters for the multi search API.
@@ -454,6 +581,15 @@ type MultiSearchParameters struct {
 	// CacheTtl The duration (in seconds) that determines how long the search query is cached. This value can be set on a per-query basis. Default: 60.
 	CacheTtl *int `json:"cache_ttl,omitempty"`
 
+	// Conversation Enable conversational search.
+	Conversation *bool `json:"conversation,omitempty"`
+
+	// ConversationId The Id of a previous conversation to continue, this tells Typesense to include prior context when communicating with the LLM.
+	ConversationId *string `json:"conversation_id,omitempty"`
+
+	// ConversationModelId The Id of Conversation Model to be used.
+	ConversationModelId *string `json:"conversation_model_id,omitempty"`
+
 	// DropTokensThreshold If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
 	DropTokensThreshold *int `json:"drop_tokens_threshold,omitempty"`
 
@@ -489,6 +625,9 @@ type MultiSearchParameters struct {
 
 	// GroupLimit Maximum number of hits to be returned for every group. If the `group_limit` is set as `K` then only the top K hits in each group are returned in the response. Default: 3
 	GroupLimit *int `json:"group_limit,omitempty"`
+
+	// GroupMissingValues Setting this parameter to true will place all documents that have a null value in the group_by field, into a single group. Setting this parameter to false, will cause each document with a null value in the group_by field to not be grouped with other documents. Default: true
+	GroupMissingValues *bool `json:"group_missing_values,omitempty"`
 
 	// HiddenHits A list of records to unconditionally hide from search results. A list of `record_id`s to hide. Eg: to hide records with IDs 123 and 456, you'd specify `123,456`.
 	// You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
@@ -609,11 +748,15 @@ type MultiSearchParameters struct {
 
 	// VectorQuery Vector query expression for fetching documents "closest" to a given query/document vector.
 	VectorQuery *string `json:"vector_query,omitempty"`
+
+	// VoiceQuery The base64 encoded audio file in 16 khz 16-bit WAV format.
+	VoiceQuery *string `json:"voice_query,omitempty"`
 }
 
 // MultiSearchResult defines model for MultiSearchResult.
 type MultiSearchResult struct {
-	Results []SearchResult `json:"results"`
+	Conversation *SearchResultConversation `json:"conversation,omitempty"`
+	Results      []SearchResult            `json:"results"`
 }
 
 // MultiSearchSearchesParameter defines model for MultiSearchSearchesParameter.
@@ -684,19 +827,40 @@ type SearchHighlight struct {
 
 // SearchOverride defines model for SearchOverride.
 type SearchOverride struct {
+	// EffectiveFromTs A Unix timestamp that indicates the date/time from which the override will be active. You can use this to create override rules that start applying from a future point in time.
+	EffectiveFromTs *int `json:"effective_from_ts,omitempty"`
+
+	// EffectiveToTs A Unix timestamp that indicates the date/time until which the override will be active. You can use this to create override rules that stop applying after a period of time.
+	EffectiveToTs *int `json:"effective_to_ts,omitempty"`
+
 	// Excludes List of document `id`s that should be excluded from the search results.
 	Excludes *[]SearchOverrideExclude `json:"excludes,omitempty"`
 
 	// FilterBy A filter by clause that is applied to any search query that matches the override rule.
 	FilterBy *string `json:"filter_by,omitempty"`
-	Id       *string `json:"id,omitempty"`
+
+	// FilterCuratedHits When set to true, the filter conditions of the query is applied to the curated records as well. Default: false.
+	FilterCuratedHits *bool   `json:"filter_curated_hits,omitempty"`
+	Id                *string `json:"id,omitempty"`
 
 	// Includes List of document `id`s that should be included in the search results with their corresponding `position`s.
 	Includes *[]SearchOverrideInclude `json:"includes,omitempty"`
 
+	// Metadata Return a custom JSON object in the Search API response, when this rule is triggered. This can can be used to display a pre-defined message (eg: a promotion banner) on the front-end when a particular rule is triggered.
+	Metadata *map[string]interface{} `json:"metadata,omitempty"`
+
 	// RemoveMatchedTokens Indicates whether search query tokens that exist in the override's rule should be removed from the search query.
-	RemoveMatchedTokens *bool              `json:"remove_matched_tokens,omitempty"`
-	Rule                SearchOverrideRule `json:"rule"`
+	RemoveMatchedTokens *bool `json:"remove_matched_tokens,omitempty"`
+
+	// ReplaceQuery Replaces the current search query with this value, when the search query matches the override rule.
+	ReplaceQuery *string            `json:"replace_query,omitempty"`
+	Rule         SearchOverrideRule `json:"rule"`
+
+	// SortBy A sort by clause that is applied to any search query that matches the override rule.
+	SortBy *string `json:"sort_by,omitempty"`
+
+	// StopProcessing When set to true, override processing will stop at the first matching rule. When set to false override processing will continue and multiple override actions will be triggered in sequence. Overrides are processed in the lexical sort order of their id field. Default: true.
+	StopProcessing *bool `json:"stop_processing,omitempty"`
 }
 
 // SearchOverrideExclude defines model for SearchOverrideExclude.
@@ -716,13 +880,16 @@ type SearchOverrideInclude struct {
 
 // SearchOverrideRule defines model for SearchOverrideRule.
 type SearchOverrideRule struct {
+	// FilterBy Indicates that the override should apply when the filter_by parameter in a search query exactly matches the string specified here (including backticks, spaces, brackets, etc).
+	FilterBy *string `json:"filter_by,omitempty"`
+
 	// Match Indicates whether the match on the query term should be `exact` or `contains`. If we want to match all queries that contained the word `apple`, we will use the `contains` match instead.
-	Match SearchOverrideRuleMatch `json:"match"`
+	Match *SearchOverrideRuleMatch `json:"match,omitempty"`
 
 	// Query Indicates what search queries should be overridden
-	Query string `json:"query"`
+	Query *string `json:"query,omitempty"`
 
-	// Tags List of tags.
+	// Tags List of tag values to associate with this override rule.
 	Tags *[]string `json:"tags,omitempty"`
 }
 
@@ -731,18 +898,39 @@ type SearchOverrideRuleMatch string
 
 // SearchOverrideSchema defines model for SearchOverrideSchema.
 type SearchOverrideSchema struct {
+	// EffectiveFromTs A Unix timestamp that indicates the date/time from which the override will be active. You can use this to create override rules that start applying from a future point in time.
+	EffectiveFromTs *int `json:"effective_from_ts,omitempty"`
+
+	// EffectiveToTs A Unix timestamp that indicates the date/time until which the override will be active. You can use this to create override rules that stop applying after a period of time.
+	EffectiveToTs *int `json:"effective_to_ts,omitempty"`
+
 	// Excludes List of document `id`s that should be excluded from the search results.
 	Excludes *[]SearchOverrideExclude `json:"excludes,omitempty"`
 
 	// FilterBy A filter by clause that is applied to any search query that matches the override rule.
 	FilterBy *string `json:"filter_by,omitempty"`
 
+	// FilterCuratedHits When set to true, the filter conditions of the query is applied to the curated records as well. Default: false.
+	FilterCuratedHits *bool `json:"filter_curated_hits,omitempty"`
+
 	// Includes List of document `id`s that should be included in the search results with their corresponding `position`s.
 	Includes *[]SearchOverrideInclude `json:"includes,omitempty"`
 
+	// Metadata Return a custom JSON object in the Search API response, when this rule is triggered. This can can be used to display a pre-defined message (eg: a promotion banner) on the front-end when a particular rule is triggered.
+	Metadata *map[string]interface{} `json:"metadata,omitempty"`
+
 	// RemoveMatchedTokens Indicates whether search query tokens that exist in the override's rule should be removed from the search query.
-	RemoveMatchedTokens *bool              `json:"remove_matched_tokens,omitempty"`
-	Rule                SearchOverrideRule `json:"rule"`
+	RemoveMatchedTokens *bool `json:"remove_matched_tokens,omitempty"`
+
+	// ReplaceQuery Replaces the current search query with this value, when the search query matches the override rule.
+	ReplaceQuery *string            `json:"replace_query,omitempty"`
+	Rule         SearchOverrideRule `json:"rule"`
+
+	// SortBy A sort by clause that is applied to any search query that matches the override rule.
+	SortBy *string `json:"sort_by,omitempty"`
+
+	// StopProcessing When set to true, override processing will stop at the first matching rule. When set to false override processing will continue and multiple override actions will be triggered in sequence. Overrides are processed in the lexical sort order of their id field. Default: true.
+	StopProcessing *bool `json:"stop_processing,omitempty"`
 }
 
 // SearchOverridesResponse defines model for SearchOverridesResponse.
@@ -754,6 +942,15 @@ type SearchOverridesResponse struct {
 type SearchParameters struct {
 	// CacheTtl The duration (in seconds) that determines how long the search query is cached. This value can be set on a per-query basis. Default: 60.
 	CacheTtl *int `json:"cache_ttl,omitempty"`
+
+	// Conversation Enable conversational search.
+	Conversation *bool `json:"conversation,omitempty"`
+
+	// ConversationId The Id of a previous conversation to continue, this tells Typesense to include prior context when communicating with the LLM.
+	ConversationId *string `json:"conversation_id,omitempty"`
+
+	// ConversationModelId The Id of Conversation Model to be used.
+	ConversationModelId *string `json:"conversation_model_id,omitempty"`
 
 	// DropTokensThreshold If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
 	DropTokensThreshold *int `json:"drop_tokens_threshold,omitempty"`
@@ -793,6 +990,9 @@ type SearchParameters struct {
 
 	// GroupLimit Maximum number of hits to be returned for every group. If the `group_limit` is set as `K` then only the top K hits in each group are returned in the response. Default: 3
 	GroupLimit *int `json:"group_limit,omitempty"`
+
+	// GroupMissingValues Setting this parameter to true will place all documents that have a null value in the group_by field, into a single group. Setting this parameter to false, will cause each document with a null value in the group_by field to not be grouped with other documents. Default: true
+	GroupMissingValues *bool `json:"group_missing_values,omitempty"`
 
 	// HiddenHits A list of records to unconditionally hide from search results. A list of `record_id`s to hide. Eg: to hide records with IDs 123 and 456, you'd specify `123,456`.
 	// You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
@@ -919,11 +1119,15 @@ type SearchParameters struct {
 
 	// VectorQuery Vector query expression for fetching documents "closest" to a given query/document vector.
 	VectorQuery *string `json:"vector_query,omitempty"`
+
+	// VoiceQuery The base64 encoded audio file in 16 khz 16-bit WAV format.
+	VoiceQuery *string `json:"voice_query,omitempty"`
 }
 
 // SearchResult defines model for SearchResult.
 type SearchResult struct {
-	FacetCounts *[]FacetCounts `json:"facet_counts,omitempty"`
+	Conversation *SearchResultConversation `json:"conversation,omitempty"`
+	FacetCounts  *[]FacetCounts            `json:"facet_counts,omitempty"`
 
 	// Found The number of documents found
 	Found       *int                `json:"found,omitempty"`
@@ -941,6 +1145,9 @@ type SearchResult struct {
 		CollectionName string `json:"collection_name"`
 		PerPage        int    `json:"per_page"`
 		Q              string `json:"q"`
+		VoiceQuery     *struct {
+			TranscribedQuery *string `json:"transcribed_query,omitempty"`
+		} `json:"voice_query,omitempty"`
 	} `json:"request_params,omitempty"`
 
 	// SearchCutoff Whether the search was cut off
@@ -948,6 +1155,14 @@ type SearchResult struct {
 
 	// SearchTimeMs The number of milliseconds the search took
 	SearchTimeMs *int `json:"search_time_ms,omitempty"`
+}
+
+// SearchResultConversation defines model for SearchResultConversation.
+type SearchResultConversation struct {
+	Answer              string                   `json:"answer"`
+	ConversationHistory []map[string]interface{} `json:"conversation_history"`
+	ConversationId      string                   `json:"conversation_id"`
+	Query               string                   `json:"query"`
 }
 
 // SearchResultHit defines model for SearchResultHit.
@@ -973,8 +1188,14 @@ type SearchResultHit struct {
 type SearchSynonym struct {
 	Id *string `json:"id,omitempty"`
 
+	// Locale Locale for the synonym, leave blank to use the standard tokenizer.
+	Locale *string `json:"locale,omitempty"`
+
 	// Root For 1-way synonyms, indicates the root word that words in the `synonyms` parameter map to.
 	Root *string `json:"root,omitempty"`
+
+	// SymbolsToIndex By default, special characters are dropped from synonyms. Use this attribute to specify which special characters should be indexed as is.
+	SymbolsToIndex *[]string `json:"symbols_to_index,omitempty"`
 
 	// Synonyms Array of words that should be considered as synonyms.
 	Synonyms []string `json:"synonyms"`
@@ -982,8 +1203,14 @@ type SearchSynonym struct {
 
 // SearchSynonymSchema defines model for SearchSynonymSchema.
 type SearchSynonymSchema struct {
+	// Locale Locale for the synonym, leave blank to use the standard tokenizer.
+	Locale *string `json:"locale,omitempty"`
+
 	// Root For 1-way synonyms, indicates the root word that words in the `synonyms` parameter map to.
 	Root *string `json:"root,omitempty"`
+
+	// SymbolsToIndex By default, special characters are dropped from synonyms. Use this attribute to specify which special characters should be indexed as is.
+	SymbolsToIndex *[]string `json:"symbols_to_index,omitempty"`
 
 	// Synonyms Array of words that should be considered as synonyms.
 	Synonyms []string `json:"synonyms"`
@@ -1022,10 +1249,16 @@ type SuccessStatus struct {
 	Success bool `json:"success"`
 }
 
+// VoiceQueryModelCollectionConfig Configuration for the voice query model
+type VoiceQueryModelCollectionConfig struct {
+	ModelName *string `json:"model_name,omitempty"`
+}
+
 // DeleteDocumentsParams defines parameters for DeleteDocuments.
 type DeleteDocumentsParams struct {
-	BatchSize *int    `form:"batch_size,omitempty" json:"batch_size,omitempty"`
-	FilterBy  *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
+	BatchSize      *int    `form:"batch_size,omitempty" json:"batch_size,omitempty"`
+	FilterBy       *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
+	IgnoreNotFound *bool   `form:"ignore_not_found,omitempty" json:"ignore_not_found,omitempty"`
 }
 
 // UpdateDocumentsJSONBody defines parameters for UpdateDocuments.
@@ -1043,10 +1276,16 @@ type IndexDocumentJSONBody = interface{}
 type IndexDocumentParams struct {
 	// Action Additional action to perform
 	Action *IndexDocumentParamsAction `form:"action,omitempty" json:"action,omitempty"`
+
+	// DirtyValues Dealing with Dirty Data
+	DirtyValues *IndexDocumentParamsDirtyValues `form:"dirty_values,omitempty" json:"dirty_values,omitempty"`
 }
 
 // IndexDocumentParamsAction defines parameters for IndexDocument.
 type IndexDocumentParamsAction string
+
+// IndexDocumentParamsDirtyValues defines parameters for IndexDocument.
+type IndexDocumentParamsDirtyValues string
 
 // ExportDocumentsParams defines parameters for ExportDocuments.
 type ExportDocumentsParams struct {
@@ -1057,11 +1296,16 @@ type ExportDocumentsParams struct {
 
 // ImportDocumentsParams defines parameters for ImportDocuments.
 type ImportDocumentsParams struct {
-	Action                   *string                           `form:"action,omitempty" json:"action,omitempty"`
+	Action                   *ImportDocumentsParamsAction      `form:"action,omitempty" json:"action,omitempty"`
 	BatchSize                *int                              `form:"batch_size,omitempty" json:"batch_size,omitempty"`
 	DirtyValues              *ImportDocumentsParamsDirtyValues `form:"dirty_values,omitempty" json:"dirty_values,omitempty"`
 	RemoteEmbeddingBatchSize *int                              `form:"remote_embedding_batch_size,omitempty" json:"remote_embedding_batch_size,omitempty"`
+	ReturnDoc                *bool                             `form:"return_doc,omitempty" json:"return_doc,omitempty"`
+	ReturnId                 *bool                             `form:"return_id,omitempty" json:"return_id,omitempty"`
 }
+
+// ImportDocumentsParamsAction defines parameters for ImportDocuments.
+type ImportDocumentsParamsAction string
 
 // ImportDocumentsParamsDirtyValues defines parameters for ImportDocuments.
 type ImportDocumentsParamsDirtyValues string
@@ -1069,6 +1313,9 @@ type ImportDocumentsParamsDirtyValues string
 // SearchCollectionParams defines parameters for SearchCollection.
 type SearchCollectionParams struct {
 	CacheTtl                      *int    `form:"cache_ttl,omitempty" json:"cache_ttl,omitempty"`
+	Conversation                  *bool   `form:"conversation,omitempty" json:"conversation,omitempty"`
+	ConversationId                *string `form:"conversation_id,omitempty" json:"conversation_id,omitempty"`
+	ConversationModelId           *string `form:"conversation_model_id,omitempty" json:"conversation_model_id,omitempty"`
 	DropTokensThreshold           *int    `form:"drop_tokens_threshold,omitempty" json:"drop_tokens_threshold,omitempty"`
 	EnableHighlightV1             *bool   `form:"enable_highlight_v1,omitempty" json:"enable_highlight_v1,omitempty"`
 	EnableOverrides               *bool   `form:"enable_overrides,omitempty" json:"enable_overrides,omitempty"`
@@ -1082,6 +1329,7 @@ type SearchCollectionParams struct {
 	FilterBy                      *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
 	GroupBy                       *string `form:"group_by,omitempty" json:"group_by,omitempty"`
 	GroupLimit                    *int    `form:"group_limit,omitempty" json:"group_limit,omitempty"`
+	GroupMissingValues            *bool   `form:"group_missing_values,omitempty" json:"group_missing_values,omitempty"`
 	HiddenHits                    *string `form:"hidden_hits,omitempty" json:"hidden_hits,omitempty"`
 	HighlightAffixNumTokens       *int    `form:"highlight_affix_num_tokens,omitempty" json:"highlight_affix_num_tokens,omitempty"`
 	HighlightEndTag               *string `form:"highlight_end_tag,omitempty" json:"highlight_end_tag,omitempty"`
@@ -1123,6 +1371,7 @@ type SearchCollectionParams struct {
 	TypoTokensThreshold           *int    `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
 	UseCache                      *bool   `form:"use_cache,omitempty" json:"use_cache,omitempty"`
 	VectorQuery                   *string `form:"vector_query,omitempty" json:"vector_query,omitempty"`
+	VoiceQuery                    *string `form:"voice_query,omitempty" json:"voice_query,omitempty"`
 }
 
 // UpdateDocumentJSONBody defines parameters for UpdateDocument.
@@ -1131,6 +1380,9 @@ type UpdateDocumentJSONBody = interface{}
 // MultiSearchParams defines parameters for MultiSearch.
 type MultiSearchParams struct {
 	CacheTtl                      *int    `form:"cache_ttl,omitempty" json:"cache_ttl,omitempty"`
+	Conversation                  *bool   `form:"conversation,omitempty" json:"conversation,omitempty"`
+	ConversationId                *string `form:"conversation_id,omitempty" json:"conversation_id,omitempty"`
+	ConversationModelId           *string `form:"conversation_model_id,omitempty" json:"conversation_model_id,omitempty"`
 	DropTokensThreshold           *int    `form:"drop_tokens_threshold,omitempty" json:"drop_tokens_threshold,omitempty"`
 	EnableHighlightV1             *bool   `form:"enable_highlight_v1,omitempty" json:"enable_highlight_v1,omitempty"`
 	EnableOverrides               *bool   `form:"enable_overrides,omitempty" json:"enable_overrides,omitempty"`
@@ -1144,6 +1396,7 @@ type MultiSearchParams struct {
 	FilterBy                      *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
 	GroupBy                       *string `form:"group_by,omitempty" json:"group_by,omitempty"`
 	GroupLimit                    *int    `form:"group_limit,omitempty" json:"group_limit,omitempty"`
+	GroupMissingValues            *bool   `form:"group_missing_values,omitempty" json:"group_missing_values,omitempty"`
 	HiddenHits                    *string `form:"hidden_hits,omitempty" json:"hidden_hits,omitempty"`
 	HighlightAffixNumTokens       *int    `form:"highlight_affix_num_tokens,omitempty" json:"highlight_affix_num_tokens,omitempty"`
 	HighlightEndTag               *string `form:"highlight_end_tag,omitempty" json:"highlight_end_tag,omitempty"`
@@ -1185,6 +1438,7 @@ type MultiSearchParams struct {
 	TypoTokensThreshold           *int    `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
 	UseCache                      *bool   `form:"use_cache,omitempty" json:"use_cache,omitempty"`
 	VectorQuery                   *string `form:"vector_query,omitempty" json:"vector_query,omitempty"`
+	VoiceQuery                    *string `form:"voice_query,omitempty" json:"voice_query,omitempty"`
 }
 
 // TakeSnapshotParams defines parameters for TakeSnapshot.
@@ -1196,11 +1450,14 @@ type TakeSnapshotParams struct {
 // UpsertAliasJSONRequestBody defines body for UpsertAlias for application/json ContentType.
 type UpsertAliasJSONRequestBody = CollectionAliasSchema
 
+// CreateAnalyticsEventJSONRequestBody defines body for CreateAnalyticsEvent for application/json ContentType.
+type CreateAnalyticsEventJSONRequestBody = AnalyticsEventCreateSchema
+
 // CreateAnalyticsRuleJSONRequestBody defines body for CreateAnalyticsRule for application/json ContentType.
 type CreateAnalyticsRuleJSONRequestBody = AnalyticsRuleSchema
 
 // UpsertAnalyticsRuleJSONRequestBody defines body for UpsertAnalyticsRule for application/json ContentType.
-type UpsertAnalyticsRuleJSONRequestBody = AnalyticsRuleSchema
+type UpsertAnalyticsRuleJSONRequestBody = AnalyticsRuleUpsertSchema
 
 // CreateCollectionJSONRequestBody defines body for CreateCollection for application/json ContentType.
 type CreateCollectionJSONRequestBody = CollectionSchema
@@ -1224,13 +1481,10 @@ type UpsertSearchOverrideJSONRequestBody = SearchOverrideSchema
 type UpsertSearchSynonymJSONRequestBody = SearchSynonymSchema
 
 // CreateConversationModelJSONRequestBody defines body for CreateConversationModel for application/json ContentType.
-type CreateConversationModelJSONRequestBody = ConversationModelCreateAndUpdateSchema
+type CreateConversationModelJSONRequestBody = ConversationModelCreateSchema
 
 // UpdateConversationModelJSONRequestBody defines body for UpdateConversationModel for application/json ContentType.
-type UpdateConversationModelJSONRequestBody = ConversationModelCreateAndUpdateSchema
-
-// UpdateConversationJSONRequestBody defines body for UpdateConversation for application/json ContentType.
-type UpdateConversationJSONRequestBody = ConversationUpdateSchema
+type UpdateConversationModelJSONRequestBody = ConversationModelUpdateSchema
 
 // CreateKeyJSONRequestBody defines body for CreateKey for application/json ContentType.
 type CreateKeyJSONRequestBody = ApiKeySchema
