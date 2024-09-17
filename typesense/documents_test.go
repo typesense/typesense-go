@@ -341,7 +341,7 @@ func TestDocumentsExportOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 func TestSingleCollectionSearchRAG(t *testing.T) {
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
-		validateRequestMetadata(t, r, "/collections/test/documents/search?q=can+you+suggest&conversation=true&conversation_model_id=conv-1&conversation_id=123", http.MethodPost)
+		validateRequestMetadata(t, r, "/collections/test/documents/search?conversation=true&conversation_id=123&conversation_model_id=conv-1&q=can+you+suggest", http.MethodGet)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`
 		{
@@ -369,7 +369,7 @@ func TestSingleCollectionSearchRAG(t *testing.T) {
 		ConversationId:      pointer.String("123"),
 	})
 
-	assert.NotNil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, &api.SearchResult{
 		Conversation: &api.SearchResultConversation{
 			Answer: "Based on the context provided,...",

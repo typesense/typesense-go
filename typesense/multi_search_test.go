@@ -296,7 +296,7 @@ func TestMultiSearchOnApiClientError(t *testing.T) {
 
 func TestMultiSearchRAG(t *testing.T) {
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
-		validateRequestMetadata(t, r, "/multi_search?q=can+you+suggest&conversation=true&conversation_model_id=conv-1&conversation_id=123", http.MethodPost)
+		validateRequestMetadata(t, r, "/multi_search?conversation=true&conversation_id=123&conversation_model_id=conv-1&q=can+you+suggest", http.MethodPost)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`
 		{
@@ -312,8 +312,7 @@ func TestMultiSearchRAG(t *testing.T) {
 				],
 				"conversation_id": "abc",
 				"query": "can you suggest"
-			},
-			"results": []
+			}
 		}`))
 	})
 	defer server.Close()
@@ -327,7 +326,7 @@ func TestMultiSearchRAG(t *testing.T) {
 		Searches: newMultiSearchBodyParams().Searches,
 	})
 
-	assert.NotNil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, &api.MultiSearchResult{
 		Conversation: &api.SearchResultConversation{
 			Answer: "Based on the context provided,...",

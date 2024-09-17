@@ -79,7 +79,6 @@ func TestConversationModelsCreate(t *testing.T) {
 
 		data := jsonEncode(t, expectedData)
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
 		w.Write(data)
 	})
 	defer server.Close()
