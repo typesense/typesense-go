@@ -44,6 +44,10 @@ func (c *Client) Alias(aliasName string) AliasInterface {
 	return &alias{apiClient: c.apiClient, name: aliasName}
 }
 
+func (c *Client) Analytics() AnalyticsInterface {
+	return &analytics{apiClient: c.apiClient}
+}
+
 func (c *Client) Conversations() ConversationsInterface {
 	return &conversations{apiClient: c.apiClient}
 }

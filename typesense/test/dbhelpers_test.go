@@ -187,17 +187,11 @@ func newKey() *api.ApiKey {
 
 type newSearchOverrideSchemaOption func(*api.SearchOverrideSchema)
 
-func withOverrideRuleMatch(match api.SearchOverrideRuleMatch) newSearchOverrideSchemaOption {
-	return func(o *api.SearchOverrideSchema) {
-		o.Rule.Match = match
-	}
-}
-
 func newSearchOverrideSchema() *api.SearchOverrideSchema {
 	schema := &api.SearchOverrideSchema{
 		Rule: api.SearchOverrideRule{
-			Query: "apple",
-			Match: "exact",
+			Query: pointer.String("apple"),
+			Match: (*api.SearchOverrideRuleMatch)(pointer.String("exact")),
 		},
 		Includes: &[]api.SearchOverrideInclude{
 			{
@@ -224,8 +218,8 @@ func newSearchOverride(overrideID string) *api.SearchOverride {
 	return &api.SearchOverride{
 		Id: pointer.String(overrideID),
 		Rule: api.SearchOverrideRule{
-			Query: "apple",
-			Match: "exact",
+			Query: pointer.String("apple"),
+			Match: (*api.SearchOverrideRuleMatch)(pointer.String("exact")),
 		},
 		Includes: &[]api.SearchOverrideInclude{
 			{
@@ -322,6 +316,53 @@ func newPresetFromMultiSearchSearchesParameter(presetName string) *api.PresetSch
 	return preset
 }
 
+func newAnalyticsRuleUpsertSchema(collectionName string, eventName string) *api.AnalyticsRuleUpsertSchema {
+	return &api.AnalyticsRuleUpsertSchema{
+		Type: "counter",
+		Params: api.AnalyticsRuleParameters{
+			Source: api.AnalyticsRuleParametersSource{
+				Collections: []string{"products"},
+				Events: &[]struct {
+					Name   string  "json:\"name\""
+					Type   string  "json:\"type\""
+					Weight float32 "json:\"weight\""
+				}{
+					{Type: "click", Weight: 1, Name: eventName},
+				},
+			},
+			Destination: api.AnalyticsRuleParametersDestination{
+				Collection:   collectionName,
+				CounterField: pointer.String("num_employees"),
+			},
+			Limit: pointer.Int(9999),
+		},
+	}
+}
+
+func newAnalyticsRule(ruleName string, collectionName string, eventName string) *api.AnalyticsRuleSchema {
+	return &api.AnalyticsRuleSchema{
+		Name: ruleName,
+		Type: "counter",
+		Params: api.AnalyticsRuleParameters{
+			Source: api.AnalyticsRuleParametersSource{
+				Collections: []string{"products"},
+				Events: &[]struct {
+					Name   string  "json:\"name\""
+					Type   string  "json:\"type\""
+					Weight float32 "json:\"weight\""
+				}{
+					{Type: "click", Weight: 1, Name: eventName},
+				},
+			},
+			Destination: api.AnalyticsRuleParametersDestination{
+				Collection:   collectionName,
+				CounterField: pointer.String("num_employees"),
+			},
+			Limit: pointer.Int(9999),
+		},
+	}
+}
+
 func createNewCollection(t *testing.T, namePrefix string) string {
 	t.Helper()
 	collectionName := newUUIDName(namePrefix)
@@ -361,6 +402,17 @@ func createNewPreset(t *testing.T, presetValueIsFromSearchParameters ...bool) (s
 
 	require.NoError(t, err)
 	return presetName, result
+}
+
+func createNewAnalyticsRule(t *testing.T, collectionName string, eventName string) *api.AnalyticsRuleSchema {
+	t.Helper()
+	ruleSchema := newAnalyticsRuleUpsertSchema(collectionName, eventName)
+	ruleName := newUUIDName("test-rule")
+
+	result, err := typesenseClient.Analytics().Rules().Upsert(context.Background(), ruleName, ruleSchema)
+
+	require.NoError(t, err)
+	return result
 }
 
 func retrieveDocuments(t *testing.T, collectionName string, docIDs ...string) []map[string]interface{} {
