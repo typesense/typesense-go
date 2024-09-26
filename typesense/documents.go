@@ -9,13 +9,11 @@ import (
 	"net/http"
 
 	"github.com/typesense/typesense-go/v2/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense/api/pointer"
 )
-
-var upsertAction api.IndexDocumentParamsAction = "upsert"
 
 const (
 	defaultImportBatchSize = 40
-	defaultImportAction    = "create"
 )
 
 // DocumentsInterface is a type for Documents API operations
@@ -31,7 +29,7 @@ type DocumentsInterface interface {
 	// Search performs document search in collection
 	Search(ctx context.Context, params *api.SearchCollectionParams) (*api.SearchResult, error)
 	// Export returns all documents from index in jsonl format
-	Export(ctx context.Context) (io.ReadCloser, error)
+	Export(ctx context.Context, params *api.ExportDocumentsParams) (io.ReadCloser, error)
 	// Import returns json array. Each item of the response indicates
 	// the result of each document present in the request body (in the same order).
 	Import(ctx context.Context, documents []interface{}, params *api.ImportDocumentsParams) ([]*api.ImportDocumentResponse, error)
@@ -39,6 +37,8 @@ type DocumentsInterface interface {
 	// response indicates the result of each document present in the
 	// request body (in the same order).
 	ImportJsonl(ctx context.Context, body io.Reader, params *api.ImportDocumentsParams) (io.ReadCloser, error)
+	// Index returns indexed document, this method allow configuration of dirty values behavior and action mode. Default action: create
+	Index(ctx context.Context, document interface{}, params *api.IndexDocumentParams) (map[string]interface{}, error)
 }
 
 // documents is internal implementation of DocumentsInterface
@@ -59,6 +59,10 @@ func (d *documents) indexDocument(ctx context.Context, document interface{}, par
 	return *response.JSON201, nil
 }
 
+func (d *documents) Index(ctx context.Context, document interface{}, params *api.IndexDocumentParams) (map[string]interface{}, error) {
+	return d.indexDocument(ctx, document, params)
+}
+
 func (d *documents) Create(ctx context.Context, document interface{}) (map[string]interface{}, error) {
 	return d.indexDocument(ctx, document, &api.IndexDocumentParams{})
 }
@@ -76,7 +80,7 @@ func (d *documents) Update(ctx context.Context, updateFields interface{}, params
 }
 
 func (d *documents) Upsert(ctx context.Context, document interface{}) (map[string]interface{}, error) {
-	return d.indexDocument(ctx, document, &api.IndexDocumentParams{Action: &upsertAction})
+	return d.indexDocument(ctx, document, &api.IndexDocumentParams{Action: pointer.Any(api.Upsert)})
 }
 
 func (d *documents) Delete(ctx context.Context, filter *api.DeleteDocumentsParams) (int, error) {
@@ -103,8 +107,8 @@ func (d *documents) Search(ctx context.Context, params *api.SearchCollectionPara
 	return response.JSON200, nil
 }
 
-func (d *documents) Export(ctx context.Context) (io.ReadCloser, error) {
-	response, err := d.apiClient.ExportDocuments(ctx, d.collectionName, &api.ExportDocumentsParams{})
+func (d *documents) Export(ctx context.Context, params *api.ExportDocumentsParams) (io.ReadCloser, error) {
+	response, err := d.apiClient.ExportDocuments(ctx, d.collectionName, params)
 	if err != nil {
 		return nil, err
 	}
@@ -122,8 +126,7 @@ func initImportParams(params *api.ImportDocumentsParams) {
 		*params.BatchSize = defaultImportBatchSize
 	}
 	if params.Action == nil {
-		params.Action = new(string)
-		*params.Action = defaultImportAction
+		params.Action = pointer.Any(api.Create)
 	}
 }
 

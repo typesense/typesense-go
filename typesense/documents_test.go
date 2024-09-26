@@ -123,7 +123,7 @@ func TestDocumentUpsert(t *testing.T) {
 	mockedResult := createNewDocumentResponse()
 
 	notNill := gomock.Not(gomock.Nil())
-	indexParams := &api.IndexDocumentParams{Action: &upsertAction}
+	indexParams := &api.IndexDocumentParams{Action: pointer.Any(api.Upsert)}
 	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, newDocument).
 		Return(&api.IndexDocumentResponse{
@@ -146,7 +146,7 @@ func TestDocumentUpsertOnApiClientErrorReturnsError(t *testing.T) {
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	notNill := gomock.Not(gomock.Nil())
-	indexParams := &api.IndexDocumentParams{Action: &upsertAction}
+	indexParams := &api.IndexDocumentParams{Action: pointer.Any(api.Upsert)}
 	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, newDocument).
 		Return(nil, errors.New("failed request")).
@@ -165,7 +165,7 @@ func TestDocumentUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	notNill := gomock.Not(gomock.Nil())
-	indexParams := &api.IndexDocumentParams{Action: &upsertAction}
+	indexParams := &api.IndexDocumentParams{Action: pointer.Any(api.Upsert)}
 	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, newDocument).
 		Return(&api.IndexDocumentResponse{
@@ -298,7 +298,7 @@ func TestDocumentsExport(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Collection("companies").Documents().Export(context.Background())
+	result, err := client.Collection("companies").Documents().Export(context.Background(), &api.ExportDocumentsParams{})
 	assert.Nil(t, err)
 
 	resultBytes, err := ioutil.ReadAll(result)
@@ -317,7 +317,7 @@ func TestDocumentsExportOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Export(context.Background())
+	_, err := client.Collection("companies").Documents().Export(context.Background(), &api.ExportDocumentsParams{})
 	assert.NotNil(t, err)
 }
 
@@ -335,7 +335,7 @@ func TestDocumentsExportOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Export(context.Background())
+	_, err := client.Collection("companies").Documents().Export(context.Background(), &api.ExportDocumentsParams{})
 	assert.NotNil(t, err)
 }
 

@@ -2089,9 +2089,9 @@ func NewImportDocumentsRequestWithBody(server string, collectionName string, par
 
 		}
 
-		if params.BatchSize != nil {
+		if params.DirtyValues != nil {
 
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "batch_size", runtime.ParamLocationQuery, *params.BatchSize); err != nil {
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "dirty_values", runtime.ParamLocationQuery, *params.DirtyValues); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -2105,9 +2105,9 @@ func NewImportDocumentsRequestWithBody(server string, collectionName string, par
 
 		}
 
-		if params.DirtyValues != nil {
+		if params.BatchSize != nil {
 
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "dirty_values", runtime.ParamLocationQuery, *params.DirtyValues); err != nil {
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "batch_size", runtime.ParamLocationQuery, *params.BatchSize); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err

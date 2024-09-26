@@ -387,22 +387,17 @@ components:
           description: URL of vLLM service
           type: string
       type: object
+    DirtyValues:
+      enum:
+        - coerce_or_reject
+        - coerce_or_drop
+        - drop
+        - reject
+      type: string
     DocumentIndexParameters:
       properties:
-        action:
-          enum:
-            - create
-            - update
-            - upsert
-            - emplace
-          type: string
         dirty_values:
-          enum:
-            - coerce_or_reject
-            - coerce_or_drop
-            - drop
-            - reject
-          type: string
+          $ref: '#/components/schemas/DirtyValues'
       type: object
     ErrorResponse:
       properties:
@@ -523,6 +518,13 @@ components:
       required:
         - ok
       type: object
+    IndexAction:
+      enum:
+        - create
+        - update
+        - upsert
+        - emplace
+      type: string
     MultiSearchCollectionParameters:
       allOf:
         - $ref: '#/components/schemas/MultiSearchParameters'
@@ -1236,6 +1238,8 @@ components:
           type: array
         found:
           description: The number of documents found
+          type: integer
+        found_docs:
           type: integer
         grouped_hits:
           items:
@@ -1965,20 +1969,14 @@ paths:
           in: query
           name: action
           schema:
-            enum:
-              - upsert
+            $ref: '#/components/schemas/IndexAction'
             example: upsert
             type: string
         - description: Dealing with Dirty Data
           in: query
           name: dirty_values
           schema:
-            enum:
-              - coerce_or_reject
-              - coerce_or_drop
-              - drop
-              - reject
-            type: string
+            $ref: '#/components/schemas/DirtyValues'
       requestBody:
         content:
           application/json:
@@ -2171,25 +2169,15 @@ paths:
         - in: query
           name: action
           schema:
-            enum:
-              - create
-              - update
-              - upsert
-              - emplace
-            type: string
+            $ref: '#/components/schemas/IndexAction'
+        - in: query
+          name: dirty_values
+          schema:
+            $ref: '#/components/schemas/DirtyValues'
         - in: query
           name: batch_size
           schema:
             type: integer
-        - in: query
-          name: dirty_values
-          schema:
-            enum:
-              - coerce_or_reject
-              - coerce_or_drop
-              - drop
-              - reject
-            type: string
         - in: query
           name: remote_embedding_batch_size
           schema:

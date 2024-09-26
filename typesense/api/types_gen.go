@@ -27,39 +27,26 @@ const (
 	AnalyticsRuleUpsertSchemaTypePopularQueries AnalyticsRuleUpsertSchemaType = "popular_queries"
 )
 
+// Defines values for DirtyValues.
+const (
+	CoerceOrDrop   DirtyValues = "coerce_or_drop"
+	CoerceOrReject DirtyValues = "coerce_or_reject"
+	Drop           DirtyValues = "drop"
+	Reject         DirtyValues = "reject"
+)
+
+// Defines values for IndexAction.
+const (
+	Create  IndexAction = "create"
+	Emplace IndexAction = "emplace"
+	Update  IndexAction = "update"
+	Upsert  IndexAction = "upsert"
+)
+
 // Defines values for SearchOverrideRuleMatch.
 const (
 	Contains SearchOverrideRuleMatch = "contains"
 	Exact    SearchOverrideRuleMatch = "exact"
-)
-
-// Defines values for IndexDocumentParamsAction.
-const (
-	IndexDocumentParamsActionUpsert IndexDocumentParamsAction = "upsert"
-)
-
-// Defines values for IndexDocumentParamsDirtyValues.
-const (
-	IndexDocumentParamsDirtyValuesCoerceOrDrop   IndexDocumentParamsDirtyValues = "coerce_or_drop"
-	IndexDocumentParamsDirtyValuesCoerceOrReject IndexDocumentParamsDirtyValues = "coerce_or_reject"
-	IndexDocumentParamsDirtyValuesDrop           IndexDocumentParamsDirtyValues = "drop"
-	IndexDocumentParamsDirtyValuesReject         IndexDocumentParamsDirtyValues = "reject"
-)
-
-// Defines values for ImportDocumentsParamsAction.
-const (
-	ImportDocumentsParamsActionCreate  ImportDocumentsParamsAction = "create"
-	ImportDocumentsParamsActionEmplace ImportDocumentsParamsAction = "emplace"
-	ImportDocumentsParamsActionUpdate  ImportDocumentsParamsAction = "update"
-	ImportDocumentsParamsActionUpsert  ImportDocumentsParamsAction = "upsert"
-)
-
-// Defines values for ImportDocumentsParamsDirtyValues.
-const (
-	ImportDocumentsParamsDirtyValuesCoerceOrDrop   ImportDocumentsParamsDirtyValues = "coerce_or_drop"
-	ImportDocumentsParamsDirtyValuesCoerceOrReject ImportDocumentsParamsDirtyValues = "coerce_or_reject"
-	ImportDocumentsParamsDirtyValuesDrop           ImportDocumentsParamsDirtyValues = "drop"
-	ImportDocumentsParamsDirtyValuesReject         ImportDocumentsParamsDirtyValues = "reject"
 )
 
 // APIStatsResponse defines model for APIStatsResponse.
@@ -344,6 +331,9 @@ type ConversationModelUpdateSchema struct {
 	VllmUrl *string `json:"vllm_url,omitempty"`
 }
 
+// DirtyValues defines model for DirtyValues.
+type DirtyValues string
+
 // FacetCounts defines model for FacetCounts.
 type FacetCounts struct {
 	Counts *[]struct {
@@ -395,6 +385,9 @@ type Field struct {
 type HealthStatus struct {
 	Ok bool `json:"ok"`
 }
+
+// IndexAction defines model for IndexAction.
+type IndexAction string
 
 // MultiSearchCollectionParameters defines model for MultiSearchCollectionParameters.
 type MultiSearchCollectionParameters struct {
@@ -1131,6 +1124,7 @@ type SearchResult struct {
 
 	// Found The number of documents found
 	Found       *int                `json:"found,omitempty"`
+	FoundDocs   *int                `json:"found_docs,omitempty"`
 	GroupedHits *[]SearchGroupedHit `json:"grouped_hits,omitempty"`
 
 	// Hits The documents that matched the search query
@@ -1275,17 +1269,11 @@ type IndexDocumentJSONBody = interface{}
 // IndexDocumentParams defines parameters for IndexDocument.
 type IndexDocumentParams struct {
 	// Action Additional action to perform
-	Action *IndexDocumentParamsAction `form:"action,omitempty" json:"action,omitempty"`
+	Action *IndexAction `form:"action,omitempty" json:"action,omitempty"`
 
 	// DirtyValues Dealing with Dirty Data
-	DirtyValues *IndexDocumentParamsDirtyValues `form:"dirty_values,omitempty" json:"dirty_values,omitempty"`
+	DirtyValues *DirtyValues `form:"dirty_values,omitempty" json:"dirty_values,omitempty"`
 }
-
-// IndexDocumentParamsAction defines parameters for IndexDocument.
-type IndexDocumentParamsAction string
-
-// IndexDocumentParamsDirtyValues defines parameters for IndexDocument.
-type IndexDocumentParamsDirtyValues string
 
 // ExportDocumentsParams defines parameters for ExportDocuments.
 type ExportDocumentsParams struct {
@@ -1296,19 +1284,13 @@ type ExportDocumentsParams struct {
 
 // ImportDocumentsParams defines parameters for ImportDocuments.
 type ImportDocumentsParams struct {
-	Action                   *ImportDocumentsParamsAction      `form:"action,omitempty" json:"action,omitempty"`
-	BatchSize                *int                              `form:"batch_size,omitempty" json:"batch_size,omitempty"`
-	DirtyValues              *ImportDocumentsParamsDirtyValues `form:"dirty_values,omitempty" json:"dirty_values,omitempty"`
-	RemoteEmbeddingBatchSize *int                              `form:"remote_embedding_batch_size,omitempty" json:"remote_embedding_batch_size,omitempty"`
-	ReturnDoc                *bool                             `form:"return_doc,omitempty" json:"return_doc,omitempty"`
-	ReturnId                 *bool                             `form:"return_id,omitempty" json:"return_id,omitempty"`
+	Action                   *IndexAction `form:"action,omitempty" json:"action,omitempty"`
+	DirtyValues              *DirtyValues `form:"dirty_values,omitempty" json:"dirty_values,omitempty"`
+	BatchSize                *int         `form:"batch_size,omitempty" json:"batch_size,omitempty"`
+	RemoteEmbeddingBatchSize *int         `form:"remote_embedding_batch_size,omitempty" json:"remote_embedding_batch_size,omitempty"`
+	ReturnDoc                *bool        `form:"return_doc,omitempty" json:"return_doc,omitempty"`
+	ReturnId                 *bool        `form:"return_id,omitempty" json:"return_id,omitempty"`
 }
-
-// ImportDocumentsParamsAction defines parameters for ImportDocuments.
-type ImportDocumentsParamsAction string
-
-// ImportDocumentsParamsDirtyValues defines parameters for ImportDocuments.
-type ImportDocumentsParamsDirtyValues string
 
 // SearchCollectionParams defines parameters for SearchCollection.
 type SearchCollectionParams struct {

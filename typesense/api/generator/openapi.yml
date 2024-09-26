@@ -228,18 +228,12 @@ paths:
           schema:
             type: string
             example: upsert
-            enum:
-              - upsert
+            $ref: "#/components/schemas/IndexAction"
         - name: dirty_values
           in: query
           description: Dealing with Dirty Data
           schema:
-            type: string
-            enum:
-              - coerce_or_reject
-              - coerce_or_drop
-              - drop
-              - reject
+            $ref: "#/components/schemas/DirtyValues"
       requestBody:
         description: The document object to be indexed
         content:
@@ -732,18 +726,12 @@ paths:
           required: true
           schema:
             type: string
+        # Do not change the index position of this param
         - name: importDocumentsParameters
           in: query
           schema:
             type: object
             properties:
-              action:
-                type: string
-                enum:
-                  - create
-                  - update
-                  - upsert
-                  - emplace
               batch_size:
                 type: integer
               return_id:
@@ -752,17 +740,18 @@ paths:
                   Returning the id of the imported documents. If you want the
                   import response to return the ingested document's id in the
                   response, you can use the return_id parameter.
-              dirty_values:
-                type: string
-                enum:
-                  - coerce_or_reject
-                  - coerce_or_drop
-                  - drop
-                  - reject
               remote_embedding_batch_size:
                 type: integer
               return_doc:
                 type: boolean
+        - name: action
+          in: query
+          schema:
+            $ref: "#/components/schemas/IndexAction"
+        - name: dirty_values
+          in: query
+          schema:
+            $ref: "#/components/schemas/DirtyValues"
       requestBody:
         description: The json array of documents or the JSONL file to import
         content:
@@ -1974,6 +1963,8 @@ components:
         found:
           type: integer
           description: The number of documents found
+        found_docs:
+          type: integer
         search_time_ms:
           type: integer
           description: The number of milliseconds the search took
@@ -3385,23 +3376,18 @@ components:
       properties:
         name:
           type: string
+    # client libraries already have .create, .upsert,... methods so we omit the `action` param
     DocumentIndexParameters:
       type: object
       properties:
-        action:
-          type: string
-          enum:
-            - create
-            - update
-            - upsert
-            - emplace
         dirty_values:
-          type: string
-          enum:
-            - coerce_or_reject
-            - coerce_or_drop
-            - drop
-            - reject
+          $ref: "#/components/schemas/DirtyValues"
+    DirtyValues:
+      type: string
+      enum: [coerce_or_reject, coerce_or_drop, drop, reject]
+    IndexAction:
+      type: string
+      enum: [create, update, upsert, emplace]
     ConversationModelCreateSchema:
       required:
         - model_name

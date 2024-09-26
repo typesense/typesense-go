@@ -48,7 +48,7 @@ func (m *eqReaderMatcher) String() string {
 
 func TestDocumentsImportWithOneDocument(t *testing.T) {
 	expectedParams := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(40),
 	}
 	expectedBody := strings.NewReader(`{"id":"123","companyName":"Stark Industries","numEmployees":5215,"country":"USA"}` + "\n")
@@ -75,7 +75,7 @@ func TestDocumentsImportWithOneDocument(t *testing.T) {
 		createNewDocument(),
 	}
 	params := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(40),
 	}
 	result, err := client.Collection("companies").Documents().Import(context.Background(), documents, params)
@@ -91,7 +91,7 @@ func TestDocumentsImportWithEmptyListReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(40),
 	}
 	documents := []interface{}{}
@@ -101,7 +101,7 @@ func TestDocumentsImportWithEmptyListReturnsError(t *testing.T) {
 
 func TestDocumentsImportWithOneDocumentAndInvalidResultJsonReturnsError(t *testing.T) {
 	expectedParams := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(40),
 	}
 	expectedBody := strings.NewReader(`{"id":"123","companyName":"Stark Industries","numEmployees":5215,"country":"USA"}` + "\n")
@@ -125,7 +125,7 @@ func TestDocumentsImportWithOneDocumentAndInvalidResultJsonReturnsError(t *testi
 		createNewDocument(),
 	}
 	params := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(40),
 	}
 	_, err := client.Collection("companies").Documents().Import(context.Background(), documents, params)
@@ -139,7 +139,7 @@ func TestDocumentsImportWithInvalidInputDataReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(40),
 	}
 	documents := []interface{}{
@@ -162,7 +162,7 @@ func TestDocumentsImportOnApiClientErrorReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(40),
 	}
 	documents := []interface{}{
@@ -188,7 +188,7 @@ func TestDocumentsImportOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(40),
 	}
 	documents := []interface{}{
@@ -200,7 +200,7 @@ func TestDocumentsImportOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 func TestDocumentsImportWithTwoDocuments(t *testing.T) {
 	expectedParams := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(40),
 	}
 	expectedBody := strings.NewReader(`{"id":"123","companyName":"Stark Industries","numEmployees":5215,"country":"USA"}` +
@@ -230,7 +230,7 @@ func TestDocumentsImportWithTwoDocuments(t *testing.T) {
 		createNewDocument("125"),
 	}
 	params := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(40),
 	}
 	result, err := client.Collection("companies").Documents().Import(context.Background(), documents, params)
@@ -241,7 +241,7 @@ func TestDocumentsImportWithTwoDocuments(t *testing.T) {
 
 func TestDocumentsImportWithActionOnly(t *testing.T) {
 	expectedParams := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(defaultImportBatchSize),
 	}
 
@@ -263,7 +263,7 @@ func TestDocumentsImportWithActionOnly(t *testing.T) {
 		createNewDocument(),
 	}
 	params := &api.ImportDocumentsParams{
-		Action: pointer.String("create"),
+		Action: pointer.Any(api.Create),
 	}
 	_, err := client.Collection("companies").Documents().Import(context.Background(), documents, params)
 	assert.Nil(t, err)
@@ -271,7 +271,7 @@ func TestDocumentsImportWithActionOnly(t *testing.T) {
 
 func TestDocumentsImportWithBatchSizeOnly(t *testing.T) {
 	expectedParams := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(10),
 	}
 
@@ -302,7 +302,7 @@ func TestDocumentsImportWithBatchSizeOnly(t *testing.T) {
 func TestDocumentsImportJsonl(t *testing.T) {
 	expectedBytes := []byte(`{"success": true}`)
 	expectedParams := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(40),
 	}
 	expectedBody := createDocumentStream()
@@ -322,7 +322,7 @@ func TestDocumentsImportJsonl(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(40),
 	}
 	importBody := createDocumentStream()
@@ -347,7 +347,7 @@ func TestDocumentsImportJsonlOnApiClientErrorReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(40),
 	}
 	importBody := createDocumentStream()
@@ -371,7 +371,7 @@ func TestDocumentsImportJsonlOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(40),
 	}
 	importBody := createDocumentStream()
@@ -381,7 +381,7 @@ func TestDocumentsImportJsonlOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 func TestDocumentsImportJsonlWithActionOnly(t *testing.T) {
 	expectedParams := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(defaultImportBatchSize),
 	}
 
@@ -400,7 +400,7 @@ func TestDocumentsImportJsonlWithActionOnly(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	params := &api.ImportDocumentsParams{
-		Action: pointer.String("create"),
+		Action: pointer.Any(api.Create),
 	}
 	importBody := createDocumentStream()
 	_, err := client.Collection("companies").Documents().ImportJsonl(context.Background(), importBody, params)
@@ -409,7 +409,7 @@ func TestDocumentsImportJsonlWithActionOnly(t *testing.T) {
 
 func TestDocumentsImportJsonlWithBatchSizeOnly(t *testing.T) {
 	expectedParams := &api.ImportDocumentsParams{
-		Action:    pointer.String("create"),
+		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(10),
 	}
 

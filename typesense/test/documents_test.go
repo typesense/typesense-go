@@ -106,7 +106,7 @@ func TestDocumentsExport(t *testing.T) {
 	createDocument(t, collectionName, newDocument("125", withCompanyName("Company2")))
 	createDocument(t, collectionName, newDocument("127", withCompanyName("Company3")))
 
-	body, err := typesenseClient.Collection(collectionName).Documents().Export(context.Background())
+	body, err := typesenseClient.Collection(collectionName).Documents().Export(context.Background(), &api.ExportDocumentsParams{})
 	require.NoError(t, err)
 	defer body.Close()
 
