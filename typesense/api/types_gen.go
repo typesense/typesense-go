@@ -870,6 +870,9 @@ type SearchParameters struct {
 
 // SearchResult defines model for SearchResult.
 type SearchResult struct {
+	Code *int `json:"code,omitempty"`
+	Error *string `json:"error,omitempty"`
+
 	FacetCounts *[]FacetCounts `json:"facet_counts,omitempty"`
 
 	// Found The number of documents found
