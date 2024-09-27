@@ -168,6 +168,9 @@ type CollectionSchema struct {
 
 	// TokenSeparators List of symbols or special characters to be used for splitting the text into individual words in addition to space and new-line characters.
 	TokenSeparators *[]string `json:"token_separators,omitempty"`
+
+	// The dirty_values parameter determines what Typesense should do when the type of a particular field being indexed does not match the previously inferred type for that field, or the one defined in the collection's schema.
+	DirtyValues *string `json:"dirty_values,omitempty"`
 }
 
 // CollectionUpdateSchema defines model for CollectionUpdateSchema.
@@ -388,6 +391,9 @@ type MultiSearchCollectionParameters struct {
 
 	// VectorQuery Vector query expression for fetching documents "closest" to a given query/document vector.
 	VectorQuery *string `json:"vector_query,omitempty"`
+
+	// MaxCandidates Control the number of similar words that Typesense considers for prefix and typo searching .
+	MaxCandidates *int `json:"max_candidates,omitempty"`
 }
 
 // MultiSearchParameters Parameters for the multi search API.
@@ -864,6 +870,9 @@ type SearchParameters struct {
 
 // SearchResult defines model for SearchResult.
 type SearchResult struct {
+	Code *int `json:"code,omitempty"`
+	Error *string `json:"error,omitempty"`
+
 	FacetCounts *[]FacetCounts `json:"facet_counts,omitempty"`
 
 	// Found The number of documents found
