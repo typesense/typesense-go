@@ -391,6 +391,9 @@ type MultiSearchCollectionParameters struct {
 
 	// VectorQuery Vector query expression for fetching documents "closest" to a given query/document vector.
 	VectorQuery *string `json:"vector_query,omitempty"`
+
+	// MaxCandidates Control the number of similar words that Typesense considers for prefix and typo searching .
+	MaxCandidates *int `json:"max_candidates,omitempty"`
 }
 
 // MultiSearchParameters Parameters for the multi search API.
