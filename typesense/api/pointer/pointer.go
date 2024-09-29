@@ -33,6 +33,7 @@ func Interface(v interface{}) *interface{} {
 func String(v string) *string {
 	return &v
 }
+
 func Any[T any](v T) *T {
 	return &v
 }

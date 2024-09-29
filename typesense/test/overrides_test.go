@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/typesense/typesense-go/v2/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense/api/pointer"
 )
 
 func TestSearchOverrideUpsertNewOverride(t *testing.T) {
@@ -33,14 +34,14 @@ func TestSearchOverrideUpsertExistingOverride(t *testing.T) {
 	collectionName := createNewCollection(t, "companies")
 	overrideID := newUUIDName("customize-apple")
 	expectedResult := newSearchOverride(overrideID)
-	expectedResult.Rule.Match = "contains"
+	expectedResult.Rule.Match = pointer.Any(api.Contains)
 
 	body := newSearchOverrideSchema()
-	body.Rule.Match = "exact"
+	body.Rule.Match = pointer.Any(api.Exact)
 	_, err := typesenseClient.Collection(collectionName).Overrides().Upsert(context.Background(), overrideID, body)
 	require.NoError(t, err)
 
-	body.Rule.Match = "contains"
+	body.Rule.Match = pointer.Any(api.Contains)
 
 	result, err := typesenseClient.Collection(collectionName).Overrides().Upsert(context.Background(), overrideID, body)
 

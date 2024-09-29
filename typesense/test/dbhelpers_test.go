@@ -56,6 +56,7 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 				Locale:   pointer.String(""),
 				Sort:     pointer.False(),
 				Drop:     nil,
+				Store:    pointer.True(),
 			},
 			{
 				Name:     "num_employees",
@@ -67,6 +68,7 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 				Locale:   pointer.String(""),
 				Sort:     pointer.True(),
 				Drop:     nil,
+				Store:    pointer.True(),
 			},
 			{
 				Name:     "country",
@@ -78,6 +80,7 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 				Locale:   pointer.String(""),
 				Sort:     pointer.False(),
 				Drop:     nil,
+				Store:    pointer.True(),
 			},
 		},
 		EnableNestedFields:  pointer.False(),
@@ -191,7 +194,7 @@ func newSearchOverrideSchema() *api.SearchOverrideSchema {
 	schema := &api.SearchOverrideSchema{
 		Rule: api.SearchOverrideRule{
 			Query: pointer.String("apple"),
-			Match: (*api.SearchOverrideRuleMatch)(pointer.String("exact")),
+			Match: pointer.Any(api.Exact),
 		},
 		Includes: &[]api.SearchOverrideInclude{
 			{
@@ -209,6 +212,8 @@ func newSearchOverrideSchema() *api.SearchOverrideSchema {
 			},
 		},
 		RemoveMatchedTokens: pointer.True(),
+		FilterCuratedHits:   pointer.False(),
+		StopProcessing:      pointer.True(),
 	}
 
 	return schema
@@ -219,7 +224,7 @@ func newSearchOverride(overrideID string) *api.SearchOverride {
 		Id: pointer.String(overrideID),
 		Rule: api.SearchOverrideRule{
 			Query: pointer.String("apple"),
-			Match: (*api.SearchOverrideRuleMatch)(pointer.String("exact")),
+			Match: pointer.Any(api.Exact),
 		},
 		Includes: &[]api.SearchOverrideInclude{
 			{
@@ -237,6 +242,8 @@ func newSearchOverride(overrideID string) *api.SearchOverride {
 			},
 		},
 		RemoveMatchedTokens: pointer.True(),
+		FilterCuratedHits:   pointer.False(),
+		StopProcessing:      pointer.True(),
 	}
 }
 

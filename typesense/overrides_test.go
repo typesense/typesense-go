@@ -18,8 +18,8 @@ import (
 func createNewSearchOverrideSchema() *api.SearchOverrideSchema {
 	return &api.SearchOverrideSchema{
 		Rule: api.SearchOverrideRule{
-			Query: "apple",
-			Match: "exact",
+			Query: pointer.String("apple"),
+			Match: pointer.Any(api.Exact),
 		},
 		Includes: &[]api.SearchOverrideInclude{
 			{
