@@ -2275,6 +2275,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 		}
 
+		if params.DropTokensMode != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "drop_tokens_mode", runtime.ParamLocationQuery, *params.DropTokensMode); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.DropTokensThreshold != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "drop_tokens_threshold", runtime.ParamLocationQuery, *params.DropTokensThreshold); err != nil {
@@ -2310,6 +2326,38 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 		if params.EnableOverrides != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_overrides", runtime.ParamLocationQuery, *params.EnableOverrides); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.EnableSynonyms != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_synonyms", runtime.ParamLocationQuery, *params.EnableSynonyms); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.EnableTyposForAlphaNumericalTokens != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_typos_for_alpha_numerical_tokens", runtime.ParamLocationQuery, *params.EnableTyposForAlphaNumericalTokens); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -2438,6 +2486,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 		if params.FilterBy != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "filter_by", runtime.ParamLocationQuery, *params.FilterBy); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.FilterCuratedHits != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "filter_curated_hits", runtime.ParamLocationQuery, *params.FilterCuratedHits); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -3078,6 +3142,38 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 		if params.Stopwords != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "stopwords", runtime.ParamLocationQuery, *params.Stopwords); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SynonymNumTypos != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "synonym_num_typos", runtime.ParamLocationQuery, *params.SynonymNumTypos); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SynonymPrefix != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "synonym_prefix", runtime.ParamLocationQuery, *params.SynonymPrefix); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -4153,6 +4249,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 		}
 
+		if params.DropTokensMode != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "drop_tokens_mode", runtime.ParamLocationQuery, *params.DropTokensMode); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.DropTokensThreshold != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "drop_tokens_threshold", runtime.ParamLocationQuery, *params.DropTokensThreshold); err != nil {
@@ -4188,6 +4300,38 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 		if params.EnableOverrides != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_overrides", runtime.ParamLocationQuery, *params.EnableOverrides); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.EnableSynonyms != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_synonyms", runtime.ParamLocationQuery, *params.EnableSynonyms); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.EnableTyposForAlphaNumericalTokens != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_typos_for_alpha_numerical_tokens", runtime.ParamLocationQuery, *params.EnableTyposForAlphaNumericalTokens); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -4316,6 +4460,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 		if params.FilterBy != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "filter_by", runtime.ParamLocationQuery, *params.FilterBy); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.FilterCuratedHits != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "filter_curated_hits", runtime.ParamLocationQuery, *params.FilterCuratedHits); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -4956,6 +5116,38 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 		if params.Stopwords != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "stopwords", runtime.ParamLocationQuery, *params.Stopwords); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SynonymNumTypos != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "synonym_num_typos", runtime.ParamLocationQuery, *params.SynonymNumTypos); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SynonymPrefix != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "synonym_prefix", runtime.ParamLocationQuery, *params.SynonymPrefix); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err

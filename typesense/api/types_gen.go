@@ -35,6 +35,13 @@ const (
 	Reject         DirtyValues = "reject"
 )
 
+// Defines values for DropTokensMode.
+const (
+	BothSides3  DropTokensMode = "both_sides:3"
+	LeftToRight DropTokensMode = "left_to_right"
+	RightToLeft DropTokensMode = "right_to_left"
+)
+
 // Defines values for IndexAction.
 const (
 	Create  IndexAction = "create"
@@ -334,6 +341,9 @@ type ConversationModelUpdateSchema struct {
 // DirtyValues defines model for DirtyValues.
 type DirtyValues string
 
+// DropTokensMode Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries upto 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
+type DropTokensMode string
+
 // FacetCounts defines model for FacetCounts.
 type FacetCounts struct {
 	Counts *[]struct {
@@ -366,19 +376,30 @@ type Field struct {
 			ProjectId    *string `json:"project_id,omitempty"`
 		} `json:"model_config"`
 	} `json:"embed,omitempty"`
-	Facet     *bool   `json:"facet,omitempty"`
-	Index     *bool   `json:"index,omitempty"`
-	Infix     *bool   `json:"infix,omitempty"`
-	Locale    *string `json:"locale,omitempty"`
-	Name      string  `json:"name"`
-	NumDim    *int    `json:"num_dim,omitempty"`
-	Optional  *bool   `json:"optional,omitempty"`
+	Facet    *bool   `json:"facet,omitempty"`
+	Index    *bool   `json:"index,omitempty"`
+	Infix    *bool   `json:"infix,omitempty"`
+	Locale   *string `json:"locale,omitempty"`
+	Name     string  `json:"name"`
+	NumDim   *int    `json:"num_dim,omitempty"`
+	Optional *bool   `json:"optional,omitempty"`
+
+	// RangeIndex Enables an index optimized for range filtering on numerical fields (e.g. rating:>3.5). Default: false.
+	RangeIndex *bool `json:"range_index,omitempty"`
+
+	// Reference Name of a field in another collection that should be linked to this collection so that it can be joined during query.
 	Reference *string `json:"reference,omitempty"`
 	Sort      *bool   `json:"sort,omitempty"`
 
-	// Store Whether to store the image on disk.
+	// Stem Values are stemmed before indexing in-memory. Default: false.
+	Stem *bool `json:"stem,omitempty"`
+
+	// Store When set to false, the field value will not be stored on disk. Default: true.
 	Store *bool  `json:"store,omitempty"`
 	Type  string `json:"type"`
+
+	// VecDist The distance metric to be used for vector search. Default: `cosine`. You can also use `ip` for inner product.
+	VecDist *string `json:"vec_dist,omitempty"`
 }
 
 // HealthStatus defines model for HealthStatus.
@@ -406,11 +427,20 @@ type MultiSearchCollectionParameters struct {
 	// ConversationModelId The Id of Conversation Model to be used.
 	ConversationModelId *string `json:"conversation_model_id,omitempty"`
 
+	// DropTokensMode Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries upto 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
+	DropTokensMode *DropTokensMode `json:"drop_tokens_mode,omitempty"`
+
 	// DropTokensThreshold If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
 	DropTokensThreshold *int `json:"drop_tokens_threshold,omitempty"`
 
 	// EnableOverrides If you have some overrides defined but want to disable all of them during query time, you can do that by setting this parameter to false
 	EnableOverrides *bool `json:"enable_overrides,omitempty"`
+
+	// EnableSynonyms If you have some synonyms defined but want to disable all of them for a particular search query, set enable_synonyms to false. Default: true
+	EnableSynonyms *bool `json:"enable_synonyms,omitempty"`
+
+	// EnableTyposForAlphaNumericalTokens Set this parameter to false to disable typos on alphanumerical query tokens. Default: true.
+	EnableTyposForAlphaNumericalTokens *bool `json:"enable_typos_for_alpha_numerical_tokens,omitempty"`
 
 	// EnableTyposForNumericalTokens Make Typesense disable typos for numerical tokens.
 	EnableTyposForNumericalTokens *bool `json:"enable_typos_for_numerical_tokens,omitempty"`
@@ -435,6 +465,9 @@ type MultiSearchCollectionParameters struct {
 
 	// FilterBy Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
 	FilterBy *string `json:"filter_by,omitempty"`
+
+	// FilterCuratedHits Whether the filter_by condition of the search query should be applicable to curated results (override definitions, pinned hits, hidden hits, etc.). Default: false
+	FilterCuratedHits *bool `json:"filter_curated_hits,omitempty"`
 
 	// GroupBy You can aggregate search results into groups or buckets by specify one or more `group_by` fields. Separate multiple fields with a comma. To group on a particular field, it must be a faceted field.
 	GroupBy *string `json:"group_by,omitempty"`
@@ -552,6 +585,12 @@ type MultiSearchCollectionParameters struct {
 
 	// Stopwords Name of the stopwords set to apply for this search, the keywords present in the set will be removed from the search query.
 	Stopwords *string `json:"stopwords,omitempty"`
+
+	// SynonymNumTypos Allow synonym resolution on typo-corrected words in the query. Default: 0
+	SynonymNumTypos *int `json:"synonym_num_typos,omitempty"`
+
+	// SynonymPrefix Allow synonym resolution on word prefixes in the query. Default: false
+	SynonymPrefix *bool `json:"synonym_prefix,omitempty"`
 
 	// TextMatchType In a multi-field matching context, this parameter determines how the representative text match score of a record is calculated. Possible values are max_score (default) or max_weight.
 	TextMatchType *string `json:"text_match_type,omitempty"`
@@ -583,11 +622,20 @@ type MultiSearchParameters struct {
 	// ConversationModelId The Id of Conversation Model to be used.
 	ConversationModelId *string `json:"conversation_model_id,omitempty"`
 
+	// DropTokensMode Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries upto 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
+	DropTokensMode *DropTokensMode `json:"drop_tokens_mode,omitempty"`
+
 	// DropTokensThreshold If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
 	DropTokensThreshold *int `json:"drop_tokens_threshold,omitempty"`
 
 	// EnableOverrides If you have some overrides defined but want to disable all of them during query time, you can do that by setting this parameter to false
 	EnableOverrides *bool `json:"enable_overrides,omitempty"`
+
+	// EnableSynonyms If you have some synonyms defined but want to disable all of them for a particular search query, set enable_synonyms to false. Default: true
+	EnableSynonyms *bool `json:"enable_synonyms,omitempty"`
+
+	// EnableTyposForAlphaNumericalTokens Set this parameter to false to disable typos on alphanumerical query tokens. Default: true.
+	EnableTyposForAlphaNumericalTokens *bool `json:"enable_typos_for_alpha_numerical_tokens,omitempty"`
 
 	// EnableTyposForNumericalTokens Make Typesense disable typos for numerical tokens.
 	EnableTyposForNumericalTokens *bool `json:"enable_typos_for_numerical_tokens,omitempty"`
@@ -612,6 +660,9 @@ type MultiSearchParameters struct {
 
 	// FilterBy Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
 	FilterBy *string `json:"filter_by,omitempty"`
+
+	// FilterCuratedHits Whether the filter_by condition of the search query should be applicable to curated results (override definitions, pinned hits, hidden hits, etc.). Default: false
+	FilterCuratedHits *bool `json:"filter_curated_hits,omitempty"`
 
 	// GroupBy You can aggregate search results into groups or buckets by specify one or more `group_by` fields. Separate multiple fields with a comma. To group on a particular field, it must be a faceted field.
 	GroupBy *string `json:"group_by,omitempty"`
@@ -729,6 +780,12 @@ type MultiSearchParameters struct {
 
 	// Stopwords Name of the stopwords set to apply for this search, the keywords present in the set will be removed from the search query.
 	Stopwords *string `json:"stopwords,omitempty"`
+
+	// SynonymNumTypos Allow synonym resolution on typo-corrected words in the query. Default: 0
+	SynonymNumTypos *int `json:"synonym_num_typos,omitempty"`
+
+	// SynonymPrefix Allow synonym resolution on word prefixes in the query. Default: false
+	SynonymPrefix *bool `json:"synonym_prefix,omitempty"`
 
 	// TextMatchType In a multi-field matching context, this parameter determines how the representative text match score of a record is calculated. Possible values are max_score (default) or max_weight.
 	TextMatchType *string `json:"text_match_type,omitempty"`
@@ -945,6 +1002,9 @@ type SearchParameters struct {
 	// ConversationModelId The Id of Conversation Model to be used.
 	ConversationModelId *string `json:"conversation_model_id,omitempty"`
 
+	// DropTokensMode Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries upto 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
+	DropTokensMode *DropTokensMode `json:"drop_tokens_mode,omitempty"`
+
 	// DropTokensThreshold If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
 	DropTokensThreshold *int `json:"drop_tokens_threshold,omitempty"`
 
@@ -953,6 +1013,12 @@ type SearchParameters struct {
 
 	// EnableOverrides If you have some overrides defined but want to disable all of them during query time, you can do that by setting this parameter to false
 	EnableOverrides *bool `json:"enable_overrides,omitempty"`
+
+	// EnableSynonyms If you have some synonyms defined but want to disable all of them for a particular search query, set enable_synonyms to false. Default: true
+	EnableSynonyms *bool `json:"enable_synonyms,omitempty"`
+
+	// EnableTyposForAlphaNumericalTokens Set this parameter to false to disable typos on alphanumerical query tokens. Default: true.
+	EnableTyposForAlphaNumericalTokens *bool `json:"enable_typos_for_alpha_numerical_tokens,omitempty"`
 
 	// EnableTyposForNumericalTokens Make Typesense disable typos for numerical tokens.
 	EnableTyposForNumericalTokens *bool `json:"enable_typos_for_numerical_tokens,omitempty"`
@@ -977,6 +1043,9 @@ type SearchParameters struct {
 
 	// FilterBy Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
 	FilterBy *string `json:"filter_by,omitempty"`
+
+	// FilterCuratedHits Whether the filter_by condition of the search query should be applicable to curated results (override definitions, pinned hits, hidden hits, etc.). Default: false
+	FilterCuratedHits *bool `json:"filter_curated_hits,omitempty"`
 
 	// GroupBy You can aggregate search results into groups or buckets by specify one or more `group_by` fields. Separate multiple fields with a comma. To group on a particular field, it must be a faceted field.
 	GroupBy *string `json:"group_by,omitempty"`
@@ -1100,6 +1169,12 @@ type SearchParameters struct {
 
 	// Stopwords Name of the stopwords set to apply for this search, the keywords present in the set will be removed from the search query.
 	Stopwords *string `json:"stopwords,omitempty"`
+
+	// SynonymNumTypos Allow synonym resolution on typo-corrected words in the query. Default: 0
+	SynonymNumTypos *int `json:"synonym_num_typos,omitempty"`
+
+	// SynonymPrefix Allow synonym resolution on word prefixes in the query. Default: false
+	SynonymPrefix *bool `json:"synonym_prefix,omitempty"`
 
 	// TextMatchType In a multi-field matching context, this parameter determines how the representative text match score of a record is calculated. Possible values are max_score (default) or max_weight.
 	TextMatchType *string `json:"text_match_type,omitempty"`
@@ -1294,66 +1369,72 @@ type ImportDocumentsParams struct {
 
 // SearchCollectionParams defines parameters for SearchCollection.
 type SearchCollectionParams struct {
-	CacheTtl                      *int    `form:"cache_ttl,omitempty" json:"cache_ttl,omitempty"`
-	Conversation                  *bool   `form:"conversation,omitempty" json:"conversation,omitempty"`
-	ConversationId                *string `form:"conversation_id,omitempty" json:"conversation_id,omitempty"`
-	ConversationModelId           *string `form:"conversation_model_id,omitempty" json:"conversation_model_id,omitempty"`
-	DropTokensThreshold           *int    `form:"drop_tokens_threshold,omitempty" json:"drop_tokens_threshold,omitempty"`
-	EnableHighlightV1             *bool   `form:"enable_highlight_v1,omitempty" json:"enable_highlight_v1,omitempty"`
-	EnableOverrides               *bool   `form:"enable_overrides,omitempty" json:"enable_overrides,omitempty"`
-	EnableTyposForNumericalTokens *bool   `form:"enable_typos_for_numerical_tokens,omitempty" json:"enable_typos_for_numerical_tokens,omitempty"`
-	ExcludeFields                 *string `form:"exclude_fields,omitempty" json:"exclude_fields,omitempty"`
-	ExhaustiveSearch              *bool   `form:"exhaustive_search,omitempty" json:"exhaustive_search,omitempty"`
-	FacetBy                       *string `form:"facet_by,omitempty" json:"facet_by,omitempty"`
-	FacetQuery                    *string `form:"facet_query,omitempty" json:"facet_query,omitempty"`
-	FacetReturnParent             *string `form:"facet_return_parent,omitempty" json:"facet_return_parent,omitempty"`
-	FacetStrategy                 *string `form:"facet_strategy,omitempty" json:"facet_strategy,omitempty"`
-	FilterBy                      *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
-	GroupBy                       *string `form:"group_by,omitempty" json:"group_by,omitempty"`
-	GroupLimit                    *int    `form:"group_limit,omitempty" json:"group_limit,omitempty"`
-	GroupMissingValues            *bool   `form:"group_missing_values,omitempty" json:"group_missing_values,omitempty"`
-	HiddenHits                    *string `form:"hidden_hits,omitempty" json:"hidden_hits,omitempty"`
-	HighlightAffixNumTokens       *int    `form:"highlight_affix_num_tokens,omitempty" json:"highlight_affix_num_tokens,omitempty"`
-	HighlightEndTag               *string `form:"highlight_end_tag,omitempty" json:"highlight_end_tag,omitempty"`
-	HighlightFields               *string `form:"highlight_fields,omitempty" json:"highlight_fields,omitempty"`
-	HighlightFullFields           *string `form:"highlight_full_fields,omitempty" json:"highlight_full_fields,omitempty"`
-	HighlightStartTag             *string `form:"highlight_start_tag,omitempty" json:"highlight_start_tag,omitempty"`
-	IncludeFields                 *string `form:"include_fields,omitempty" json:"include_fields,omitempty"`
-	Infix                         *string `form:"infix,omitempty" json:"infix,omitempty"`
-	Limit                         *int    `form:"limit,omitempty" json:"limit,omitempty"`
-	MaxCandidates                 *int    `form:"max_candidates,omitempty" json:"max_candidates,omitempty"`
-	MaxExtraPrefix                *int    `form:"max_extra_prefix,omitempty" json:"max_extra_prefix,omitempty"`
-	MaxExtraSuffix                *int    `form:"max_extra_suffix,omitempty" json:"max_extra_suffix,omitempty"`
-	MaxFacetValues                *int    `form:"max_facet_values,omitempty" json:"max_facet_values,omitempty"`
-	MinLen1typo                   *int    `form:"min_len_1typo,omitempty" json:"min_len_1typo,omitempty"`
-	MinLen2typo                   *int    `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
-	NumTypos                      *string `form:"num_typos,omitempty" json:"num_typos,omitempty"`
-	Offset                        *int    `form:"offset,omitempty" json:"offset,omitempty"`
-	OverrideTags                  *string `form:"override_tags,omitempty" json:"override_tags,omitempty"`
-	Page                          *int    `form:"page,omitempty" json:"page,omitempty"`
-	PerPage                       *int    `form:"per_page,omitempty" json:"per_page,omitempty"`
-	PinnedHits                    *string `form:"pinned_hits,omitempty" json:"pinned_hits,omitempty"`
-	PreSegmentedQuery             *bool   `form:"pre_segmented_query,omitempty" json:"pre_segmented_query,omitempty"`
-	Prefix                        *string `form:"prefix,omitempty" json:"prefix,omitempty"`
-	Preset                        *string `form:"preset,omitempty" json:"preset,omitempty"`
-	PrioritizeExactMatch          *bool   `form:"prioritize_exact_match,omitempty" json:"prioritize_exact_match,omitempty"`
-	PrioritizeNumMatchingFields   *bool   `form:"prioritize_num_matching_fields,omitempty" json:"prioritize_num_matching_fields,omitempty"`
-	PrioritizeTokenPosition       *bool   `form:"prioritize_token_position,omitempty" json:"prioritize_token_position,omitempty"`
-	Q                             *string `form:"q,omitempty" json:"q,omitempty"`
-	QueryBy                       *string `form:"query_by,omitempty" json:"query_by,omitempty"`
-	QueryByWeights                *string `form:"query_by_weights,omitempty" json:"query_by_weights,omitempty"`
-	RemoteEmbeddingNumTries       *int    `form:"remote_embedding_num_tries,omitempty" json:"remote_embedding_num_tries,omitempty"`
-	RemoteEmbeddingTimeoutMs      *int    `form:"remote_embedding_timeout_ms,omitempty" json:"remote_embedding_timeout_ms,omitempty"`
-	SearchCutoffMs                *int    `form:"search_cutoff_ms,omitempty" json:"search_cutoff_ms,omitempty"`
-	SnippetThreshold              *int    `form:"snippet_threshold,omitempty" json:"snippet_threshold,omitempty"`
-	SortBy                        *string `form:"sort_by,omitempty" json:"sort_by,omitempty"`
-	SplitJoinTokens               *string `form:"split_join_tokens,omitempty" json:"split_join_tokens,omitempty"`
-	Stopwords                     *string `form:"stopwords,omitempty" json:"stopwords,omitempty"`
-	TextMatchType                 *string `form:"text_match_type,omitempty" json:"text_match_type,omitempty"`
-	TypoTokensThreshold           *int    `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
-	UseCache                      *bool   `form:"use_cache,omitempty" json:"use_cache,omitempty"`
-	VectorQuery                   *string `form:"vector_query,omitempty" json:"vector_query,omitempty"`
-	VoiceQuery                    *string `form:"voice_query,omitempty" json:"voice_query,omitempty"`
+	CacheTtl                           *int            `form:"cache_ttl,omitempty" json:"cache_ttl,omitempty"`
+	Conversation                       *bool           `form:"conversation,omitempty" json:"conversation,omitempty"`
+	ConversationId                     *string         `form:"conversation_id,omitempty" json:"conversation_id,omitempty"`
+	ConversationModelId                *string         `form:"conversation_model_id,omitempty" json:"conversation_model_id,omitempty"`
+	DropTokensMode                     *DropTokensMode `form:"drop_tokens_mode,omitempty" json:"drop_tokens_mode,omitempty"`
+	DropTokensThreshold                *int            `form:"drop_tokens_threshold,omitempty" json:"drop_tokens_threshold,omitempty"`
+	EnableHighlightV1                  *bool           `form:"enable_highlight_v1,omitempty" json:"enable_highlight_v1,omitempty"`
+	EnableOverrides                    *bool           `form:"enable_overrides,omitempty" json:"enable_overrides,omitempty"`
+	EnableSynonyms                     *bool           `form:"enable_synonyms,omitempty" json:"enable_synonyms,omitempty"`
+	EnableTyposForAlphaNumericalTokens *bool           `form:"enable_typos_for_alpha_numerical_tokens,omitempty" json:"enable_typos_for_alpha_numerical_tokens,omitempty"`
+	EnableTyposForNumericalTokens      *bool           `form:"enable_typos_for_numerical_tokens,omitempty" json:"enable_typos_for_numerical_tokens,omitempty"`
+	ExcludeFields                      *string         `form:"exclude_fields,omitempty" json:"exclude_fields,omitempty"`
+	ExhaustiveSearch                   *bool           `form:"exhaustive_search,omitempty" json:"exhaustive_search,omitempty"`
+	FacetBy                            *string         `form:"facet_by,omitempty" json:"facet_by,omitempty"`
+	FacetQuery                         *string         `form:"facet_query,omitempty" json:"facet_query,omitempty"`
+	FacetReturnParent                  *string         `form:"facet_return_parent,omitempty" json:"facet_return_parent,omitempty"`
+	FacetStrategy                      *string         `form:"facet_strategy,omitempty" json:"facet_strategy,omitempty"`
+	FilterBy                           *string         `form:"filter_by,omitempty" json:"filter_by,omitempty"`
+	FilterCuratedHits                  *bool           `form:"filter_curated_hits,omitempty" json:"filter_curated_hits,omitempty"`
+	GroupBy                            *string         `form:"group_by,omitempty" json:"group_by,omitempty"`
+	GroupLimit                         *int            `form:"group_limit,omitempty" json:"group_limit,omitempty"`
+	GroupMissingValues                 *bool           `form:"group_missing_values,omitempty" json:"group_missing_values,omitempty"`
+	HiddenHits                         *string         `form:"hidden_hits,omitempty" json:"hidden_hits,omitempty"`
+	HighlightAffixNumTokens            *int            `form:"highlight_affix_num_tokens,omitempty" json:"highlight_affix_num_tokens,omitempty"`
+	HighlightEndTag                    *string         `form:"highlight_end_tag,omitempty" json:"highlight_end_tag,omitempty"`
+	HighlightFields                    *string         `form:"highlight_fields,omitempty" json:"highlight_fields,omitempty"`
+	HighlightFullFields                *string         `form:"highlight_full_fields,omitempty" json:"highlight_full_fields,omitempty"`
+	HighlightStartTag                  *string         `form:"highlight_start_tag,omitempty" json:"highlight_start_tag,omitempty"`
+	IncludeFields                      *string         `form:"include_fields,omitempty" json:"include_fields,omitempty"`
+	Infix                              *string         `form:"infix,omitempty" json:"infix,omitempty"`
+	Limit                              *int            `form:"limit,omitempty" json:"limit,omitempty"`
+	MaxCandidates                      *int            `form:"max_candidates,omitempty" json:"max_candidates,omitempty"`
+	MaxExtraPrefix                     *int            `form:"max_extra_prefix,omitempty" json:"max_extra_prefix,omitempty"`
+	MaxExtraSuffix                     *int            `form:"max_extra_suffix,omitempty" json:"max_extra_suffix,omitempty"`
+	MaxFacetValues                     *int            `form:"max_facet_values,omitempty" json:"max_facet_values,omitempty"`
+	MinLen1typo                        *int            `form:"min_len_1typo,omitempty" json:"min_len_1typo,omitempty"`
+	MinLen2typo                        *int            `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
+	NumTypos                           *string         `form:"num_typos,omitempty" json:"num_typos,omitempty"`
+	Offset                             *int            `form:"offset,omitempty" json:"offset,omitempty"`
+	OverrideTags                       *string         `form:"override_tags,omitempty" json:"override_tags,omitempty"`
+	Page                               *int            `form:"page,omitempty" json:"page,omitempty"`
+	PerPage                            *int            `form:"per_page,omitempty" json:"per_page,omitempty"`
+	PinnedHits                         *string         `form:"pinned_hits,omitempty" json:"pinned_hits,omitempty"`
+	PreSegmentedQuery                  *bool           `form:"pre_segmented_query,omitempty" json:"pre_segmented_query,omitempty"`
+	Prefix                             *string         `form:"prefix,omitempty" json:"prefix,omitempty"`
+	Preset                             *string         `form:"preset,omitempty" json:"preset,omitempty"`
+	PrioritizeExactMatch               *bool           `form:"prioritize_exact_match,omitempty" json:"prioritize_exact_match,omitempty"`
+	PrioritizeNumMatchingFields        *bool           `form:"prioritize_num_matching_fields,omitempty" json:"prioritize_num_matching_fields,omitempty"`
+	PrioritizeTokenPosition            *bool           `form:"prioritize_token_position,omitempty" json:"prioritize_token_position,omitempty"`
+	Q                                  *string         `form:"q,omitempty" json:"q,omitempty"`
+	QueryBy                            *string         `form:"query_by,omitempty" json:"query_by,omitempty"`
+	QueryByWeights                     *string         `form:"query_by_weights,omitempty" json:"query_by_weights,omitempty"`
+	RemoteEmbeddingNumTries            *int            `form:"remote_embedding_num_tries,omitempty" json:"remote_embedding_num_tries,omitempty"`
+	RemoteEmbeddingTimeoutMs           *int            `form:"remote_embedding_timeout_ms,omitempty" json:"remote_embedding_timeout_ms,omitempty"`
+	SearchCutoffMs                     *int            `form:"search_cutoff_ms,omitempty" json:"search_cutoff_ms,omitempty"`
+	SnippetThreshold                   *int            `form:"snippet_threshold,omitempty" json:"snippet_threshold,omitempty"`
+	SortBy                             *string         `form:"sort_by,omitempty" json:"sort_by,omitempty"`
+	SplitJoinTokens                    *string         `form:"split_join_tokens,omitempty" json:"split_join_tokens,omitempty"`
+	Stopwords                          *string         `form:"stopwords,omitempty" json:"stopwords,omitempty"`
+	SynonymNumTypos                    *int            `form:"synonym_num_typos,omitempty" json:"synonym_num_typos,omitempty"`
+	SynonymPrefix                      *bool           `form:"synonym_prefix,omitempty" json:"synonym_prefix,omitempty"`
+	TextMatchType                      *string         `form:"text_match_type,omitempty" json:"text_match_type,omitempty"`
+	TypoTokensThreshold                *int            `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
+	UseCache                           *bool           `form:"use_cache,omitempty" json:"use_cache,omitempty"`
+	VectorQuery                        *string         `form:"vector_query,omitempty" json:"vector_query,omitempty"`
+	VoiceQuery                         *string         `form:"voice_query,omitempty" json:"voice_query,omitempty"`
 }
 
 // UpdateDocumentJSONBody defines parameters for UpdateDocument.
@@ -1361,66 +1442,72 @@ type UpdateDocumentJSONBody = interface{}
 
 // MultiSearchParams defines parameters for MultiSearch.
 type MultiSearchParams struct {
-	CacheTtl                      *int    `form:"cache_ttl,omitempty" json:"cache_ttl,omitempty"`
-	Conversation                  *bool   `form:"conversation,omitempty" json:"conversation,omitempty"`
-	ConversationId                *string `form:"conversation_id,omitempty" json:"conversation_id,omitempty"`
-	ConversationModelId           *string `form:"conversation_model_id,omitempty" json:"conversation_model_id,omitempty"`
-	DropTokensThreshold           *int    `form:"drop_tokens_threshold,omitempty" json:"drop_tokens_threshold,omitempty"`
-	EnableHighlightV1             *bool   `form:"enable_highlight_v1,omitempty" json:"enable_highlight_v1,omitempty"`
-	EnableOverrides               *bool   `form:"enable_overrides,omitempty" json:"enable_overrides,omitempty"`
-	EnableTyposForNumericalTokens *bool   `form:"enable_typos_for_numerical_tokens,omitempty" json:"enable_typos_for_numerical_tokens,omitempty"`
-	ExcludeFields                 *string `form:"exclude_fields,omitempty" json:"exclude_fields,omitempty"`
-	ExhaustiveSearch              *bool   `form:"exhaustive_search,omitempty" json:"exhaustive_search,omitempty"`
-	FacetBy                       *string `form:"facet_by,omitempty" json:"facet_by,omitempty"`
-	FacetQuery                    *string `form:"facet_query,omitempty" json:"facet_query,omitempty"`
-	FacetReturnParent             *string `form:"facet_return_parent,omitempty" json:"facet_return_parent,omitempty"`
-	FacetStrategy                 *string `form:"facet_strategy,omitempty" json:"facet_strategy,omitempty"`
-	FilterBy                      *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
-	GroupBy                       *string `form:"group_by,omitempty" json:"group_by,omitempty"`
-	GroupLimit                    *int    `form:"group_limit,omitempty" json:"group_limit,omitempty"`
-	GroupMissingValues            *bool   `form:"group_missing_values,omitempty" json:"group_missing_values,omitempty"`
-	HiddenHits                    *string `form:"hidden_hits,omitempty" json:"hidden_hits,omitempty"`
-	HighlightAffixNumTokens       *int    `form:"highlight_affix_num_tokens,omitempty" json:"highlight_affix_num_tokens,omitempty"`
-	HighlightEndTag               *string `form:"highlight_end_tag,omitempty" json:"highlight_end_tag,omitempty"`
-	HighlightFields               *string `form:"highlight_fields,omitempty" json:"highlight_fields,omitempty"`
-	HighlightFullFields           *string `form:"highlight_full_fields,omitempty" json:"highlight_full_fields,omitempty"`
-	HighlightStartTag             *string `form:"highlight_start_tag,omitempty" json:"highlight_start_tag,omitempty"`
-	IncludeFields                 *string `form:"include_fields,omitempty" json:"include_fields,omitempty"`
-	Infix                         *string `form:"infix,omitempty" json:"infix,omitempty"`
-	Limit                         *int    `form:"limit,omitempty" json:"limit,omitempty"`
-	MaxCandidates                 *int    `form:"max_candidates,omitempty" json:"max_candidates,omitempty"`
-	MaxExtraPrefix                *int    `form:"max_extra_prefix,omitempty" json:"max_extra_prefix,omitempty"`
-	MaxExtraSuffix                *int    `form:"max_extra_suffix,omitempty" json:"max_extra_suffix,omitempty"`
-	MaxFacetValues                *int    `form:"max_facet_values,omitempty" json:"max_facet_values,omitempty"`
-	MinLen1typo                   *int    `form:"min_len_1typo,omitempty" json:"min_len_1typo,omitempty"`
-	MinLen2typo                   *int    `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
-	NumTypos                      *string `form:"num_typos,omitempty" json:"num_typos,omitempty"`
-	Offset                        *int    `form:"offset,omitempty" json:"offset,omitempty"`
-	OverrideTags                  *string `form:"override_tags,omitempty" json:"override_tags,omitempty"`
-	Page                          *int    `form:"page,omitempty" json:"page,omitempty"`
-	PerPage                       *int    `form:"per_page,omitempty" json:"per_page,omitempty"`
-	PinnedHits                    *string `form:"pinned_hits,omitempty" json:"pinned_hits,omitempty"`
-	PreSegmentedQuery             *bool   `form:"pre_segmented_query,omitempty" json:"pre_segmented_query,omitempty"`
-	Prefix                        *string `form:"prefix,omitempty" json:"prefix,omitempty"`
-	Preset                        *string `form:"preset,omitempty" json:"preset,omitempty"`
-	PrioritizeExactMatch          *bool   `form:"prioritize_exact_match,omitempty" json:"prioritize_exact_match,omitempty"`
-	PrioritizeNumMatchingFields   *bool   `form:"prioritize_num_matching_fields,omitempty" json:"prioritize_num_matching_fields,omitempty"`
-	PrioritizeTokenPosition       *bool   `form:"prioritize_token_position,omitempty" json:"prioritize_token_position,omitempty"`
-	Q                             *string `form:"q,omitempty" json:"q,omitempty"`
-	QueryBy                       *string `form:"query_by,omitempty" json:"query_by,omitempty"`
-	QueryByWeights                *string `form:"query_by_weights,omitempty" json:"query_by_weights,omitempty"`
-	RemoteEmbeddingNumTries       *int    `form:"remote_embedding_num_tries,omitempty" json:"remote_embedding_num_tries,omitempty"`
-	RemoteEmbeddingTimeoutMs      *int    `form:"remote_embedding_timeout_ms,omitempty" json:"remote_embedding_timeout_ms,omitempty"`
-	SearchCutoffMs                *int    `form:"search_cutoff_ms,omitempty" json:"search_cutoff_ms,omitempty"`
-	SnippetThreshold              *int    `form:"snippet_threshold,omitempty" json:"snippet_threshold,omitempty"`
-	SortBy                        *string `form:"sort_by,omitempty" json:"sort_by,omitempty"`
-	SplitJoinTokens               *string `form:"split_join_tokens,omitempty" json:"split_join_tokens,omitempty"`
-	Stopwords                     *string `form:"stopwords,omitempty" json:"stopwords,omitempty"`
-	TextMatchType                 *string `form:"text_match_type,omitempty" json:"text_match_type,omitempty"`
-	TypoTokensThreshold           *int    `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
-	UseCache                      *bool   `form:"use_cache,omitempty" json:"use_cache,omitempty"`
-	VectorQuery                   *string `form:"vector_query,omitempty" json:"vector_query,omitempty"`
-	VoiceQuery                    *string `form:"voice_query,omitempty" json:"voice_query,omitempty"`
+	CacheTtl                           *int            `form:"cache_ttl,omitempty" json:"cache_ttl,omitempty"`
+	Conversation                       *bool           `form:"conversation,omitempty" json:"conversation,omitempty"`
+	ConversationId                     *string         `form:"conversation_id,omitempty" json:"conversation_id,omitempty"`
+	ConversationModelId                *string         `form:"conversation_model_id,omitempty" json:"conversation_model_id,omitempty"`
+	DropTokensMode                     *DropTokensMode `form:"drop_tokens_mode,omitempty" json:"drop_tokens_mode,omitempty"`
+	DropTokensThreshold                *int            `form:"drop_tokens_threshold,omitempty" json:"drop_tokens_threshold,omitempty"`
+	EnableHighlightV1                  *bool           `form:"enable_highlight_v1,omitempty" json:"enable_highlight_v1,omitempty"`
+	EnableOverrides                    *bool           `form:"enable_overrides,omitempty" json:"enable_overrides,omitempty"`
+	EnableSynonyms                     *bool           `form:"enable_synonyms,omitempty" json:"enable_synonyms,omitempty"`
+	EnableTyposForAlphaNumericalTokens *bool           `form:"enable_typos_for_alpha_numerical_tokens,omitempty" json:"enable_typos_for_alpha_numerical_tokens,omitempty"`
+	EnableTyposForNumericalTokens      *bool           `form:"enable_typos_for_numerical_tokens,omitempty" json:"enable_typos_for_numerical_tokens,omitempty"`
+	ExcludeFields                      *string         `form:"exclude_fields,omitempty" json:"exclude_fields,omitempty"`
+	ExhaustiveSearch                   *bool           `form:"exhaustive_search,omitempty" json:"exhaustive_search,omitempty"`
+	FacetBy                            *string         `form:"facet_by,omitempty" json:"facet_by,omitempty"`
+	FacetQuery                         *string         `form:"facet_query,omitempty" json:"facet_query,omitempty"`
+	FacetReturnParent                  *string         `form:"facet_return_parent,omitempty" json:"facet_return_parent,omitempty"`
+	FacetStrategy                      *string         `form:"facet_strategy,omitempty" json:"facet_strategy,omitempty"`
+	FilterBy                           *string         `form:"filter_by,omitempty" json:"filter_by,omitempty"`
+	FilterCuratedHits                  *bool           `form:"filter_curated_hits,omitempty" json:"filter_curated_hits,omitempty"`
+	GroupBy                            *string         `form:"group_by,omitempty" json:"group_by,omitempty"`
+	GroupLimit                         *int            `form:"group_limit,omitempty" json:"group_limit,omitempty"`
+	GroupMissingValues                 *bool           `form:"group_missing_values,omitempty" json:"group_missing_values,omitempty"`
+	HiddenHits                         *string         `form:"hidden_hits,omitempty" json:"hidden_hits,omitempty"`
+	HighlightAffixNumTokens            *int            `form:"highlight_affix_num_tokens,omitempty" json:"highlight_affix_num_tokens,omitempty"`
+	HighlightEndTag                    *string         `form:"highlight_end_tag,omitempty" json:"highlight_end_tag,omitempty"`
+	HighlightFields                    *string         `form:"highlight_fields,omitempty" json:"highlight_fields,omitempty"`
+	HighlightFullFields                *string         `form:"highlight_full_fields,omitempty" json:"highlight_full_fields,omitempty"`
+	HighlightStartTag                  *string         `form:"highlight_start_tag,omitempty" json:"highlight_start_tag,omitempty"`
+	IncludeFields                      *string         `form:"include_fields,omitempty" json:"include_fields,omitempty"`
+	Infix                              *string         `form:"infix,omitempty" json:"infix,omitempty"`
+	Limit                              *int            `form:"limit,omitempty" json:"limit,omitempty"`
+	MaxCandidates                      *int            `form:"max_candidates,omitempty" json:"max_candidates,omitempty"`
+	MaxExtraPrefix                     *int            `form:"max_extra_prefix,omitempty" json:"max_extra_prefix,omitempty"`
+	MaxExtraSuffix                     *int            `form:"max_extra_suffix,omitempty" json:"max_extra_suffix,omitempty"`
+	MaxFacetValues                     *int            `form:"max_facet_values,omitempty" json:"max_facet_values,omitempty"`
+	MinLen1typo                        *int            `form:"min_len_1typo,omitempty" json:"min_len_1typo,omitempty"`
+	MinLen2typo                        *int            `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
+	NumTypos                           *string         `form:"num_typos,omitempty" json:"num_typos,omitempty"`
+	Offset                             *int            `form:"offset,omitempty" json:"offset,omitempty"`
+	OverrideTags                       *string         `form:"override_tags,omitempty" json:"override_tags,omitempty"`
+	Page                               *int            `form:"page,omitempty" json:"page,omitempty"`
+	PerPage                            *int            `form:"per_page,omitempty" json:"per_page,omitempty"`
+	PinnedHits                         *string         `form:"pinned_hits,omitempty" json:"pinned_hits,omitempty"`
+	PreSegmentedQuery                  *bool           `form:"pre_segmented_query,omitempty" json:"pre_segmented_query,omitempty"`
+	Prefix                             *string         `form:"prefix,omitempty" json:"prefix,omitempty"`
+	Preset                             *string         `form:"preset,omitempty" json:"preset,omitempty"`
+	PrioritizeExactMatch               *bool           `form:"prioritize_exact_match,omitempty" json:"prioritize_exact_match,omitempty"`
+	PrioritizeNumMatchingFields        *bool           `form:"prioritize_num_matching_fields,omitempty" json:"prioritize_num_matching_fields,omitempty"`
+	PrioritizeTokenPosition            *bool           `form:"prioritize_token_position,omitempty" json:"prioritize_token_position,omitempty"`
+	Q                                  *string         `form:"q,omitempty" json:"q,omitempty"`
+	QueryBy                            *string         `form:"query_by,omitempty" json:"query_by,omitempty"`
+	QueryByWeights                     *string         `form:"query_by_weights,omitempty" json:"query_by_weights,omitempty"`
+	RemoteEmbeddingNumTries            *int            `form:"remote_embedding_num_tries,omitempty" json:"remote_embedding_num_tries,omitempty"`
+	RemoteEmbeddingTimeoutMs           *int            `form:"remote_embedding_timeout_ms,omitempty" json:"remote_embedding_timeout_ms,omitempty"`
+	SearchCutoffMs                     *int            `form:"search_cutoff_ms,omitempty" json:"search_cutoff_ms,omitempty"`
+	SnippetThreshold                   *int            `form:"snippet_threshold,omitempty" json:"snippet_threshold,omitempty"`
+	SortBy                             *string         `form:"sort_by,omitempty" json:"sort_by,omitempty"`
+	SplitJoinTokens                    *string         `form:"split_join_tokens,omitempty" json:"split_join_tokens,omitempty"`
+	Stopwords                          *string         `form:"stopwords,omitempty" json:"stopwords,omitempty"`
+	SynonymNumTypos                    *int            `form:"synonym_num_typos,omitempty" json:"synonym_num_typos,omitempty"`
+	SynonymPrefix                      *bool           `form:"synonym_prefix,omitempty" json:"synonym_prefix,omitempty"`
+	TextMatchType                      *string         `form:"text_match_type,omitempty" json:"text_match_type,omitempty"`
+	TypoTokensThreshold                *int            `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
+	UseCache                           *bool           `form:"use_cache,omitempty" json:"use_cache,omitempty"`
+	VectorQuery                        *string         `form:"vector_query,omitempty" json:"vector_query,omitempty"`
+	VoiceQuery                         *string         `form:"voice_query,omitempty" json:"voice_query,omitempty"`
 }
 
 // TakeSnapshotParams defines parameters for TakeSnapshot.

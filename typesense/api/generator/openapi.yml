@@ -1875,7 +1875,8 @@ components:
           default: false
         reference:
           type: string
-          example: string
+          description: >
+            Name of a field in another collection that should be linked to this collection so that it can be joined during query.
         num_dim:
           type: integer
           example: 256
@@ -1886,7 +1887,19 @@ components:
         store:
           type: boolean
           description: >
-            Whether to store the image on disk.
+            When set to false, the field value will not be stored on disk. Default: true.
+        vec_dist:
+          type: string
+          description: >
+            The distance metric to be used for vector search. Default: `cosine`. You can also use `ip` for inner product.
+        range_index:
+          type: boolean
+          description: >
+            Enables an index optimized for range filtering on numerical fields (e.g. rating:>3.5). Default: false.
+        stem:
+          type: boolean
+          description: >
+            Values are stemmed before indexing in-memory. Default: false.
         embed:
           type: object
           required:
@@ -2574,12 +2587,35 @@ components:
             enough results are found. Tokens that have the least individual hits
             are dropped first. Set to 0 to disable. Default: 10
           type: integer
+        drop_tokens_mode:
+          $ref: "#/components/schemas/DropTokensMode"
         typo_tokens_threshold:
           description: >
             If the number of results found for a specific query is less than this number,
             Typesense will attempt to look for tokens with more typos until
             enough results are found. Default: 100
           type: integer
+        enable_typos_for_alpha_numerical_tokens:
+          type: boolean
+          description: >
+            Set this parameter to false to disable typos on alphanumerical query tokens. Default: true.
+
+        filter_curated_hits:
+          type: boolean
+          description: >
+            Whether the filter_by condition of the search query should be applicable to curated results (override definitions, pinned hits, hidden hits, etc.). Default: false
+        enable_synonyms:
+          type: boolean
+          description: >
+            If you have some synonyms defined but want to disable all of them for a particular search query, set enable_synonyms to false. Default: true
+        synonym_prefix:
+          type: boolean
+          description: >
+            Allow synonym resolution on word prefixes in the query. Default: false
+        synonym_num_typos:
+          type: integer
+          description: >
+            Allow synonym resolution on typo-corrected words in the query. Default: 0
 
         pinned_hits:
           description: >
@@ -2928,12 +2964,35 @@ components:
             enough results are found. Tokens that have the least individual hits
             are dropped first. Set to 0 to disable. Default: 10
           type: integer
+        drop_tokens_mode:
+          $ref: "#/components/schemas/DropTokensMode"
         typo_tokens_threshold:
           description: >
             If the number of results found for a specific query is less than this number,
             Typesense will attempt to look for tokens with more typos until
             enough results are found. Default: 100
           type: integer
+        enable_typos_for_alpha_numerical_tokens:
+          type: boolean
+          description: >
+            Set this parameter to false to disable typos on alphanumerical query tokens. Default: true.
+
+        filter_curated_hits:
+          type: boolean
+          description: >
+            Whether the filter_by condition of the search query should be applicable to curated results (override definitions, pinned hits, hidden hits, etc.). Default: false
+        enable_synonyms:
+          type: boolean
+          description: >
+            If you have some synonyms defined but want to disable all of them for a particular search query, set enable_synonyms to false. Default: true
+        synonym_prefix:
+          type: boolean
+          description: >
+            Allow synonym resolution on word prefixes in the query. Default: false
+        synonym_num_typos:
+          type: integer
+          description: >
+            Allow synonym resolution on typo-corrected words in the query. Default: 0
 
         pinned_hits:
           description: >
@@ -3388,6 +3447,14 @@ components:
     IndexAction:
       type: string
       enum: [create, update, upsert, emplace]
+    DropTokensMode:
+      type: string
+      enum: [right_to_left, left_to_right, both_sides:3]
+      description: >
+        Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document.
+        Values: right_to_left (default), left_to_right, both_sides:3
+        A note on both_sides:3 - for queries upto 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results.
+        If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
     ConversationModelCreateSchema:
       required:
         - model_name

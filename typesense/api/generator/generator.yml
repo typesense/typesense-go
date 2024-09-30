@@ -399,6 +399,14 @@ components:
         dirty_values:
           $ref: '#/components/schemas/DirtyValues'
       type: object
+    DropTokensMode:
+      description: |
+        Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries upto 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
+      enum:
+        - right_to_left
+        - left_to_right
+        - both_sides:3
+      type: string
     ErrorResponse:
       properties:
         message:
@@ -494,18 +502,31 @@ components:
         optional:
           example: true
           type: boolean
+        range_index:
+          description: |
+            Enables an index optimized for range filtering on numerical fields (e.g. rating:>3.5). Default: false.
+          type: boolean
         reference:
-          example: string
+          description: |
+            Name of a field in another collection that should be linked to this collection so that it can be joined during query.
           type: string
         sort:
           example: true
           type: boolean
+        stem:
+          description: |
+            Values are stemmed before indexing in-memory. Default: false.
+          type: boolean
         store:
           description: |
-            Whether to store the image on disk.
+            When set to false, the field value will not be stored on disk. Default: true.
           type: boolean
         type:
           example: string
+          type: string
+        vec_dist:
+          description: |
+            The distance metric to be used for vector search. Default: `cosine`. You can also use `ip` for inner product.
           type: string
       required:
         - name
@@ -556,6 +577,8 @@ components:
           description: |
             The Id of Conversation Model to be used.
           type: string
+        drop_tokens_mode:
+          $ref: '#/components/schemas/DropTokensMode'
         drop_tokens_threshold:
           description: |
             If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
@@ -564,6 +587,14 @@ components:
           default: false
           description: |
             If you have some overrides defined but want to disable all of them during query time, you can do that by setting this parameter to false
+          type: boolean
+        enable_synonyms:
+          description: |
+            If you have some synonyms defined but want to disable all of them for a particular search query, set enable_synonyms to false. Default: true
+          type: boolean
+        enable_typos_for_alpha_numerical_tokens:
+          description: |
+            Set this parameter to false to disable typos on alphanumerical query tokens. Default: true.
           type: boolean
         enable_typos_for_numerical_tokens:
           default: true
@@ -595,6 +626,10 @@ components:
           description: Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
           example: 'num_employees:>100 && country: [USA, UK]'
           type: string
+        filter_curated_hits:
+          description: |
+            Whether the filter_by condition of the search query should be applicable to curated results (override definitions, pinned hits, hidden hits, etc.). Default: false
+          type: boolean
         group_by:
           description: You can aggregate search results into groups or buckets by specify one or more `group_by` fields. Separate multiple fields with a comma. To group on a particular field, it must be a faceted field.
           type: string
@@ -738,6 +773,14 @@ components:
           description: |
             Name of the stopwords set to apply for this search, the keywords present in the set will be removed from the search query.
           type: string
+        synonym_num_typos:
+          description: |
+            Allow synonym resolution on typo-corrected words in the query. Default: 0
+          type: integer
+        synonym_prefix:
+          description: |
+            Allow synonym resolution on word prefixes in the query. Default: false
+          type: boolean
         text_match_type:
           description: In a multi-field matching context, this parameter determines how the representative text match score of a record is calculated. Possible values are max_score (default) or max_weight.
           type: string
@@ -1010,6 +1053,8 @@ components:
           description: |
             The Id of Conversation Model to be used.
           type: string
+        drop_tokens_mode:
+          $ref: '#/components/schemas/DropTokensMode'
         drop_tokens_threshold:
           description: |
             If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
@@ -1023,6 +1068,14 @@ components:
           default: false
           description: |
             If you have some overrides defined but want to disable all of them during query time, you can do that by setting this parameter to false
+          type: boolean
+        enable_synonyms:
+          description: |
+            If you have some synonyms defined but want to disable all of them for a particular search query, set enable_synonyms to false. Default: true
+          type: boolean
+        enable_typos_for_alpha_numerical_tokens:
+          description: |
+            Set this parameter to false to disable typos on alphanumerical query tokens. Default: true.
           type: boolean
         enable_typos_for_numerical_tokens:
           default: true
@@ -1054,6 +1107,10 @@ components:
           description: Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
           example: 'num_employees:>100 && country: [USA, UK]'
           type: string
+        filter_curated_hits:
+          description: |
+            Whether the filter_by condition of the search query should be applicable to curated results (override definitions, pinned hits, hidden hits, etc.). Default: false
+          type: boolean
         group_by:
           description: You can aggregate search results into groups or buckets by specify one or more `group_by` fields. Separate multiple fields with a comma. To group on a particular field, it must be a faceted field.
           type: string
@@ -1205,6 +1262,14 @@ components:
           description: |
             Name of the stopwords set to apply for this search, the keywords present in the set will be removed from the search query.
           type: string
+        synonym_num_typos:
+          description: |
+            Allow synonym resolution on typo-corrected words in the query. Default: 0
+          type: integer
+        synonym_prefix:
+          description: |
+            Allow synonym resolution on word prefixes in the query. Default: false
+          type: boolean
         text_match_type:
           description: In a multi-field matching context, this parameter determines how the representative text match score of a record is calculated. Possible values are max_score (default) or max_weight.
           type: string
@@ -2251,6 +2316,10 @@ paths:
           schema:
             type: string
         - in: query
+          name: drop_tokens_mode
+          schema:
+            $ref: '#/components/schemas/DropTokensMode'
+        - in: query
           name: drop_tokens_threshold
           schema:
             type: integer
@@ -2260,6 +2329,14 @@ paths:
             type: boolean
         - in: query
           name: enable_overrides
+          schema:
+            type: boolean
+        - in: query
+          name: enable_synonyms
+          schema:
+            type: boolean
+        - in: query
+          name: enable_typos_for_alpha_numerical_tokens
           schema:
             type: boolean
         - in: query
@@ -2294,6 +2371,10 @@ paths:
           name: filter_by
           schema:
             type: string
+        - in: query
+          name: filter_curated_hits
+          schema:
+            type: boolean
         - in: query
           name: group_by
           schema:
@@ -2454,6 +2535,14 @@ paths:
           name: stopwords
           schema:
             type: string
+        - in: query
+          name: synonym_num_typos
+          schema:
+            type: integer
+        - in: query
+          name: synonym_prefix
+          schema:
+            type: boolean
         - in: query
           name: text_match_type
           schema:
@@ -3025,6 +3114,10 @@ paths:
           schema:
             type: string
         - in: query
+          name: drop_tokens_mode
+          schema:
+            $ref: '#/components/schemas/DropTokensMode'
+        - in: query
           name: drop_tokens_threshold
           schema:
             type: integer
@@ -3034,6 +3127,14 @@ paths:
             type: boolean
         - in: query
           name: enable_overrides
+          schema:
+            type: boolean
+        - in: query
+          name: enable_synonyms
+          schema:
+            type: boolean
+        - in: query
+          name: enable_typos_for_alpha_numerical_tokens
           schema:
             type: boolean
         - in: query
@@ -3068,6 +3169,10 @@ paths:
           name: filter_by
           schema:
             type: string
+        - in: query
+          name: filter_curated_hits
+          schema:
+            type: boolean
         - in: query
           name: group_by
           schema:
@@ -3228,6 +3333,14 @@ paths:
           name: stopwords
           schema:
             type: string
+        - in: query
+          name: synonym_num_typos
+          schema:
+            type: integer
+        - in: query
+          name: synonym_prefix
+          schema:
+            type: boolean
         - in: query
           name: text_match_type
           schema:
