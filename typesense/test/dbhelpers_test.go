@@ -57,6 +57,7 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 				Sort:     pointer.False(),
 				Drop:     nil,
 				Store:    pointer.True(),
+				Stem:     pointer.False(),
 			},
 			{
 				Name:     "num_employees",
@@ -69,6 +70,7 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 				Sort:     pointer.True(),
 				Drop:     nil,
 				Store:    pointer.True(),
+				Stem:     pointer.False(),
 			},
 			{
 				Name:     "country",
@@ -81,6 +83,7 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 				Sort:     pointer.False(),
 				Drop:     nil,
 				Store:    pointer.True(),
+				Stem:     pointer.False(),
 			},
 		},
 		EnableNestedFields:  pointer.False(),

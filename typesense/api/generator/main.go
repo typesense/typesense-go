@@ -215,16 +215,15 @@ func unwrapSearchParameters(m *yml) {
 		newMap["in"] = query
 		newMap["schema"] = make(yml)
 		if obj.Value.(yml)["oneOf"] == nil {
+			switch {
 			// if the param is referencing a schema
-			if obj.Value.(yml)["type"] == nil {
+			case obj.Value.(yml)["type"] == nil:
 				newMap["schema"].(yml)["$ref"] = obj.Value.(yml)["$ref"].(string)
-			} else {
-				if obj.Value.(yml)["type"].(string) == array {
-					newMap["schema"].(yml)["type"] = array
-					newMap["schema"].(yml)["items"] = obj.Value.(yml)["items"]
-				} else {
-					newMap["schema"].(yml)["type"] = obj.Value.(yml)["type"].(string)
-				}
+			case obj.Value.(yml)["type"].(string) == array:
+				newMap["schema"].(yml)["type"] = array
+				newMap["schema"].(yml)["items"] = obj.Value.(yml)["items"]
+			default:
+				newMap["schema"].(yml)["type"] = obj.Value.(yml)["type"].(string)
 			}
 		} else {
 			newMap["schema"].(yml)["oneOf"] = obj.Value.(yml)["oneOf"]
@@ -246,15 +245,15 @@ func unwrapMultiSearchParameters(m *yml) {
 		newMap["in"] = query
 		newMap["schema"] = make(yml)
 		if obj.Value.(yml)["oneOf"] == nil {
-			if obj.Value.(yml)["type"] == nil {
+			switch {
+			// if the param is referencing a schema
+			case obj.Value.(yml)["type"] == nil:
 				newMap["schema"].(yml)["$ref"] = obj.Value.(yml)["$ref"].(string)
-			} else {
-				if obj.Value.(yml)["type"].(string) == array {
-					newMap["schema"].(yml)["type"] = array
-					newMap["schema"].(yml)["items"] = obj.Value.(yml)["items"]
-				} else {
-					newMap["schema"].(yml)["type"] = obj.Value.(yml)["type"].(string)
-				}
+			case obj.Value.(yml)["type"].(string) == array:
+				newMap["schema"].(yml)["type"] = array
+				newMap["schema"].(yml)["items"] = obj.Value.(yml)["items"]
+			default:
+				newMap["schema"].(yml)["type"] = obj.Value.(yml)["type"].(string)
 			}
 		} else {
 			newMap["schema"].(yml)["oneOf"] = obj.Value.(yml)["oneOf"]
