@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"reflect"
 	"strings"
@@ -23,7 +22,7 @@ type eqReaderMatcher struct {
 }
 
 func eqReader(r io.Reader) gomock.Matcher {
-	allBytes, err := ioutil.ReadAll(r)
+	allBytes, err := io.ReadAll(r)
 	if err != nil {
 		panic(err)
 	}
@@ -35,7 +34,7 @@ func (m *eqReaderMatcher) Matches(x interface{}) bool {
 		return false
 	}
 	r := x.(io.Reader)
-	allBytes, err := ioutil.ReadAll(r)
+	allBytes, err := io.ReadAll(r)
 	if err != nil {
 		panic(err)
 	}
@@ -66,7 +65,7 @@ func TestDocumentsImportWithOneDocument(t *testing.T) {
 			"companies", expectedParams, "application/octet-stream", eqReader(expectedBody)).
 		Return(&http.Response{
 			StatusCode: http.StatusOK,
-			Body:       ioutil.NopCloser(strings.NewReader(expectedResultString)),
+			Body:       io.NopCloser(strings.NewReader(expectedResultString)),
 		}, nil).
 		Times(1)
 
@@ -116,7 +115,7 @@ func TestDocumentsImportWithOneDocumentAndInvalidResultJsonReturnsError(t *testi
 			"companies", expectedParams, "application/octet-stream", eqReader(expectedBody)).
 		Return(&http.Response{
 			StatusCode: http.StatusOK,
-			Body:       ioutil.NopCloser(strings.NewReader(expectedResultString)),
+			Body:       io.NopCloser(strings.NewReader(expectedResultString)),
 		}, nil).
 		Times(1)
 
@@ -182,7 +181,7 @@ func TestDocumentsImportOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 			"companies", gomock.Any(), "application/octet-stream", gomock.Any()).
 		Return(&http.Response{
 			StatusCode: http.StatusInternalServerError,
-			Body:       ioutil.NopCloser(strings.NewReader("Internal server error")),
+			Body:       io.NopCloser(strings.NewReader("Internal server error")),
 		}, nil).
 		Times(1)
 
@@ -220,7 +219,7 @@ func TestDocumentsImportWithTwoDocuments(t *testing.T) {
 			"companies", expectedParams, "application/octet-stream", eqReader(expectedBody)).
 		Return(&http.Response{
 			StatusCode: http.StatusOK,
-			Body:       ioutil.NopCloser(strings.NewReader(expectedResultString)),
+			Body:       io.NopCloser(strings.NewReader(expectedResultString)),
 		}, nil).
 		Times(1)
 
@@ -254,7 +253,7 @@ func TestDocumentsImportWithActionOnly(t *testing.T) {
 			"companies", expectedParams, "application/octet-stream", gomock.Any()).
 		Return(&http.Response{
 			StatusCode: http.StatusOK,
-			Body:       ioutil.NopCloser(strings.NewReader(`{"success": true}`)),
+			Body:       io.NopCloser(strings.NewReader(`{"success": true}`)),
 		}, nil).
 		Times(1)
 
@@ -284,7 +283,7 @@ func TestDocumentsImportWithBatchSizeOnly(t *testing.T) {
 			"companies", expectedParams, "application/octet-stream", gomock.Any()).
 		Return(&http.Response{
 			StatusCode: http.StatusOK,
-			Body:       ioutil.NopCloser(strings.NewReader(`{"success": true}`)),
+			Body:       io.NopCloser(strings.NewReader(`{"success": true}`)),
 		}, nil).
 		Times(1)
 
@@ -316,7 +315,7 @@ func TestDocumentsImportJsonl(t *testing.T) {
 			"companies", expectedParams, "application/octet-stream", eqReader(expectedBody)).
 		Return(&http.Response{
 			StatusCode: http.StatusOK,
-			Body:       ioutil.NopCloser(bytes.NewBuffer(expectedBytes)),
+			Body:       io.NopCloser(bytes.NewBuffer(expectedBytes)),
 		}, nil).
 		Times(1)
 
@@ -329,7 +328,7 @@ func TestDocumentsImportJsonl(t *testing.T) {
 	result, err := client.Collection("companies").Documents().ImportJsonl(context.Background(), importBody, params)
 	assert.Nil(t, err)
 
-	resultBytes, err := ioutil.ReadAll(result)
+	resultBytes, err := io.ReadAll(result)
 	assert.Nil(t, err)
 	assert.Equal(t, string(expectedBytes), string(resultBytes))
 }
@@ -365,7 +364,7 @@ func TestDocumentsImportJsonlOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 			gomock.Any(), gomock.Any(), "application/octet-stream", gomock.Any()).
 		Return(&http.Response{
 			StatusCode: http.StatusInternalServerError,
-			Body:       ioutil.NopCloser(strings.NewReader("Internal server error")),
+			Body:       io.NopCloser(strings.NewReader("Internal server error")),
 		}, nil).
 		Times(1)
 
@@ -394,7 +393,7 @@ func TestDocumentsImportJsonlWithActionOnly(t *testing.T) {
 			"companies", expectedParams, "application/octet-stream", gomock.Any()).
 		Return(&http.Response{
 			StatusCode: http.StatusOK,
-			Body:       ioutil.NopCloser(strings.NewReader(`{"success": true}`)),
+			Body:       io.NopCloser(strings.NewReader(`{"success": true}`)),
 		}, nil).
 		Times(1)
 
@@ -422,7 +421,7 @@ func TestDocumentsImportJsonlWithBatchSizeOnly(t *testing.T) {
 			"companies", expectedParams, "application/octet-stream", gomock.Any()).
 		Return(&http.Response{
 			StatusCode: http.StatusOK,
-			Body:       ioutil.NopCloser(strings.NewReader(`{"success": true}`)),
+			Body:       io.NopCloser(strings.NewReader(`{"success": true}`)),
 		}, nil).
 		Times(1)
 

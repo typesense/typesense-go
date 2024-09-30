@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
@@ -277,11 +276,11 @@ func TestDocumentsDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 }
 
 func createDocumentStream() io.ReadCloser {
-	return ioutil.NopCloser(strings.NewReader(`{"id": "125","company_name":"Future Technology","num_employees":1232,"country":"UK"}`))
+	return io.NopCloser(strings.NewReader(`{"id": "125","company_name":"Future Technology","num_employees":1232,"country":"UK"}`))
 }
 
 func TestDocumentsExport(t *testing.T) {
-	expectedBytes, err := ioutil.ReadAll(createDocumentStream())
+	expectedBytes, err := io.ReadAll(createDocumentStream())
 	assert.Nil(t, err)
 
 	ctrl := gomock.NewController(t)
@@ -301,7 +300,7 @@ func TestDocumentsExport(t *testing.T) {
 	result, err := client.Collection("companies").Documents().Export(context.Background(), &api.ExportDocumentsParams{})
 	assert.Nil(t, err)
 
-	resultBytes, err := ioutil.ReadAll(result)
+	resultBytes, err := io.ReadAll(result)
 	assert.Nil(t, err)
 	assert.Equal(t, string(expectedBytes), string(resultBytes))
 }
@@ -330,7 +329,7 @@ func TestDocumentsExportOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		ExportDocuments(gomock.Not(gomock.Nil()), "companies", &api.ExportDocumentsParams{}).
 		Return(&http.Response{
 			StatusCode: http.StatusInternalServerError,
-			Body:       ioutil.NopCloser(strings.NewReader("Internal server error")),
+			Body:       io.NopCloser(strings.NewReader("Internal server error")),
 		}, nil).
 		Times(1)
 
