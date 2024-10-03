@@ -175,9 +175,9 @@ type ClientInterface interface {
 	GetDocument(ctx context.Context, collectionName string, documentId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateDocumentWithBody request with any body
-	UpdateDocumentWithBody(ctx context.Context, collectionName string, documentId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateDocumentWithBody(ctx context.Context, collectionName string, documentId string, params *UpdateDocumentParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateDocument(ctx context.Context, collectionName string, documentId string, body UpdateDocumentJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateDocument(ctx context.Context, collectionName string, documentId string, params *UpdateDocumentParams, body UpdateDocumentJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetSearchOverrides request
 	GetSearchOverrides(ctx context.Context, collectionName string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -664,8 +664,8 @@ func (c *Client) GetDocument(ctx context.Context, collectionName string, documen
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateDocumentWithBody(ctx context.Context, collectionName string, documentId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateDocumentRequestWithBody(c.Server, collectionName, documentId, contentType, body)
+func (c *Client) UpdateDocumentWithBody(ctx context.Context, collectionName string, documentId string, params *UpdateDocumentParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateDocumentRequestWithBody(c.Server, collectionName, documentId, params, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -676,8 +676,8 @@ func (c *Client) UpdateDocumentWithBody(ctx context.Context, collectionName stri
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateDocument(ctx context.Context, collectionName string, documentId string, body UpdateDocumentJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateDocumentRequest(c.Server, collectionName, documentId, body)
+func (c *Client) UpdateDocument(ctx context.Context, collectionName string, documentId string, params *UpdateDocumentParams, body UpdateDocumentJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateDocumentRequest(c.Server, collectionName, documentId, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -3361,18 +3361,18 @@ func NewGetDocumentRequest(server string, collectionName string, documentId stri
 }
 
 // NewUpdateDocumentRequest calls the generic UpdateDocument builder with application/json body
-func NewUpdateDocumentRequest(server string, collectionName string, documentId string, body UpdateDocumentJSONRequestBody) (*http.Request, error) {
+func NewUpdateDocumentRequest(server string, collectionName string, documentId string, params *UpdateDocumentParams, body UpdateDocumentJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateDocumentRequestWithBody(server, collectionName, documentId, "application/json", bodyReader)
+	return NewUpdateDocumentRequestWithBody(server, collectionName, documentId, params, "application/json", bodyReader)
 }
 
 // NewUpdateDocumentRequestWithBody generates requests for UpdateDocument with any type of body
-func NewUpdateDocumentRequestWithBody(server string, collectionName string, documentId string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateDocumentRequestWithBody(server string, collectionName string, documentId string, params *UpdateDocumentParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -3402,6 +3402,28 @@ func NewUpdateDocumentRequestWithBody(server string, collectionName string, docu
 	queryURL, err := serverURL.Parse(operationPath)
 	if err != nil {
 		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.DirtyValues != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "dirty_values", runtime.ParamLocationQuery, *params.DirtyValues); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
 	}
 
 	req, err := http.NewRequest("PATCH", queryURL.String(), body)
@@ -5766,9 +5788,9 @@ type ClientWithResponsesInterface interface {
 	GetDocumentWithResponse(ctx context.Context, collectionName string, documentId string, reqEditors ...RequestEditorFn) (*GetDocumentResponse, error)
 
 	// UpdateDocumentWithBodyWithResponse request with any body
-	UpdateDocumentWithBodyWithResponse(ctx context.Context, collectionName string, documentId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateDocumentResponse, error)
+	UpdateDocumentWithBodyWithResponse(ctx context.Context, collectionName string, documentId string, params *UpdateDocumentParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateDocumentResponse, error)
 
-	UpdateDocumentWithResponse(ctx context.Context, collectionName string, documentId string, body UpdateDocumentJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateDocumentResponse, error)
+	UpdateDocumentWithResponse(ctx context.Context, collectionName string, documentId string, params *UpdateDocumentParams, body UpdateDocumentJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateDocumentResponse, error)
 
 	// GetSearchOverridesWithResponse request
 	GetSearchOverridesWithResponse(ctx context.Context, collectionName string, reqEditors ...RequestEditorFn) (*GetSearchOverridesResponse, error)
@@ -7440,16 +7462,16 @@ func (c *ClientWithResponses) GetDocumentWithResponse(ctx context.Context, colle
 }
 
 // UpdateDocumentWithBodyWithResponse request with arbitrary body returning *UpdateDocumentResponse
-func (c *ClientWithResponses) UpdateDocumentWithBodyWithResponse(ctx context.Context, collectionName string, documentId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateDocumentResponse, error) {
-	rsp, err := c.UpdateDocumentWithBody(ctx, collectionName, documentId, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateDocumentWithBodyWithResponse(ctx context.Context, collectionName string, documentId string, params *UpdateDocumentParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateDocumentResponse, error) {
+	rsp, err := c.UpdateDocumentWithBody(ctx, collectionName, documentId, params, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUpdateDocumentResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateDocumentWithResponse(ctx context.Context, collectionName string, documentId string, body UpdateDocumentJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateDocumentResponse, error) {
-	rsp, err := c.UpdateDocument(ctx, collectionName, documentId, body, reqEditors...)
+func (c *ClientWithResponses) UpdateDocumentWithResponse(ctx context.Context, collectionName string, documentId string, params *UpdateDocumentParams, body UpdateDocumentJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateDocumentResponse, error) {
+	rsp, err := c.UpdateDocument(ctx, collectionName, documentId, params, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}

@@ -53,7 +53,7 @@ func TestDocumentCreate(t *testing.T) {
 	mockedResult := createNewDocumentResponse()
 
 	notNill := gomock.Not(gomock.Nil())
-	indexParams := &api.IndexDocumentParams{}
+	indexParams := &api.IndexDocumentParams{DirtyValues: pointer.Any(api.CoerceOrDrop)}
 	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, expectedDocument).
 		Return(&api.IndexDocumentResponse{
@@ -63,7 +63,7 @@ func TestDocumentCreate(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	document := createNewDocument()
-	result, err := client.Collection("companies").Documents().Create(context.Background(), document)
+	result, err := client.Collection("companies").Documents().Create(context.Background(), document, &api.DocumentIndexParameters{DirtyValues: pointer.Any(api.CoerceOrDrop)})
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -84,7 +84,7 @@ func TestDocumentCreateOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Create(context.Background(), newDocument)
+	_, err := client.Collection("companies").Documents().Create(context.Background(), newDocument, &api.DocumentIndexParameters{})
 	assert.NotNil(t, err)
 }
 
@@ -108,7 +108,7 @@ func TestDocumentCreateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Create(context.Background(), newDocument)
+	_, err := client.Collection("companies").Documents().Create(context.Background(), newDocument, &api.DocumentIndexParameters{})
 	assert.NotNil(t, err)
 }
 
@@ -122,7 +122,7 @@ func TestDocumentUpsert(t *testing.T) {
 	mockedResult := createNewDocumentResponse()
 
 	notNill := gomock.Not(gomock.Nil())
-	indexParams := &api.IndexDocumentParams{Action: pointer.Any(api.Upsert)}
+	indexParams := &api.IndexDocumentParams{Action: pointer.Any(api.Upsert), DirtyValues: pointer.Any(api.CoerceOrDrop)}
 	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, newDocument).
 		Return(&api.IndexDocumentResponse{
@@ -131,7 +131,7 @@ func TestDocumentUpsert(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Collection("companies").Documents().Upsert(context.Background(), newDocument)
+	result, err := client.Collection("companies").Documents().Upsert(context.Background(), newDocument, &api.DocumentIndexParameters{DirtyValues: pointer.Any(api.CoerceOrDrop)})
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -152,7 +152,7 @@ func TestDocumentUpsertOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Upsert(context.Background(), newDocument)
+	_, err := client.Collection("companies").Documents().Upsert(context.Background(), newDocument, &api.DocumentIndexParameters{})
 	assert.NotNil(t, err)
 }
 
@@ -176,7 +176,7 @@ func TestDocumentUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Upsert(context.Background(), newDocument)
+	_, err := client.Collection("companies").Documents().Upsert(context.Background(), newDocument, &api.DocumentIndexParameters{})
 	assert.NotNil(t, err)
 }
 

@@ -374,6 +374,7 @@ type Field struct {
 			ClientSecret *string `json:"client_secret,omitempty"`
 			ModelName    string  `json:"model_name"`
 			ProjectId    *string `json:"project_id,omitempty"`
+			Url          *string `json:"url,omitempty"`
 		} `json:"model_config"`
 	} `json:"embed,omitempty"`
 	Facet    *bool   `json:"facet,omitempty"`
@@ -1439,6 +1440,12 @@ type SearchCollectionParams struct {
 
 // UpdateDocumentJSONBody defines parameters for UpdateDocument.
 type UpdateDocumentJSONBody = interface{}
+
+// UpdateDocumentParams defines parameters for UpdateDocument.
+type UpdateDocumentParams struct {
+	// DirtyValues Dealing with Dirty Data
+	DirtyValues *DirtyValues `form:"dirty_values,omitempty" json:"dirty_values,omitempty"`
+}
 
 // MultiSearchParams defines parameters for MultiSearch.
 type MultiSearchParams struct {

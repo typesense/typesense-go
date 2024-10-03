@@ -19,11 +19,11 @@ const (
 // DocumentsInterface is a type for Documents API operations
 type DocumentsInterface interface {
 	// Create returns indexed document
-	Create(ctx context.Context, document interface{}) (map[string]interface{}, error)
+	Create(ctx context.Context, document interface{}, params *api.DocumentIndexParameters) (map[string]interface{}, error)
 	// Update updates documents matching the filter_by condition
 	Update(ctx context.Context, updateFields interface{}, params *api.UpdateDocumentsParams) (int, error)
 	// Upsert returns indexed/updated document
-	Upsert(context.Context, interface{}) (map[string]interface{}, error)
+	Upsert(ctx context.Context, document interface{}, params *api.DocumentIndexParameters) (map[string]interface{}, error)
 	// Delete returns number of deleted documents
 	Delete(ctx context.Context, filter *api.DeleteDocumentsParams) (int, error)
 	// Search performs document search in collection
@@ -37,8 +37,6 @@ type DocumentsInterface interface {
 	// response indicates the result of each document present in the
 	// request body (in the same order).
 	ImportJsonl(ctx context.Context, body io.Reader, params *api.ImportDocumentsParams) (io.ReadCloser, error)
-	// Index returns indexed document, this method allow configuration of dirty values behavior and action mode. Default action: create
-	Index(ctx context.Context, document interface{}, params *api.IndexDocumentParams) (map[string]interface{}, error)
 }
 
 // documents is internal implementation of DocumentsInterface
@@ -59,12 +57,8 @@ func (d *documents) indexDocument(ctx context.Context, document interface{}, par
 	return *response.JSON201, nil
 }
 
-func (d *documents) Index(ctx context.Context, document interface{}, params *api.IndexDocumentParams) (map[string]interface{}, error) {
-	return d.indexDocument(ctx, document, params)
-}
-
-func (d *documents) Create(ctx context.Context, document interface{}) (map[string]interface{}, error) {
-	return d.indexDocument(ctx, document, &api.IndexDocumentParams{})
+func (d *documents) Create(ctx context.Context, document interface{}, params *api.DocumentIndexParameters) (map[string]interface{}, error) {
+	return d.indexDocument(ctx, document, &api.IndexDocumentParams{DirtyValues: params.DirtyValues})
 }
 
 func (d *documents) Update(ctx context.Context, updateFields interface{}, params *api.UpdateDocumentsParams) (int, error) {
@@ -79,8 +73,8 @@ func (d *documents) Update(ctx context.Context, updateFields interface{}, params
 	return response.JSON200.NumUpdated, nil
 }
 
-func (d *documents) Upsert(ctx context.Context, document interface{}) (map[string]interface{}, error) {
-	return d.indexDocument(ctx, document, &api.IndexDocumentParams{Action: pointer.Any(api.Upsert)})
+func (d *documents) Upsert(ctx context.Context, document interface{}, params *api.DocumentIndexParameters) (map[string]interface{}, error) {
+	return d.indexDocument(ctx, document, &api.IndexDocumentParams{Action: pointer.Any(api.Upsert), DirtyValues: params.DirtyValues})
 }
 
 func (d *documents) Delete(ctx context.Context, filter *api.DeleteDocumentsParams) (int, error) {

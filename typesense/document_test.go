@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/typesense/typesense-go/v2/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense/api/pointer"
 	"github.com/typesense/typesense-go/v2/typesense/mocks"
 	"go.uber.org/mock/gomock"
 )
@@ -71,13 +73,13 @@ func TestDocumentUpdate(t *testing.T) {
 
 	notNill := gomock.Not(gomock.Nil())
 	mockAPIClient.EXPECT().
-		UpdateDocument(notNill, "companies", "123", expectedDocument).
+		UpdateDocument(notNill, "companies", "123", &api.UpdateDocumentParams{DirtyValues: pointer.Any(api.CoerceOrDrop)}, expectedDocument).
 		Return(createResponse(200, "", mockedResult), nil).
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	document := createNewDocument()
-	result, err := client.Collection("companies").Document("123").Update(context.Background(), document)
+	result, err := client.Collection("companies").Document("123").Update(context.Background(), document, &api.DocumentIndexParameters{DirtyValues: pointer.Any(api.CoerceOrDrop)})
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -92,13 +94,13 @@ func TestDocumentUpdateOnApiClientErrorReturnsError(t *testing.T) {
 
 	notNill := gomock.Not(gomock.Nil())
 	mockAPIClient.EXPECT().
-		UpdateDocument(notNill, "companies", "123", expectedDocument).
+		UpdateDocument(notNill, "companies", "123", &api.UpdateDocumentParams{}, expectedDocument).
 		Return(nil, errors.New("failed request")).
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	document := createNewDocument()
-	_, err := client.Collection("companies").Document("123").Update(context.Background(), document)
+	_, err := client.Collection("companies").Document("123").Update(context.Background(), document, &api.DocumentIndexParameters{})
 	assert.NotNil(t, err)
 }
 
@@ -111,13 +113,13 @@ func TestDocumentUpdateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 
 	notNill := gomock.Not(gomock.Nil())
 	mockAPIClient.EXPECT().
-		UpdateDocument(notNill, "companies", "123", expectedDocument).
+		UpdateDocument(notNill, "companies", "123", &api.UpdateDocumentParams{}, expectedDocument).
 		Return(createResponse(500, "Internal server error", nil), nil).
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	document := createNewDocument()
-	_, err := client.Collection("companies").Document("123").Update(context.Background(), document)
+	_, err := client.Collection("companies").Document("123").Update(context.Background(), document, &api.DocumentIndexParameters{})
 	assert.NotNil(t, err)
 }
 

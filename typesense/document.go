@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"io"
 	"strings"
+
+	"github.com/typesense/typesense-go/v2/typesense/api"
 )
 
 type DocumentInterface[T any] interface {
 	Retrieve(ctx context.Context) (T, error)
-	Update(ctx context.Context, document any) (T, error)
+	Update(ctx context.Context, document any, params *api.DocumentIndexParameters) (T, error)
 	Delete(ctx context.Context) (T, error)
 }
 
@@ -39,9 +41,9 @@ func (d *document[T]) Retrieve(ctx context.Context) (resp T, err error) {
 	return resp, nil
 }
 
-func (d *document[T]) Update(ctx context.Context, document any) (resp T, err error) {
+func (d *document[T]) Update(ctx context.Context, document any, params *api.DocumentIndexParameters) (resp T, err error) {
 	response, err := d.apiClient.UpdateDocument(ctx,
-		d.collectionName, d.documentID, document)
+		d.collectionName, d.documentID, &api.UpdateDocumentParams{DirtyValues: params.DirtyValues}, document)
 	if err != nil {
 		return resp, err
 	}

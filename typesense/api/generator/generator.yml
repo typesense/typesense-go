@@ -472,6 +472,8 @@ components:
                   type: string
                 project_id:
                   type: string
+                url:
+                  type: string
               required:
                 - model_name
               type: object
@@ -2151,6 +2153,11 @@ paths:
           required: true
           schema:
             type: string
+        - description: Dealing with Dirty Data
+          in: query
+          name: dirty_values
+          schema:
+            $ref: '#/components/schemas/DirtyValues'
       requestBody:
         content:
           application/json:
@@ -2605,7 +2612,7 @@ paths:
       summary: List all collection overrides
       tags:
         - documents
-        - promote
+        - curation
   /collections/{collectionName}/overrides/{overrideId}:
     delete:
       operationId: deleteSearchOverride
@@ -2638,7 +2645,7 @@ paths:
       summary: Delete an override associated with a collection
       tags:
         - documents
-        - promote
+        - curation
     get:
       description: Retrieve the details of a search override, given its id.
       operationId: getSearchOverride
@@ -2705,7 +2712,7 @@ paths:
       summary: Create or update an override to promote certain documents over others
       tags:
         - documents
-        - promote
+        - curation
   /collections/{collectionName}/synonyms:
     get:
       operationId: getSearchSynonyms
@@ -3657,11 +3664,11 @@ tags:
       description: Find out more
       url: https://typesense.org/api/#index-document
     name: documents
-  - description: Promote certain documents over others
+  - description: Hand-curate search results based on conditional business rules
     externalDocs:
       description: Find out more
       url: https://typesense.org/docs/0.23.0/api/#curation
-    name: promote
+    name: curation
   - description: Typesense can aggregate search queries for both analytics purposes and for query suggestions.
     externalDocs:
       description: Find out more

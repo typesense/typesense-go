@@ -19,8 +19,8 @@ tags:
     externalDocs:
       description: Find out more
       url: https://typesense.org/api/#index-document
-  - name: promote
-    description: Promote certain documents over others
+  - name: curation
+    description: Hand-curate search results based on conditional business rules
     externalDocs:
       description: Find out more
       url: https://typesense.org/docs/0.23.0/api/#curation
@@ -412,7 +412,7 @@ paths:
     get:
       tags:
         - documents
-        - promote
+        - curation
       summary: List all collection overrides
       operationId: getSearchOverrides
       parameters:
@@ -460,7 +460,7 @@ paths:
     put:
       tags:
         - documents
-        - promote
+        - curation
       summary: Create or update an override to promote certain documents over others
       description:
         Create or update an override to promote certain documents over others.
@@ -502,7 +502,7 @@ paths:
     delete:
       tags:
         - documents
-        - promote
+        - curation
       summary: Delete an override associated with a collection
       operationId: deleteSearchOverride
       parameters:
@@ -842,6 +842,11 @@ paths:
           required: true
           schema:
             type: string
+        - name: dirty_values
+          in: query
+          description: Dealing with Dirty Data
+          schema:
+            $ref: "#/components/schemas/DirtyValues"
       requestBody:
         description: The document object with fields to be updated
         content:
@@ -1784,12 +1789,12 @@ components:
             maxLength: 1
           default: []
         enable_nested_fields:
-            type: boolean
-            description:
-              Enables experimental support at a collection level for nested object or object array fields.
-              This field is only available if the Typesense server is version `0.24.0.rcn34` or later.
-            default: false
-            example: true
+          type: boolean
+          description:
+            Enables experimental support at a collection level for nested object or object array fields.
+            This field is only available if the Typesense server is version `0.24.0.rcn34` or later.
+          default: false
+          example: true
         symbols_to_index:
           type: array
           description: >
@@ -1918,6 +1923,8 @@ components:
                 model_name:
                   type: string
                 api_key:
+                  type: string
+                url:
                   type: string
                 access_token:
                   type: string
@@ -2436,8 +2443,8 @@ components:
             If infix index is enabled for this field, infix searching can be done on a per-field
             basis by sending a comma separated string parameter called infix to the search query.
             This parameter can have 3 values; `off` infix search is disabled, which is default
-             `always` infix search is performed along with regular search
-             `fallback` infix search is performed if regular search does not produce results
+            `always` infix search is performed along with regular search
+            `fallback` infix search is performed if regular search does not produce results
           type: string
 
         max_extra_prefix:
@@ -2773,7 +2780,7 @@ components:
           type: boolean
         conversation_model_id:
           description: >
-             The Id of Conversation Model to be used.
+            The Id of Conversation Model to be used.
           type: string
         conversation_id:
           description: >
@@ -2821,8 +2828,8 @@ components:
             If infix index is enabled for this field, infix searching can be done on a per-field
             basis by sending a comma separated string parameter called infix to the search query.
             This parameter can have 3 values; `off` infix search is disabled, which is default
-             `always` infix search is performed along with regular search
-             `fallback` infix search is performed if regular search does not produce results
+            `always` infix search is performed along with regular search
+            `fallback` infix search is performed if regular search does not produce results
           type: string
 
         max_extra_prefix:
@@ -3143,7 +3150,7 @@ components:
           type: boolean
         conversation_model_id:
           description: >
-             The Id of Conversation Model to be used.
+            The Id of Conversation Model to be used.
           type: string
         conversation_id:
           description: >

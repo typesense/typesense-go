@@ -16,3 +16,9 @@ func WithAPIKey(apiKey string) ClientOption {
 		return nil
 	}
 }
+
+// Manually defining this unreferenced schema here instead of disabling oapi-codegen schema pruning
+
+type DocumentIndexParameters struct {
+	DirtyValues *DirtyValues `json:"dirty_values,omitempty"`
+}

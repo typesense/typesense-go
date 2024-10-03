@@ -174,7 +174,7 @@ func TestMultiSearchVectorQuery(t *testing.T) {
 		Vec:   []float32{0.45, 0.222, 0.021, 0.1323},
 	}
 
-	_, err = typesenseClient.Collection("embeddings").Documents().Create(context.Background(), vecDoc)
+	_, err = typesenseClient.Collection("embeddings").Documents().Create(context.Background(), vecDoc, &api.DocumentIndexParameters{})
 	require.NoError(t, err)
 
 	searchParams := &api.MultiSearchParams{}

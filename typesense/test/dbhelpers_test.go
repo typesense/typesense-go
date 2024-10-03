@@ -385,7 +385,7 @@ func createNewCollection(t *testing.T, namePrefix string) string {
 
 func createDocument(t *testing.T, collectionName string, document *testDocument) {
 	t.Helper()
-	_, err := typesenseClient.Collection(collectionName).Documents().Create(context.Background(), document)
+	_, err := typesenseClient.Collection(collectionName).Documents().Create(context.Background(), document, &api.DocumentIndexParameters{})
 	require.NoError(t, err)
 }
 
