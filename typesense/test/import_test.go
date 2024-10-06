@@ -29,7 +29,7 @@ func TestDocumentsImport(t *testing.T) {
 		newDocument("127", withCompanyName("Company3")),
 	}
 
-	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
+	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create)}
 	responses, err := typesenseClient.Collection(collectionName).Documents().Import(context.Background(), documents, params)
 
 	require.NoError(t, err)
@@ -58,7 +58,7 @@ func TestDocumentsImportJsonl(t *testing.T) {
 	require.NoError(t, buffer.WriteByte('\n'))
 	require.NoError(t, je.Encode(newDocument("127", withCompanyName("Company3"))))
 
-	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
+	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create)}
 	responses, err := typesenseClient.Collection(collectionName).Documents().ImportJsonl(context.Background(), &buffer, params)
 
 	require.NoError(t, err)

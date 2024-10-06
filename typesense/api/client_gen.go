@@ -103,6 +103,11 @@ type ClientInterface interface {
 
 	UpsertAlias(ctx context.Context, aliasName string, body UpsertAliasJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// CreateAnalyticsEventWithBody request with any body
+	CreateAnalyticsEventWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateAnalyticsEvent(ctx context.Context, body CreateAnalyticsEventJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// RetrieveAnalyticsRules request
 	RetrieveAnalyticsRules(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -170,9 +175,9 @@ type ClientInterface interface {
 	GetDocument(ctx context.Context, collectionName string, documentId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateDocumentWithBody request with any body
-	UpdateDocumentWithBody(ctx context.Context, collectionName string, documentId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateDocumentWithBody(ctx context.Context, collectionName string, documentId string, params *UpdateDocumentParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateDocument(ctx context.Context, collectionName string, documentId string, body UpdateDocumentJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateDocument(ctx context.Context, collectionName string, documentId string, params *UpdateDocumentParams, body UpdateDocumentJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetSearchOverrides request
 	GetSearchOverrides(ctx context.Context, collectionName string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -201,6 +206,25 @@ type ClientInterface interface {
 	UpsertSearchSynonymWithBody(ctx context.Context, collectionName string, synonymId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	UpsertSearchSynonym(ctx context.Context, collectionName string, synonymId string, body UpsertSearchSynonymJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RetrieveAllConversationModels request
+	RetrieveAllConversationModels(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateConversationModelWithBody request with any body
+	CreateConversationModelWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateConversationModel(ctx context.Context, body CreateConversationModelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteConversationModel request
+	DeleteConversationModel(ctx context.Context, modelId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RetrieveConversationModel request
+	RetrieveConversationModel(ctx context.Context, modelId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateConversationModelWithBody request with any body
+	UpdateConversationModelWithBody(ctx context.Context, modelId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateConversationModel(ctx context.Context, modelId string, body UpdateConversationModelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Debug request
 	Debug(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -318,6 +342,30 @@ func (c *Client) UpsertAliasWithBody(ctx context.Context, aliasName string, cont
 
 func (c *Client) UpsertAlias(ctx context.Context, aliasName string, body UpsertAliasJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpsertAliasRequest(c.Server, aliasName, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateAnalyticsEventWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateAnalyticsEventRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateAnalyticsEvent(ctx context.Context, body CreateAnalyticsEventJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateAnalyticsEventRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -616,8 +664,8 @@ func (c *Client) GetDocument(ctx context.Context, collectionName string, documen
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateDocumentWithBody(ctx context.Context, collectionName string, documentId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateDocumentRequestWithBody(c.Server, collectionName, documentId, contentType, body)
+func (c *Client) UpdateDocumentWithBody(ctx context.Context, collectionName string, documentId string, params *UpdateDocumentParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateDocumentRequestWithBody(c.Server, collectionName, documentId, params, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -628,8 +676,8 @@ func (c *Client) UpdateDocumentWithBody(ctx context.Context, collectionName stri
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateDocument(ctx context.Context, collectionName string, documentId string, body UpdateDocumentJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateDocumentRequest(c.Server, collectionName, documentId, body)
+func (c *Client) UpdateDocument(ctx context.Context, collectionName string, documentId string, params *UpdateDocumentParams, body UpdateDocumentJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateDocumentRequest(c.Server, collectionName, documentId, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -750,6 +798,90 @@ func (c *Client) UpsertSearchSynonymWithBody(ctx context.Context, collectionName
 
 func (c *Client) UpsertSearchSynonym(ctx context.Context, collectionName string, synonymId string, body UpsertSearchSynonymJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpsertSearchSynonymRequest(c.Server, collectionName, synonymId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RetrieveAllConversationModels(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrieveAllConversationModelsRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateConversationModelWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateConversationModelRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateConversationModel(ctx context.Context, body CreateConversationModelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateConversationModelRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteConversationModel(ctx context.Context, modelId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteConversationModelRequest(c.Server, modelId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RetrieveConversationModel(ctx context.Context, modelId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrieveConversationModelRequest(c.Server, modelId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateConversationModelWithBody(ctx context.Context, modelId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateConversationModelRequestWithBody(c.Server, modelId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateConversationModel(ctx context.Context, modelId string, body UpdateConversationModelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateConversationModelRequest(c.Server, modelId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1169,6 +1301,46 @@ func NewUpsertAliasRequestWithBody(server string, aliasName string, contentType 
 	}
 
 	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewCreateAnalyticsEventRequest calls the generic CreateAnalyticsEvent builder with application/json body
+func NewCreateAnalyticsEventRequest(server string, body CreateAnalyticsEventJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateAnalyticsEventRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateAnalyticsEventRequestWithBody generates requests for CreateAnalyticsEvent with any type of body
+func NewCreateAnalyticsEventRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/analytics/events")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
@@ -1603,6 +1775,22 @@ func NewDeleteDocumentsRequest(server string, collectionName string, params *Del
 
 		}
 
+		if params.IgnoreNotFound != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ignore_not_found", runtime.ParamLocationQuery, *params.IgnoreNotFound); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
@@ -1726,6 +1914,22 @@ func NewIndexDocumentRequestWithBody(server string, collectionName string, param
 		if params.Action != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "action", runtime.ParamLocationQuery, *params.Action); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.DirtyValues != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "dirty_values", runtime.ParamLocationQuery, *params.DirtyValues); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -1885,22 +2089,6 @@ func NewImportDocumentsRequestWithBody(server string, collectionName string, par
 
 		}
 
-		if params.BatchSize != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "batch_size", runtime.ParamLocationQuery, *params.BatchSize); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
 		if params.DirtyValues != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "dirty_values", runtime.ParamLocationQuery, *params.DirtyValues); err != nil {
@@ -1917,9 +2105,57 @@ func NewImportDocumentsRequestWithBody(server string, collectionName string, par
 
 		}
 
+		if params.BatchSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "batch_size", runtime.ParamLocationQuery, *params.BatchSize); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.RemoteEmbeddingBatchSize != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "remote_embedding_batch_size", runtime.ParamLocationQuery, *params.RemoteEmbeddingBatchSize); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.ReturnDoc != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "return_doc", runtime.ParamLocationQuery, *params.ReturnDoc); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.ReturnId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "return_id", runtime.ParamLocationQuery, *params.ReturnId); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -1991,6 +2227,70 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 		}
 
+		if params.Conversation != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "conversation", runtime.ParamLocationQuery, *params.Conversation); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.ConversationId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "conversation_id", runtime.ParamLocationQuery, *params.ConversationId); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.ConversationModelId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "conversation_model_id", runtime.ParamLocationQuery, *params.ConversationModelId); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.DropTokensMode != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "drop_tokens_mode", runtime.ParamLocationQuery, *params.DropTokensMode); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.DropTokensThreshold != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "drop_tokens_threshold", runtime.ParamLocationQuery, *params.DropTokensThreshold); err != nil {
@@ -2026,6 +2326,38 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 		if params.EnableOverrides != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_overrides", runtime.ParamLocationQuery, *params.EnableOverrides); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.EnableSynonyms != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_synonyms", runtime.ParamLocationQuery, *params.EnableSynonyms); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.EnableTyposForAlphaNumericalTokens != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_typos_for_alpha_numerical_tokens", runtime.ParamLocationQuery, *params.EnableTyposForAlphaNumericalTokens); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -2167,6 +2499,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 		}
 
+		if params.FilterCuratedHits != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "filter_curated_hits", runtime.ParamLocationQuery, *params.FilterCuratedHits); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.GroupBy != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "group_by", runtime.ParamLocationQuery, *params.GroupBy); err != nil {
@@ -2186,6 +2534,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 		if params.GroupLimit != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "group_limit", runtime.ParamLocationQuery, *params.GroupLimit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.GroupMissingValues != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "group_missing_values", runtime.ParamLocationQuery, *params.GroupMissingValues); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -2791,6 +3155,38 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 		}
 
+		if params.SynonymNumTypos != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "synonym_num_typos", runtime.ParamLocationQuery, *params.SynonymNumTypos); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SynonymPrefix != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "synonym_prefix", runtime.ParamLocationQuery, *params.SynonymPrefix); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.TextMatchType != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "text_match_type", runtime.ParamLocationQuery, *params.TextMatchType); err != nil {
@@ -2842,6 +3238,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 		if params.VectorQuery != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "vector_query", runtime.ParamLocationQuery, *params.VectorQuery); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.VoiceQuery != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "voice_query", runtime.ParamLocationQuery, *params.VoiceQuery); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -2949,18 +3361,18 @@ func NewGetDocumentRequest(server string, collectionName string, documentId stri
 }
 
 // NewUpdateDocumentRequest calls the generic UpdateDocument builder with application/json body
-func NewUpdateDocumentRequest(server string, collectionName string, documentId string, body UpdateDocumentJSONRequestBody) (*http.Request, error) {
+func NewUpdateDocumentRequest(server string, collectionName string, documentId string, params *UpdateDocumentParams, body UpdateDocumentJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateDocumentRequestWithBody(server, collectionName, documentId, "application/json", bodyReader)
+	return NewUpdateDocumentRequestWithBody(server, collectionName, documentId, params, "application/json", bodyReader)
 }
 
 // NewUpdateDocumentRequestWithBody generates requests for UpdateDocument with any type of body
-func NewUpdateDocumentRequestWithBody(server string, collectionName string, documentId string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateDocumentRequestWithBody(server string, collectionName string, documentId string, params *UpdateDocumentParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -2990,6 +3402,28 @@ func NewUpdateDocumentRequestWithBody(server string, collectionName string, docu
 	queryURL, err := serverURL.Parse(operationPath)
 	if err != nil {
 		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.DirtyValues != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "dirty_values", runtime.ParamLocationQuery, *params.DirtyValues); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
 	}
 
 	req, err := http.NewRequest("PATCH", queryURL.String(), body)
@@ -3342,6 +3776,188 @@ func NewUpsertSearchSynonymRequestWithBody(server string, collectionName string,
 	return req, nil
 }
 
+// NewRetrieveAllConversationModelsRequest generates requests for RetrieveAllConversationModels
+func NewRetrieveAllConversationModelsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/conversations/models")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateConversationModelRequest calls the generic CreateConversationModel builder with application/json body
+func NewCreateConversationModelRequest(server string, body CreateConversationModelJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateConversationModelRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateConversationModelRequestWithBody generates requests for CreateConversationModel with any type of body
+func NewCreateConversationModelRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/conversations/models")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteConversationModelRequest generates requests for DeleteConversationModel
+func NewDeleteConversationModelRequest(server string, modelId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "modelId", runtime.ParamLocationPath, modelId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/conversations/models/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRetrieveConversationModelRequest generates requests for RetrieveConversationModel
+func NewRetrieveConversationModelRequest(server string, modelId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "modelId", runtime.ParamLocationPath, modelId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/conversations/models/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateConversationModelRequest calls the generic UpdateConversationModel builder with application/json body
+func NewUpdateConversationModelRequest(server string, modelId string, body UpdateConversationModelJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateConversationModelRequestWithBody(server, modelId, "application/json", bodyReader)
+}
+
+// NewUpdateConversationModelRequestWithBody generates requests for UpdateConversationModel with any type of body
+func NewUpdateConversationModelRequestWithBody(server string, modelId string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "modelId", runtime.ParamLocationPath, modelId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/conversations/models/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewDebugRequest generates requests for Debug
 func NewDebugRequest(server string) (*http.Request, error) {
 	var err error
@@ -3607,6 +4223,70 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 		}
 
+		if params.Conversation != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "conversation", runtime.ParamLocationQuery, *params.Conversation); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.ConversationId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "conversation_id", runtime.ParamLocationQuery, *params.ConversationId); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.ConversationModelId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "conversation_model_id", runtime.ParamLocationQuery, *params.ConversationModelId); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.DropTokensMode != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "drop_tokens_mode", runtime.ParamLocationQuery, *params.DropTokensMode); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.DropTokensThreshold != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "drop_tokens_threshold", runtime.ParamLocationQuery, *params.DropTokensThreshold); err != nil {
@@ -3642,6 +4322,38 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 		if params.EnableOverrides != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_overrides", runtime.ParamLocationQuery, *params.EnableOverrides); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.EnableSynonyms != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_synonyms", runtime.ParamLocationQuery, *params.EnableSynonyms); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.EnableTyposForAlphaNumericalTokens != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_typos_for_alpha_numerical_tokens", runtime.ParamLocationQuery, *params.EnableTyposForAlphaNumericalTokens); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -3783,6 +4495,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 		}
 
+		if params.FilterCuratedHits != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "filter_curated_hits", runtime.ParamLocationQuery, *params.FilterCuratedHits); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.GroupBy != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "group_by", runtime.ParamLocationQuery, *params.GroupBy); err != nil {
@@ -3802,6 +4530,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 		if params.GroupLimit != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "group_limit", runtime.ParamLocationQuery, *params.GroupLimit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.GroupMissingValues != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "group_missing_values", runtime.ParamLocationQuery, *params.GroupMissingValues); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -4407,6 +5151,38 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 		}
 
+		if params.SynonymNumTypos != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "synonym_num_typos", runtime.ParamLocationQuery, *params.SynonymNumTypos); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SynonymPrefix != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "synonym_prefix", runtime.ParamLocationQuery, *params.SynonymPrefix); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.TextMatchType != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "text_match_type", runtime.ParamLocationQuery, *params.TextMatchType); err != nil {
@@ -4458,6 +5234,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 		if params.VectorQuery != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "vector_query", runtime.ParamLocationQuery, *params.VectorQuery); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.VoiceQuery != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "voice_query", runtime.ParamLocationQuery, *params.VoiceQuery); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -4924,6 +5716,11 @@ type ClientWithResponsesInterface interface {
 
 	UpsertAliasWithResponse(ctx context.Context, aliasName string, body UpsertAliasJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertAliasResponse, error)
 
+	// CreateAnalyticsEventWithBodyWithResponse request with any body
+	CreateAnalyticsEventWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAnalyticsEventResponse, error)
+
+	CreateAnalyticsEventWithResponse(ctx context.Context, body CreateAnalyticsEventJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAnalyticsEventResponse, error)
+
 	// RetrieveAnalyticsRulesWithResponse request
 	RetrieveAnalyticsRulesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAnalyticsRulesResponse, error)
 
@@ -4991,9 +5788,9 @@ type ClientWithResponsesInterface interface {
 	GetDocumentWithResponse(ctx context.Context, collectionName string, documentId string, reqEditors ...RequestEditorFn) (*GetDocumentResponse, error)
 
 	// UpdateDocumentWithBodyWithResponse request with any body
-	UpdateDocumentWithBodyWithResponse(ctx context.Context, collectionName string, documentId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateDocumentResponse, error)
+	UpdateDocumentWithBodyWithResponse(ctx context.Context, collectionName string, documentId string, params *UpdateDocumentParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateDocumentResponse, error)
 
-	UpdateDocumentWithResponse(ctx context.Context, collectionName string, documentId string, body UpdateDocumentJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateDocumentResponse, error)
+	UpdateDocumentWithResponse(ctx context.Context, collectionName string, documentId string, params *UpdateDocumentParams, body UpdateDocumentJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateDocumentResponse, error)
 
 	// GetSearchOverridesWithResponse request
 	GetSearchOverridesWithResponse(ctx context.Context, collectionName string, reqEditors ...RequestEditorFn) (*GetSearchOverridesResponse, error)
@@ -5022,6 +5819,25 @@ type ClientWithResponsesInterface interface {
 	UpsertSearchSynonymWithBodyWithResponse(ctx context.Context, collectionName string, synonymId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpsertSearchSynonymResponse, error)
 
 	UpsertSearchSynonymWithResponse(ctx context.Context, collectionName string, synonymId string, body UpsertSearchSynonymJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertSearchSynonymResponse, error)
+
+	// RetrieveAllConversationModelsWithResponse request
+	RetrieveAllConversationModelsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllConversationModelsResponse, error)
+
+	// CreateConversationModelWithBodyWithResponse request with any body
+	CreateConversationModelWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateConversationModelResponse, error)
+
+	CreateConversationModelWithResponse(ctx context.Context, body CreateConversationModelJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateConversationModelResponse, error)
+
+	// DeleteConversationModelWithResponse request
+	DeleteConversationModelWithResponse(ctx context.Context, modelId string, reqEditors ...RequestEditorFn) (*DeleteConversationModelResponse, error)
+
+	// RetrieveConversationModelWithResponse request
+	RetrieveConversationModelWithResponse(ctx context.Context, modelId string, reqEditors ...RequestEditorFn) (*RetrieveConversationModelResponse, error)
+
+	// UpdateConversationModelWithBodyWithResponse request with any body
+	UpdateConversationModelWithBodyWithResponse(ctx context.Context, modelId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateConversationModelResponse, error)
+
+	UpdateConversationModelWithResponse(ctx context.Context, modelId string, body UpdateConversationModelJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateConversationModelResponse, error)
 
 	// DebugWithResponse request
 	DebugWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DebugResponse, error)
@@ -5181,6 +5997,29 @@ func (r UpsertAliasResponse) StatusCode() int {
 	return 0
 }
 
+type CreateAnalyticsEventResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *AnalyticsEventCreateResponse
+	JSON400      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateAnalyticsEventResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateAnalyticsEventResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type RetrieveAnalyticsRulesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -5229,7 +6068,7 @@ func (r CreateAnalyticsRuleResponse) StatusCode() int {
 type DeleteAnalyticsRuleResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *AnalyticsRuleSchema
+	JSON200      *AnalyticsRuleDeleteResponse
 	JSON404      *ApiResponse
 }
 
@@ -5275,7 +6114,7 @@ func (r RetrieveAnalyticsRuleResponse) StatusCode() int {
 type UpsertAnalyticsRuleResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *AnalyticsRuleSchema
+	JSON200      *AnalyticsRuleSchema
 	JSON400      *ApiResponse
 }
 
@@ -5806,6 +6645,117 @@ func (r UpsertSearchSynonymResponse) StatusCode() int {
 	return 0
 }
 
+type RetrieveAllConversationModelsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *[]*ConversationModelSchema
+}
+
+// Status returns HTTPResponse.Status
+func (r RetrieveAllConversationModelsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetrieveAllConversationModelsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateConversationModelResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ConversationModelSchema
+	JSON400      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateConversationModelResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateConversationModelResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteConversationModelResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ConversationModelSchema
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteConversationModelResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteConversationModelResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RetrieveConversationModelResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ConversationModelSchema
+}
+
+// Status returns HTTPResponse.Status
+func (r RetrieveConversationModelResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetrieveConversationModelResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateConversationModelResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ConversationModelSchema
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateConversationModelResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateConversationModelResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type DebugResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -6284,6 +7234,23 @@ func (c *ClientWithResponses) UpsertAliasWithResponse(ctx context.Context, alias
 	return ParseUpsertAliasResponse(rsp)
 }
 
+// CreateAnalyticsEventWithBodyWithResponse request with arbitrary body returning *CreateAnalyticsEventResponse
+func (c *ClientWithResponses) CreateAnalyticsEventWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAnalyticsEventResponse, error) {
+	rsp, err := c.CreateAnalyticsEventWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateAnalyticsEventResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateAnalyticsEventWithResponse(ctx context.Context, body CreateAnalyticsEventJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAnalyticsEventResponse, error) {
+	rsp, err := c.CreateAnalyticsEvent(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateAnalyticsEventResponse(rsp)
+}
+
 // RetrieveAnalyticsRulesWithResponse request returning *RetrieveAnalyticsRulesResponse
 func (c *ClientWithResponses) RetrieveAnalyticsRulesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAnalyticsRulesResponse, error) {
 	rsp, err := c.RetrieveAnalyticsRules(ctx, reqEditors...)
@@ -6495,16 +7462,16 @@ func (c *ClientWithResponses) GetDocumentWithResponse(ctx context.Context, colle
 }
 
 // UpdateDocumentWithBodyWithResponse request with arbitrary body returning *UpdateDocumentResponse
-func (c *ClientWithResponses) UpdateDocumentWithBodyWithResponse(ctx context.Context, collectionName string, documentId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateDocumentResponse, error) {
-	rsp, err := c.UpdateDocumentWithBody(ctx, collectionName, documentId, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateDocumentWithBodyWithResponse(ctx context.Context, collectionName string, documentId string, params *UpdateDocumentParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateDocumentResponse, error) {
+	rsp, err := c.UpdateDocumentWithBody(ctx, collectionName, documentId, params, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUpdateDocumentResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateDocumentWithResponse(ctx context.Context, collectionName string, documentId string, body UpdateDocumentJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateDocumentResponse, error) {
-	rsp, err := c.UpdateDocument(ctx, collectionName, documentId, body, reqEditors...)
+func (c *ClientWithResponses) UpdateDocumentWithResponse(ctx context.Context, collectionName string, documentId string, params *UpdateDocumentParams, body UpdateDocumentJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateDocumentResponse, error) {
+	rsp, err := c.UpdateDocument(ctx, collectionName, documentId, params, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -6597,6 +7564,67 @@ func (c *ClientWithResponses) UpsertSearchSynonymWithResponse(ctx context.Contex
 		return nil, err
 	}
 	return ParseUpsertSearchSynonymResponse(rsp)
+}
+
+// RetrieveAllConversationModelsWithResponse request returning *RetrieveAllConversationModelsResponse
+func (c *ClientWithResponses) RetrieveAllConversationModelsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllConversationModelsResponse, error) {
+	rsp, err := c.RetrieveAllConversationModels(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetrieveAllConversationModelsResponse(rsp)
+}
+
+// CreateConversationModelWithBodyWithResponse request with arbitrary body returning *CreateConversationModelResponse
+func (c *ClientWithResponses) CreateConversationModelWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateConversationModelResponse, error) {
+	rsp, err := c.CreateConversationModelWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateConversationModelResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateConversationModelWithResponse(ctx context.Context, body CreateConversationModelJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateConversationModelResponse, error) {
+	rsp, err := c.CreateConversationModel(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateConversationModelResponse(rsp)
+}
+
+// DeleteConversationModelWithResponse request returning *DeleteConversationModelResponse
+func (c *ClientWithResponses) DeleteConversationModelWithResponse(ctx context.Context, modelId string, reqEditors ...RequestEditorFn) (*DeleteConversationModelResponse, error) {
+	rsp, err := c.DeleteConversationModel(ctx, modelId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteConversationModelResponse(rsp)
+}
+
+// RetrieveConversationModelWithResponse request returning *RetrieveConversationModelResponse
+func (c *ClientWithResponses) RetrieveConversationModelWithResponse(ctx context.Context, modelId string, reqEditors ...RequestEditorFn) (*RetrieveConversationModelResponse, error) {
+	rsp, err := c.RetrieveConversationModel(ctx, modelId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetrieveConversationModelResponse(rsp)
+}
+
+// UpdateConversationModelWithBodyWithResponse request with arbitrary body returning *UpdateConversationModelResponse
+func (c *ClientWithResponses) UpdateConversationModelWithBodyWithResponse(ctx context.Context, modelId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateConversationModelResponse, error) {
+	rsp, err := c.UpdateConversationModelWithBody(ctx, modelId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateConversationModelResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateConversationModelWithResponse(ctx context.Context, modelId string, body UpdateConversationModelJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateConversationModelResponse, error) {
+	rsp, err := c.UpdateConversationModel(ctx, modelId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateConversationModelResponse(rsp)
 }
 
 // DebugWithResponse request returning *DebugResponse
@@ -6934,6 +7962,39 @@ func ParseUpsertAliasResponse(rsp *http.Response) (*UpsertAliasResponse, error) 
 	return response, nil
 }
 
+// ParseCreateAnalyticsEventResponse parses an HTTP response from a CreateAnalyticsEventWithResponse call
+func ParseCreateAnalyticsEventResponse(rsp *http.Response) (*CreateAnalyticsEventResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateAnalyticsEventResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest AnalyticsEventCreateResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseRetrieveAnalyticsRulesResponse parses an HTTP response from a RetrieveAnalyticsRulesWithResponse call
 func ParseRetrieveAnalyticsRulesResponse(rsp *http.Response) (*RetrieveAnalyticsRulesResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -7008,7 +8069,7 @@ func ParseDeleteAnalyticsRuleResponse(rsp *http.Response) (*DeleteAnalyticsRuleR
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest AnalyticsRuleSchema
+		var dest AnalyticsRuleDeleteResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -7073,12 +8134,12 @@ func ParseUpsertAnalyticsRuleResponse(rsp *http.Response) (*UpsertAnalyticsRuleR
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest AnalyticsRuleSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest ApiResponse
@@ -7817,6 +8878,143 @@ func ParseUpsertSearchSynonymResponse(rsp *http.Response) (*UpsertSearchSynonymR
 			return nil, err
 		}
 		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetrieveAllConversationModelsResponse parses an HTTP response from a RetrieveAllConversationModelsWithResponse call
+func ParseRetrieveAllConversationModelsResponse(rsp *http.Response) (*RetrieveAllConversationModelsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetrieveAllConversationModelsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []*ConversationModelSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateConversationModelResponse parses an HTTP response from a CreateConversationModelWithResponse call
+func ParseCreateConversationModelResponse(rsp *http.Response) (*CreateConversationModelResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateConversationModelResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ConversationModelSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteConversationModelResponse parses an HTTP response from a DeleteConversationModelWithResponse call
+func ParseDeleteConversationModelResponse(rsp *http.Response) (*DeleteConversationModelResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteConversationModelResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ConversationModelSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetrieveConversationModelResponse parses an HTTP response from a RetrieveConversationModelWithResponse call
+func ParseRetrieveConversationModelResponse(rsp *http.Response) (*RetrieveConversationModelResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetrieveConversationModelResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ConversationModelSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateConversationModelResponse parses an HTTP response from a UpdateConversationModelWithResponse call
+func ParseUpdateConversationModelResponse(rsp *http.Response) (*UpdateConversationModelResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateConversationModelResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ConversationModelSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
 
 	}
 
