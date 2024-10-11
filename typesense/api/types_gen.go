@@ -1361,8 +1361,8 @@ type ExportDocumentsParams struct {
 // ImportDocumentsParams defines parameters for ImportDocuments.
 type ImportDocumentsParams struct {
 	Action                   *IndexAction `form:"action,omitempty" json:"action,omitempty"`
-	DirtyValues              *DirtyValues `form:"dirty_values,omitempty" json:"dirty_values,omitempty"`
 	BatchSize                *int         `form:"batch_size,omitempty" json:"batch_size,omitempty"`
+	DirtyValues              *DirtyValues `form:"dirty_values,omitempty" json:"dirty_values,omitempty"`
 	RemoteEmbeddingBatchSize *int         `form:"remote_embedding_batch_size,omitempty" json:"remote_embedding_batch_size,omitempty"`
 	ReturnDoc                *bool        `form:"return_doc,omitempty" json:"return_doc,omitempty"`
 	ReturnId                 *bool        `form:"return_id,omitempty" json:"return_id,omitempty"`

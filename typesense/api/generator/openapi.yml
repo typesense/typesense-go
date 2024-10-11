@@ -744,14 +744,10 @@ paths:
                 type: integer
               return_doc:
                 type: boolean
-        - name: action
-          in: query
-          schema:
-            $ref: "#/components/schemas/IndexAction"
-        - name: dirty_values
-          in: query
-          schema:
-            $ref: "#/components/schemas/DirtyValues"
+              action:
+                $ref: "#/components/schemas/IndexAction"
+              dirty_values:
+                $ref: "#/components/schemas/DirtyValues"
       requestBody:
         description: The json array of documents or the JSONL file to import
         content:

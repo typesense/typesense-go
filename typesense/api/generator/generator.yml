@@ -2243,13 +2243,13 @@ paths:
           schema:
             $ref: '#/components/schemas/IndexAction'
         - in: query
-          name: dirty_values
-          schema:
-            $ref: '#/components/schemas/DirtyValues'
-        - in: query
           name: batch_size
           schema:
             type: integer
+        - in: query
+          name: dirty_values
+          schema:
+            $ref: '#/components/schemas/DirtyValues'
         - in: query
           name: remote_embedding_batch_size
           schema:
