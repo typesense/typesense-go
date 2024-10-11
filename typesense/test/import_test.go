@@ -29,7 +29,7 @@ func TestDocumentsImport(t *testing.T) {
 		newDocument("127", withCompanyName("Company3")),
 	}
 
-	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create)}
+	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create), DirtyValues: pointer.Any(api.CoerceOrDrop)}
 	responses, err := typesenseClient.Collection(collectionName).Documents().Import(context.Background(), documents, params)
 
 	require.NoError(t, err)

@@ -190,7 +190,16 @@ func unwrapImportDocuments(m *yml) {
 		newMap["name"] = obj.Key
 		newMap["in"] = query
 		newMap["schema"] = make(yml)
-		newMap["schema"].(yml)["type"] = obj.Value.(yml)["type"].(string)
+		switch {
+		// if the param is referencing a schema
+		case obj.Value.(yml)["type"] == nil:
+			newMap["schema"].(yml)["$ref"] = obj.Value.(yml)["$ref"].(string)
+		case obj.Value.(yml)["type"].(string) == array:
+			newMap["schema"].(yml)["type"] = array
+			newMap["schema"].(yml)["items"] = obj.Value.(yml)["items"]
+		default:
+			newMap["schema"].(yml)["type"] = obj.Value.(yml)["type"].(string)
+		}
 		if obj.Value.(yml)["enum"] != nil {
 			newMap["schema"].(yml)["enum"] = obj.Value.(yml)["enum"]
 		}
