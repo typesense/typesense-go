@@ -22,7 +22,7 @@ func TestCollectionSearch(t *testing.T) {
 		newDocument("131", withCompanyName("Stark Industries 5"), withNumEmployees(1000)),
 	}
 
-	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
+	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create)}
 	_, err := typesenseClient.Collection(collectionName).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
@@ -67,7 +67,7 @@ func TestCollectionSearchRange(t *testing.T) {
 		newDocument("129", withCompanyName("Stark Industries 4"), withNumEmployees(500)),
 	}
 
-	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
+	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create)}
 	_, err := typesenseClient.Collection(collectionName).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
@@ -131,7 +131,7 @@ func TestCollectionGroupByStringArray(t *testing.T) {
 		},
 	}
 
-	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
+	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create)}
 	_, err = typesenseClient.Collection(collectionName).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
@@ -160,7 +160,7 @@ func TestCollectionSearchWithPreset(t *testing.T) {
 		newDocument("131", withCompanyName("Stark Industries 5"), withNumEmployees(1000)),
 	}
 
-	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
+	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create)}
 	_, err := typesenseClient.Collection(collectionName).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
@@ -214,7 +214,7 @@ func TestCollectionSearchWithStopwords(t *testing.T) {
 		newDocument("129", withCompanyName("Stark Industries 4"), withNumEmployees(2000)),
 	}
 
-	params := &api.ImportDocumentsParams{Action: pointer.String("create")}
+	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create)}
 	_, err := typesenseClient.Collection(collectionName).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 

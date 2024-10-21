@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
@@ -54,7 +53,7 @@ func TestDocumentCreate(t *testing.T) {
 	mockedResult := createNewDocumentResponse()
 
 	notNill := gomock.Not(gomock.Nil())
-	indexParams := &api.IndexDocumentParams{}
+	indexParams := &api.IndexDocumentParams{DirtyValues: pointer.Any(api.CoerceOrDrop)}
 	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, expectedDocument).
 		Return(&api.IndexDocumentResponse{
@@ -64,7 +63,7 @@ func TestDocumentCreate(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	document := createNewDocument()
-	result, err := client.Collection("companies").Documents().Create(context.Background(), document)
+	result, err := client.Collection("companies").Documents().Create(context.Background(), document, &api.DocumentIndexParameters{DirtyValues: pointer.Any(api.CoerceOrDrop)})
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -85,7 +84,7 @@ func TestDocumentCreateOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Create(context.Background(), newDocument)
+	_, err := client.Collection("companies").Documents().Create(context.Background(), newDocument, &api.DocumentIndexParameters{})
 	assert.NotNil(t, err)
 }
 
@@ -109,7 +108,7 @@ func TestDocumentCreateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Create(context.Background(), newDocument)
+	_, err := client.Collection("companies").Documents().Create(context.Background(), newDocument, &api.DocumentIndexParameters{})
 	assert.NotNil(t, err)
 }
 
@@ -123,7 +122,7 @@ func TestDocumentUpsert(t *testing.T) {
 	mockedResult := createNewDocumentResponse()
 
 	notNill := gomock.Not(gomock.Nil())
-	indexParams := &api.IndexDocumentParams{Action: &upsertAction}
+	indexParams := &api.IndexDocumentParams{Action: pointer.Any(api.Upsert), DirtyValues: pointer.Any(api.CoerceOrDrop)}
 	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, newDocument).
 		Return(&api.IndexDocumentResponse{
@@ -132,7 +131,7 @@ func TestDocumentUpsert(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Collection("companies").Documents().Upsert(context.Background(), newDocument)
+	result, err := client.Collection("companies").Documents().Upsert(context.Background(), newDocument, &api.DocumentIndexParameters{DirtyValues: pointer.Any(api.CoerceOrDrop)})
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -146,14 +145,14 @@ func TestDocumentUpsertOnApiClientErrorReturnsError(t *testing.T) {
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	notNill := gomock.Not(gomock.Nil())
-	indexParams := &api.IndexDocumentParams{Action: &upsertAction}
+	indexParams := &api.IndexDocumentParams{Action: pointer.Any(api.Upsert)}
 	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, newDocument).
 		Return(nil, errors.New("failed request")).
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Upsert(context.Background(), newDocument)
+	_, err := client.Collection("companies").Documents().Upsert(context.Background(), newDocument, &api.DocumentIndexParameters{})
 	assert.NotNil(t, err)
 }
 
@@ -165,7 +164,7 @@ func TestDocumentUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	notNill := gomock.Not(gomock.Nil())
-	indexParams := &api.IndexDocumentParams{Action: &upsertAction}
+	indexParams := &api.IndexDocumentParams{Action: pointer.Any(api.Upsert)}
 	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, newDocument).
 		Return(&api.IndexDocumentResponse{
@@ -177,7 +176,7 @@ func TestDocumentUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Upsert(context.Background(), newDocument)
+	_, err := client.Collection("companies").Documents().Upsert(context.Background(), newDocument, &api.DocumentIndexParameters{})
 	assert.NotNil(t, err)
 }
 
@@ -277,11 +276,11 @@ func TestDocumentsDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 }
 
 func createDocumentStream() io.ReadCloser {
-	return ioutil.NopCloser(strings.NewReader(`{"id": "125","company_name":"Future Technology","num_employees":1232,"country":"UK"}`))
+	return io.NopCloser(strings.NewReader(`{"id": "125","company_name":"Future Technology","num_employees":1232,"country":"UK"}`))
 }
 
 func TestDocumentsExport(t *testing.T) {
-	expectedBytes, err := ioutil.ReadAll(createDocumentStream())
+	expectedBytes, err := io.ReadAll(createDocumentStream())
 	assert.Nil(t, err)
 
 	ctrl := gomock.NewController(t)
@@ -298,10 +297,10 @@ func TestDocumentsExport(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Collection("companies").Documents().Export(context.Background())
+	result, err := client.Collection("companies").Documents().Export(context.Background(), &api.ExportDocumentsParams{})
 	assert.Nil(t, err)
 
-	resultBytes, err := ioutil.ReadAll(result)
+	resultBytes, err := io.ReadAll(result)
 	assert.Nil(t, err)
 	assert.Equal(t, string(expectedBytes), string(resultBytes))
 }
@@ -317,7 +316,7 @@ func TestDocumentsExportOnApiClientErrorReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Export(context.Background())
+	_, err := client.Collection("companies").Documents().Export(context.Background(), &api.ExportDocumentsParams{})
 	assert.NotNil(t, err)
 }
 
@@ -330,11 +329,59 @@ func TestDocumentsExportOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		ExportDocuments(gomock.Not(gomock.Nil()), "companies", &api.ExportDocumentsParams{}).
 		Return(&http.Response{
 			StatusCode: http.StatusInternalServerError,
-			Body:       ioutil.NopCloser(strings.NewReader("Internal server error")),
+			Body:       io.NopCloser(strings.NewReader("Internal server error")),
 		}, nil).
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collection("companies").Documents().Export(context.Background())
+	_, err := client.Collection("companies").Documents().Export(context.Background(), &api.ExportDocumentsParams{})
 	assert.NotNil(t, err)
+}
+
+func TestSingleCollectionSearchRAG(t *testing.T) {
+	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
+		validateRequestMetadata(t, r, "/collections/test/documents/search?conversation=true&conversation_id=123&conversation_model_id=conv-1&q=can+you+suggest", http.MethodGet)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`
+		{
+			"conversation": {
+				"answer": "Based on the context provided,...",
+				"conversation_history": [
+				{
+					"user": "can you suggest an action series"
+				},
+				{
+					"assistant": "Based on the context provided,..."
+				}
+				],
+				"conversation_id": "abc",
+				"query": "can you suggest"
+			}
+		}`))
+	})
+	defer server.Close()
+
+	res, err := client.Collection("test").Documents().Search(context.Background(), &api.SearchCollectionParams{
+		Q:                   pointer.String("can you suggest"),
+		Conversation:        pointer.True(),
+		ConversationModelId: pointer.String("conv-1"),
+		ConversationId:      pointer.String("123"),
+	})
+
+	assert.NoError(t, err)
+	assert.Equal(t, &api.SearchResult{
+		Conversation: &api.SearchResultConversation{
+			Answer: "Based on the context provided,...",
+			ConversationHistory: []map[string]interface{}{
+				{
+					"user": "can you suggest an action series",
+				},
+				{
+					"assistant": "Based on the context provided,...",
+				},
+			},
+			ConversationId: "abc",
+			Query:          "can you suggest",
+		},
+	}, res)
 }

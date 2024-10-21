@@ -190,7 +190,16 @@ func unwrapImportDocuments(m *yml) {
 		newMap["name"] = obj.Key
 		newMap["in"] = query
 		newMap["schema"] = make(yml)
-		newMap["schema"].(yml)["type"] = obj.Value.(yml)["type"].(string)
+		switch {
+		// if the param is referencing a schema
+		case obj.Value.(yml)["type"] == nil:
+			newMap["schema"].(yml)["$ref"] = obj.Value.(yml)["$ref"].(string)
+		case obj.Value.(yml)["type"].(string) == array:
+			newMap["schema"].(yml)["type"] = array
+			newMap["schema"].(yml)["items"] = obj.Value.(yml)["items"]
+		default:
+			newMap["schema"].(yml)["type"] = obj.Value.(yml)["type"].(string)
+		}
 		if obj.Value.(yml)["enum"] != nil {
 			newMap["schema"].(yml)["enum"] = obj.Value.(yml)["enum"]
 		}
@@ -215,10 +224,14 @@ func unwrapSearchParameters(m *yml) {
 		newMap["in"] = query
 		newMap["schema"] = make(yml)
 		if obj.Value.(yml)["oneOf"] == nil {
-			if obj.Value.(yml)["type"].(string) == array {
+			switch {
+			// if the param is referencing a schema
+			case obj.Value.(yml)["type"] == nil:
+				newMap["schema"].(yml)["$ref"] = obj.Value.(yml)["$ref"].(string)
+			case obj.Value.(yml)["type"].(string) == array:
 				newMap["schema"].(yml)["type"] = array
 				newMap["schema"].(yml)["items"] = obj.Value.(yml)["items"]
-			} else {
+			default:
 				newMap["schema"].(yml)["type"] = obj.Value.(yml)["type"].(string)
 			}
 		} else {
@@ -241,10 +254,14 @@ func unwrapMultiSearchParameters(m *yml) {
 		newMap["in"] = query
 		newMap["schema"] = make(yml)
 		if obj.Value.(yml)["oneOf"] == nil {
-			if obj.Value.(yml)["type"].(string) == array {
+			switch {
+			// if the param is referencing a schema
+			case obj.Value.(yml)["type"] == nil:
+				newMap["schema"].(yml)["$ref"] = obj.Value.(yml)["$ref"].(string)
+			case obj.Value.(yml)["type"].(string) == array:
 				newMap["schema"].(yml)["type"] = array
 				newMap["schema"].(yml)["items"] = obj.Value.(yml)["items"]
-			} else {
+			default:
 				newMap["schema"].(yml)["type"] = obj.Value.(yml)["type"].(string)
 			}
 		} else {

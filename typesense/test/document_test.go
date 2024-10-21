@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/typesense/typesense-go/v2/typesense"
+	"github.com/typesense/typesense-go/v2/typesense/api"
 )
 
 func TestDocumentRetrieveGeneric(t *testing.T) {
@@ -41,7 +42,7 @@ func TestDocumentUpdate(t *testing.T) {
 	createDocument(t, collectionName, document)
 
 	document.CompanyName = newCompanyName
-	typesenseClient.Collection(collectionName).Document("123").Update(context.Background(), document)
+	typesenseClient.Collection(collectionName).Document("123").Update(context.Background(), document, &api.DocumentIndexParameters{})
 
 	result, err := typesenseClient.Collection(collectionName).Document("123").Retrieve(context.Background())
 
