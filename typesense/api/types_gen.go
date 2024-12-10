@@ -1241,7 +1241,7 @@ type SearchResultHit struct {
 	Document *map[string]interface{} `json:"document,omitempty"`
 
 	// GeoDistanceMeters Can be any key-value pair
-	GeoDistanceMeters *map[string]float64 `json:"geo_distance_meters,omitempty"`
+	GeoDistanceMeters *map[string]float32 `json:"geo_distance_meters,omitempty"`
 
 	// Highlight Highlighted version of the matching document
 	Highlight *map[string]interface{} `json:"highlight,omitempty"`
