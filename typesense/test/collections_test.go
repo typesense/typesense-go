@@ -19,9 +19,8 @@ func TestCollectionCreate(t *testing.T) {
 	expectedResult := expectedNewCollection(collectionName)
 
 	result, err := typesenseClient.Collections().Create(context.Background(), schema)
-	result.CreatedAt = pointer.Int64(0)
-
 	require.NoError(t, err)
+	result.CreatedAt = pointer.Int64(0)
 	require.Equal(t, expectedResult, result)
 }
 

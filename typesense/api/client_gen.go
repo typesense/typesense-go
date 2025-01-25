@@ -6488,7 +6488,7 @@ func (r GetSearchOverridesResponse) StatusCode() int {
 type DeleteSearchOverrideResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *SearchOverride
+	JSON200      *SearchOverrideDeleteResponse
 	JSON404      *ApiResponse
 }
 
@@ -6579,7 +6579,7 @@ func (r GetSearchSynonymsResponse) StatusCode() int {
 type DeleteSearchSynonymResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *SearchSynonym
+	JSON200      *SearchSynonymDeleteResponse
 	JSON404      *ApiResponse
 }
 
@@ -6851,7 +6851,7 @@ func (r CreateKeyResponse) StatusCode() int {
 type DeleteKeyResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *ApiKey
+	JSON200      *ApiKeyDeleteResponse
 	JSON400      *ApiResponse
 	JSON404      *ApiResponse
 }
@@ -8675,7 +8675,7 @@ func ParseDeleteSearchOverrideResponse(rsp *http.Response) (*DeleteSearchOverrid
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest SearchOverride
+		var dest SearchOverrideDeleteResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -8800,7 +8800,7 @@ func ParseDeleteSearchSynonymResponse(rsp *http.Response) (*DeleteSearchSynonymR
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest SearchSynonym
+		var dest SearchSynonymDeleteResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -9156,7 +9156,7 @@ func ParseDeleteKeyResponse(rsp *http.Response) (*DeleteKeyResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ApiKey
+		var dest ApiKeyDeleteResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

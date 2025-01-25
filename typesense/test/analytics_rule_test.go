@@ -13,7 +13,8 @@ import (
 func TestAnalyticsRuleRetrieve(t *testing.T) {
 	eventName := newUUIDName("event")
 	collectionName := createNewCollection(t, "analytics-rules-collection")
-	expectedRule := createNewAnalyticsRule(t, collectionName, eventName)
+	sourceCollectionName := createNewCollection(t, "analytics-rules-source-collection")
+	expectedRule := createNewAnalyticsRule(t, collectionName, sourceCollectionName, eventName)
 
 	result, err := typesenseClient.Analytics().Rule(expectedRule.Name).Retrieve(context.Background())
 
@@ -24,7 +25,8 @@ func TestAnalyticsRuleRetrieve(t *testing.T) {
 func TestAnalyticsRuleDelete(t *testing.T) {
 	eventName := newUUIDName("event")
 	collectionName := createNewCollection(t, "analytics-rules-collection")
-	expectedRule := createNewAnalyticsRule(t, collectionName, eventName)
+	sourceCollectionName := createNewCollection(t, "analytics-rules-source-collection")
+	expectedRule := createNewAnalyticsRule(t, collectionName, sourceCollectionName, eventName)
 
 	result, err := typesenseClient.Analytics().Rule(expectedRule.Name).Delete(context.Background())
 

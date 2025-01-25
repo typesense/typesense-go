@@ -11,7 +11,7 @@ type SynonymInterface interface {
 	// Retrieve a single search synonym
 	Retrieve(ctx context.Context) (*api.SearchSynonym, error)
 	// Delete a synonym associated with a collection
-	Delete(ctx context.Context) (*api.SearchSynonym, error)
+	Delete(ctx context.Context) (*api.SearchSynonymDeleteResponse, error)
 }
 
 // synonym is internal implementation of SynonymInterface
@@ -33,7 +33,7 @@ func (s *synonym) Retrieve(ctx context.Context) (*api.SearchSynonym, error) {
 	return response.JSON200, nil
 }
 
-func (s *synonym) Delete(ctx context.Context) (*api.SearchSynonym, error) {
+func (s *synonym) Delete(ctx context.Context) (*api.SearchSynonymDeleteResponse, error) {
 	response, err := s.apiClient.DeleteSearchSynonymWithResponse(ctx,
 		s.collectionName, s.synonymID)
 	if err != nil {

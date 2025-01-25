@@ -285,7 +285,7 @@ func newCollectionAlias(collectionName string, name string) *api.CollectionAlias
 func newPresetFromSearchParametersUpsertSchema() *api.PresetUpsertSchema {
 	preset := &api.PresetUpsertSchema{}
 	preset.Value.FromSearchParameters(api.SearchParameters{
-		Q: "hello",
+		Q: pointer.Any("hello"),
 	})
 	return preset
 }
@@ -295,7 +295,7 @@ func newPresetFromSearchParameters(presetName string) *api.PresetSchema {
 		Name: presetName,
 	}
 	preset.Value.FromSearchParameters(api.SearchParameters{
-		Q: "hello",
+		Q: pointer.Any("hello"),
 	})
 	return preset
 }
@@ -326,12 +326,12 @@ func newPresetFromMultiSearchSearchesParameter(presetName string) *api.PresetSch
 	return preset
 }
 
-func newAnalyticsRuleUpsertSchema(collectionName string, eventName string) *api.AnalyticsRuleUpsertSchema {
+func newAnalyticsRuleUpsertSchema(collectionName string, sourceCollectionName string, eventName string) *api.AnalyticsRuleUpsertSchema {
 	return &api.AnalyticsRuleUpsertSchema{
 		Type: "counter",
 		Params: api.AnalyticsRuleParameters{
 			Source: api.AnalyticsRuleParametersSource{
-				Collections: []string{"products"},
+				Collections: []string{sourceCollectionName},
 				Events: &[]struct {
 					Name   string  "json:\"name\""
 					Type   string  "json:\"type\""
@@ -349,13 +349,13 @@ func newAnalyticsRuleUpsertSchema(collectionName string, eventName string) *api.
 	}
 }
 
-func newAnalyticsRule(ruleName string, collectionName string, eventName string) *api.AnalyticsRuleSchema {
+func newAnalyticsRule(ruleName string, collectionName string, sourceCollectionName string, eventName string) *api.AnalyticsRuleSchema {
 	return &api.AnalyticsRuleSchema{
 		Name: ruleName,
 		Type: "counter",
 		Params: api.AnalyticsRuleParameters{
 			Source: api.AnalyticsRuleParametersSource{
-				Collections: []string{"products"},
+				Collections: []string{sourceCollectionName},
 				Events: &[]struct {
 					Name   string  "json:\"name\""
 					Type   string  "json:\"type\""
@@ -414,9 +414,9 @@ func createNewPreset(t *testing.T, presetValueIsFromSearchParameters ...bool) (s
 	return presetName, result
 }
 
-func createNewAnalyticsRule(t *testing.T, collectionName string, eventName string) *api.AnalyticsRuleSchema {
+func createNewAnalyticsRule(t *testing.T, collectionName string, sourceCollectionName string, eventName string) *api.AnalyticsRuleSchema {
 	t.Helper()
-	ruleSchema := newAnalyticsRuleUpsertSchema(collectionName, eventName)
+	ruleSchema := newAnalyticsRuleUpsertSchema(collectionName, sourceCollectionName, eventName)
 	ruleName := newUUIDName("test-rule")
 
 	result, err := typesenseClient.Analytics().Rules().Upsert(context.Background(), ruleName, ruleSchema)

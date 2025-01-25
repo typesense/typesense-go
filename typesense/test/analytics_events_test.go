@@ -14,7 +14,8 @@ import (
 func TestAnalyticsEventsCreate(t *testing.T) {
 	eventName := newUUIDName("event")
 	collectionName := createNewCollection(t, "analytics-rules-collection")
-	createNewAnalyticsRule(t, collectionName, eventName)
+	sourceCollectionName := createNewCollection(t, "analytics-rules-source-collection")
+	createNewAnalyticsRule(t, collectionName, sourceCollectionName, eventName)
 
 	result, err := typesenseClient.Analytics().Events().Create(context.Background(), &api.AnalyticsEventCreateSchema{
 		Type: "click",

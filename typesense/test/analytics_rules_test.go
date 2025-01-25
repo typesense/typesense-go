@@ -13,10 +13,11 @@ import (
 
 func TestAnalyticsRulesUpsert(t *testing.T) {
 	collectionName := createNewCollection(t, "analytics-rules-collection")
+	sourceCollectionName := createNewCollection(t, "analytics-rules-source-collection")
 	eventName := newUUIDName("event")
-	ruleSchema := newAnalyticsRuleUpsertSchema(collectionName, eventName)
+	ruleSchema := newAnalyticsRuleUpsertSchema(collectionName, sourceCollectionName, eventName)
 	ruleName := newUUIDName("test-rule")
-	expectedData := newAnalyticsRule(ruleName, collectionName, eventName)
+	expectedData := newAnalyticsRule(ruleName, collectionName, sourceCollectionName, eventName)
 
 	result, err := typesenseClient.Analytics().Rules().Upsert(context.Background(), ruleName, ruleSchema)
 
@@ -26,8 +27,9 @@ func TestAnalyticsRulesUpsert(t *testing.T) {
 
 func TestAnalyticsRulesRetrieve(t *testing.T) {
 	collectionName := createNewCollection(t, "analytics-rules-collection")
+	sourceCollectionName := createNewCollection(t, "analytics-rules-source-collection")
 	eventName := newUUIDName("event")
-	expectedRule := createNewAnalyticsRule(t, collectionName, eventName)
+	expectedRule := createNewAnalyticsRule(t, collectionName, sourceCollectionName, eventName)
 
 	results, err := typesenseClient.Analytics().Rules().Retrieve(context.Background())
 

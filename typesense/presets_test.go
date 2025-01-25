@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/typesense/typesense-go/v2/typesense/api"
+	"github.com/typesense/typesense-go/v2/typesense/api/pointer"
 )
 
 func TestPresetsRetrieveAsSearchParameters(t *testing.T) {
@@ -17,7 +18,7 @@ func TestPresetsRetrieveAsSearchParameters(t *testing.T) {
 		},
 	}
 
-	presetValue := api.SearchParameters{Q: "Hello"}
+	presetValue := api.SearchParameters{Q: pointer.Any("Hello")}
 
 	expectedData[0].Value.FromSearchParameters(presetValue)
 
@@ -105,7 +106,7 @@ func TestPresetsRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 func TestPresetsFromSearchParametersUpsert(t *testing.T) {
 	expectedData := &api.PresetUpsertSchema{}
 
-	presetValue := api.SearchParameters{Q: "Xin chao"}
+	presetValue := api.SearchParameters{Q: pointer.Any("Xin chao")}
 
 	expectedData.Value.FromSearchParameters(presetValue)
 

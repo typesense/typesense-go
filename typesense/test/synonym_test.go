@@ -30,7 +30,6 @@ func TestSearchSynonymRetrieve(t *testing.T) {
 func TestSearchSynonymDelete(t *testing.T) {
 	collectionName := createNewCollection(t, "products")
 	synonymID := newUUIDName("customize-apple")
-	expectedResult := newSearchSynonym(synonymID)
 
 	body := newSearchSynonymSchema()
 	_, err := typesenseClient.Collection(collectionName).Synonyms().Upsert(context.Background(), synonymID, body)
@@ -39,7 +38,7 @@ func TestSearchSynonymDelete(t *testing.T) {
 	result, err := typesenseClient.Collection(collectionName).Synonym(synonymID).Delete(context.Background())
 
 	require.NoError(t, err)
-	require.Equal(t, expectedResult.Id, result.Id)
+	require.Equal(t, synonymID, result.Id)
 
 	_, err = typesenseClient.Collection(collectionName).Synonym(synonymID).Retrieve(context.Background())
 	require.Error(t, err)

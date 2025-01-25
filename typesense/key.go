@@ -8,7 +8,7 @@ import (
 
 type KeyInterface interface {
 	Retrieve(ctx context.Context) (*api.ApiKey, error)
-	Delete(ctx context.Context) (*api.ApiKey, error)
+	Delete(ctx context.Context) (*api.ApiKeyDeleteResponse, error)
 }
 
 type key struct {
@@ -27,7 +27,7 @@ func (k *key) Retrieve(ctx context.Context) (*api.ApiKey, error) {
 	return response.JSON200, nil
 }
 
-func (k *key) Delete(ctx context.Context) (*api.ApiKey, error) {
+func (k *key) Delete(ctx context.Context) (*api.ApiKeyDeleteResponse, error) {
 	response, err := k.apiClient.DeleteKeyWithResponse(ctx, k.keyID)
 	if err != nil {
 		return nil, err

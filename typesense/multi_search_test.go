@@ -54,7 +54,7 @@ func newMultiSearchBodyParams() api.MultiSearchSearchesParameter {
 
 func newMultiSearchResult() *api.MultiSearchResult {
 	return &api.MultiSearchResult{
-		Results: []api.SearchResult{
+		Results: []api.MultiSearchResultItem{
 			{
 				Found:        pointer.Int(1),
 				SearchTimeMs: pointer.Int(1),
@@ -153,7 +153,7 @@ func TestMultiSearchResultDeserialization(t *testing.T) {
 		]
 	}`
 	expected := &api.MultiSearchResult{
-		Results: []api.SearchResult{
+		Results: []api.MultiSearchResultItem{
 			{
 				Found:        pointer.Int(1),
 				SearchTimeMs: pointer.Int(1),

@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/typesense/typesense-go/v2/typesense/api/pointer"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/typesense/typesense-go/v2/typesense/api"
 	"github.com/typesense/typesense-go/v2/typesense/mocks"
@@ -74,12 +72,12 @@ func TestSearchSynonymRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 }
 
 func TestSearchSynonymDelete(t *testing.T) {
-	expectedResult := &api.SearchSynonym{Id: pointer.String("customize-apple")}
+	expectedResult := &api.SearchSynonymDeleteResponse{Id: "customize-apple"}
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
-	mockedResult := &api.SearchSynonym{Id: pointer.String("customize-apple")}
+	mockedResult := &api.SearchSynonymDeleteResponse{Id: "customize-apple"}
 
 	mockAPIClient.EXPECT().
 		DeleteSearchSynonymWithResponse(gomock.Not(gomock.Nil()), "products", "customize-apple").

@@ -165,8 +165,8 @@ func TestCollectionSearchWithPreset(t *testing.T) {
 	require.NoError(t, err)
 
 	searchParams := api.SearchParameters{
-		Q:              "Company",
-		QueryBy:        "company_name, company_name",
+		Q:              pointer.Any("Company"),
+		QueryBy:        pointer.Any("company_name, company_name"),
 		QueryByWeights: pointer.String("2, 1"),
 		FilterBy:       pointer.String("num_employees:>=100"),
 		SortBy:         pointer.String("num_employees:desc"),
