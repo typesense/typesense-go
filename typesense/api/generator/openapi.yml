@@ -3226,13 +3226,14 @@ components:
       allOf:
         - $ref: "#/components/schemas/MultiSearchParameters"
         - type: object
-          required:
-            - collection
           properties:
             collection:
               type: string
               description: >
                 The collection to search in.
+            x-typesense-api-key:
+              type: string
+              description: A separate search API key for each search within a multi_search request
     FacetCounts:
       type: object
       properties:

@@ -571,8 +571,9 @@ components:
               description: |
                 The collection to search in.
               type: string
-          required:
-            - collection
+            x-typesense-api-key:
+              description: A separate search API key for each search within a multi_search request
+              type: string
           type: object
     MultiSearchParameters:
       description: |

@@ -426,7 +426,7 @@ type MultiSearchCollectionParameters struct {
 	CacheTtl *int `json:"cache_ttl,omitempty"`
 
 	// Collection The collection to search in.
-	Collection string `json:"collection"`
+	Collection *string `json:"collection,omitempty"`
 
 	// Conversation Enable conversational search.
 	Conversation *bool `json:"conversation,omitempty"`
@@ -616,6 +616,9 @@ type MultiSearchCollectionParameters struct {
 
 	// VoiceQuery The base64 encoded audio file in 16 khz 16-bit WAV format.
 	VoiceQuery *string `json:"voice_query,omitempty"`
+
+	// XTypesenseApiKey A separate search API key for each search within a multi_search request
+	XTypesenseApiKey *string `json:"x-typesense-api-key,omitempty"`
 }
 
 // MultiSearchParameters Parameters for the multi search API.

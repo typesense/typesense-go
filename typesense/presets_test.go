@@ -58,7 +58,7 @@ func TestPresetsRetrieveAsMultiSearchSearchesParameter(t *testing.T) {
 	presetValue := api.MultiSearchSearchesParameter{
 		Searches: []api.MultiSearchCollectionParameters{
 			{
-				Collection: "test",
+				Collection: pointer.String("test"),
 			},
 		},
 	}
@@ -150,7 +150,7 @@ func TestPresetsFromMultiSearchSearchesParameterUpsert(t *testing.T) {
 	presetValue := api.MultiSearchSearchesParameter{
 		Searches: []api.MultiSearchCollectionParameters{
 			{
-				Collection: "test",
+				Collection: pointer.String("test"),
 			},
 		},
 	}

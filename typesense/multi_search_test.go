@@ -39,12 +39,12 @@ func newMultiSearchBodyParams() api.MultiSearchSearchesParameter {
 	return api.MultiSearchSearchesParameter{
 		Searches: []api.MultiSearchCollectionParameters{
 			{
-				Collection: "companies",
+				Collection: pointer.String("companies"),
 				Q:          pointer.String("text"),
 				QueryBy:    pointer.String("company_name"),
 			},
 			{
-				Collection: "companies",
+				Collection: pointer.String("companies"),
 				Q:          pointer.String("text"),
 				QueryBy:    pointer.String("company_name"),
 			},

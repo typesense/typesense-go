@@ -305,7 +305,7 @@ func newPresetFromMultiSearchSearchesParameterUpsertSchema() *api.PresetUpsertSc
 	preset.Value.FromMultiSearchSearchesParameter(api.MultiSearchSearchesParameter{
 		Searches: []api.MultiSearchCollectionParameters{
 			{
-				Collection: "test",
+				Collection: pointer.Any("test"),
 			},
 		},
 	})
@@ -319,7 +319,7 @@ func newPresetFromMultiSearchSearchesParameter(presetName string) *api.PresetSch
 	preset.Value.FromMultiSearchSearchesParameter(api.MultiSearchSearchesParameter{
 		Searches: []api.MultiSearchCollectionParameters{
 			{
-				Collection: "test",
+				Collection: pointer.Any("test"),
 			},
 		},
 	})
