@@ -20,6 +20,7 @@ import (
 type MockHTTPRequestDoer struct {
 	ctrl     *gomock.Controller
 	recorder *MockHTTPRequestDoerMockRecorder
+	isgomock struct{}
 }
 
 // MockHTTPRequestDoerMockRecorder is the mock recorder for MockHTTPRequestDoer.
@@ -58,6 +59,7 @@ func (mr *MockHTTPRequestDoerMockRecorder) Do(req any) *gomock.Call {
 type MockBreaker struct {
 	ctrl     *gomock.Controller
 	recorder *MockBreakerMockRecorder
+	isgomock struct{}
 }
 
 // MockBreakerMockRecorder is the mock recorder for MockBreaker.
