@@ -8,8 +8,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/typesense/typesense-go/v2/typesense/api"
-	"github.com/typesense/typesense-go/v2/typesense/api/pointer"
+	"github.com/typesense/typesense-go/v3/typesense/api"
+	"github.com/typesense/typesense-go/v3/typesense/api/pointer"
 )
 
 const (

@@ -31,7 +31,7 @@ func TestKeyDelete(t *testing.T) {
 	result, err := typesenseClient.Key(*expectedKey.Id).Delete(context.Background())
 
 	require.NoError(t, err)
-	require.Equal(t, expectedKey.Id, result.Id)
+	require.Equal(t, *expectedKey.Id, result.Id)
 
 	_, err = typesenseClient.Key(*expectedKey.Id).Retrieve(context.Background())
 	require.Error(t, err)

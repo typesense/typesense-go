@@ -15,7 +15,7 @@ import (
 	http "net/http"
 	reflect "reflect"
 
-	api "github.com/typesense/typesense-go/v2/typesense/api"
+	api "github.com/typesense/typesense-go/v3/typesense/api"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -23,6 +23,7 @@ import (
 type MockAPIClientInterface struct {
 	ctrl     *gomock.Controller
 	recorder *MockAPIClientInterfaceMockRecorder
+	isgomock struct{}
 }
 
 // MockAPIClientInterfaceMockRecorder is the mock recorder for MockAPIClientInterface.

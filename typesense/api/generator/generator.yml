@@ -160,6 +160,15 @@ components:
               readOnly: true
               type: string
           type: object
+    ApiKeyDeleteResponse:
+      properties:
+        id:
+          description: The id of the API key that was deleted
+          format: int64
+          type: integer
+      required:
+        - id
+      type: object
     ApiKeySchema:
       properties:
         actions:
@@ -468,9 +477,15 @@ components:
                   type: string
                 client_secret:
                   type: string
+                indexing_prefix:
+                  type: string
                 model_name:
                   type: string
                 project_id:
+                  type: string
+                query_prefix:
+                  type: string
+                refresh_token:
                   type: string
                 url:
                   type: string
@@ -556,8 +571,9 @@ components:
               description: |
                 The collection to search in.
               type: string
-          required:
-            - collection
+            x-typesense-api-key:
+              description: A separate search API key for each search within a multi_search request
+              type: string
           type: object
     MultiSearchParameters:
       description: |
@@ -809,11 +825,23 @@ components:
           $ref: '#/components/schemas/SearchResultConversation'
         results:
           items:
-            $ref: '#/components/schemas/SearchResult'
+            $ref: '#/components/schemas/MultiSearchResultItem'
           type: array
       required:
         - results
       type: object
+    MultiSearchResultItem:
+      allOf:
+        - $ref: '#/components/schemas/SearchResult'
+        - properties:
+            code:
+              description: HTTP error code
+              format: int64
+              type: integer
+            error:
+              description: Error description
+              type: string
+          type: object
     MultiSearchSearchesParameter:
       properties:
         searches:
@@ -932,6 +960,14 @@ components:
           required:
             - id
           type: object
+    SearchOverrideDeleteResponse:
+      properties:
+        id:
+          description: The id of the override that was deleted
+          type: string
+      required:
+        - id
+      type: object
     SearchOverrideExclude:
       properties:
         id:
@@ -1291,9 +1327,6 @@ components:
           description: |
             The base64 encoded audio file in 16 khz 16-bit WAV format.
           type: string
-      required:
-        - q
-        - query_by
       type: object
     SearchResult:
       properties:
@@ -1399,6 +1432,23 @@ components:
         text_match:
           format: int64
           type: integer
+        text_match_info:
+          properties:
+            best_field_score:
+              type: string
+            best_field_weight:
+              type: integer
+            fields_matched:
+              type: integer
+            num_tokens_dropped:
+              type: integer
+            score:
+              type: string
+            tokens_matched:
+              type: integer
+            typo_prefix_score:
+              type: integer
+          type: object
         vector_distance:
           description: Distance between the query vector and matching document's vector value
           format: float
@@ -1414,6 +1464,14 @@ components:
           required:
             - id
           type: object
+    SearchSynonymDeleteResponse:
+      properties:
+        id:
+          description: The id of the synonym that was deleted
+          type: string
+      required:
+        - id
+      type: object
     SearchSynonymSchema:
       properties:
         locale:
@@ -1533,7 +1591,7 @@ paths:
       description: List all aliases and the corresponding collections that they map to.
       operationId: getAliases
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -1553,13 +1611,13 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CollectionAlias'
           description: Collection alias was deleted
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -1579,13 +1637,13 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CollectionAlias'
           description: Collection alias fetched
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -1611,19 +1669,19 @@ paths:
               $ref: '#/components/schemas/CollectionAliasSchema'
         description: Collection alias to be created/updated
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CollectionAlias'
           description: The collection alias was created/updated
-        400:
+        "400":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
           description: Bad request, see error message for details
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -1644,13 +1702,13 @@ paths:
         description: The Analytics event to be created
         required: true
       responses:
-        201:
+        "201":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AnalyticsEventCreateResponse'
           description: Analytics event successfully created
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -1664,7 +1722,7 @@ paths:
       description: Retrieve the details of all analytics rules
       operationId: retrieveAnalyticsRules
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -1684,13 +1742,13 @@ paths:
         description: The Analytics rule to be created
         required: true
       responses:
-        201:
+        "201":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AnalyticsRuleSchema'
           description: Analytics rule successfully created
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -1711,13 +1769,13 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AnalyticsRuleDeleteResponse'
           description: Analytics rule deleted
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -1737,13 +1795,13 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AnalyticsRuleSchema'
           description: Analytics rule fetched
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -1770,13 +1828,13 @@ paths:
         description: The Analytics rule to be upserted
         required: true
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AnalyticsRuleSchema'
           description: Analytics rule successfully upserted
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -1790,7 +1848,7 @@ paths:
       description: Returns a summary of all your collections. The collections are returned sorted by creation date, with the most recent collections appearing first.
       operationId: getCollections
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -1813,19 +1871,19 @@ paths:
         description: The collection object to be created
         required: true
       responses:
-        201:
+        "201":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CollectionResponse'
           description: Collection successfully created
-        400:
+        "400":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
           description: Bad request, see error message for details
-        409:
+        "409":
           content:
             application/json:
               schema:
@@ -1846,13 +1904,13 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CollectionResponse'
           description: Collection deleted
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -1872,13 +1930,13 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CollectionResponse'
           description: Collection fetched
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -1905,19 +1963,19 @@ paths:
         description: The document object with fields to be updated
         required: true
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CollectionUpdateSchema'
           description: The updated partial collection schema
-        400:
+        "400":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
           description: Bad request, see error message for details
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -1950,7 +2008,7 @@ paths:
           schema:
             type: boolean
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -1961,7 +2019,7 @@ paths:
                   - num_deleted
                 type: object
           description: Documents successfully deleted
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -2054,14 +2112,14 @@ paths:
         description: The document object to be indexed
         required: true
       responses:
-        201:
+        "201":
           content:
             application/json:
               schema:
                 description: Can be any key-value pair
                 type: object
           description: Document successfully created/indexed
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -2088,14 +2146,14 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 description: Can be any key-value pair
                 type: object
           description: The document referenced by the ID was deleted
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -2121,14 +2179,14 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 description: Can be any key-value pair
                 type: object
           description: The document referenced by the ID
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -2168,14 +2226,14 @@ paths:
         description: The document object with fields to be updated
         required: true
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 description: Can be any key-value pair
                 type: object
           description: The document referenced by the ID was updated
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -2208,7 +2266,7 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/octet-stream:
               schema:
@@ -2218,7 +2276,7 @@ paths:
                   {"id": "126", "company_name": "Random Corp.", "num_employees": 531,"country": "AU"}
                 type: string
           description: Exports all the documents in a given collection.
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -2271,7 +2329,7 @@ paths:
         description: The json array of documents or the JSONL file to import
         required: true
       responses:
-        200:
+        "200":
           content:
             application/octet-stream:
               schema:
@@ -2280,13 +2338,13 @@ paths:
                   {"success": false, "error": "Bad JSON.", "document": "[bad doc"}
                 type: string
           description: Result of the import operation. Each line of the response indicates the result of each document present in the request body (in the same order). If the import of a single document fails, it does not affect the other documents. If there is a failure, the response line will include a corresponding error message and as well as the actual document content.
-        400:
+        "400":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
           description: Bad request, see error message for details
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -2571,19 +2629,19 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchResult'
           description: Search results
-        400:
+        "400":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
           description: Bad request, see error message for details
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -2603,7 +2661,7 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -2630,13 +2688,13 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchOverride'
+                $ref: '#/components/schemas/SearchOverrideDeleteResponse'
           description: The ID of the deleted search override
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -2663,7 +2721,7 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -2697,13 +2755,13 @@ paths:
         description: The search override object to be created/updated
         required: true
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchOverride'
           description: Created/updated search override
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -2724,13 +2782,13 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchSynonymsResponse'
           description: List of all search synonyms
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -2738,7 +2796,7 @@ paths:
           description: Search synonyms was not found
       summary: List all collection synonyms
       tags:
-        - documents
+        - synonyms
   /collections/{collectionName}/synonyms/{synonymId}:
     delete:
       operationId: deleteSearchSynonym
@@ -2756,13 +2814,13 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchSynonym'
+                $ref: '#/components/schemas/SearchSynonymDeleteResponse'
           description: The ID of the deleted search synonym
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -2770,7 +2828,7 @@ paths:
           description: Search synonym not found
       summary: Delete a synonym associated with a collection
       tags:
-        - documents
+        - synonyms
     get:
       description: Retrieve the details of a search synonym, given its id.
       operationId: getSearchSynonym
@@ -2788,13 +2846,13 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchSynonym'
           description: Search synonym fetched
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -2802,7 +2860,7 @@ paths:
           description: Search synonym was not found
       summary: Retrieve a single search synonym
       tags:
-        - documents
+        - synonyms
     put:
       description: Create or update a synonym  to define search terms that should be considered equivalent.
       operationId: upsertSearchSynonym
@@ -2827,13 +2885,13 @@ paths:
         description: The search synonym object to be created/updated
         required: true
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchSynonym'
           description: Created/updated search synonym
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -2841,13 +2899,13 @@ paths:
           description: Search synonym was not found
       summary: Create or update a synonym
       tags:
-        - documents
+        - synonyms
   /conversations/models:
     get:
       description: Retrieve all conversation models
       operationId: retrieveAllConversationModels
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -2869,13 +2927,13 @@ paths:
               $ref: '#/components/schemas/ConversationModelCreateSchema'
         required: true
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConversationModelSchema'
           description: Created Conversation Model
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -2895,7 +2953,7 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -2915,7 +2973,7 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -2941,7 +2999,7 @@ paths:
               $ref: '#/components/schemas/ConversationModelUpdateSchema'
         required: true
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -2955,7 +3013,7 @@ paths:
       description: Print debugging information
       operationId: debug
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -2972,7 +3030,7 @@ paths:
       description: Checks if Typesense server is ready to accept requests.
       operationId: health
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -2985,7 +3043,7 @@ paths:
     get:
       operationId: getKeys
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -3004,19 +3062,19 @@ paths:
               $ref: '#/components/schemas/ApiKeySchema'
         description: The object that describes API key scope
       responses:
-        201:
+        "201":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiKey'
           description: Created API key
-        400:
+        "400":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
           description: Bad request, see error message for details
-        409:
+        "409":
           content:
             application/json:
               schema:
@@ -3037,19 +3095,19 @@ paths:
             format: int64
             type: integer
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiKey'
+                $ref: '#/components/schemas/ApiKeyDeleteResponse'
           description: The key referenced by the ID
-        400:
+        "400":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
           description: Bad request, see error message for details
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -3070,13 +3128,13 @@ paths:
             format: int64
             type: integer
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiKey'
           description: The key referenced by the ID
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -3090,7 +3148,7 @@ paths:
       description: Retrieve the metrics.
       operationId: retrieveMetrics
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -3374,13 +3432,13 @@ paths:
             schema:
               $ref: '#/components/schemas/MultiSearchSearchesParameter'
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MultiSearchResult'
           description: Search results
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -3401,7 +3459,7 @@ paths:
           schema:
             type: string
       responses:
-        201:
+        "201":
           content:
             application/json:
               schema:
@@ -3415,7 +3473,7 @@ paths:
       description: Triggers a follower node to initiate the raft voting process, which triggers leader re-election. The follower node that you run this operation against will become the new leader, once this command succeeds.
       operationId: vote
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -3429,7 +3487,7 @@ paths:
       description: Retrieve the details of all presets
       operationId: retrieveAllPresets
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -3451,13 +3509,13 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PresetDeleteSchema'
           description: Preset deleted.
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -3478,13 +3536,13 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PresetSchema'
           description: Preset fetched.
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -3512,13 +3570,13 @@ paths:
         description: The stopwords set to upsert.
         required: true
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PresetSchema'
           description: Preset successfully upserted.
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -3532,7 +3590,7 @@ paths:
       description: Retrieve the stats about API endpoints.
       operationId: retrieveAPIStats
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -3546,7 +3604,7 @@ paths:
       description: Retrieve the details of all stopwords sets
       operationId: retrieveStopwordsSets
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -3568,7 +3626,7 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -3581,7 +3639,7 @@ paths:
                   - id
                 type: object
           description: Stopwords set rule deleted.
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -3602,13 +3660,13 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/StopwordsSetRetrieveSchema'
           description: Stopwords set fetched.
-        404:
+        "404":
           content:
             application/json:
               schema:
@@ -3636,13 +3694,13 @@ paths:
         description: The stopwords set to upsert.
         required: true
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/StopwordsSetSchema'
           description: Stopwords set successfully upserted.
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -3701,3 +3759,8 @@ tags:
       description: Find out more
       url: https://typesense.org/docs/27.0/api/conversational-search-rag.html
     name: conversations
+  - description: Manage synonyms
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/docs/27.0/api/synonyms.html
+    name: synonyms

@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/typesense/typesense-go/v2/typesense/api"
-	"github.com/typesense/typesense-go/v2/typesense/api/pointer"
+	"github.com/typesense/typesense-go/v3/typesense/api"
+	"github.com/typesense/typesense-go/v3/typesense/api/pointer"
 )
 
 func TestMultiSearch(t *testing.T) {
@@ -39,17 +39,17 @@ func TestMultiSearch(t *testing.T) {
 		Searches: []api.MultiSearchCollectionParameters{
 			{
 				Q:          pointer.String("Company"),
-				Collection: collectionName1,
+				Collection: pointer.Any(collectionName1),
 				FilterBy:   pointer.String("num_employees:>100"),
 				SortBy:     pointer.String("num_employees:desc"),
 			},
 			{
 				Q:          pointer.String("Company"),
-				Collection: collectionName1,
+				Collection: pointer.Any(collectionName1),
 				FilterBy:   pointer.String("num_employees:>1000"),
 			},
 			{
-				Collection: collectionName2,
+				Collection: pointer.String(collectionName2),
 				Q:          pointer.String("Stark"),
 				FilterBy:   pointer.String("num_employees:>=1000"),
 			},
@@ -108,7 +108,7 @@ func TestMultiSearchGroupBy(t *testing.T) {
 	searches := api.MultiSearchSearchesParameter{
 		Searches: []api.MultiSearchCollectionParameters{
 			{
-				Collection: collectionName1,
+				Collection: pointer.Any(collectionName1),
 				SortBy:     pointer.String("num_employees:desc"),
 			},
 		},
@@ -181,7 +181,7 @@ func TestMultiSearchVectorQuery(t *testing.T) {
 	searches := api.MultiSearchSearchesParameter{
 		Searches: []api.MultiSearchCollectionParameters{
 			{
-				Collection:  "embeddings",
+				Collection:  pointer.String("embeddings"),
 				Q:           pointer.String("*"),
 				VectorQuery: pointer.String("vec:([0.96826,0.94,0.39557,0.306488], k: 10)"),
 			},
@@ -218,17 +218,17 @@ func TestMultiSearchWithPreset(t *testing.T) {
 		Searches: []api.MultiSearchCollectionParameters{
 			{
 				Q:          pointer.String("Company"),
-				Collection: collectionName1,
+				Collection: pointer.Any(collectionName1),
 				FilterBy:   pointer.String("num_employees:>100"),
 				SortBy:     pointer.String("num_employees:desc"),
 			},
 			{
 				Q:          pointer.String("Company"),
-				Collection: collectionName1,
+				Collection: pointer.Any(collectionName1),
 				FilterBy:   pointer.String("num_employees:>1000"),
 			},
 			{
-				Collection: collectionName2,
+				Collection: pointer.String(collectionName2),
 				Q:          pointer.String("Stark"),
 				FilterBy:   pointer.String("num_employees:>=1000"),
 			},
@@ -313,12 +313,12 @@ func TestMultiSearchWithStopwords(t *testing.T) {
 		Searches: []api.MultiSearchCollectionParameters{
 			{
 				Q:          pointer.String("Company Stark"),
-				Collection: collectionName1,
+				Collection: pointer.Any(collectionName1),
 				SortBy:     pointer.String("num_employees:desc"),
 			},
 			{
 				Q:          pointer.String("Stark"),
-				Collection: collectionName2,
+				Collection: pointer.String(collectionName2),
 			},
 		},
 	}

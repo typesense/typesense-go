@@ -10,9 +10,9 @@ import (
 	"bytes"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/typesense/typesense-go/v2/typesense/api"
-	"github.com/typesense/typesense-go/v2/typesense/api/pointer"
-	"github.com/typesense/typesense-go/v2/typesense/mocks"
+	"github.com/typesense/typesense-go/v3/typesense/api"
+	"github.com/typesense/typesense-go/v3/typesense/api/pointer"
+	"github.com/typesense/typesense-go/v3/typesense/mocks"
 	"go.uber.org/mock/gomock"
 )
 
@@ -39,12 +39,12 @@ func newMultiSearchBodyParams() api.MultiSearchSearchesParameter {
 	return api.MultiSearchSearchesParameter{
 		Searches: []api.MultiSearchCollectionParameters{
 			{
-				Collection: "companies",
+				Collection: pointer.String("companies"),
 				Q:          pointer.String("text"),
 				QueryBy:    pointer.String("company_name"),
 			},
 			{
-				Collection: "companies",
+				Collection: pointer.String("companies"),
 				Q:          pointer.String("text"),
 				QueryBy:    pointer.String("company_name"),
 			},
@@ -54,7 +54,7 @@ func newMultiSearchBodyParams() api.MultiSearchSearchesParameter {
 
 func newMultiSearchResult() *api.MultiSearchResult {
 	return &api.MultiSearchResult{
-		Results: []api.SearchResult{
+		Results: []api.MultiSearchResultItem{
 			{
 				Found:        pointer.Int(1),
 				SearchTimeMs: pointer.Int(1),
@@ -153,7 +153,7 @@ func TestMultiSearchResultDeserialization(t *testing.T) {
 		]
 	}`
 	expected := &api.MultiSearchResult{
-		Results: []api.SearchResult{
+		Results: []api.MultiSearchResultItem{
 			{
 				Found:        pointer.Int(1),
 				SearchTimeMs: pointer.Int(1),

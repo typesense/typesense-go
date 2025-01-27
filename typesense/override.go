@@ -3,13 +3,13 @@ package typesense
 import (
 	"context"
 
-	"github.com/typesense/typesense-go/v2/typesense/api"
+	"github.com/typesense/typesense-go/v3/typesense/api"
 )
 
 // OverrideInterface is a type for Search Override API operations
 type OverrideInterface interface {
 	Retrieve(ctx context.Context) (*api.SearchOverride, error)
-	Delete(ctx context.Context) (*api.SearchOverride, error)
+	Delete(ctx context.Context) (*api.SearchOverrideDeleteResponse, error)
 }
 
 // override is internal implementation of OverrideInterface
@@ -31,7 +31,7 @@ func (o *override) Retrieve(ctx context.Context) (*api.SearchOverride, error) {
 	return response.JSON200, nil
 }
 
-func (o *override) Delete(ctx context.Context) (*api.SearchOverride, error) {
+func (o *override) Delete(ctx context.Context) (*api.SearchOverrideDeleteResponse, error) {
 	response, err := o.apiClient.DeleteSearchOverrideWithResponse(ctx,
 		o.collectionName, o.overrideID)
 	if err != nil {

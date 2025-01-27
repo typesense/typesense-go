@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/typesense/typesense-go/v2/typesense/api"
-	"github.com/typesense/typesense-go/v2/typesense/api/pointer"
+	"github.com/typesense/typesense-go/v3/typesense/api"
+	"github.com/typesense/typesense-go/v3/typesense/api/pointer"
 )
 
 func TestCollectionCreate(t *testing.T) {
@@ -19,9 +19,8 @@ func TestCollectionCreate(t *testing.T) {
 	expectedResult := expectedNewCollection(collectionName)
 
 	result, err := typesenseClient.Collections().Create(context.Background(), schema)
-	result.CreatedAt = pointer.Int64(0)
-
 	require.NoError(t, err)
+	result.CreatedAt = pointer.Int64(0)
 	require.Equal(t, expectedResult, result)
 }
 

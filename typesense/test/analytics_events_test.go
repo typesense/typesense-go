@@ -8,13 +8,14 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/typesense/typesense-go/v2/typesense/api"
+	"github.com/typesense/typesense-go/v3/typesense/api"
 )
 
 func TestAnalyticsEventsCreate(t *testing.T) {
 	eventName := newUUIDName("event")
 	collectionName := createNewCollection(t, "analytics-rules-collection")
-	createNewAnalyticsRule(t, collectionName, eventName)
+	sourceCollectionName := createNewCollection(t, "analytics-rules-source-collection")
+	createNewAnalyticsRule(t, collectionName, sourceCollectionName, eventName)
 
 	result, err := typesenseClient.Analytics().Events().Create(context.Background(), &api.AnalyticsEventCreateSchema{
 		Type: "click",

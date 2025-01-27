@@ -28,7 +28,6 @@ func TestSearchOverrideRetrieve(t *testing.T) {
 func TestSearchOverrideDelete(t *testing.T) {
 	collectionName := createNewCollection(t, "companies")
 	overrideID := newUUIDName("customize-apple")
-	expectedResult := newSearchOverride(overrideID)
 
 	body := newSearchOverrideSchema()
 	_, err := typesenseClient.Collection(collectionName).Overrides().Upsert(context.Background(), overrideID, body)
@@ -37,7 +36,7 @@ func TestSearchOverrideDelete(t *testing.T) {
 	result, err := typesenseClient.Collection(collectionName).Override(overrideID).Delete(context.Background())
 
 	require.NoError(t, err)
-	require.Equal(t, expectedResult.Id, result.Id)
+	require.Equal(t, overrideID, result.Id)
 
 	_, err = typesenseClient.Collection(collectionName).Override(overrideID).Retrieve(context.Background())
 	require.Error(t, err)

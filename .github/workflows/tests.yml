@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       typesense:
-        image: typesense/typesense:27.0
+        image: typesense/typesense:28.0.rc35
         ports:
           - 8108:8108/tcp
         volumes:

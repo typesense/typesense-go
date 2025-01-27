@@ -6,11 +6,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/typesense/typesense-go/v2/typesense/api/pointer"
-
 	"github.com/stretchr/testify/assert"
-	"github.com/typesense/typesense-go/v2/typesense/api"
-	"github.com/typesense/typesense-go/v2/typesense/mocks"
+	"github.com/typesense/typesense-go/v3/typesense/api"
+	"github.com/typesense/typesense-go/v3/typesense/mocks"
 	"go.uber.org/mock/gomock"
 )
 
@@ -74,12 +72,12 @@ func TestKeyRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 }
 
 func TestKeyDelete(t *testing.T) {
-	expectedResult := &api.ApiKey{Id: pointer.Int64(1)}
+	expectedResult := &api.ApiKeyDeleteResponse{Id: 1}
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
-	mockedResult := &api.ApiKey{Id: pointer.Int64(1)}
+	mockedResult := &api.ApiKeyDeleteResponse{Id: 1}
 
 	mockAPIClient.EXPECT().
 		DeleteKeyWithResponse(gomock.Not(gomock.Nil()), int64(1)).
