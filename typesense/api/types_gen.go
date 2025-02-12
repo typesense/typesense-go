@@ -404,9 +404,18 @@ type Field struct {
 	// Stem Values are stemmed before indexing in-memory. Default: false.
 	Stem *bool `json:"stem,omitempty"`
 
+	// StemDictionary Name of the stemming dictionary to use for this field
+	StemDictionary *string `json:"stem_dictionary,omitempty"`
+
 	// Store When set to false, the field value will not be stored on disk. Default: true.
-	Store *bool  `json:"store,omitempty"`
-	Type  string `json:"type"`
+	Store *bool `json:"store,omitempty"`
+
+	// SymbolsToIndex List of symbols or special characters to be indexed.
+	SymbolsToIndex *[]string `json:"symbols_to_index,omitempty"`
+
+	// TokenSeparators List of symbols or special characters to be used for splitting the text into individual words in addition to space and new-line characters.
+	TokenSeparators *[]string `json:"token_separators,omitempty"`
+	Type            string    `json:"type"`
 
 	// VecDist The distance metric to be used for vector search. Default: `cosine`. You can also use `ip` for inner product.
 	VecDist *string `json:"vec_dist,omitempty"`
@@ -583,6 +592,9 @@ type MultiSearchCollectionParameters struct {
 
 	// RemoteEmbeddingTimeoutMs Timeout (in milliseconds) for fetching remote embeddings.
 	RemoteEmbeddingTimeoutMs *int `json:"remote_embedding_timeout_ms,omitempty"`
+
+	// RerankHybridMatches When true, computes both text match and vector distance scores for all matches in hybrid search. Documents found only through keyword search will get a vector distance score, and documents found only through vector search will get a text match score.
+	RerankHybridMatches *bool `json:"rerank_hybrid_matches,omitempty"`
 
 	// SearchCutoffMs Typesense will attempt to return results early if the cutoff time has elapsed. This is not a strict guarantee and facet computation is not bound by this parameter.
 	SearchCutoffMs *int `json:"search_cutoff_ms,omitempty"`
@@ -864,6 +876,9 @@ type MultiSearchResultItem struct {
 // MultiSearchSearchesParameter defines model for MultiSearchSearchesParameter.
 type MultiSearchSearchesParameter struct {
 	Searches []MultiSearchCollectionParameters `json:"searches"`
+
+	// Union When true, merges the search results from each search query into a single ordered set of hits.
+	Union *bool `json:"union,omitempty"`
 }
 
 // PresetDeleteSchema defines model for PresetDeleteSchema.
@@ -895,6 +910,18 @@ type PresetUpsertSchema_Value struct {
 // PresetsRetrieveSchema defines model for PresetsRetrieveSchema.
 type PresetsRetrieveSchema struct {
 	Presets []*PresetSchema `json:"presets"`
+}
+
+// SchemaChangeStatus defines model for SchemaChangeStatus.
+type SchemaChangeStatus struct {
+	// AlteredDocs Number of documents that have been altered
+	AlteredDocs *int `json:"altered_docs,omitempty"`
+
+	// Collection Name of the collection being modified
+	Collection *string `json:"collection,omitempty"`
+
+	// ValidatedDocs Number of documents that have been validated
+	ValidatedDocs *int `json:"validated_docs,omitempty"`
 }
 
 // SearchGroupedHit defines model for SearchGroupedHit.
@@ -1154,6 +1181,9 @@ type SearchParameters struct {
 	// MaxFacetValues Maximum number of facet values to be returned.
 	MaxFacetValues *int `json:"max_facet_values,omitempty"`
 
+	// MaxFilterByCandidates Controls the number of similar words that Typesense considers during fuzzy search on filter_by values. Useful for controlling prefix matches like company_name:Acm*.
+	MaxFilterByCandidates *int `json:"max_filter_by_candidates,omitempty"`
+
 	// MinLen1typo Minimum word length for 1-typo correction to be applied. The value of num_typos is still treated as the maximum allowed typos.
 	MinLen1typo *int `json:"min_len_1typo,omitempty"`
 
@@ -1363,6 +1393,21 @@ type SearchSynonymsResponse struct {
 	Synonyms []*SearchSynonym `json:"synonyms"`
 }
 
+// StemmingDictionary defines model for StemmingDictionary.
+type StemmingDictionary struct {
+	// Id Unique identifier for the dictionary
+	Id string `json:"id"`
+
+	// Words List of word mappings in the dictionary
+	Words []struct {
+		// Root The root form of the word
+		Root string `json:"root"`
+
+		// Word The word form to be stemmed
+		Word string `json:"word"`
+	} `json:"words"`
+}
+
 // StopwordsSetRetrieveSchema defines model for StopwordsSetRetrieveSchema.
 type StopwordsSetRetrieveSchema struct {
 	Stopwords StopwordsSetSchema `json:"stopwords"`
@@ -1401,6 +1446,7 @@ type DeleteDocumentsParams struct {
 	BatchSize      *int    `form:"batch_size,omitempty" json:"batch_size,omitempty"`
 	FilterBy       *string `form:"filter_by,omitempty" json:"filter_by,omitempty"`
 	IgnoreNotFound *bool   `form:"ignore_not_found,omitempty" json:"ignore_not_found,omitempty"`
+	Truncate       *bool   `form:"truncate,omitempty" json:"truncate,omitempty"`
 }
 
 // UpdateDocumentsJSONBody defines parameters for UpdateDocuments.
@@ -1477,6 +1523,7 @@ type SearchCollectionParams struct {
 	MaxExtraPrefix                     *int            `form:"max_extra_prefix,omitempty" json:"max_extra_prefix,omitempty"`
 	MaxExtraSuffix                     *int            `form:"max_extra_suffix,omitempty" json:"max_extra_suffix,omitempty"`
 	MaxFacetValues                     *int            `form:"max_facet_values,omitempty" json:"max_facet_values,omitempty"`
+	MaxFilterByCandidates              *int            `form:"max_filter_by_candidates,omitempty" json:"max_filter_by_candidates,omitempty"`
 	MinLen1typo                        *int            `form:"min_len_1typo,omitempty" json:"min_len_1typo,omitempty"`
 	MinLen2typo                        *int            `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
 	NumTypos                           *string         `form:"num_typos,omitempty" json:"num_typos,omitempty"`
@@ -1556,6 +1603,7 @@ type MultiSearchParams struct {
 	MaxExtraPrefix                     *int            `form:"max_extra_prefix,omitempty" json:"max_extra_prefix,omitempty"`
 	MaxExtraSuffix                     *int            `form:"max_extra_suffix,omitempty" json:"max_extra_suffix,omitempty"`
 	MaxFacetValues                     *int            `form:"max_facet_values,omitempty" json:"max_facet_values,omitempty"`
+	MaxFilterByCandidates              *int            `form:"max_filter_by_candidates,omitempty" json:"max_filter_by_candidates,omitempty"`
 	MinLen1typo                        *int            `form:"min_len_1typo,omitempty" json:"min_len_1typo,omitempty"`
 	MinLen2typo                        *int            `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
 	NumTypos                           *string         `form:"num_typos,omitempty" json:"num_typos,omitempty"`
@@ -1593,6 +1641,15 @@ type MultiSearchParams struct {
 type TakeSnapshotParams struct {
 	// SnapshotPath The directory on the server where the snapshot should be saved.
 	SnapshotPath string `form:"snapshot_path" json:"snapshot_path"`
+}
+
+// ImportStemmingDictionaryJSONBody defines parameters for ImportStemmingDictionary.
+type ImportStemmingDictionaryJSONBody = string
+
+// ImportStemmingDictionaryParams defines parameters for ImportStemmingDictionary.
+type ImportStemmingDictionaryParams struct {
+	// Id The ID to assign to the dictionary
+	Id string `form:"id" json:"id"`
 }
 
 // UpsertAliasJSONRequestBody defines body for UpsertAlias for application/json ContentType.
@@ -1642,6 +1699,9 @@ type MultiSearchJSONRequestBody = MultiSearchSearchesParameter
 
 // UpsertPresetJSONRequestBody defines body for UpsertPreset for application/json ContentType.
 type UpsertPresetJSONRequestBody = PresetUpsertSchema
+
+// ImportStemmingDictionaryJSONRequestBody defines body for ImportStemmingDictionary for application/json ContentType.
+type ImportStemmingDictionaryJSONRequestBody = ImportStemmingDictionaryJSONBody
 
 // UpsertStopwordsSetJSONRequestBody defines body for UpsertStopwordsSet for application/json ContentType.
 type UpsertStopwordsSetJSONRequestBody = StopwordsSetUpsertSchema

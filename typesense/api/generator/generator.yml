@@ -534,10 +534,32 @@ components:
           description: |
             Values are stemmed before indexing in-memory. Default: false.
           type: boolean
+        stem_dictionary:
+          description: Name of the stemming dictionary to use for this field
+          example: irregular-plurals
+          type: string
         store:
           description: |
             When set to false, the field value will not be stored on disk. Default: true.
           type: boolean
+        symbols_to_index:
+          default: []
+          description: |
+            List of symbols or special characters to be indexed.
+          items:
+            maxLength: 1
+            minLength: 1
+            type: string
+          type: array
+        token_separators:
+          default: []
+          description: |
+            List of symbols or special characters to be used for splitting the text into individual words in addition to space and new-line characters.
+          items:
+            maxLength: 1
+            minLength: 1
+            type: string
+          type: array
         type:
           example: string
           type: string
@@ -571,6 +593,11 @@ components:
               description: |
                 The collection to search in.
               type: string
+            rerank_hybrid_matches:
+              default: false
+              description: |
+                When true, computes both text match and vector distance scores for all matches in hybrid search. Documents found only through keyword search will get a vector distance score, and documents found only through vector search will get a text match score.
+              type: boolean
             x-typesense-api-key:
               description: A separate search API key for each search within a multi_search request
               type: string
@@ -848,6 +875,9 @@ components:
           items:
             $ref: '#/components/schemas/MultiSearchCollectionParameters'
           type: array
+        union:
+          description: When true, merges the search results from each search query into a single ordered set of hits.
+          type: boolean
       required:
         - searches
       type: object
@@ -884,6 +914,18 @@ components:
           x-go-type: '[]*PresetSchema'
       required:
         - presets
+      type: object
+    SchemaChangeStatus:
+      properties:
+        altered_docs:
+          description: Number of documents that have been altered
+          type: integer
+        collection:
+          description: Name of the collection being modified
+          type: string
+        validated_docs:
+          description: Number of documents that have been validated
+          type: integer
       type: object
     ScopedKeyParameters:
       properties:
@@ -1207,6 +1249,9 @@ components:
         max_facet_values:
           description: Maximum number of facet values to be returned.
           type: integer
+        max_filter_by_candidates:
+          description: Controls the number of similar words that Typesense considers during fuzzy search on filter_by values. Useful for controlling prefix matches like company_name:Acm*.
+          type: integer
         min_len_1typo:
           description: |
             Minimum word length for 1-typo correction to be applied. The value of num_typos is still treated as the maximum allowed typos.
@@ -1508,6 +1553,33 @@ components:
         snapshot_path:
           type: string
       type: object
+    StemmingDictionary:
+      properties:
+        id:
+          description: Unique identifier for the dictionary
+          example: irregular-plurals
+          type: string
+        words:
+          description: List of word mappings in the dictionary
+          items:
+            properties:
+              root:
+                description: The root form of the word
+                example: person
+                type: string
+              word:
+                description: The word form to be stemmed
+                example: people
+                type: string
+            required:
+              - word
+              - root
+            type: object
+          type: array
+      required:
+        - id
+        - words
+      type: object
     StopwordsSetRetrieveSchema:
       example: |
         {"stopwords": {"id": "countries", "stopwords": ["Germany", "France", "Italy"], "locale": "en"}}
@@ -1583,7 +1655,7 @@ externalDocs:
 info:
   description: An open source search engine for building delightful search experiences.
   title: Typesense API
-  version: "27.0"
+  version: "28.0"
 openapi: 3.0.3
 paths:
   /aliases:
@@ -2005,6 +2077,10 @@ paths:
             type: string
         - in: query
           name: ignore_not_found
+          schema:
+            type: boolean
+        - in: query
+          name: truncate
           schema:
             type: boolean
       responses:
@@ -2502,6 +2578,10 @@ paths:
             type: integer
         - in: query
           name: max_facet_values
+          schema:
+            type: integer
+        - in: query
+          name: max_filter_by_candidates
           schema:
             type: integer
         - in: query
@@ -3303,6 +3383,10 @@ paths:
           schema:
             type: integer
         - in: query
+          name: max_filter_by_candidates
+          schema:
+            type: integer
+        - in: query
           name: min_len_1typo
           schema:
             type: integer
@@ -3447,6 +3531,22 @@ paths:
       summary: send multiple search requests in a single HTTP request
       tags:
         - documents
+  /operations/schema_changes:
+    get:
+      description: Returns the status of any ongoing schema change operations. If no schema changes are in progress, returns an empty response.
+      operationId: getSchemaChanges
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SchemaChangeStatus'
+                type: array
+          description: List of schema changes in progress
+      summary: Get the status of in-progress schema change operations
+      tags:
+        - operations
   /operations/snapshot:
     post:
       description: Creates a point-in-time snapshot of a Typesense node's state and data in the specified directory. You can then backup the snapshot directory that gets created and later restore it as a data directory, as needed.
@@ -3599,6 +3699,96 @@ paths:
       summary: Get stats about API endpoints.
       tags:
         - operations
+  /stemming/dictionaries:
+    get:
+      description: Retrieve a list of all available stemming dictionaries.
+      operationId: listStemmingDictionaries
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                properties:
+                  dictionaries:
+                    example:
+                      - irregular-plurals
+                      - company-terms
+                    items:
+                      type: string
+                    type: array
+                type: object
+          description: List of all dictionaries
+      summary: List all stemming dictionaries
+      tags:
+        - stemming
+  /stemming/dictionaries/{dictionaryId}:
+    get:
+      description: Fetch details of a specific stemming dictionary.
+      operationId: getStemmingDictionary
+      parameters:
+        - description: The ID of the dictionary to retrieve
+          example: irregular-plurals
+          in: path
+          name: dictionaryId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StemmingDictionary'
+          description: Stemming dictionary details
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Dictionary not found
+      summary: Retrieve a stemming dictionary
+      tags:
+        - stemming
+  /stemming/dictionaries/import:
+    post:
+      description: Upload a JSONL file containing word mappings to create or update a stemming dictionary.
+      operationId: importStemmingDictionary
+      parameters:
+        - description: The ID to assign to the dictionary
+          example: irregular-plurals
+          in: query
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example: |
+                {"word": "people", "root": "person"}
+                {"word": "children", "root": "child"}
+              type: string
+        description: The JSONL file containing word mappings
+        required: true
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                example: |
+                  {"word": "people", "root": "person"} {"word": "children", "root": "child"}
+                type: string
+          description: Dictionary successfully imported
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Bad request, see error message for details
+      summary: Import a stemming dictionary
+      tags:
+        - stemming
   /stopwords:
     get:
       description: Retrieve the details of all stopwords sets
@@ -3730,7 +3920,7 @@ tags:
   - description: Typesense can aggregate search queries for both analytics purposes and for query suggestions.
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/26.0/api/analytics-query-suggestions.html
+      url: https://typesense.org/docs/28.0/api/analytics-query-suggestions.html
     name: analytics
   - description: Manage API Keys with fine-grain access control
     externalDocs:
@@ -3742,25 +3932,30 @@ tags:
   - description: Manage Typesense cluster
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/26.0/api/cluster-operations.html
+      url: https://typesense.org/docs/28.0/api/cluster-operations.html
     name: operations
   - description: Manage stopwords sets
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/26.0/api/stopwords.html
+      url: https://typesense.org/docs/28.0/api/stopwords.html
     name: stopwords
   - description: Store and reference search parameters
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/26.0/api/search.html#presets
+      url: https://typesense.org/docs/28.0/api/search.html#presets
     name: presets
   - description: Conversational Search (RAG)
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/27.0/api/conversational-search-rag.html
+      url: https://typesense.org/docs/28.0/api/conversational-search-rag.html
     name: conversations
   - description: Manage synonyms
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/27.0/api/synonyms.html
+      url: https://typesense.org/docs/28.0/api/synonyms.html
     name: synonyms
+  - description: Manage stemming dictionaries
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/docs/28.0/api/stemming.html
+    name: stemming
