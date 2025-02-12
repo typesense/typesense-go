@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Typesense API
   description: "An open source search engine for building delightful search experiences."
-  version: '27.0'
+  version: '28.0'
 externalDocs:
   description: Find out more about Typsesense
   url: https://typesense.org
@@ -28,7 +28,7 @@ tags:
     description: Typesense can aggregate search queries for both analytics purposes and for query suggestions.
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/26.0/api/analytics-query-suggestions.html
+      url: https://typesense.org/docs/28.0/api/analytics-query-suggestions.html
   - name: keys
     description: Manage API Keys with fine-grain access control
     externalDocs:
@@ -40,27 +40,32 @@ tags:
     description: Manage Typesense cluster
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/26.0/api/cluster-operations.html
+      url: https://typesense.org/docs/28.0/api/cluster-operations.html
   - name: stopwords
     description: Manage stopwords sets
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/26.0/api/stopwords.html
+      url: https://typesense.org/docs/28.0/api/stopwords.html
   - name: presets
     description: Store and reference search parameters
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/26.0/api/search.html#presets
+      url: https://typesense.org/docs/28.0/api/search.html#presets
   - name: conversations
     description: Conversational Search (RAG)
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/27.0/api/conversational-search-rag.html
+      url: https://typesense.org/docs/28.0/api/conversational-search-rag.html
   - name: synonyms
     description: Manage synonyms
     externalDocs:
       description: Find out more
-      url: https://typesense.org/docs/27.0/api/synonyms.html
+      url: https://typesense.org/docs/28.0/api/synonyms.html
+  - name: stemming
+    description: Manage stemming dictionaries
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/docs/28.0/api/stemming.html
 paths:
   /collections:
     get:
@@ -356,6 +361,9 @@ paths:
                   of other operations running on the server.
                 type: integer
               ignore_not_found:
+                type: boolean
+              truncate:
+                description: When true, removes all documents from the collection while preserving the collection and its schema.
                 type: boolean
       responses:
         '200':
@@ -1263,6 +1271,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /operations/schema_changes:
+    get:
+      tags:
+        - operations
+      summary: Get the status of in-progress schema change operations
+      description: Returns the status of any ongoing schema change operations. If no schema changes are in progress, returns an empty response.
+      operationId: getSchemaChanges
+      responses:
+        '200':
+          description: List of schema changes in progress
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SchemaChangeStatus"
   /operations/snapshot:
     post:
       tags:
@@ -1742,6 +1766,97 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+  /stemming/dictionaries:
+    get:
+      tags:
+        - stemming
+      summary: List all stemming dictionaries
+      description: Retrieve a list of all available stemming dictionaries.
+      operationId: listStemmingDictionaries
+      responses:
+        '200':
+          description: List of all dictionaries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dictionaries:
+                    type: array
+                    items:
+                      type: string
+                    example: ["irregular-plurals", "company-terms"]
+
+  /stemming/dictionaries/{dictionaryId}:
+    get:
+      tags:
+        - stemming
+      summary: Retrieve a stemming dictionary
+      description: Fetch details of a specific stemming dictionary.
+      operationId: getStemmingDictionary
+      parameters:
+        - name: dictionaryId
+          in: path
+          description: The ID of the dictionary to retrieve
+          required: true
+          schema:
+            type: string
+          example: irregular-plurals
+      responses:
+        '200':
+          description: Stemming dictionary details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StemmingDictionary"
+        '404':
+          description: Dictionary not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+
+  /stemming/dictionaries/import:
+    post:
+      tags:
+        - stemming
+      summary: Import a stemming dictionary
+      description: Upload a JSONL file containing word mappings to create or update a stemming dictionary.
+      operationId: importStemmingDictionary
+      parameters:
+        - name: id
+          in: query
+          description: The ID to assign to the dictionary
+          required: true
+          schema:
+            type: string
+          example: irregular-plurals
+      requestBody:
+        description: The JSONL file containing word mappings
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+              example: |
+                {"word": "people", "root": "person"}
+                {"word": "children", "root": "child"}
+      responses:
+        '200':
+          description: Dictionary successfully imported
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                example: >
+                  {"word": "people", "root": "person"}
+                  {"word": "children", "root": "child"}
+        '400':
+          description: Bad request, see error message for details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
 components:
   schemas:
     CollectionSchema:
@@ -1906,6 +2021,33 @@ components:
           type: boolean
           description: >
             Values are stemmed before indexing in-memory. Default: false.
+        stem_dictionary:
+          type: string
+          description: Name of the stemming dictionary to use for this field
+          example: irregular-plurals
+        token_separators:
+          type: array
+          description: >
+            List of symbols or special characters to be used for
+            splitting the text into individual words in addition to space and new-line characters.
+          items:
+            type: string # characters only
+            # Could `enum` be used instead, given it's symbols/special *characters*, e.g.:
+            # enum: ["@", "!", ".", "/", ","]
+            minLength: 1
+            maxLength: 1
+          default: []
+        symbols_to_index:
+          type: array
+          description: >
+            List of symbols or special characters to be indexed.
+          items:
+            type: string # characters only
+            # Could `enum` be used instead, given it's symbols/special *characters*, e.g.:
+            # enum: ["@", "!", ".", "/", ","]
+            minLength: 1
+            maxLength: 1
+          default: []
         embed:
           type: object
           required:
@@ -2353,6 +2495,18 @@ components:
       properties:
         ok:
           type: boolean
+    SchemaChangeStatus:
+      type: object
+      properties:
+        collection:
+          type: string
+          description: Name of the collection being modified
+        validated_docs:
+          type: integer
+          description: Number of documents that have been validated
+        altered_docs:
+          type: integer
+          description: Number of documents that have been altered
     SuccessStatus:
       type: object
       required:
@@ -2526,6 +2680,12 @@ components:
             multiple conditions with &&.
           type: string
           example: "num_employees:>100 && country: [USA, UK]"
+
+        max_filter_by_candidates:
+          description:
+            Controls the number of similar words that Typesense considers during fuzzy search
+            on filter_by values. Useful for controlling prefix matches like company_name:Acm*.
+          type: integer
 
         sort_by:
           description:
@@ -3218,6 +3378,9 @@ components:
       required:
         - searches
       properties:
+        union:
+          type: boolean
+          description: When true, merges the search results from each search query into a single ordered set of hits.
         searches:
           type: array
           items:
@@ -3234,6 +3397,13 @@ components:
             x-typesense-api-key:
               type: string
               description: A separate search API key for each search within a multi_search request
+            rerank_hybrid_matches:
+              type: boolean
+              description: >
+                When true, computes both text match and vector distance scores for all matches in hybrid search.
+                Documents found only through keyword search will get a vector distance score, and
+                documents found only through vector search will get a text match score.
+              default: false
     FacetCounts:
       type: object
       properties:
@@ -3584,6 +3754,33 @@ components:
             id:
               type: string
               description: An explicit id for the model, otherwise the API will return a response with an auto-generated conversation model id.
+    StemmingDictionary:
+      type: object
+      required:
+        - id
+        - words
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the dictionary
+          example: irregular-plurals
+        words:
+          type: array
+          description: List of word mappings in the dictionary
+          items:
+            type: object
+            required:
+              - word
+              - root
+            properties:
+              word:
+                type: string
+                description: The word form to be stemmed
+                example: people
+              root:
+                type: string
+                description: The root form of the word
+                example: person
   securitySchemes:
     api_key_header:
       type: apiKey

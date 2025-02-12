@@ -1243,6 +1243,46 @@ func (mr *MockAPIClientInterfaceMockRecorder) GetKeysWithResponse(ctx any, reqEd
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKeysWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetKeysWithResponse), varargs...)
 }
 
+// GetSchemaChanges mocks base method.
+func (m *MockAPIClientInterface) GetSchemaChanges(ctx context.Context, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetSchemaChanges", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSchemaChanges indicates an expected call of GetSchemaChanges.
+func (mr *MockAPIClientInterfaceMockRecorder) GetSchemaChanges(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSchemaChanges", reflect.TypeOf((*MockAPIClientInterface)(nil).GetSchemaChanges), varargs...)
+}
+
+// GetSchemaChangesWithResponse mocks base method.
+func (m *MockAPIClientInterface) GetSchemaChangesWithResponse(ctx context.Context, reqEditors ...api.RequestEditorFn) (*api.GetSchemaChangesResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetSchemaChangesWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.GetSchemaChangesResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSchemaChangesWithResponse indicates an expected call of GetSchemaChangesWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) GetSchemaChangesWithResponse(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSchemaChangesWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetSchemaChangesWithResponse), varargs...)
+}
+
 // GetSearchOverride mocks base method.
 func (m *MockAPIClientInterface) GetSearchOverride(ctx context.Context, collectionName, overrideId string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -1403,6 +1443,46 @@ func (mr *MockAPIClientInterfaceMockRecorder) GetSearchSynonymsWithResponse(ctx,
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchSynonymsWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetSearchSynonymsWithResponse), varargs...)
 }
 
+// GetStemmingDictionary mocks base method.
+func (m *MockAPIClientInterface) GetStemmingDictionary(ctx context.Context, dictionaryId string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, dictionaryId}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetStemmingDictionary", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetStemmingDictionary indicates an expected call of GetStemmingDictionary.
+func (mr *MockAPIClientInterfaceMockRecorder) GetStemmingDictionary(ctx, dictionaryId any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, dictionaryId}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStemmingDictionary", reflect.TypeOf((*MockAPIClientInterface)(nil).GetStemmingDictionary), varargs...)
+}
+
+// GetStemmingDictionaryWithResponse mocks base method.
+func (m *MockAPIClientInterface) GetStemmingDictionaryWithResponse(ctx context.Context, dictionaryId string, reqEditors ...api.RequestEditorFn) (*api.GetStemmingDictionaryResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, dictionaryId}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetStemmingDictionaryWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.GetStemmingDictionaryResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetStemmingDictionaryWithResponse indicates an expected call of GetStemmingDictionaryWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) GetStemmingDictionaryWithResponse(ctx, dictionaryId any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, dictionaryId}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStemmingDictionaryWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetStemmingDictionaryWithResponse), varargs...)
+}
+
 // Health mocks base method.
 func (m *MockAPIClientInterface) Health(ctx context.Context, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -1483,6 +1563,86 @@ func (mr *MockAPIClientInterfaceMockRecorder) ImportDocumentsWithBodyWithRespons
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ImportDocumentsWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).ImportDocumentsWithBodyWithResponse), varargs...)
 }
 
+// ImportStemmingDictionary mocks base method.
+func (m *MockAPIClientInterface) ImportStemmingDictionary(ctx context.Context, params *api.ImportStemmingDictionaryParams, body api.ImportStemmingDictionaryJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, params, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ImportStemmingDictionary", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ImportStemmingDictionary indicates an expected call of ImportStemmingDictionary.
+func (mr *MockAPIClientInterfaceMockRecorder) ImportStemmingDictionary(ctx, params, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, params, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ImportStemmingDictionary", reflect.TypeOf((*MockAPIClientInterface)(nil).ImportStemmingDictionary), varargs...)
+}
+
+// ImportStemmingDictionaryWithBody mocks base method.
+func (m *MockAPIClientInterface) ImportStemmingDictionaryWithBody(ctx context.Context, params *api.ImportStemmingDictionaryParams, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, params, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ImportStemmingDictionaryWithBody", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ImportStemmingDictionaryWithBody indicates an expected call of ImportStemmingDictionaryWithBody.
+func (mr *MockAPIClientInterfaceMockRecorder) ImportStemmingDictionaryWithBody(ctx, params, contentType, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, params, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ImportStemmingDictionaryWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).ImportStemmingDictionaryWithBody), varargs...)
+}
+
+// ImportStemmingDictionaryWithBodyWithResponse mocks base method.
+func (m *MockAPIClientInterface) ImportStemmingDictionaryWithBodyWithResponse(ctx context.Context, params *api.ImportStemmingDictionaryParams, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*api.ImportStemmingDictionaryResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, params, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ImportStemmingDictionaryWithBodyWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.ImportStemmingDictionaryResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ImportStemmingDictionaryWithBodyWithResponse indicates an expected call of ImportStemmingDictionaryWithBodyWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) ImportStemmingDictionaryWithBodyWithResponse(ctx, params, contentType, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, params, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ImportStemmingDictionaryWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).ImportStemmingDictionaryWithBodyWithResponse), varargs...)
+}
+
+// ImportStemmingDictionaryWithResponse mocks base method.
+func (m *MockAPIClientInterface) ImportStemmingDictionaryWithResponse(ctx context.Context, params *api.ImportStemmingDictionaryParams, body api.ImportStemmingDictionaryJSONRequestBody, reqEditors ...api.RequestEditorFn) (*api.ImportStemmingDictionaryResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, params, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ImportStemmingDictionaryWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.ImportStemmingDictionaryResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ImportStemmingDictionaryWithResponse indicates an expected call of ImportStemmingDictionaryWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) ImportStemmingDictionaryWithResponse(ctx, params, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, params, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ImportStemmingDictionaryWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).ImportStemmingDictionaryWithResponse), varargs...)
+}
+
 // IndexDocument mocks base method.
 func (m *MockAPIClientInterface) IndexDocument(ctx context.Context, collectionName string, params *api.IndexDocumentParams, body api.IndexDocumentJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -1561,6 +1721,46 @@ func (mr *MockAPIClientInterfaceMockRecorder) IndexDocumentWithResponse(ctx, col
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, collectionName, params, body}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IndexDocumentWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).IndexDocumentWithResponse), varargs...)
+}
+
+// ListStemmingDictionaries mocks base method.
+func (m *MockAPIClientInterface) ListStemmingDictionaries(ctx context.Context, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListStemmingDictionaries", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListStemmingDictionaries indicates an expected call of ListStemmingDictionaries.
+func (mr *MockAPIClientInterfaceMockRecorder) ListStemmingDictionaries(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListStemmingDictionaries", reflect.TypeOf((*MockAPIClientInterface)(nil).ListStemmingDictionaries), varargs...)
+}
+
+// ListStemmingDictionariesWithResponse mocks base method.
+func (m *MockAPIClientInterface) ListStemmingDictionariesWithResponse(ctx context.Context, reqEditors ...api.RequestEditorFn) (*api.ListStemmingDictionariesResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListStemmingDictionariesWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.ListStemmingDictionariesResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListStemmingDictionariesWithResponse indicates an expected call of ListStemmingDictionariesWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) ListStemmingDictionariesWithResponse(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListStemmingDictionariesWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).ListStemmingDictionariesWithResponse), varargs...)
 }
 
 // MultiSearch mocks base method.
