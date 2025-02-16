@@ -7,6 +7,6 @@ type ImportDocumentResponse struct {
 }
 
 type StemmingDictionaryWord struct {
-    Root string `json:"root"`
-    Word string `json:"word"`
+	Root string `json:"root"`
+	Word string `json:"word"`
 }
