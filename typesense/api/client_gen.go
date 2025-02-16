@@ -254,6 +254,9 @@ type ClientInterface interface {
 
 	MultiSearch(ctx context.Context, params *MultiSearchParams, body MultiSearchJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// GetSchemaChanges request
+	GetSchemaChanges(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// TakeSnapshot request
 	TakeSnapshot(ctx context.Context, params *TakeSnapshotParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -276,6 +279,17 @@ type ClientInterface interface {
 
 	// RetrieveAPIStats request
 	RetrieveAPIStats(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListStemmingDictionaries request
+	ListStemmingDictionaries(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ImportStemmingDictionaryWithBody request with any body
+	ImportStemmingDictionaryWithBody(ctx context.Context, params *ImportStemmingDictionaryParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ImportStemmingDictionary(ctx context.Context, params *ImportStemmingDictionaryParams, body ImportStemmingDictionaryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetStemmingDictionary request
+	GetStemmingDictionary(ctx context.Context, dictionaryId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RetrieveStopwordsSets request
 	RetrieveStopwordsSets(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1012,6 +1026,18 @@ func (c *Client) MultiSearch(ctx context.Context, params *MultiSearchParams, bod
 	return c.Client.Do(req)
 }
 
+func (c *Client) GetSchemaChanges(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSchemaChangesRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) TakeSnapshot(ctx context.Context, params *TakeSnapshotParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewTakeSnapshotRequest(c.Server, params)
 	if err != nil {
@@ -1098,6 +1124,54 @@ func (c *Client) UpsertPreset(ctx context.Context, presetId string, body UpsertP
 
 func (c *Client) RetrieveAPIStats(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRetrieveAPIStatsRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListStemmingDictionaries(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListStemmingDictionariesRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ImportStemmingDictionaryWithBody(ctx context.Context, params *ImportStemmingDictionaryParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewImportStemmingDictionaryRequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ImportStemmingDictionary(ctx context.Context, params *ImportStemmingDictionaryParams, body ImportStemmingDictionaryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewImportStemmingDictionaryRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetStemmingDictionary(ctx context.Context, dictionaryId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetStemmingDictionaryRequest(c.Server, dictionaryId)
 	if err != nil {
 		return nil, err
 	}
@@ -1778,6 +1852,22 @@ func NewDeleteDocumentsRequest(server string, collectionName string, params *Del
 		if params.IgnoreNotFound != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ignore_not_found", runtime.ParamLocationQuery, *params.IgnoreNotFound); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Truncate != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "truncate", runtime.ParamLocationQuery, *params.Truncate); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -2758,6 +2848,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 		if params.MaxFacetValues != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "max_facet_values", runtime.ParamLocationQuery, *params.MaxFacetValues); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.MaxFilterByCandidates != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "max_filter_by_candidates", runtime.ParamLocationQuery, *params.MaxFilterByCandidates); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -4767,6 +4873,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 		}
 
+		if params.MaxFilterByCandidates != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "max_filter_by_candidates", runtime.ParamLocationQuery, *params.MaxFilterByCandidates); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.MinLen1typo != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "min_len_1typo", runtime.ParamLocationQuery, *params.MinLen1typo); err != nil {
@@ -5276,6 +5398,33 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 	return req, nil
 }
 
+// NewGetSchemaChangesRequest generates requests for GetSchemaChanges
+func NewGetSchemaChangesRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/operations/schema_changes")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewTakeSnapshotRequest generates requests for TakeSnapshot
 func NewTakeSnapshotRequest(server string, params *TakeSnapshotParams) (*http.Request, error) {
 	var err error
@@ -5500,6 +5649,125 @@ func NewRetrieveAPIStatsRequest(server string) (*http.Request, error) {
 	}
 
 	operationPath := fmt.Sprintf("/stats.json")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewListStemmingDictionariesRequest generates requests for ListStemmingDictionaries
+func NewListStemmingDictionariesRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/stemming/dictionaries")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewImportStemmingDictionaryRequest calls the generic ImportStemmingDictionary builder with application/json body
+func NewImportStemmingDictionaryRequest(server string, params *ImportStemmingDictionaryParams, body ImportStemmingDictionaryJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewImportStemmingDictionaryRequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewImportStemmingDictionaryRequestWithBody generates requests for ImportStemmingDictionary with any type of body
+func NewImportStemmingDictionaryRequestWithBody(server string, params *ImportStemmingDictionaryParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/stemming/dictionaries/import")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "id", runtime.ParamLocationQuery, params.Id); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetStemmingDictionaryRequest generates requests for GetStemmingDictionary
+func NewGetStemmingDictionaryRequest(server string, dictionaryId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "dictionaryId", runtime.ParamLocationPath, dictionaryId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/stemming/dictionaries/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5867,6 +6135,9 @@ type ClientWithResponsesInterface interface {
 
 	MultiSearchWithResponse(ctx context.Context, params *MultiSearchParams, body MultiSearchJSONRequestBody, reqEditors ...RequestEditorFn) (*MultiSearchResponse, error)
 
+	// GetSchemaChangesWithResponse request
+	GetSchemaChangesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSchemaChangesResponse, error)
+
 	// TakeSnapshotWithResponse request
 	TakeSnapshotWithResponse(ctx context.Context, params *TakeSnapshotParams, reqEditors ...RequestEditorFn) (*TakeSnapshotResponse, error)
 
@@ -5889,6 +6160,17 @@ type ClientWithResponsesInterface interface {
 
 	// RetrieveAPIStatsWithResponse request
 	RetrieveAPIStatsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAPIStatsResponse, error)
+
+	// ListStemmingDictionariesWithResponse request
+	ListStemmingDictionariesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListStemmingDictionariesResponse, error)
+
+	// ImportStemmingDictionaryWithBodyWithResponse request with any body
+	ImportStemmingDictionaryWithBodyWithResponse(ctx context.Context, params *ImportStemmingDictionaryParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ImportStemmingDictionaryResponse, error)
+
+	ImportStemmingDictionaryWithResponse(ctx context.Context, params *ImportStemmingDictionaryParams, body ImportStemmingDictionaryJSONRequestBody, reqEditors ...RequestEditorFn) (*ImportStemmingDictionaryResponse, error)
+
+	// GetStemmingDictionaryWithResponse request
+	GetStemmingDictionaryWithResponse(ctx context.Context, dictionaryId string, reqEditors ...RequestEditorFn) (*GetStemmingDictionaryResponse, error)
 
 	// RetrieveStopwordsSetsWithResponse request
 	RetrieveStopwordsSetsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveStopwordsSetsResponse, error)
@@ -6940,6 +7222,28 @@ func (r MultiSearchResponse) StatusCode() int {
 	return 0
 }
 
+type GetSchemaChangesResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *[]SchemaChangeStatus
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSchemaChangesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSchemaChangesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type TakeSnapshotResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -7091,6 +7395,75 @@ func (r RetrieveAPIStatsResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r RetrieveAPIStatsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListStemmingDictionariesResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Dictionaries *[]string `json:"dictionaries,omitempty"`
+	}
+}
+
+// Status returns HTTPResponse.Status
+func (r ListStemmingDictionariesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListStemmingDictionariesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ImportStemmingDictionaryResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r ImportStemmingDictionaryResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ImportStemmingDictionaryResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetStemmingDictionaryResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *StemmingDictionary
+	JSON404      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r GetStemmingDictionaryResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetStemmingDictionaryResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -7715,6 +8088,15 @@ func (c *ClientWithResponses) MultiSearchWithResponse(ctx context.Context, param
 	return ParseMultiSearchResponse(rsp)
 }
 
+// GetSchemaChangesWithResponse request returning *GetSchemaChangesResponse
+func (c *ClientWithResponses) GetSchemaChangesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSchemaChangesResponse, error) {
+	rsp, err := c.GetSchemaChanges(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSchemaChangesResponse(rsp)
+}
+
 // TakeSnapshotWithResponse request returning *TakeSnapshotResponse
 func (c *ClientWithResponses) TakeSnapshotWithResponse(ctx context.Context, params *TakeSnapshotParams, reqEditors ...RequestEditorFn) (*TakeSnapshotResponse, error) {
 	rsp, err := c.TakeSnapshot(ctx, params, reqEditors...)
@@ -7784,6 +8166,41 @@ func (c *ClientWithResponses) RetrieveAPIStatsWithResponse(ctx context.Context, 
 		return nil, err
 	}
 	return ParseRetrieveAPIStatsResponse(rsp)
+}
+
+// ListStemmingDictionariesWithResponse request returning *ListStemmingDictionariesResponse
+func (c *ClientWithResponses) ListStemmingDictionariesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListStemmingDictionariesResponse, error) {
+	rsp, err := c.ListStemmingDictionaries(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListStemmingDictionariesResponse(rsp)
+}
+
+// ImportStemmingDictionaryWithBodyWithResponse request with arbitrary body returning *ImportStemmingDictionaryResponse
+func (c *ClientWithResponses) ImportStemmingDictionaryWithBodyWithResponse(ctx context.Context, params *ImportStemmingDictionaryParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ImportStemmingDictionaryResponse, error) {
+	rsp, err := c.ImportStemmingDictionaryWithBody(ctx, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseImportStemmingDictionaryResponse(rsp)
+}
+
+func (c *ClientWithResponses) ImportStemmingDictionaryWithResponse(ctx context.Context, params *ImportStemmingDictionaryParams, body ImportStemmingDictionaryJSONRequestBody, reqEditors ...RequestEditorFn) (*ImportStemmingDictionaryResponse, error) {
+	rsp, err := c.ImportStemmingDictionary(ctx, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseImportStemmingDictionaryResponse(rsp)
+}
+
+// GetStemmingDictionaryWithResponse request returning *GetStemmingDictionaryResponse
+func (c *ClientWithResponses) GetStemmingDictionaryWithResponse(ctx context.Context, dictionaryId string, reqEditors ...RequestEditorFn) (*GetStemmingDictionaryResponse, error) {
+	rsp, err := c.GetStemmingDictionary(ctx, dictionaryId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetStemmingDictionaryResponse(rsp)
 }
 
 // RetrieveStopwordsSetsWithResponse request returning *RetrieveStopwordsSetsResponse
@@ -9273,6 +9690,32 @@ func ParseMultiSearchResponse(rsp *http.Response) (*MultiSearchResponse, error) 
 	return response, nil
 }
 
+// ParseGetSchemaChangesResponse parses an HTTP response from a GetSchemaChangesWithResponse call
+func ParseGetSchemaChangesResponse(rsp *http.Response) (*GetSchemaChangesResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSchemaChangesResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []SchemaChangeStatus
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseTakeSnapshotResponse parses an HTTP response from a TakeSnapshotWithResponse call
 func ParseTakeSnapshotResponse(rsp *http.Response) (*TakeSnapshotResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -9470,6 +9913,93 @@ func ParseRetrieveAPIStatsResponse(rsp *http.Response) (*RetrieveAPIStatsRespons
 			return nil, err
 		}
 		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListStemmingDictionariesResponse parses an HTTP response from a ListStemmingDictionariesWithResponse call
+func ParseListStemmingDictionariesResponse(rsp *http.Response) (*ListStemmingDictionariesResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListStemmingDictionariesResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Dictionaries *[]string `json:"dictionaries,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseImportStemmingDictionaryResponse parses an HTTP response from a ImportStemmingDictionaryWithResponse call
+func ParseImportStemmingDictionaryResponse(rsp *http.Response) (*ImportStemmingDictionaryResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ImportStemmingDictionaryResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetStemmingDictionaryResponse parses an HTTP response from a GetStemmingDictionaryWithResponse call
+func ParseGetStemmingDictionaryResponse(rsp *http.Response) (*GetStemmingDictionaryResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetStemmingDictionaryResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest StemmingDictionary
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
 
 	}
 

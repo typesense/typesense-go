@@ -5,3 +5,8 @@ type ImportDocumentResponse struct {
 	Error    string `json:"error"`
 	Document string `json:"document"`
 }
+
+type StemmingDictionaryWord struct {
+	Root string `json:"root"`
+	Word string `json:"word"`
+}

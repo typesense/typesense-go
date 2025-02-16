@@ -58,6 +58,7 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 				Drop:     nil,
 				Store:    pointer.True(),
 				Stem:     pointer.False(),
+				StemDictionary: pointer.String(""),
 			},
 			{
 				Name:     "num_employees",
@@ -71,6 +72,7 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 				Drop:     nil,
 				Store:    pointer.True(),
 				Stem:     pointer.False(),
+				StemDictionary: pointer.String(""),
 			},
 			{
 				Name:     "country",
@@ -84,6 +86,7 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 				Drop:     nil,
 				Store:    pointer.True(),
 				Stem:     pointer.False(),
+				StemDictionary: pointer.String(""),
 			},
 		},
 		EnableNestedFields:  pointer.False(),

@@ -48,6 +48,10 @@ func (c *Client) Analytics() AnalyticsInterface {
 	return &analytics{apiClient: c.apiClient}
 }
 
+func (c *Client) Stemming() StemmingInterface {
+	return &stemming{apiClient: c.apiClient}
+}
+
 func (c *Client) Conversations() ConversationsInterface {
 	return &conversations{apiClient: c.apiClient}
 }
