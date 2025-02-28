@@ -1,8 +1,10 @@
 package typesense
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -68,10 +70,25 @@ func (a *APICall) Do(req *http.Request) (*http.Response, error) {
 	var lastResponse *http.Response
 	var lastError error
 
+	// Store body in case we need to retry
+	reqBody, err := req.GetBody()
+	if err != nil {
+		return nil, err
+	}
+	defer reqBody.Close()
+
+	bodyBytes, err := io.ReadAll(reqBody)
+	if err != nil {
+		return nil, err
+	}
+
 	for numTries := 0; numTries < a.numRetriesPerRequest; numTries++ {
 		node := a.getNextNode()
 
 		replaceRequestHostname(req, node.url)
+
+		// Create a new io.ReadCloser for each retry
+		req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
 
 		response, err := a.client.Do(req)
 
