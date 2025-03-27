@@ -1486,7 +1486,9 @@ components:
             fields_matched:
               type: integer
             num_tokens_dropped:
+              format: int64
               type: integer
+              x-go-type: uint64
             score:
               type: string
             tokens_matched:
