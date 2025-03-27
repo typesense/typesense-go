@@ -1,7 +1,9 @@
 package typesense
 
 import (
+	"bytes"
 	"context"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -391,4 +393,52 @@ func TestApiCallCanAbortRequest(t *testing.T) {
 	assert.ErrorIs(t, err, context.Canceled)
 	assert.Nil(t, res)
 	assert.Equal(t, requestURLHistory, serverURLs[:3])
+}
+
+func TestApiCallRetryWithRequestBody(t *testing.T) {
+
+	requestURLHistory := make([]string, 0, 2)
+
+	servers, serverURLs := instantiateServers([]serverHandler{
+		func(w http.ResponseWriter, r *http.Request) {
+			appendHistory(&requestURLHistory, r)
+			w.WriteHeader(501)
+		},
+		func(w http.ResponseWriter, r *http.Request) {
+			appendHistory(&requestURLHistory, r)
+			data := r.Body
+			bodyBytes, _ := io.ReadAll(data)
+			assert.Equal(t, string(bodyBytes), "body data")
+			w.WriteHeader(201)
+		},
+		func(w http.ResponseWriter, r *http.Request) {
+			appendHistory(&requestURLHistory, r)
+			data := r.Body
+			bodyBytes, _ := io.ReadAll(data)
+			assert.Equal(t, string(bodyBytes), "body data")
+			w.WriteHeader(203)
+		},
+	})
+	for _, server := range servers {
+		defer server.Close()
+	}
+
+	apiCall := newAPICall(
+		&ClientConfig{
+			Nodes:             serverURLs,
+			ConnectionTimeout: 5 * time.Second,
+		},
+	)
+	req, err := http.NewRequest(http.MethodPost, "http://example.com", bytes.NewBuffer([]byte("body data")))
+	assert.NoError(t, err)
+
+	res, err := apiCall.Do(req)
+	assert.NoError(t, err)
+	assert.Equal(t, 201, res.StatusCode)
+
+	res2, err2 := apiCall.Do(req)
+	assert.NoError(t, err2)
+	assert.Equal(t, 203, res2.StatusCode)
+
+	assert.Equal(t, serverURLs, requestURLHistory)
 }

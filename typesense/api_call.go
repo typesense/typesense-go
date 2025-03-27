@@ -69,17 +69,20 @@ func (a *APICall) Do(req *http.Request) (*http.Response, error) {
 
 	var lastResponse *http.Response
 	var lastError error
+	var bodyBytes []byte
 
-	// Store body in case we need to retry
-	reqBody, err := req.GetBody()
-	if err != nil {
-		return nil, err
-	}
-	defer reqBody.Close()
+	if req.GetBody != nil {
+		// Store body in case we need to retry
+		reqBody, err := req.GetBody()
+		if err != nil {
+			return nil, err
+		}
+		defer reqBody.Close()
 
-	bodyBytes, err := io.ReadAll(reqBody)
-	if err != nil {
-		return nil, err
+		bodyBytes, err = io.ReadAll(reqBody)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	for numTries := 0; numTries < a.numRetriesPerRequest; numTries++ {
@@ -87,8 +90,10 @@ func (a *APICall) Do(req *http.Request) (*http.Response, error) {
 
 		replaceRequestHostname(req, node.url)
 
-		// Create a new io.ReadCloser for each retry
-		req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+		if bodyBytes != nil {
+			// Create a new io.ReadCloser for each retry
+			req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+		}
 
 		response, err := a.client.Do(req)
 
