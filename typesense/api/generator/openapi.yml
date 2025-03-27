@@ -2240,6 +2240,8 @@ components:
               type: integer
             num_tokens_dropped:
               type: integer
+              format: int64
+              x-go-type: uint64
             score:
               type: string
             tokens_matched:

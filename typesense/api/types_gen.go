@@ -1340,7 +1340,7 @@ type SearchResultHit struct {
 		BestFieldScore   *string `json:"best_field_score,omitempty"`
 		BestFieldWeight  *int    `json:"best_field_weight,omitempty"`
 		FieldsMatched    *int    `json:"fields_matched,omitempty"`
-		NumTokensDropped *int    `json:"num_tokens_dropped,omitempty"`
+		NumTokensDropped *uint64 `json:"num_tokens_dropped,omitempty"`
 		Score            *string `json:"score,omitempty"`
 		TokensMatched    *int    `json:"tokens_matched,omitempty"`
 		TypoPrefixScore  *int    `json:"typo_prefix_score,omitempty"`
