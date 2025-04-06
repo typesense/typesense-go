@@ -1374,58 +1374,73 @@ components:
           type: string
       type: object
     SearchResult:
+      type: object
       properties:
-        conversation:
-          $ref: '#/components/schemas/SearchResultConversation'
         facet_counts:
-          items:
-            $ref: '#/components/schemas/FacetCounts'
           type: array
+          items:
+            $ref: "#/components/schemas/FacetCounts"
         found:
-          description: The number of documents found
           type: integer
+          description: The number of documents found
         found_docs:
           type: integer
+        search_time_ms:
+          type: integer
+          description: The number of milliseconds the search took
+        out_of:
+          type: integer
+          description: The total number of documents in the collection
+        search_cutoff:
+          type: boolean
+          description: Whether the search was cut off
+        page:
+          type: integer
+          description: The search result page number
+        code:
+          type: integer
+          description: The code of error
+        message:
+          type: string
+          description: The description of error
+        error:
+          type: string
+          description: The message of error
         grouped_hits:
-          items:
-            $ref: '#/components/schemas/SearchGroupedHit'
           type: array
+          items:
+            $ref: "#/components/schemas/SearchGroupedHit"
         hits:
+          type: array
           description: The documents that matched the search query
           items:
-            $ref: '#/components/schemas/SearchResultHit'
-          type: array
-        out_of:
-          description: The total number of documents in the collection
-          type: integer
-        page:
-          description: The search result page number
-          type: integer
-        request_params:
+            $ref: "#/components/schemas/SearchResultHit"
+        hybrid_search_info:
+          type: object
           properties:
-            collection_name:
-              type: string
-            per_page:
-              type: integer
-            q:
-              type: string
-            voice_query:
-              properties:
-                transcribed_query:
-                  type: string
-              type: object
+            rank_fusion_score:
+              type: number
+              description: The rank fusion score
+        request_params:
+          type: object
           required:
             - collection_name
             - q
             - per_page
-          type: object
-        search_cutoff:
-          description: Whether the search was cut off
-          type: boolean
-        search_time_ms:
-          description: The number of milliseconds the search took
-          type: integer
-      type: object
+          properties:
+            collection_name:
+              type: string
+            q:
+              type: string
+            per_page:
+              type: integer
+            voice_query:
+              type: object
+              properties:
+                transcribed_query:
+                  type: string
+        conversation:
+          $ref: "#/components/schemas/SearchResultConversation"    SearchResultConversation:
     SearchResultConversation:
       properties:
         answer:
