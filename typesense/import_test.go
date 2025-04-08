@@ -204,10 +204,10 @@ func TestDocumentsImportWithTwoDocuments(t *testing.T) {
 	}
 	expectedBody := strings.NewReader(`{"id":"123","companyName":"Stark Industries","numEmployees":5215,"country":"USA"}` +
 		"\n" + `{"id":"125","companyName":"Stark Industries","numEmployees":5215,"country":"USA"}` + "\n")
-	expectedResultString := `{"success": true}` + "\n" + `{"success": false, "error": "Bad JSON.", "document": "[bad doc"}`
+	expectedResultString := `{"success": true, "id":"123"}` + "\n" + `{"success": false, "id":"125", "error": "Bad JSON.", "document": "[bad doc"}`
 	expectedResult := []*api.ImportDocumentResponse{
-		{Success: true},
-		{Success: false, Error: "Bad JSON.", Document: "[bad doc"},
+		{Success: true, Id: "123"},
+		{Success: false, Id: "125", Error: "Bad JSON.", Document: "[bad doc"},
 	}
 
 	ctrl := gomock.NewController(t)
