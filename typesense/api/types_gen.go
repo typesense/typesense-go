@@ -1316,10 +1316,6 @@ type SearchResult struct {
 	Code *int `json:"code,omitempty"`
 	Error *string `json:"error,omitempty"`
 	Message *string `json:"message,omitempty"`
-
-	HybridSearchInfo *struct {
-		RankFusionScore *float64 `json:"rank_fusion_score,omitempty"`
-	} `json:"hybrid_search_info,omitempty"`
 }
 
 // SearchResultConversation defines model for SearchResultConversation.
@@ -1356,6 +1352,10 @@ type SearchResultHit struct {
 
 	// VectorDistance Distance between the query vector and matching document's vector value
 	VectorDistance *float32 `json:"vector_distance,omitempty"`
+
+	HybridSearchInfo *struct {
+		RankFusionScore *float64 `json:"rank_fusion_score,omitempty"`
+	} `json:"hybrid_search_info,omitempty"`
 }
 
 // SearchSynonym defines model for SearchSynonym.
