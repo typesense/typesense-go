@@ -6,7 +6,6 @@ import (
 	"errors"
 	"io"
 	"net/http"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -30,15 +29,15 @@ func eqReader(r io.Reader) gomock.Matcher {
 }
 
 func (m *eqReaderMatcher) Matches(x interface{}) bool {
-	if _, ok := x.(io.Reader); !ok {
+	r, ok := x.(io.Reader)
+	if !ok {
 		return false
 	}
-	r := x.(io.Reader)
 	allBytes, err := io.ReadAll(r)
 	if err != nil {
 		panic(err)
 	}
-	return reflect.DeepEqual(allBytes, m.readerBytes)
+	return bytes.Equal(allBytes, m.readerBytes)
 }
 
 func (m *eqReaderMatcher) String() string {
@@ -197,17 +196,25 @@ func TestDocumentsImportOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestDocumentsImportWithTwoDocuments(t *testing.T) {
-	expectedParams := &api.ImportDocumentsParams{
+func TestDocumentsImportWithTwoSuccessesAndOneFailure(t *testing.T) {
+	params := &api.ImportDocumentsParams{
 		Action:    pointer.Any(api.Create),
 		BatchSize: pointer.Int(40),
+		ReturnId:  pointer.Any(true),
+		ReturnDoc: pointer.Any(true),
 	}
-	expectedBody := strings.NewReader(`{"id":"123","companyName":"Stark Industries","numEmployees":5215,"country":"USA"}` +
-		"\n" + `{"id":"125","companyName":"Stark Industries","numEmployees":5215,"country":"USA"}` + "\n")
-	expectedResultString := `{"success": true, "id":"123"}` + "\n" + `{"success": false, "id":"125", "error": "Bad JSON.", "document": "[bad doc"}`
+	expectedBody := `{"id":"123","companyName":"Stark Industries","numEmployees":5215,"country":"USA"}
+{"id":"125","companyName":"Stark Industries","numEmployees":5215,"country":"USA"}
+"[bad doc"
+`
+	expectedResultString := `{"success": true, "id":"123","document": {"id":"123","companyName":"Stark Industries","numEmployees":5215,"country":"USA"}}
+{"success": true, "id":"125", "document": {"id":"125","companyName":"Stark Industries","numEmployees":5215,"country":"USA"}}
+{"success": false, "id":"", "error": "Bad JSON.", "document": "[bad doc"}
+`
 	expectedResult := []*api.ImportDocumentResponse{
-		{Success: true, Id: "123"},
-		{Success: false, Id: "125", Error: "Bad JSON.", Document: "[bad doc"},
+		{Success: true, Id: "123", Document: map[string]interface{}{"id": "123", "companyName": "Stark Industries", "numEmployees": float64(5215), "country": "USA"}},
+		{Success: true, Id: "125", Document: map[string]interface{}{"id": "125", "companyName": "Stark Industries", "numEmployees": float64(5215), "country": "USA"}},
+		{Success: false, Id: "", Error: "Bad JSON.", Document: "[bad doc"},
 	}
 
 	ctrl := gomock.NewController(t)
@@ -215,8 +222,12 @@ func TestDocumentsImportWithTwoDocuments(t *testing.T) {
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
-		ImportDocumentsWithBody(gomock.Not(gomock.Nil()),
-			"companies", expectedParams, "application/octet-stream", eqReader(expectedBody)).
+		ImportDocumentsWithBody(
+			gomock.Not(gomock.Nil()),
+			"companies",
+			params,
+			"application/octet-stream",
+			eqReader(strings.NewReader(expectedBody))).
 		Return(&http.Response{
 			StatusCode: http.StatusOK,
 			Body:       io.NopCloser(strings.NewReader(expectedResultString)),
@@ -227,10 +238,7 @@ func TestDocumentsImportWithTwoDocuments(t *testing.T) {
 	documents := []interface{}{
 		createNewDocument("123"),
 		createNewDocument("125"),
-	}
-	params := &api.ImportDocumentsParams{
-		Action:    pointer.Any(api.Create),
-		BatchSize: pointer.Int(40),
+		"[bad doc",
 	}
 	result, err := client.Collection("companies").Documents().Import(context.Background(), documents, params)
 

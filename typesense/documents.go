@@ -1,10 +1,12 @@
 package typesense
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -141,18 +143,20 @@ func (d *documents) Import(ctx context.Context, documents []interface{}, params 
 	if err != nil {
 		return nil, err
 	}
+	defer response.Close()
 
 	var result []*api.ImportDocumentResponse
-	jsonDecoder := json.NewDecoder(response)
-	for jsonDecoder.More() {
+	scanner := bufio.NewScanner(response)
+	scanner.Split(bufio.ScanLines)
+	for scanner.Scan() {
 		var docResult *api.ImportDocumentResponse
-		if err := jsonDecoder.Decode(&docResult); err != nil {
-			return result, errors.New("failed to decode result")
+		if err := json.Unmarshal(scanner.Bytes(), &docResult); err != nil {
+			return result, fmt.Errorf("failed to decode result: %w", err)
 		}
 		result = append(result, docResult)
 	}
 
-	return result, nil
+	return result, scanner.Err()
 }
 
 func (d *documents) ImportJsonl(ctx context.Context, body io.Reader, params *api.ImportDocumentsParams) (io.ReadCloser, error) {
