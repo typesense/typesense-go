@@ -27,14 +27,26 @@ func TestDocumentsImport(t *testing.T) {
 		newDocument("123"),
 		newDocument("125", withCompanyName("Company2")),
 		newDocument("127", withCompanyName("Company3")),
+		// Bad doc
+		map[string]interface{}{"bad_doc": true, "content": map[string]interface{}{"bad_field": "bad_value"}},
+		"[Bad string",
 	}
 
-	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create), DirtyValues: pointer.Any(api.CoerceOrDrop)}
+	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create), DirtyValues: pointer.Any(api.CoerceOrDrop), ReturnDoc: pointer.True(), ReturnId: pointer.True()}
 	responses, err := typesenseClient.Collection(collectionName).Documents().Import(context.Background(), documents, params)
 
 	require.NoError(t, err)
-	for _, response := range responses {
-		require.True(t, response.Success, "document import failed")
+	for i, response := range responses {
+		if i < 3 {
+			require.True(t, response.Success, "document import failed")
+
+		} else if i == 3 {
+			require.False(t, response.Success, "failed to handle bad document")
+			require.Equal(t, `{"bad_doc":true,"content":{"bad_field":"bad_value"}}`, response.Document)
+		} else {
+			require.False(t, response.Success, "failed to handle bad string")
+			require.Equal(t, `"[Bad string"`, response.Document)
+		}
 	}
 
 	results := retrieveDocuments(t, collectionName, "123", "125", "127")
