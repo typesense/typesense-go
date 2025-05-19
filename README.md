@@ -503,6 +503,21 @@ Update the generated files,
 go generate ./...
 ```
 
+Run all tests
+
+```bash
+# In Windows Powershell
+# $env:TYPESENSE_API_KEY="xyz"
+# $env:TYPESENSE_URL="http://localhost:8108"
+
+export TYPESENSE_URL="http://localhost:8108"
+export TYPESENSE_API_KEY="xyz"
+
+go test ./... -tags=integration -v
+```
+
+
+
 ## License
 
 `typesense-go` is distributed under the Apache 2 license.
