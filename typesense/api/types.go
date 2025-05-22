@@ -3,7 +3,7 @@ package api
 type ImportDocumentResponse struct {
 	Success  bool   `json:"success"`
 	Error    string `json:"error"`
-	Document string `json:"document"`
+	Document any    `json:"document"` // on success: map[string]interface{}; on error: string
 	Id       string `json:"id"`
 }
 
