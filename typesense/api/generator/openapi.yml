@@ -2605,6 +2605,11 @@ components:
             $ref: "#/components/schemas/MultiSearchResultItem"
         conversation:
           $ref: "#/components/schemas/SearchResultConversation"
+        hits:
+          type: array
+          description: The documents that matched the search query
+          items:
+            $ref: "#/components/schemas/SearchResultHit"
     MultiSearchResultItem:
       allOf:
       - $ref: "#/components/schemas/SearchResult"
