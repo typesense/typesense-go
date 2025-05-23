@@ -831,6 +831,7 @@ type MultiSearchParameters struct {
 // MultiSearchResult defines model for MultiSearchResult.
 type MultiSearchResult struct {
 	Conversation *SearchResultConversation `json:"conversation,omitempty"`
+	Hits         *[]SearchResultHit        `json:"hits,omitempty"`
 	Results      []MultiSearchResultItem   `json:"results"`
 }
 
