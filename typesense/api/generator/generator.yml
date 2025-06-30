@@ -1500,6 +1500,14 @@ components:
           description: Distance between the query vector and matching document's vector value
           format: float
           type: number
+        hybrid_search_info:
+          type: object
+          description: Metadata for hybrid search when both keyword and vector search are used
+          properties:
+            rank_fusion_score:
+              type: number
+              format: float
+              description: Combined score from rank fusion of keyword and vector results
       type: object
     SearchSynonym:
       allOf:

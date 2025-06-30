@@ -1334,8 +1334,14 @@ type SearchResultHit struct {
 	Highlight *map[string]interface{} `json:"highlight,omitempty"`
 
 	// Highlights (Deprecated) Contains highlighted portions of the search fields
-	Highlights    *[]SearchHighlight `json:"highlights,omitempty"`
-	TextMatch     *int64             `json:"text_match,omitempty"`
+	Highlights *[]SearchHighlight `json:"highlights,omitempty"`
+
+	// HybridSearchInfo Metadata for hybrid search when both keyword and vector search are used
+	HybridSearchInfo *struct {
+		// RankFusionScore Combined score from rank fusion of keyword and vector results
+		RankFusionScore *float32 `json:"rank_fusion_score,omitempty"`
+	} `json:"hybrid_search_info,omitempty"`
+	TextMatch     *int64 `json:"text_match,omitempty"`
 	TextMatchInfo *struct {
 		BestFieldScore   *string `json:"best_field_score,omitempty"`
 		BestFieldWeight  *int    `json:"best_field_weight,omitempty"`
