@@ -254,6 +254,25 @@ type ClientInterface interface {
 
 	MultiSearch(ctx context.Context, params *MultiSearchParams, body MultiSearchJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// RetrieveAllNLSearchModels request
+	RetrieveAllNLSearchModels(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateNLSearchModelWithBody request with any body
+	CreateNLSearchModelWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateNLSearchModel(ctx context.Context, body CreateNLSearchModelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteNLSearchModel request
+	DeleteNLSearchModel(ctx context.Context, modelId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RetrieveNLSearchModel request
+	RetrieveNLSearchModel(ctx context.Context, modelId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateNLSearchModelWithBody request with any body
+	UpdateNLSearchModelWithBody(ctx context.Context, modelId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateNLSearchModel(ctx context.Context, modelId string, body UpdateNLSearchModelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetSchemaChanges request
 	GetSchemaChanges(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -1016,6 +1035,90 @@ func (c *Client) MultiSearchWithBody(ctx context.Context, params *MultiSearchPar
 
 func (c *Client) MultiSearch(ctx context.Context, params *MultiSearchParams, body MultiSearchJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewMultiSearchRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RetrieveAllNLSearchModels(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrieveAllNLSearchModelsRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateNLSearchModelWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateNLSearchModelRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateNLSearchModel(ctx context.Context, body CreateNLSearchModelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateNLSearchModelRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteNLSearchModel(ctx context.Context, modelId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteNLSearchModelRequest(c.Server, modelId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RetrieveNLSearchModel(ctx context.Context, modelId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrieveNLSearchModelRequest(c.Server, modelId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateNLSearchModelWithBody(ctx context.Context, modelId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateNLSearchModelRequestWithBody(c.Server, modelId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateNLSearchModel(ctx context.Context, modelId string, body UpdateNLSearchModelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateNLSearchModelRequest(c.Server, modelId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2896,6 +2999,38 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 		if params.MinLen2typo != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "min_len_2typo", runtime.ParamLocationQuery, *params.MinLen2typo); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.NlModelId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "nl_model_id", runtime.ParamLocationQuery, *params.NlModelId); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.NlQuery != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "nl_query", runtime.ParamLocationQuery, *params.NlQuery); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -4921,6 +5056,38 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 		}
 
+		if params.NlModelId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "nl_model_id", runtime.ParamLocationQuery, *params.NlModelId); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.NlQuery != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "nl_query", runtime.ParamLocationQuery, *params.NlQuery); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.NumTypos != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "num_typos", runtime.ParamLocationQuery, *params.NumTypos); err != nil {
@@ -5389,6 +5556,188 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 	}
 
 	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRetrieveAllNLSearchModelsRequest generates requests for RetrieveAllNLSearchModels
+func NewRetrieveAllNLSearchModelsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/nl_search_models")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateNLSearchModelRequest calls the generic CreateNLSearchModel builder with application/json body
+func NewCreateNLSearchModelRequest(server string, body CreateNLSearchModelJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateNLSearchModelRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateNLSearchModelRequestWithBody generates requests for CreateNLSearchModel with any type of body
+func NewCreateNLSearchModelRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/nl_search_models")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteNLSearchModelRequest generates requests for DeleteNLSearchModel
+func NewDeleteNLSearchModelRequest(server string, modelId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "modelId", runtime.ParamLocationPath, modelId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/nl_search_models/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRetrieveNLSearchModelRequest generates requests for RetrieveNLSearchModel
+func NewRetrieveNLSearchModelRequest(server string, modelId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "modelId", runtime.ParamLocationPath, modelId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/nl_search_models/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateNLSearchModelRequest calls the generic UpdateNLSearchModel builder with application/json body
+func NewUpdateNLSearchModelRequest(server string, modelId string, body UpdateNLSearchModelJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateNLSearchModelRequestWithBody(server, modelId, "application/json", bodyReader)
+}
+
+// NewUpdateNLSearchModelRequestWithBody generates requests for UpdateNLSearchModel with any type of body
+func NewUpdateNLSearchModelRequestWithBody(server string, modelId string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "modelId", runtime.ParamLocationPath, modelId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/nl_search_models/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
@@ -6134,6 +6483,25 @@ type ClientWithResponsesInterface interface {
 	MultiSearchWithBodyWithResponse(ctx context.Context, params *MultiSearchParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*MultiSearchResponse, error)
 
 	MultiSearchWithResponse(ctx context.Context, params *MultiSearchParams, body MultiSearchJSONRequestBody, reqEditors ...RequestEditorFn) (*MultiSearchResponse, error)
+
+	// RetrieveAllNLSearchModelsWithResponse request
+	RetrieveAllNLSearchModelsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllNLSearchModelsResponse, error)
+
+	// CreateNLSearchModelWithBodyWithResponse request with any body
+	CreateNLSearchModelWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNLSearchModelResponse, error)
+
+	CreateNLSearchModelWithResponse(ctx context.Context, body CreateNLSearchModelJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNLSearchModelResponse, error)
+
+	// DeleteNLSearchModelWithResponse request
+	DeleteNLSearchModelWithResponse(ctx context.Context, modelId string, reqEditors ...RequestEditorFn) (*DeleteNLSearchModelResponse, error)
+
+	// RetrieveNLSearchModelWithResponse request
+	RetrieveNLSearchModelWithResponse(ctx context.Context, modelId string, reqEditors ...RequestEditorFn) (*RetrieveNLSearchModelResponse, error)
+
+	// UpdateNLSearchModelWithBodyWithResponse request with any body
+	UpdateNLSearchModelWithBodyWithResponse(ctx context.Context, modelId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateNLSearchModelResponse, error)
+
+	UpdateNLSearchModelWithResponse(ctx context.Context, modelId string, body UpdateNLSearchModelJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateNLSearchModelResponse, error)
 
 	// GetSchemaChangesWithResponse request
 	GetSchemaChangesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSchemaChangesResponse, error)
@@ -7222,6 +7590,121 @@ func (r MultiSearchResponse) StatusCode() int {
 	return 0
 }
 
+type RetrieveAllNLSearchModelsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *[]NLSearchModelSchema
+}
+
+// Status returns HTTPResponse.Status
+func (r RetrieveAllNLSearchModelsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetrieveAllNLSearchModelsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateNLSearchModelResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *NLSearchModelSchema
+	JSON400      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateNLSearchModelResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateNLSearchModelResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteNLSearchModelResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *NLSearchModelDeleteSchema
+	JSON404      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteNLSearchModelResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteNLSearchModelResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RetrieveNLSearchModelResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *NLSearchModelSchema
+	JSON404      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r RetrieveNLSearchModelResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetrieveNLSearchModelResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateNLSearchModelResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *NLSearchModelSchema
+	JSON400      *ApiResponse
+	JSON404      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateNLSearchModelResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateNLSearchModelResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type GetSchemaChangesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -8086,6 +8569,67 @@ func (c *ClientWithResponses) MultiSearchWithResponse(ctx context.Context, param
 		return nil, err
 	}
 	return ParseMultiSearchResponse(rsp)
+}
+
+// RetrieveAllNLSearchModelsWithResponse request returning *RetrieveAllNLSearchModelsResponse
+func (c *ClientWithResponses) RetrieveAllNLSearchModelsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllNLSearchModelsResponse, error) {
+	rsp, err := c.RetrieveAllNLSearchModels(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetrieveAllNLSearchModelsResponse(rsp)
+}
+
+// CreateNLSearchModelWithBodyWithResponse request with arbitrary body returning *CreateNLSearchModelResponse
+func (c *ClientWithResponses) CreateNLSearchModelWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNLSearchModelResponse, error) {
+	rsp, err := c.CreateNLSearchModelWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateNLSearchModelResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateNLSearchModelWithResponse(ctx context.Context, body CreateNLSearchModelJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNLSearchModelResponse, error) {
+	rsp, err := c.CreateNLSearchModel(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateNLSearchModelResponse(rsp)
+}
+
+// DeleteNLSearchModelWithResponse request returning *DeleteNLSearchModelResponse
+func (c *ClientWithResponses) DeleteNLSearchModelWithResponse(ctx context.Context, modelId string, reqEditors ...RequestEditorFn) (*DeleteNLSearchModelResponse, error) {
+	rsp, err := c.DeleteNLSearchModel(ctx, modelId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteNLSearchModelResponse(rsp)
+}
+
+// RetrieveNLSearchModelWithResponse request returning *RetrieveNLSearchModelResponse
+func (c *ClientWithResponses) RetrieveNLSearchModelWithResponse(ctx context.Context, modelId string, reqEditors ...RequestEditorFn) (*RetrieveNLSearchModelResponse, error) {
+	rsp, err := c.RetrieveNLSearchModel(ctx, modelId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetrieveNLSearchModelResponse(rsp)
+}
+
+// UpdateNLSearchModelWithBodyWithResponse request with arbitrary body returning *UpdateNLSearchModelResponse
+func (c *ClientWithResponses) UpdateNLSearchModelWithBodyWithResponse(ctx context.Context, modelId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateNLSearchModelResponse, error) {
+	rsp, err := c.UpdateNLSearchModelWithBody(ctx, modelId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateNLSearchModelResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateNLSearchModelWithResponse(ctx context.Context, modelId string, body UpdateNLSearchModelJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateNLSearchModelResponse, error) {
+	rsp, err := c.UpdateNLSearchModel(ctx, modelId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateNLSearchModelResponse(rsp)
 }
 
 // GetSchemaChangesWithResponse request returning *GetSchemaChangesResponse
@@ -9684,6 +10228,171 @@ func ParseMultiSearchResponse(rsp *http.Response) (*MultiSearchResponse, error) 
 			return nil, err
 		}
 		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetrieveAllNLSearchModelsResponse parses an HTTP response from a RetrieveAllNLSearchModelsWithResponse call
+func ParseRetrieveAllNLSearchModelsResponse(rsp *http.Response) (*RetrieveAllNLSearchModelsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetrieveAllNLSearchModelsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []NLSearchModelSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateNLSearchModelResponse parses an HTTP response from a CreateNLSearchModelWithResponse call
+func ParseCreateNLSearchModelResponse(rsp *http.Response) (*CreateNLSearchModelResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateNLSearchModelResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest NLSearchModelSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteNLSearchModelResponse parses an HTTP response from a DeleteNLSearchModelWithResponse call
+func ParseDeleteNLSearchModelResponse(rsp *http.Response) (*DeleteNLSearchModelResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteNLSearchModelResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest NLSearchModelDeleteSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetrieveNLSearchModelResponse parses an HTTP response from a RetrieveNLSearchModelWithResponse call
+func ParseRetrieveNLSearchModelResponse(rsp *http.Response) (*RetrieveNLSearchModelResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetrieveNLSearchModelResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest NLSearchModelSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateNLSearchModelResponse parses an HTTP response from a UpdateNLSearchModelWithResponse call
+func ParseUpdateNLSearchModelResponse(rsp *http.Response) (*UpdateNLSearchModelResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateNLSearchModelResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest NLSearchModelSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
 
 	}
 
