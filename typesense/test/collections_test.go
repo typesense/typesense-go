@@ -44,7 +44,7 @@ func TestCollectionsRetrieve(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	result, err := typesenseClient.Collections().Retrieve(context.Background())
+	result, err := typesenseClient.Collections().Retrieve(context.Background(), &api.GetCollectionsParams{})
 
 	require.NoError(t, err)
 	require.True(t, len(result) >= total, "number of collections is invalid")
@@ -57,5 +57,14 @@ func TestCollectionsRetrieve(t *testing.T) {
 
 	for k, v := range expectedResult {
 		assert.Equal(t, v, resultMap[k])
+	}
+
+	exclude := "fields"
+	excluded, err := typesenseClient.Collections().Retrieve(context.Background(), &api.GetCollectionsParams{
+		ExcludeFields: &exclude,
+	})
+	require.NoError(t, err)
+	for _, collection := range excluded {
+		assert.Empty(t, collection.Fields)
 	}
 }

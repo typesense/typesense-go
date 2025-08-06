@@ -9,7 +9,7 @@ import (
 // CollectionsInterface is a type for Collections API operations
 type CollectionsInterface interface {
 	Create(ctx context.Context, schema *api.CollectionSchema) (*api.CollectionResponse, error)
-	Retrieve(ctx context.Context) ([]*api.CollectionResponse, error)
+	Retrieve(ctx context.Context, params *api.GetCollectionsParams) ([]*api.CollectionResponse, error)
 }
 
 // collections is internal implementation of CollectionsInterface
@@ -29,8 +29,8 @@ func (c *collections) Create(ctx context.Context, schema *api.CollectionSchema) 
 	return response.JSON201, nil
 }
 
-func (c *collections) Retrieve(ctx context.Context) ([]*api.CollectionResponse, error) {
-	response, err := c.apiClient.GetCollectionsWithResponse(ctx)
+func (c *collections) Retrieve(ctx context.Context, params *api.GetCollectionsParams) ([]*api.CollectionResponse, error) {
+	response, err := c.apiClient.GetCollectionsWithResponse(ctx, params)
 	if err != nil {
 		return nil, err
 	}

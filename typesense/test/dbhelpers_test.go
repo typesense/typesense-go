@@ -39,6 +39,9 @@ func newSchema(collectionName string) *api.CollectionSchema {
 				Optional: pointer.True(),
 			},
 		},
+		Metadata: &map[string]interface{}{
+			"revision": "1",
+		},
 	}
 }
 
@@ -47,45 +50,45 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 		Name: name,
 		Fields: []api.Field{
 			{
-				Name:     "company_name",
-				Type:     "string",
-				Facet:    pointer.False(),
-				Optional: pointer.False(),
-				Index:    pointer.True(),
-				Infix:    pointer.False(),
-				Locale:   pointer.String(""),
-				Sort:     pointer.False(),
-				Drop:     nil,
-				Store:    pointer.True(),
-				Stem:     pointer.False(),
+				Name:           "company_name",
+				Type:           "string",
+				Facet:          pointer.False(),
+				Optional:       pointer.False(),
+				Index:          pointer.True(),
+				Infix:          pointer.False(),
+				Locale:         pointer.String(""),
+				Sort:           pointer.False(),
+				Drop:           nil,
+				Store:          pointer.True(),
+				Stem:           pointer.False(),
 				StemDictionary: pointer.String(""),
 			},
 			{
-				Name:     "num_employees",
-				Type:     "int32",
-				Facet:    pointer.False(),
-				Optional: pointer.False(),
-				Index:    pointer.True(),
-				Infix:    pointer.False(),
-				Locale:   pointer.String(""),
-				Sort:     pointer.True(),
-				Drop:     nil,
-				Store:    pointer.True(),
-				Stem:     pointer.False(),
+				Name:           "num_employees",
+				Type:           "int32",
+				Facet:          pointer.False(),
+				Optional:       pointer.False(),
+				Index:          pointer.True(),
+				Infix:          pointer.False(),
+				Locale:         pointer.String(""),
+				Sort:           pointer.True(),
+				Drop:           nil,
+				Store:          pointer.True(),
+				Stem:           pointer.False(),
 				StemDictionary: pointer.String(""),
 			},
 			{
-				Name:     "country",
-				Type:     "string",
-				Facet:    pointer.True(),
-				Optional: pointer.True(),
-				Index:    pointer.True(),
-				Infix:    pointer.False(),
-				Locale:   pointer.String(""),
-				Sort:     pointer.False(),
-				Drop:     nil,
-				Store:    pointer.True(),
-				Stem:     pointer.False(),
+				Name:           "country",
+				Type:           "string",
+				Facet:          pointer.True(),
+				Optional:       pointer.True(),
+				Index:          pointer.True(),
+				Infix:          pointer.False(),
+				Locale:         pointer.String(""),
+				Sort:           pointer.False(),
+				Drop:           nil,
+				Store:          pointer.True(),
+				Stem:           pointer.False(),
 				StemDictionary: pointer.String(""),
 			},
 		},
@@ -95,6 +98,9 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 		SymbolsToIndex:      &[]string{},
 		NumDocuments:        pointer.Int64(0),
 		CreatedAt:           pointer.Int64(0),
+		Metadata: &map[string]interface{}{
+			"revision": "1",
+		},
 	}
 }
 
@@ -193,8 +199,6 @@ func newKey() *api.ApiKey {
 		ExpiresAt:   pointer.Int64(time.Now().Add(1 * time.Hour).Unix()),
 	}
 }
-
-type newSearchOverrideSchemaOption func(*api.SearchOverrideSchema)
 
 func newSearchOverrideSchema() *api.SearchOverrideSchema {
 	schema := &api.SearchOverrideSchema{

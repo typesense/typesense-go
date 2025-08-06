@@ -77,6 +77,8 @@ func main() {
 	// Unwrapping delete document parameters
 	log.Println("Unwrapping documents delete parameters")
 	unwrapDeleteDocument(&m)
+	log.Println("Unwrapping collections get parameters")
+	unwrapGetCollections(&m)
 	// Remove additionalProperties from SearchResultHit -> document
 	log.Println("Removing additionalProperties from SearchResultHit")
 	searchResultHit(&m)
@@ -272,6 +274,22 @@ func unwrapMultiSearchParameters(m *yml) {
 
 	parameters = parameters[1:]
 	(*m)["paths"].(yml)["/multi_search"].(yml)["post"].(yml)["parameters"] = parameters
+}
+
+func unwrapGetCollections(m *yml) {
+	parameters := (*m)["paths"].(yml)["/collections"].(yml)["get"].(yml)["parameters"].([]interface{})
+	deleteParameters := parameters[0].(yml)["schema"].(yml)["properties"].(yml)
+	for _, obj := range sortedSlice(deleteParameters) {
+		newMap := make(yml)
+		newMap["name"] = obj.Key
+		newMap["in"] = query
+		newMap["schema"] = make(yml)
+		newMap["schema"].(yml)["type"] = obj.Value.(yml)["type"].(string)
+		// newMap["schema"].(yml)["description"] = obj.Value.(yml)["description"].(string)
+		parameters = append(parameters, newMap)
+	}
+	parameters = parameters[1:]
+	(*m)["paths"].(yml)["/collections"].(yml)["get"].(yml)["parameters"] = parameters
 }
 
 func oAPICodeGen() {

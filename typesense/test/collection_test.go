@@ -46,6 +46,9 @@ func TestCollectionUpdate(t *testing.T) {
 				Drop: pointer.True(),
 			},
 		},
+		Metadata: &map[string]interface{}{
+			"revision": "2",
+		},
 	}
 
 	result, err := typesenseClient.Collection(collectionName).Update(context.Background(), updateSchema)
@@ -53,4 +56,5 @@ func TestCollectionUpdate(t *testing.T) {
 	require.Equal(t, 1, len(result.Fields))
 	require.Equal(t, "country", result.Fields[0].Name)
 	require.Equal(t, pointer.True(), result.Fields[0].Drop)
+	require.Equal(t, "2", (*result.Metadata)["revision"].(string))
 }
