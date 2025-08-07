@@ -56,8 +56,7 @@ func main() {
 		return
 	}
 
-	decoder := yaml.NewDecoder(configFile)
-	err = decoder.Decode(&m)
+	err = yaml.NewDecoder(configFile).Decode(&m)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
