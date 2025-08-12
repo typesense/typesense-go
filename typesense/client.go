@@ -123,6 +123,7 @@ type ClientConfig struct {
 	CircuitBreakerTimeout       time.Duration
 	CircuitBreakerReadyToTrip   circuit.GoBreakerReadyToTripFunc
 	CircuitBreakerOnStateChange circuit.GoBreakerOnStateChangeFunc
+	CustomHTTPClient            *http.Client
 }
 
 type ClientOption func(*Client)
@@ -272,6 +273,12 @@ func WithClientConfig(config *ClientConfig) ClientOption {
 	}
 }
 
+func WithCustomHTTPClient(client *http.Client) ClientOption {
+	return func(c *Client) {
+		c.apiConfig.CustomHTTPClient = client
+	}
+}
+
 func NewClient(opts ...ClientOption) *Client {
 	c := &Client{apiConfig: &ClientConfig{
 		RetryInterval:             defaultRetryInterval,
@@ -296,12 +303,16 @@ func NewClient(opts ...ClientOption) *Client {
 			circuit.WithGoBreakerReadyToTrip(c.apiConfig.CircuitBreakerReadyToTrip),
 			circuit.WithGoBreakerOnStateChange(c.apiConfig.CircuitBreakerOnStateChange),
 		)
+		client := c.apiConfig.CustomHTTPClient
+		if client == nil {
+			client = &http.Client{
+				Timeout: c.apiConfig.ConnectionTimeout,
+			}
+		}
 		httpClient := circuit.NewHTTPClient(
 			circuit.WithHTTPRequestDoer(
 				NewAPICall(
-					&http.Client{
-						Timeout: c.apiConfig.ConnectionTimeout,
-					},
+					client,
 					c.apiConfig,
 				)),
 			circuit.WithCircuitBreaker(cb),
