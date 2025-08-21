@@ -156,8 +156,6 @@ func TestCollectionSearchWithPreset(t *testing.T) {
 		newDocument("123", withCompanyName("Company 1"), withNumEmployees(50)),
 		newDocument("125", withCompanyName("Company 2"), withNumEmployees(150)),
 		newDocument("127", withCompanyName("Company 3"), withNumEmployees(250)),
-		newDocument("129", withCompanyName("Stark Industries 4"), withNumEmployees(500)),
-		newDocument("131", withCompanyName("Stark Industries 5"), withNumEmployees(1000)),
 	}
 
 	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create)}
