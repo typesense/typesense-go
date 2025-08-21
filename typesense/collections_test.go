@@ -130,7 +130,7 @@ func TestCollectionsRetrieve(t *testing.T) {
 	assert.Nil(t, copier.Copy(&mockedResult, &expectedResult))
 
 	mockAPIClient.EXPECT().
-		GetCollectionsWithResponse(gomock.Not(gomock.Nil())).
+		GetCollectionsWithResponse(gomock.Not(gomock.Nil()), gomock.Nil()).
 		Return(&api.GetCollectionsResponse{
 			JSON200: &mockedResult,
 		}, nil).
@@ -149,7 +149,7 @@ func TestCollectionsRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
-		GetCollectionsWithResponse(gomock.Not(gomock.Nil())).
+		GetCollectionsWithResponse(gomock.Not(gomock.Nil()), gomock.Nil()).
 		Return(nil, errors.New("failed request")).
 		Times(1)
 
@@ -164,7 +164,7 @@ func TestCollectionsRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
-		GetCollectionsWithResponse(gomock.Not(gomock.Nil())).
+		GetCollectionsWithResponse(gomock.Not(gomock.Nil()), gomock.Nil()).
 		Return(&api.GetCollectionsResponse{
 			HTTPResponse: &http.Response{
 				StatusCode: 500,

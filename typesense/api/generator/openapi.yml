@@ -3,6 +3,22 @@ info:
   title: Typesense API
   description: "An open source search engine for building delightful search experiences."
   version: '28.0'
+  license:
+    name: GPL-3.0
+    url: https://opensource.org/licenses/GPL-3.0
+servers:
+  - url: "{protocol}://{hostname}:{port}"
+    description: Typesense Server
+    variables:
+      protocol:
+        default: http
+        description: The protocol of your Typesense server
+      hostname:
+        default: localhost
+        description: The hostname of your Typesense server
+      port:
+        default: "8108"
+        description: The port of your Typesense server
 externalDocs:
   description: Find out more about Typsesense
   url: https://typesense.org
@@ -66,6 +82,12 @@ tags:
     externalDocs:
       description: Find out more
       url: https://typesense.org/docs/28.0/api/stemming.html
+  - name: nl_search_models
+    description: Manage NL search models
+    externalDocs:
+      description: Find out more
+      url: https://typesense.org/docs/29.0/api/natural-language-search.html
+
 paths:
   /collections:
     get:
@@ -77,6 +99,23 @@ paths:
         returned sorted by creation date, with the most recent collections appearing
         first.
       operationId: getCollections
+      parameters:
+        - name: getCollectionsParameters
+          in: query
+          schema:
+            type: object
+            properties:
+              exclude_fields:
+                description: Comma-separated list of fields from the collection to exclude from the response
+                type: string
+              limit:
+                description: >
+                  Number of collections to fetch.
+                  Default: returns all collections.
+                type: integer
+              offset:
+                description: Identifies the starting point to return collections when paginating.
+                type: integer
       responses:
         '200':
           description: List of all collections
@@ -930,6 +969,7 @@ paths:
       tags:
         - conversations
     post:
+      summary: Create a conversation model
       description: Create a Conversation Model
       operationId: createConversationModel
       requestBody:
@@ -1734,7 +1774,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PresetSchema'
         '400':
-          description: Bad request, see error message for details.
+          description: Bad request, see error message for details
           content:
             application/json:
               schema:
@@ -1857,6 +1897,141 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
+  /nl_search_models:
+    get:
+      tags:
+        - nl_search_models
+      summary: List all NL search models
+      description: Retrieve all NL search models.
+      operationId: retrieveAllNLSearchModels
+      responses:
+        '200':
+          description: List of all NL search models
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NLSearchModelSchema'
+    post:
+      tags:
+        - nl_search_models
+      summary: Create a NL search model
+      description: Create a new NL search model.
+      operationId: createNLSearchModel
+      requestBody:
+        description: The NL search model to be created
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NLSearchModelCreateSchema'
+        required: true
+      responses:
+        '201':
+          description: NL search model successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NLSearchModelSchema'
+        '400':
+          description: Bad request, see error message for details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /nl_search_models/{modelId}:
+    get:
+      tags:
+        - nl_search_models
+      summary: Retrieve a NL search model
+      description: Retrieve a specific NL search model by its ID.
+      operationId: retrieveNLSearchModel
+      parameters:
+        - name: modelId
+          in: path
+          description: The ID of the NL search model to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: NL search model fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NLSearchModelSchema'
+        '404':
+          description: NL search model not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    put:
+      tags:
+        - nl_search_models
+      summary: Update a NL search model
+      description: Update an existing NL search model.
+      operationId: updateNLSearchModel
+      parameters:
+        - name: modelId
+          in: path
+          description: The ID of the NL search model to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The NL search model fields to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NLSearchModelUpdateSchema'
+        required: true
+      responses:
+        '200':
+          description: NL search model successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NLSearchModelSchema'
+        '400':
+          description: Bad request, see error message for details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: NL search model not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    delete:
+      tags:
+        - nl_search_models
+      summary: Delete a NL search model
+      description: Delete a specific NL search model by its ID.
+      operationId: deleteNLSearchModel
+      parameters:
+        - name: modelId
+          in: path
+          description: The ID of the NL search model to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: NL search model successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NLSearchModelDeleteSchema'
+        '404':
+          description: NL search model not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
 components:
   schemas:
     CollectionSchema:
@@ -1924,6 +2099,10 @@ components:
           default: []
         voice_query_model:
           $ref: "#/components/schemas/VoiceQueryModelCollectionConfig"
+        metadata:
+          type: object
+          description: >
+            Optional details about the collection, e.g., when it was created, who created it etc.
     CollectionUpdateSchema:
       required:
         - fields
@@ -1944,6 +2123,10 @@ components:
               facet: true
           items:
             $ref: "#/components/schemas/Field"
+        metadata:
+          type: object
+          description: >
+            Optional details about the collection, e.g., when it was created, who created it etc.
     CollectionResponse:
       allOf:
         - $ref: "#/components/schemas/CollectionSchema"
@@ -2156,25 +2339,32 @@ components:
           items:
             $ref: "#/components/schemas/SearchResultHit"
         request_params:
-          type: object
-          required:
-            - collection_name
-            - q
-            - per_page
-          properties:
-            collection_name:
-              type: string
-            q:
-              type: string
-            per_page:
-              type: integer
-            voice_query:
-              type: object
-              properties:
-                transcribed_query:
-                  type: string
+            $ref: "#/components/schemas/SearchRequestParams"
         conversation:
           $ref: "#/components/schemas/SearchResultConversation"
+        union_request_params:
+          type: array
+          description: Returned only for union query response.
+          items:
+            $ref: "#/components/schemas/SearchRequestParams"
+    SearchRequestParams:
+      type: object
+      required:
+        - collection_name
+        - q
+        - per_page
+      properties:
+        collection_name:
+          type: string
+        q:
+          type: string
+        per_page:
+          type: integer
+        voice_query:
+          type: object
+          properties:
+            transcribed_query:
+              type: string
     SearchResultConversation:
       type: object
       required:
@@ -2257,6 +2447,17 @@ components:
           type: number
           format: float
           description: Distance between the query vector and matching document's vector value
+        hybrid_search_info:
+          type: object
+          description: Information about hybrid search scoring
+          properties:
+            rank_fusion_score:
+              type: number
+              format: float
+              description: Combined score from rank fusion of text and vector search
+        search_index:
+          type: integer
+          description: Returned only for union query response. Indicates the index of the query which this document matched to.
       example:
         highlights:
           company_name:
@@ -2576,24 +2777,6 @@ components:
           x-go-type: "[]*ApiKey"
           items:
             $ref: "#/components/schemas/ApiKey"
-    ScopedKeyParameters:
-      type: object
-      properties:
-        filter_by:
-          type: string
-        expires_at:
-          type: integer
-          format: int64
-    SnapshotParameters:
-      type: object
-      properties:
-        snapshot_path:
-          type: string
-    ErrorResponse:
-      type: object
-      properties:
-        message:
-          type: string
     MultiSearchResult:
       type: object
       required:
@@ -2629,6 +2812,14 @@ components:
         query_by:
           description: A list of `string` fields that should be queried
             against. Multiple fields are separated with a comma.
+          type: string
+
+        nl_query:
+          description: Whether to use natural language processing to parse the query.
+          type: boolean
+
+        nl_model_id:
+          description: The ID of the natural language model to use.
           type: string
 
         query_by_weights:
@@ -3382,6 +3573,7 @@ components:
       properties:
         union:
           type: boolean
+          default: false
           description: When true, merges the search results from each search query into a single ordered set of hits.
         searches:
           type: array
@@ -3672,12 +3864,6 @@ components:
       properties:
         name:
           type: string
-    # client libraries already have .create, .upsert,... methods so we omit the `action` param
-    DocumentIndexParameters:
-      type: object
-      properties:
-        dirty_values:
-          $ref: "#/components/schemas/DirtyValues"
     DirtyValues:
       type: string
       enum: [coerce_or_reject, coerce_or_drop, drop, reject]
@@ -3783,6 +3969,98 @@ components:
                 type: string
                 description: The root form of the word
                 example: person
+    NLSearchModelBase:
+      type: object
+      properties:
+        model_name:
+          type: string
+          description: Name of the NL model to use
+        api_key:
+          type: string
+          description: API key for the NL model service
+        api_url:
+          type: string
+          description: Custom API URL for the NL model service
+        max_bytes:
+          type: integer
+          description: Maximum number of bytes to process
+        temperature:
+          type: number
+          description: Temperature parameter for the NL model
+        system_prompt:
+          type: string
+          description: System prompt for the NL model
+        top_p:
+          type: number
+          description: Top-p parameter for the NL model (Google-specific)
+        top_k:
+          type: integer
+          description: Top-k parameter for the NL model (Google-specific)
+        stop_sequences:
+          type: array
+          items:
+            type: string
+          description: Stop sequences for the NL model (Google-specific)
+        api_version:
+          type: string
+          description: API version for the NL model service
+        project_id:
+          type: string
+          description: Project ID for GCP Vertex AI
+        access_token:
+          type: string
+          description: Access token for GCP Vertex AI
+        refresh_token:
+          type: string
+          description: Refresh token for GCP Vertex AI
+        client_id:
+          type: string
+          description: Client ID for GCP Vertex AI
+        client_secret:
+          type: string
+          description: Client secret for GCP Vertex AI
+        region:
+          type: string
+          description: Region for GCP Vertex AI
+        max_output_tokens:
+          type: integer
+          description: Maximum output tokens for GCP Vertex AI
+        account_id:
+          type: string
+          description: Account ID for Cloudflare-specific models
+
+    NLSearchModelCreateSchema:
+      allOf:
+        - $ref: '#/components/schemas/NLSearchModelBase'
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Optional ID for the NL search model
+
+    NLSearchModelSchema:
+      allOf:
+        - $ref: '#/components/schemas/NLSearchModelCreateSchema'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+              description: ID of the NL search model
+
+    NLSearchModelUpdateSchema:
+      $ref: '#/components/schemas/NLSearchModelCreateSchema'
+
+    NLSearchModelDeleteSchema:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: ID of the deleted NL search model
+
   securitySchemes:
     api_key_header:
       type: apiKey
