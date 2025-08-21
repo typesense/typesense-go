@@ -30,7 +30,7 @@ func (c *collections) Create(ctx context.Context, schema *api.CollectionSchema) 
 }
 
 func (c *collections) Retrieve(ctx context.Context) ([]*api.CollectionResponse, error) {
-	response, err := c.apiClient.GetCollectionsWithResponse(ctx)
+	response, err := c.apiClient.GetCollectionsWithResponse(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
