@@ -10328,7 +10328,7 @@ func ParseCreateNLSearchModelResponse(rsp *http.Response) (*CreateNLSearchModelR
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && (rsp.StatusCode == 200 || rsp.StatusCode == 201):
 		var dest NLSearchModelSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
