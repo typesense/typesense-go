@@ -76,6 +76,14 @@ func (c *Client) Preset(presetName string) PresetInterface {
 	return &preset{apiClient: c.apiClient, presetName: presetName}
 }
 
+func (c *Client) NLSearchModels() NLSearchModelsInterface {
+	return &nlSearchModels{apiClient: c.apiClient}
+}
+
+func (c *Client) NLSearchModel(modelID string) NLSearchModelInterface {
+	return &nlSearchModel{apiClient: c.apiClient, modelID: modelID}
+}
+
 func (c *Client) Stopwords() StopwordsInterface {
 	return &stopwords{apiClient: c.apiClient}
 }
