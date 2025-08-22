@@ -22,6 +22,7 @@ type Client struct {
 	collections CollectionsInterface
 	aliases     AliasesInterface
 	MultiSearch MultiSearchInterface
+	synonymSets SynonymSetsInterface
 }
 
 func (c *Client) Collections() CollectionsInterface {
@@ -82,6 +83,14 @@ func (c *Client) NLSearchModels() NLSearchModelsInterface {
 
 func (c *Client) NLSearchModel(modelID string) NLSearchModelInterface {
 	return &nlSearchModel{apiClient: c.apiClient, modelID: modelID}
+}
+
+func (c *Client) SynonymSets() SynonymSetsInterface {
+	return c.synonymSets
+}
+
+func (c *Client) SynonymSet(synonymSetName string) SynonymSetInterface {
+	return &synonymSet{apiClient: c.apiClient, synonymSetName: synonymSetName}
 }
 
 func (c *Client) Stopwords() StopwordsInterface {
@@ -335,5 +344,6 @@ func NewClient(opts ...ClientOption) *Client {
 	c.collections = &collections{c.apiClient}
 	c.aliases = &aliases{c.apiClient}
 	c.MultiSearch = &multiSearch{c.apiClient}
+	c.synonymSets = &synonymSets{c.apiClient}
 	return c
 }
