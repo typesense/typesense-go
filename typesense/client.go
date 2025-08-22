@@ -3,6 +3,7 @@
 package typesense
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -107,6 +108,11 @@ func (c *Client) Stats() StatsInterface {
 
 func (c *Client) Metrics() MetricsInterface {
 	return &metrics{apiClient: c.apiClient}
+}
+
+// Debug retrieves debug information from the Typesense server
+func (c *Client) Debug(ctx context.Context) (*api.DebugResponse, error) {
+	return c.apiClient.DebugWithResponse(ctx)
 }
 
 type HTTPError struct {
