@@ -220,6 +220,9 @@ type CollectionResponse struct {
 	// SymbolsToIndex List of symbols or special characters to be indexed.
 	SymbolsToIndex *[]string `json:"symbols_to_index,omitempty"`
 
+	// SynonymSets List of synonym set names to associate with this collection
+	SynonymSets *[]string `json:"synonym_sets,omitempty"`
+
 	// TokenSeparators List of symbols or special characters to be used for splitting the text into individual words in addition to space and new-line characters.
 	TokenSeparators *[]string `json:"token_separators,omitempty"`
 
@@ -247,6 +250,9 @@ type CollectionSchema struct {
 	// SymbolsToIndex List of symbols or special characters to be indexed.
 	SymbolsToIndex *[]string `json:"symbols_to_index,omitempty"`
 
+	// SynonymSets List of synonym set names to associate with this collection
+	SynonymSets *[]string `json:"synonym_sets,omitempty"`
+
 	// TokenSeparators List of symbols or special characters to be used for splitting the text into individual words in addition to space and new-line characters.
 	TokenSeparators *[]string `json:"token_separators,omitempty"`
 
@@ -261,6 +267,9 @@ type CollectionUpdateSchema struct {
 
 	// Metadata Optional details about the collection, e.g., when it was created, who created it etc.
 	Metadata *map[string]interface{} `json:"metadata,omitempty"`
+
+	// SynonymSets List of synonym set names to associate with this collection
+	SynonymSets *[]string `json:"synonym_sets,omitempty"`
 }
 
 // ConversationModelCreateSchema defines model for ConversationModelCreateSchema.
@@ -1461,6 +1470,9 @@ type SearchParameters struct {
 	// SynonymPrefix Allow synonym resolution on word prefixes in the query. Default: false
 	SynonymPrefix *bool `json:"synonym_prefix,omitempty"`
 
+	// SynonymSets List of synonym set names to associate with this search query
+	SynonymSets *string `json:"synonym_sets,omitempty"`
+
 	// TextMatchType In a multi-field matching context, this parameter determines how the representative text match score of a record is calculated. Possible values are max_score (default) or max_weight.
 	TextMatchType *string `json:"text_match_type,omitempty"`
 
@@ -1562,49 +1574,6 @@ type SearchResultHit struct {
 	VectorDistance *float32 `json:"vector_distance,omitempty"`
 }
 
-// SearchSynonym defines model for SearchSynonym.
-type SearchSynonym struct {
-	Id *string `json:"id,omitempty"`
-
-	// Locale Locale for the synonym, leave blank to use the standard tokenizer.
-	Locale *string `json:"locale,omitempty"`
-
-	// Root For 1-way synonyms, indicates the root word that words in the `synonyms` parameter map to.
-	Root *string `json:"root,omitempty"`
-
-	// SymbolsToIndex By default, special characters are dropped from synonyms. Use this attribute to specify which special characters should be indexed as is.
-	SymbolsToIndex *[]string `json:"symbols_to_index,omitempty"`
-
-	// Synonyms Array of words that should be considered as synonyms.
-	Synonyms []string `json:"synonyms"`
-}
-
-// SearchSynonymDeleteResponse defines model for SearchSynonymDeleteResponse.
-type SearchSynonymDeleteResponse struct {
-	// Id The id of the synonym that was deleted
-	Id string `json:"id"`
-}
-
-// SearchSynonymSchema defines model for SearchSynonymSchema.
-type SearchSynonymSchema struct {
-	// Locale Locale for the synonym, leave blank to use the standard tokenizer.
-	Locale *string `json:"locale,omitempty"`
-
-	// Root For 1-way synonyms, indicates the root word that words in the `synonyms` parameter map to.
-	Root *string `json:"root,omitempty"`
-
-	// SymbolsToIndex By default, special characters are dropped from synonyms. Use this attribute to specify which special characters should be indexed as is.
-	SymbolsToIndex *[]string `json:"symbols_to_index,omitempty"`
-
-	// Synonyms Array of words that should be considered as synonyms.
-	Synonyms []string `json:"synonyms"`
-}
-
-// SearchSynonymsResponse defines model for SearchSynonymsResponse.
-type SearchSynonymsResponse struct {
-	Synonyms []*SearchSynonym `json:"synonyms"`
-}
-
 // StemmingDictionary defines model for StemmingDictionary.
 type StemmingDictionary struct {
 	// Id Unique identifier for the dictionary
@@ -1646,6 +1615,48 @@ type StopwordsSetsRetrieveAllSchema struct {
 // SuccessStatus defines model for SuccessStatus.
 type SuccessStatus struct {
 	Success bool `json:"success"`
+}
+
+// SynonymItemSchema defines model for SynonymItemSchema.
+type SynonymItemSchema struct {
+	// Id Unique identifier for the synonym item
+	Id string `json:"id"`
+
+	// Locale Locale for the synonym, leave blank to use the standard tokenizer
+	Locale *string `json:"locale,omitempty"`
+
+	// Root For 1-way synonyms, indicates the root word that words in the synonyms parameter map to
+	Root *string `json:"root,omitempty"`
+
+	// SymbolsToIndex By default, special characters are dropped from synonyms. Use this attribute to specify which special characters should be indexed as is
+	SymbolsToIndex *[]string `json:"symbols_to_index,omitempty"`
+
+	// Synonyms Array of words that should be considered as synonyms
+	Synonyms []string `json:"synonyms"`
+}
+
+// SynonymSetCreateSchema defines model for SynonymSetCreateSchema.
+type SynonymSetCreateSchema struct {
+	// Items Array of synonym items
+	Items []SynonymItemSchema `json:"items"`
+}
+
+// SynonymSetDeleteSchema defines model for SynonymSetDeleteSchema.
+type SynonymSetDeleteSchema struct {
+	// Name Name of the deleted synonym set
+	Name string `json:"name"`
+}
+
+// SynonymSetRetrieveSchema defines model for SynonymSetRetrieveSchema.
+type SynonymSetRetrieveSchema = SynonymSetCreateSchema
+
+// SynonymSetSchema defines model for SynonymSetSchema.
+type SynonymSetSchema struct {
+	// Items Array of synonym items
+	Items []SynonymItemSchema `json:"items"`
+
+	// Name Name of the synonym set
+	Name string `json:"name"`
 }
 
 // VoiceQueryModelCollectionConfig Configuration for the voice query model
@@ -1771,6 +1782,7 @@ type SearchCollectionParams struct {
 	Stopwords                          *string         `form:"stopwords,omitempty" json:"stopwords,omitempty"`
 	SynonymNumTypos                    *int            `form:"synonym_num_typos,omitempty" json:"synonym_num_typos,omitempty"`
 	SynonymPrefix                      *bool           `form:"synonym_prefix,omitempty" json:"synonym_prefix,omitempty"`
+	SynonymSets                        *string         `form:"synonym_sets,omitempty" json:"synonym_sets,omitempty"`
 	TextMatchType                      *string         `form:"text_match_type,omitempty" json:"text_match_type,omitempty"`
 	TypoTokensThreshold                *int            `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
 	UseCache                           *bool           `form:"use_cache,omitempty" json:"use_cache,omitempty"`
@@ -1853,6 +1865,7 @@ type MultiSearchParams struct {
 	Stopwords                          *string         `form:"stopwords,omitempty" json:"stopwords,omitempty"`
 	SynonymNumTypos                    *int            `form:"synonym_num_typos,omitempty" json:"synonym_num_typos,omitempty"`
 	SynonymPrefix                      *bool           `form:"synonym_prefix,omitempty" json:"synonym_prefix,omitempty"`
+	SynonymSets                        *string         `form:"synonym_sets,omitempty" json:"synonym_sets,omitempty"`
 	TextMatchType                      *string         `form:"text_match_type,omitempty" json:"text_match_type,omitempty"`
 	TypoTokensThreshold                *int            `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
 	UseCache                           *bool           `form:"use_cache,omitempty" json:"use_cache,omitempty"`
@@ -1905,9 +1918,6 @@ type UpdateDocumentJSONRequestBody = UpdateDocumentJSONBody
 // UpsertSearchOverrideJSONRequestBody defines body for UpsertSearchOverride for application/json ContentType.
 type UpsertSearchOverrideJSONRequestBody = SearchOverrideSchema
 
-// UpsertSearchSynonymJSONRequestBody defines body for UpsertSearchSynonym for application/json ContentType.
-type UpsertSearchSynonymJSONRequestBody = SearchSynonymSchema
-
 // CreateConversationModelJSONRequestBody defines body for CreateConversationModel for application/json ContentType.
 type CreateConversationModelJSONRequestBody = ConversationModelCreateSchema
 
@@ -1934,6 +1944,9 @@ type ImportStemmingDictionaryJSONRequestBody = ImportStemmingDictionaryJSONBody
 
 // UpsertStopwordsSetJSONRequestBody defines body for UpsertStopwordsSet for application/json ContentType.
 type UpsertStopwordsSetJSONRequestBody = StopwordsSetUpsertSchema
+
+// UpsertSynonymSetJSONRequestBody defines body for UpsertSynonymSet for application/json ContentType.
+type UpsertSynonymSetJSONRequestBody = SynonymSetCreateSchema
 
 // AsSearchParameters returns the union data inside the PresetSchema_Value as a SearchParameters
 func (t PresetSchema_Value) AsSearchParameters() (SearchParameters, error) {

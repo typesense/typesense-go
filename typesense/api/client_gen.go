@@ -193,20 +193,6 @@ type ClientInterface interface {
 
 	UpsertSearchOverride(ctx context.Context, collectionName string, overrideId string, body UpsertSearchOverrideJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetSearchSynonyms request
-	GetSearchSynonyms(ctx context.Context, collectionName string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// DeleteSearchSynonym request
-	DeleteSearchSynonym(ctx context.Context, collectionName string, synonymId string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetSearchSynonym request
-	GetSearchSynonym(ctx context.Context, collectionName string, synonymId string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// UpsertSearchSynonymWithBody request with any body
-	UpsertSearchSynonymWithBody(ctx context.Context, collectionName string, synonymId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	UpsertSearchSynonym(ctx context.Context, collectionName string, synonymId string, body UpsertSearchSynonymJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// RetrieveAllConversationModels request
 	RetrieveAllConversationModels(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -323,6 +309,20 @@ type ClientInterface interface {
 	UpsertStopwordsSetWithBody(ctx context.Context, setId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	UpsertStopwordsSet(ctx context.Context, setId string, body UpsertStopwordsSetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RetrieveSynonymSets request
+	RetrieveSynonymSets(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteSynonymSet request
+	DeleteSynonymSet(ctx context.Context, synonymSetName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RetrieveSynonymSet request
+	RetrieveSynonymSet(ctx context.Context, synonymSetName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpsertSynonymSetWithBody request with any body
+	UpsertSynonymSetWithBody(ctx context.Context, synonymSetName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpsertSynonymSet(ctx context.Context, synonymSetName string, body UpsertSynonymSetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) GetAliases(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -771,66 +771,6 @@ func (c *Client) UpsertSearchOverrideWithBody(ctx context.Context, collectionNam
 
 func (c *Client) UpsertSearchOverride(ctx context.Context, collectionName string, overrideId string, body UpsertSearchOverrideJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpsertSearchOverrideRequest(c.Server, collectionName, overrideId, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetSearchSynonyms(ctx context.Context, collectionName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetSearchSynonymsRequest(c.Server, collectionName)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) DeleteSearchSynonym(ctx context.Context, collectionName string, synonymId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteSearchSynonymRequest(c.Server, collectionName, synonymId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetSearchSynonym(ctx context.Context, collectionName string, synonymId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetSearchSynonymRequest(c.Server, collectionName, synonymId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) UpsertSearchSynonymWithBody(ctx context.Context, collectionName string, synonymId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpsertSearchSynonymRequestWithBody(c.Server, collectionName, synonymId, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) UpsertSearchSynonym(ctx context.Context, collectionName string, synonymId string, body UpsertSearchSynonymJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpsertSearchSynonymRequest(c.Server, collectionName, synonymId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1335,6 +1275,66 @@ func (c *Client) UpsertStopwordsSetWithBody(ctx context.Context, setId string, c
 
 func (c *Client) UpsertStopwordsSet(ctx context.Context, setId string, body UpsertStopwordsSetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpsertStopwordsSetRequest(c.Server, setId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RetrieveSynonymSets(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrieveSynonymSetsRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteSynonymSet(ctx context.Context, synonymSetName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSynonymSetRequest(c.Server, synonymSetName)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RetrieveSynonymSet(ctx context.Context, synonymSetName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrieveSynonymSetRequest(c.Server, synonymSetName)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpsertSynonymSetWithBody(ctx context.Context, synonymSetName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpsertSynonymSetRequestWithBody(c.Server, synonymSetName, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpsertSynonymSet(ctx context.Context, synonymSetName string, body UpsertSynonymSetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpsertSynonymSetRequest(c.Server, synonymSetName, body)
 	if err != nil {
 		return nil, err
 	}
@@ -3482,6 +3482,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 		}
 
+		if params.SynonymSets != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "synonym_sets", runtime.ParamLocationQuery, *params.SynonymSets); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.TextMatchType != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "text_match_type", runtime.ParamLocationQuery, *params.TextMatchType); err != nil {
@@ -3882,176 +3898,6 @@ func NewUpsertSearchOverrideRequestWithBody(server string, collectionName string
 	}
 
 	operationPath := fmt.Sprintf("/collections/%s/overrides/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewGetSearchSynonymsRequest generates requests for GetSearchSynonyms
-func NewGetSearchSynonymsRequest(server string, collectionName string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "collectionName", runtime.ParamLocationPath, collectionName)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/collections/%s/synonyms", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewDeleteSearchSynonymRequest generates requests for DeleteSearchSynonym
-func NewDeleteSearchSynonymRequest(server string, collectionName string, synonymId string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "collectionName", runtime.ParamLocationPath, collectionName)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "synonymId", runtime.ParamLocationPath, synonymId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/collections/%s/synonyms/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewGetSearchSynonymRequest generates requests for GetSearchSynonym
-func NewGetSearchSynonymRequest(server string, collectionName string, synonymId string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "collectionName", runtime.ParamLocationPath, collectionName)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "synonymId", runtime.ParamLocationPath, synonymId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/collections/%s/synonyms/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewUpsertSearchSynonymRequest calls the generic UpsertSearchSynonym builder with application/json body
-func NewUpsertSearchSynonymRequest(server string, collectionName string, synonymId string, body UpsertSearchSynonymJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewUpsertSearchSynonymRequestWithBody(server, collectionName, synonymId, "application/json", bodyReader)
-}
-
-// NewUpsertSearchSynonymRequestWithBody generates requests for UpsertSearchSynonym with any type of body
-func NewUpsertSearchSynonymRequestWithBody(server string, collectionName string, synonymId string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "collectionName", runtime.ParamLocationPath, collectionName)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "synonymId", runtime.ParamLocationPath, synonymId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/collections/%s/synonyms/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5526,6 +5372,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 		}
 
+		if params.SynonymSets != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "synonym_sets", runtime.ParamLocationQuery, *params.SynonymSets); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.TextMatchType != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "text_match_type", runtime.ParamLocationQuery, *params.TextMatchType); err != nil {
@@ -6330,6 +6192,148 @@ func NewUpsertStopwordsSetRequestWithBody(server string, setId string, contentTy
 	return req, nil
 }
 
+// NewRetrieveSynonymSetsRequest generates requests for RetrieveSynonymSets
+func NewRetrieveSynonymSetsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/synonym_sets")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewDeleteSynonymSetRequest generates requests for DeleteSynonymSet
+func NewDeleteSynonymSetRequest(server string, synonymSetName string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "synonymSetName", runtime.ParamLocationPath, synonymSetName)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/synonym_sets/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRetrieveSynonymSetRequest generates requests for RetrieveSynonymSet
+func NewRetrieveSynonymSetRequest(server string, synonymSetName string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "synonymSetName", runtime.ParamLocationPath, synonymSetName)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/synonym_sets/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpsertSynonymSetRequest calls the generic UpsertSynonymSet builder with application/json body
+func NewUpsertSynonymSetRequest(server string, synonymSetName string, body UpsertSynonymSetJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpsertSynonymSetRequestWithBody(server, synonymSetName, "application/json", bodyReader)
+}
+
+// NewUpsertSynonymSetRequestWithBody generates requests for UpsertSynonymSet with any type of body
+func NewUpsertSynonymSetRequestWithBody(server string, synonymSetName string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "synonymSetName", runtime.ParamLocationPath, synonymSetName)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/synonym_sets/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
@@ -6477,20 +6481,6 @@ type ClientWithResponsesInterface interface {
 
 	UpsertSearchOverrideWithResponse(ctx context.Context, collectionName string, overrideId string, body UpsertSearchOverrideJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertSearchOverrideResponse, error)
 
-	// GetSearchSynonymsWithResponse request
-	GetSearchSynonymsWithResponse(ctx context.Context, collectionName string, reqEditors ...RequestEditorFn) (*GetSearchSynonymsResponse, error)
-
-	// DeleteSearchSynonymWithResponse request
-	DeleteSearchSynonymWithResponse(ctx context.Context, collectionName string, synonymId string, reqEditors ...RequestEditorFn) (*DeleteSearchSynonymResponse, error)
-
-	// GetSearchSynonymWithResponse request
-	GetSearchSynonymWithResponse(ctx context.Context, collectionName string, synonymId string, reqEditors ...RequestEditorFn) (*GetSearchSynonymResponse, error)
-
-	// UpsertSearchSynonymWithBodyWithResponse request with any body
-	UpsertSearchSynonymWithBodyWithResponse(ctx context.Context, collectionName string, synonymId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpsertSearchSynonymResponse, error)
-
-	UpsertSearchSynonymWithResponse(ctx context.Context, collectionName string, synonymId string, body UpsertSearchSynonymJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertSearchSynonymResponse, error)
-
 	// RetrieveAllConversationModelsWithResponse request
 	RetrieveAllConversationModelsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllConversationModelsResponse, error)
 
@@ -6607,6 +6597,20 @@ type ClientWithResponsesInterface interface {
 	UpsertStopwordsSetWithBodyWithResponse(ctx context.Context, setId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpsertStopwordsSetResponse, error)
 
 	UpsertStopwordsSetWithResponse(ctx context.Context, setId string, body UpsertStopwordsSetJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertStopwordsSetResponse, error)
+
+	// RetrieveSynonymSetsWithResponse request
+	RetrieveSynonymSetsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveSynonymSetsResponse, error)
+
+	// DeleteSynonymSetWithResponse request
+	DeleteSynonymSetWithResponse(ctx context.Context, synonymSetName string, reqEditors ...RequestEditorFn) (*DeleteSynonymSetResponse, error)
+
+	// RetrieveSynonymSetWithResponse request
+	RetrieveSynonymSetWithResponse(ctx context.Context, synonymSetName string, reqEditors ...RequestEditorFn) (*RetrieveSynonymSetResponse, error)
+
+	// UpsertSynonymSetWithBodyWithResponse request with any body
+	UpsertSynonymSetWithBodyWithResponse(ctx context.Context, synonymSetName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpsertSynonymSetResponse, error)
+
+	UpsertSynonymSetWithResponse(ctx context.Context, synonymSetName string, body UpsertSynonymSetJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertSynonymSetResponse, error)
 }
 
 type GetAliasesResponse struct {
@@ -7257,98 +7261,6 @@ func (r UpsertSearchOverrideResponse) StatusCode() int {
 	return 0
 }
 
-type GetSearchSynonymsResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *SearchSynonymsResponse
-	JSON404      *ApiResponse
-}
-
-// Status returns HTTPResponse.Status
-func (r GetSearchSynonymsResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetSearchSynonymsResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type DeleteSearchSynonymResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *SearchSynonymDeleteResponse
-	JSON404      *ApiResponse
-}
-
-// Status returns HTTPResponse.Status
-func (r DeleteSearchSynonymResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r DeleteSearchSynonymResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetSearchSynonymResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *SearchSynonym
-	JSON404      *ApiResponse
-}
-
-// Status returns HTTPResponse.Status
-func (r GetSearchSynonymResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetSearchSynonymResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type UpsertSearchSynonymResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *SearchSynonym
-	JSON404      *ApiResponse
-}
-
-// Status returns HTTPResponse.Status
-func (r UpsertSearchSynonymResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r UpsertSearchSynonymResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
 type RetrieveAllConversationModelsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -7374,7 +7286,7 @@ func (r RetrieveAllConversationModelsResponse) StatusCode() int {
 type CreateConversationModelResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *ConversationModelSchema
+	JSON201      *ConversationModelSchema
 	JSON400      *ApiResponse
 }
 
@@ -8100,6 +8012,97 @@ func (r UpsertStopwordsSetResponse) StatusCode() int {
 	return 0
 }
 
+type RetrieveSynonymSetsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *[]SynonymSetSchema
+}
+
+// Status returns HTTPResponse.Status
+func (r RetrieveSynonymSetsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetrieveSynonymSetsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteSynonymSetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *SynonymSetDeleteSchema
+	JSON404      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteSynonymSetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteSynonymSetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RetrieveSynonymSetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *SynonymSetRetrieveSchema
+	JSON404      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r RetrieveSynonymSetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetrieveSynonymSetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpsertSynonymSetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *SynonymSetSchema
+	JSON400      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r UpsertSynonymSetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpsertSynonymSetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 // GetAliasesWithResponse request returning *GetAliasesResponse
 func (c *ClientWithResponses) GetAliasesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetAliasesResponse, error) {
 	rsp, err := c.GetAliases(ctx, reqEditors...)
@@ -8430,50 +8433,6 @@ func (c *ClientWithResponses) UpsertSearchOverrideWithResponse(ctx context.Conte
 		return nil, err
 	}
 	return ParseUpsertSearchOverrideResponse(rsp)
-}
-
-// GetSearchSynonymsWithResponse request returning *GetSearchSynonymsResponse
-func (c *ClientWithResponses) GetSearchSynonymsWithResponse(ctx context.Context, collectionName string, reqEditors ...RequestEditorFn) (*GetSearchSynonymsResponse, error) {
-	rsp, err := c.GetSearchSynonyms(ctx, collectionName, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetSearchSynonymsResponse(rsp)
-}
-
-// DeleteSearchSynonymWithResponse request returning *DeleteSearchSynonymResponse
-func (c *ClientWithResponses) DeleteSearchSynonymWithResponse(ctx context.Context, collectionName string, synonymId string, reqEditors ...RequestEditorFn) (*DeleteSearchSynonymResponse, error) {
-	rsp, err := c.DeleteSearchSynonym(ctx, collectionName, synonymId, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDeleteSearchSynonymResponse(rsp)
-}
-
-// GetSearchSynonymWithResponse request returning *GetSearchSynonymResponse
-func (c *ClientWithResponses) GetSearchSynonymWithResponse(ctx context.Context, collectionName string, synonymId string, reqEditors ...RequestEditorFn) (*GetSearchSynonymResponse, error) {
-	rsp, err := c.GetSearchSynonym(ctx, collectionName, synonymId, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetSearchSynonymResponse(rsp)
-}
-
-// UpsertSearchSynonymWithBodyWithResponse request with arbitrary body returning *UpsertSearchSynonymResponse
-func (c *ClientWithResponses) UpsertSearchSynonymWithBodyWithResponse(ctx context.Context, collectionName string, synonymId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpsertSearchSynonymResponse, error) {
-	rsp, err := c.UpsertSearchSynonymWithBody(ctx, collectionName, synonymId, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseUpsertSearchSynonymResponse(rsp)
-}
-
-func (c *ClientWithResponses) UpsertSearchSynonymWithResponse(ctx context.Context, collectionName string, synonymId string, body UpsertSearchSynonymJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertSearchSynonymResponse, error) {
-	rsp, err := c.UpsertSearchSynonym(ctx, collectionName, synonymId, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseUpsertSearchSynonymResponse(rsp)
 }
 
 // RetrieveAllConversationModelsWithResponse request returning *RetrieveAllConversationModelsResponse
@@ -8843,6 +8802,50 @@ func (c *ClientWithResponses) UpsertStopwordsSetWithResponse(ctx context.Context
 		return nil, err
 	}
 	return ParseUpsertStopwordsSetResponse(rsp)
+}
+
+// RetrieveSynonymSetsWithResponse request returning *RetrieveSynonymSetsResponse
+func (c *ClientWithResponses) RetrieveSynonymSetsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveSynonymSetsResponse, error) {
+	rsp, err := c.RetrieveSynonymSets(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetrieveSynonymSetsResponse(rsp)
+}
+
+// DeleteSynonymSetWithResponse request returning *DeleteSynonymSetResponse
+func (c *ClientWithResponses) DeleteSynonymSetWithResponse(ctx context.Context, synonymSetName string, reqEditors ...RequestEditorFn) (*DeleteSynonymSetResponse, error) {
+	rsp, err := c.DeleteSynonymSet(ctx, synonymSetName, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteSynonymSetResponse(rsp)
+}
+
+// RetrieveSynonymSetWithResponse request returning *RetrieveSynonymSetResponse
+func (c *ClientWithResponses) RetrieveSynonymSetWithResponse(ctx context.Context, synonymSetName string, reqEditors ...RequestEditorFn) (*RetrieveSynonymSetResponse, error) {
+	rsp, err := c.RetrieveSynonymSet(ctx, synonymSetName, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetrieveSynonymSetResponse(rsp)
+}
+
+// UpsertSynonymSetWithBodyWithResponse request with arbitrary body returning *UpsertSynonymSetResponse
+func (c *ClientWithResponses) UpsertSynonymSetWithBodyWithResponse(ctx context.Context, synonymSetName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpsertSynonymSetResponse, error) {
+	rsp, err := c.UpsertSynonymSetWithBody(ctx, synonymSetName, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpsertSynonymSetResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpsertSynonymSetWithResponse(ctx context.Context, synonymSetName string, body UpsertSynonymSetJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertSynonymSetResponse, error) {
+	rsp, err := c.UpsertSynonymSet(ctx, synonymSetName, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpsertSynonymSetResponse(rsp)
 }
 
 // ParseGetAliasesResponse parses an HTTP response from a GetAliasesWithResponse call
@@ -9767,138 +9770,6 @@ func ParseUpsertSearchOverrideResponse(rsp *http.Response) (*UpsertSearchOverrid
 	return response, nil
 }
 
-// ParseGetSearchSynonymsResponse parses an HTTP response from a GetSearchSynonymsWithResponse call
-func ParseGetSearchSynonymsResponse(rsp *http.Response) (*GetSearchSynonymsResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetSearchSynonymsResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest SearchSynonymsResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest ApiResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseDeleteSearchSynonymResponse parses an HTTP response from a DeleteSearchSynonymWithResponse call
-func ParseDeleteSearchSynonymResponse(rsp *http.Response) (*DeleteSearchSynonymResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &DeleteSearchSynonymResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest SearchSynonymDeleteResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest ApiResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetSearchSynonymResponse parses an HTTP response from a GetSearchSynonymWithResponse call
-func ParseGetSearchSynonymResponse(rsp *http.Response) (*GetSearchSynonymResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetSearchSynonymResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest SearchSynonym
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest ApiResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseUpsertSearchSynonymResponse parses an HTTP response from a UpsertSearchSynonymWithResponse call
-func ParseUpsertSearchSynonymResponse(rsp *http.Response) (*UpsertSearchSynonymResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &UpsertSearchSynonymResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest SearchSynonym
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest ApiResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	}
-
-	return response, nil
-}
-
 // ParseRetrieveAllConversationModelsResponse parses an HTTP response from a RetrieveAllConversationModelsWithResponse call
 func ParseRetrieveAllConversationModelsResponse(rsp *http.Response) (*RetrieveAllConversationModelsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -9939,12 +9810,12 @@ func ParseCreateConversationModelResponse(rsp *http.Response) (*CreateConversati
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
 		var dest ConversationModelSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON200 = &dest
+		response.JSON201 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest ApiResponse
@@ -10328,7 +10199,7 @@ func ParseCreateNLSearchModelResponse(rsp *http.Response) (*CreateNLSearchModelR
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && (rsp.StatusCode == 200 || rsp.StatusCode == 201):
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
 		var dest NLSearchModelSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -10879,6 +10750,131 @@ func ParseUpsertStopwordsSetResponse(rsp *http.Response) (*UpsertStopwordsSetRes
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest StopwordsSetSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetrieveSynonymSetsResponse parses an HTTP response from a RetrieveSynonymSetsWithResponse call
+func ParseRetrieveSynonymSetsResponse(rsp *http.Response) (*RetrieveSynonymSetsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetrieveSynonymSetsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []SynonymSetSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteSynonymSetResponse parses an HTTP response from a DeleteSynonymSetWithResponse call
+func ParseDeleteSynonymSetResponse(rsp *http.Response) (*DeleteSynonymSetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteSynonymSetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SynonymSetDeleteSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetrieveSynonymSetResponse parses an HTTP response from a RetrieveSynonymSetWithResponse call
+func ParseRetrieveSynonymSetResponse(rsp *http.Response) (*RetrieveSynonymSetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetrieveSynonymSetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SynonymSetRetrieveSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpsertSynonymSetResponse parses an HTTP response from a UpsertSynonymSetWithResponse call
+func ParseUpsertSynonymSetResponse(rsp *http.Response) (*UpsertSynonymSetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpsertSynonymSetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SynonymSetSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

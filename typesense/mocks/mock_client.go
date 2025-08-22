@@ -963,46 +963,6 @@ func (mr *MockAPIClientInterfaceMockRecorder) DeleteSearchOverrideWithResponse(c
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSearchOverrideWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteSearchOverrideWithResponse), varargs...)
 }
 
-// DeleteSearchSynonym mocks base method.
-func (m *MockAPIClientInterface) DeleteSearchSynonym(ctx context.Context, collectionName, synonymId string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
-	m.ctrl.T.Helper()
-	varargs := []any{ctx, collectionName, synonymId}
-	for _, a := range reqEditors {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeleteSearchSynonym", varargs...)
-	ret0, _ := ret[0].(*http.Response)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteSearchSynonym indicates an expected call of DeleteSearchSynonym.
-func (mr *MockAPIClientInterfaceMockRecorder) DeleteSearchSynonym(ctx, collectionName, synonymId any, reqEditors ...any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, collectionName, synonymId}, reqEditors...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSearchSynonym", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteSearchSynonym), varargs...)
-}
-
-// DeleteSearchSynonymWithResponse mocks base method.
-func (m *MockAPIClientInterface) DeleteSearchSynonymWithResponse(ctx context.Context, collectionName, synonymId string, reqEditors ...api.RequestEditorFn) (*api.DeleteSearchSynonymResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []any{ctx, collectionName, synonymId}
-	for _, a := range reqEditors {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeleteSearchSynonymWithResponse", varargs...)
-	ret0, _ := ret[0].(*api.DeleteSearchSynonymResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteSearchSynonymWithResponse indicates an expected call of DeleteSearchSynonymWithResponse.
-func (mr *MockAPIClientInterfaceMockRecorder) DeleteSearchSynonymWithResponse(ctx, collectionName, synonymId any, reqEditors ...any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, collectionName, synonymId}, reqEditors...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSearchSynonymWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteSearchSynonymWithResponse), varargs...)
-}
-
 // DeleteStopwordsSet mocks base method.
 func (m *MockAPIClientInterface) DeleteStopwordsSet(ctx context.Context, setId string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -1041,6 +1001,46 @@ func (mr *MockAPIClientInterfaceMockRecorder) DeleteStopwordsSetWithResponse(ctx
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, setId}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteStopwordsSetWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteStopwordsSetWithResponse), varargs...)
+}
+
+// DeleteSynonymSet mocks base method.
+func (m *MockAPIClientInterface) DeleteSynonymSet(ctx context.Context, synonymSetName string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, synonymSetName}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteSynonymSet", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteSynonymSet indicates an expected call of DeleteSynonymSet.
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteSynonymSet(ctx, synonymSetName any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, synonymSetName}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSynonymSet", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteSynonymSet), varargs...)
+}
+
+// DeleteSynonymSetWithResponse mocks base method.
+func (m *MockAPIClientInterface) DeleteSynonymSetWithResponse(ctx context.Context, synonymSetName string, reqEditors ...api.RequestEditorFn) (*api.DeleteSynonymSetResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, synonymSetName}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteSynonymSetWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.DeleteSynonymSetResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteSynonymSetWithResponse indicates an expected call of DeleteSynonymSetWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) DeleteSynonymSetWithResponse(ctx, synonymSetName any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, synonymSetName}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSynonymSetWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).DeleteSynonymSetWithResponse), varargs...)
 }
 
 // ExportDocuments mocks base method.
@@ -1481,86 +1481,6 @@ func (mr *MockAPIClientInterfaceMockRecorder) GetSearchOverridesWithResponse(ctx
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, collectionName}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchOverridesWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetSearchOverridesWithResponse), varargs...)
-}
-
-// GetSearchSynonym mocks base method.
-func (m *MockAPIClientInterface) GetSearchSynonym(ctx context.Context, collectionName, synonymId string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
-	m.ctrl.T.Helper()
-	varargs := []any{ctx, collectionName, synonymId}
-	for _, a := range reqEditors {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetSearchSynonym", varargs...)
-	ret0, _ := ret[0].(*http.Response)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetSearchSynonym indicates an expected call of GetSearchSynonym.
-func (mr *MockAPIClientInterfaceMockRecorder) GetSearchSynonym(ctx, collectionName, synonymId any, reqEditors ...any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, collectionName, synonymId}, reqEditors...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchSynonym", reflect.TypeOf((*MockAPIClientInterface)(nil).GetSearchSynonym), varargs...)
-}
-
-// GetSearchSynonymWithResponse mocks base method.
-func (m *MockAPIClientInterface) GetSearchSynonymWithResponse(ctx context.Context, collectionName, synonymId string, reqEditors ...api.RequestEditorFn) (*api.GetSearchSynonymResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []any{ctx, collectionName, synonymId}
-	for _, a := range reqEditors {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetSearchSynonymWithResponse", varargs...)
-	ret0, _ := ret[0].(*api.GetSearchSynonymResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetSearchSynonymWithResponse indicates an expected call of GetSearchSynonymWithResponse.
-func (mr *MockAPIClientInterfaceMockRecorder) GetSearchSynonymWithResponse(ctx, collectionName, synonymId any, reqEditors ...any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, collectionName, synonymId}, reqEditors...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchSynonymWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetSearchSynonymWithResponse), varargs...)
-}
-
-// GetSearchSynonyms mocks base method.
-func (m *MockAPIClientInterface) GetSearchSynonyms(ctx context.Context, collectionName string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
-	m.ctrl.T.Helper()
-	varargs := []any{ctx, collectionName}
-	for _, a := range reqEditors {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetSearchSynonyms", varargs...)
-	ret0, _ := ret[0].(*http.Response)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetSearchSynonyms indicates an expected call of GetSearchSynonyms.
-func (mr *MockAPIClientInterfaceMockRecorder) GetSearchSynonyms(ctx, collectionName any, reqEditors ...any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, collectionName}, reqEditors...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchSynonyms", reflect.TypeOf((*MockAPIClientInterface)(nil).GetSearchSynonyms), varargs...)
-}
-
-// GetSearchSynonymsWithResponse mocks base method.
-func (m *MockAPIClientInterface) GetSearchSynonymsWithResponse(ctx context.Context, collectionName string, reqEditors ...api.RequestEditorFn) (*api.GetSearchSynonymsResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []any{ctx, collectionName}
-	for _, a := range reqEditors {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetSearchSynonymsWithResponse", varargs...)
-	ret0, _ := ret[0].(*api.GetSearchSynonymsResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetSearchSynonymsWithResponse indicates an expected call of GetSearchSynonymsWithResponse.
-func (mr *MockAPIClientInterfaceMockRecorder) GetSearchSynonymsWithResponse(ctx, collectionName any, reqEditors ...any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, collectionName}, reqEditors...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchSynonymsWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetSearchSynonymsWithResponse), varargs...)
 }
 
 // GetStemmingDictionary mocks base method.
@@ -2443,6 +2363,86 @@ func (mr *MockAPIClientInterfaceMockRecorder) RetrieveStopwordsSetsWithResponse(
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveStopwordsSetsWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveStopwordsSetsWithResponse), varargs...)
 }
 
+// RetrieveSynonymSet mocks base method.
+func (m *MockAPIClientInterface) RetrieveSynonymSet(ctx context.Context, synonymSetName string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, synonymSetName}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveSynonymSet", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveSynonymSet indicates an expected call of RetrieveSynonymSet.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveSynonymSet(ctx, synonymSetName any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, synonymSetName}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveSynonymSet", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveSynonymSet), varargs...)
+}
+
+// RetrieveSynonymSetWithResponse mocks base method.
+func (m *MockAPIClientInterface) RetrieveSynonymSetWithResponse(ctx context.Context, synonymSetName string, reqEditors ...api.RequestEditorFn) (*api.RetrieveSynonymSetResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, synonymSetName}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveSynonymSetWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.RetrieveSynonymSetResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveSynonymSetWithResponse indicates an expected call of RetrieveSynonymSetWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveSynonymSetWithResponse(ctx, synonymSetName any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, synonymSetName}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveSynonymSetWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveSynonymSetWithResponse), varargs...)
+}
+
+// RetrieveSynonymSets mocks base method.
+func (m *MockAPIClientInterface) RetrieveSynonymSets(ctx context.Context, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveSynonymSets", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveSynonymSets indicates an expected call of RetrieveSynonymSets.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveSynonymSets(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveSynonymSets", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveSynonymSets), varargs...)
+}
+
+// RetrieveSynonymSetsWithResponse mocks base method.
+func (m *MockAPIClientInterface) RetrieveSynonymSetsWithResponse(ctx context.Context, reqEditors ...api.RequestEditorFn) (*api.RetrieveSynonymSetsResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RetrieveSynonymSetsWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.RetrieveSynonymSetsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RetrieveSynonymSetsWithResponse indicates an expected call of RetrieveSynonymSetsWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveSynonymSetsWithResponse(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveSynonymSetsWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveSynonymSetsWithResponse), varargs...)
+}
+
 // SearchCollection mocks base method.
 func (m *MockAPIClientInterface) SearchCollection(ctx context.Context, collectionName string, params *api.SearchCollectionParams, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -3243,86 +3243,6 @@ func (mr *MockAPIClientInterfaceMockRecorder) UpsertSearchOverrideWithResponse(c
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchOverrideWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSearchOverrideWithResponse), varargs...)
 }
 
-// UpsertSearchSynonym mocks base method.
-func (m *MockAPIClientInterface) UpsertSearchSynonym(ctx context.Context, collectionName, synonymId string, body api.UpsertSearchSynonymJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
-	m.ctrl.T.Helper()
-	varargs := []any{ctx, collectionName, synonymId, body}
-	for _, a := range reqEditors {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "UpsertSearchSynonym", varargs...)
-	ret0, _ := ret[0].(*http.Response)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpsertSearchSynonym indicates an expected call of UpsertSearchSynonym.
-func (mr *MockAPIClientInterfaceMockRecorder) UpsertSearchSynonym(ctx, collectionName, synonymId, body any, reqEditors ...any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, collectionName, synonymId, body}, reqEditors...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchSynonym", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSearchSynonym), varargs...)
-}
-
-// UpsertSearchSynonymWithBody mocks base method.
-func (m *MockAPIClientInterface) UpsertSearchSynonymWithBody(ctx context.Context, collectionName, synonymId, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
-	m.ctrl.T.Helper()
-	varargs := []any{ctx, collectionName, synonymId, contentType, body}
-	for _, a := range reqEditors {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "UpsertSearchSynonymWithBody", varargs...)
-	ret0, _ := ret[0].(*http.Response)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpsertSearchSynonymWithBody indicates an expected call of UpsertSearchSynonymWithBody.
-func (mr *MockAPIClientInterfaceMockRecorder) UpsertSearchSynonymWithBody(ctx, collectionName, synonymId, contentType, body any, reqEditors ...any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, collectionName, synonymId, contentType, body}, reqEditors...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchSynonymWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSearchSynonymWithBody), varargs...)
-}
-
-// UpsertSearchSynonymWithBodyWithResponse mocks base method.
-func (m *MockAPIClientInterface) UpsertSearchSynonymWithBodyWithResponse(ctx context.Context, collectionName, synonymId, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*api.UpsertSearchSynonymResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []any{ctx, collectionName, synonymId, contentType, body}
-	for _, a := range reqEditors {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "UpsertSearchSynonymWithBodyWithResponse", varargs...)
-	ret0, _ := ret[0].(*api.UpsertSearchSynonymResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpsertSearchSynonymWithBodyWithResponse indicates an expected call of UpsertSearchSynonymWithBodyWithResponse.
-func (mr *MockAPIClientInterfaceMockRecorder) UpsertSearchSynonymWithBodyWithResponse(ctx, collectionName, synonymId, contentType, body any, reqEditors ...any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, collectionName, synonymId, contentType, body}, reqEditors...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchSynonymWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSearchSynonymWithBodyWithResponse), varargs...)
-}
-
-// UpsertSearchSynonymWithResponse mocks base method.
-func (m *MockAPIClientInterface) UpsertSearchSynonymWithResponse(ctx context.Context, collectionName, synonymId string, body api.UpsertSearchSynonymJSONRequestBody, reqEditors ...api.RequestEditorFn) (*api.UpsertSearchSynonymResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []any{ctx, collectionName, synonymId, body}
-	for _, a := range reqEditors {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "UpsertSearchSynonymWithResponse", varargs...)
-	ret0, _ := ret[0].(*api.UpsertSearchSynonymResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpsertSearchSynonymWithResponse indicates an expected call of UpsertSearchSynonymWithResponse.
-func (mr *MockAPIClientInterfaceMockRecorder) UpsertSearchSynonymWithResponse(ctx, collectionName, synonymId, body any, reqEditors ...any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, collectionName, synonymId, body}, reqEditors...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSearchSynonymWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSearchSynonymWithResponse), varargs...)
-}
-
 // UpsertStopwordsSet mocks base method.
 func (m *MockAPIClientInterface) UpsertStopwordsSet(ctx context.Context, setId string, body api.UpsertStopwordsSetJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -3401,6 +3321,86 @@ func (mr *MockAPIClientInterfaceMockRecorder) UpsertStopwordsSetWithResponse(ctx
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, setId, body}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertStopwordsSetWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertStopwordsSetWithResponse), varargs...)
+}
+
+// UpsertSynonymSet mocks base method.
+func (m *MockAPIClientInterface) UpsertSynonymSet(ctx context.Context, synonymSetName string, body api.UpsertSynonymSetJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, synonymSetName, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpsertSynonymSet", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpsertSynonymSet indicates an expected call of UpsertSynonymSet.
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertSynonymSet(ctx, synonymSetName, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, synonymSetName, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSynonymSet", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSynonymSet), varargs...)
+}
+
+// UpsertSynonymSetWithBody mocks base method.
+func (m *MockAPIClientInterface) UpsertSynonymSetWithBody(ctx context.Context, synonymSetName, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, synonymSetName, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpsertSynonymSetWithBody", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpsertSynonymSetWithBody indicates an expected call of UpsertSynonymSetWithBody.
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertSynonymSetWithBody(ctx, synonymSetName, contentType, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, synonymSetName, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSynonymSetWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSynonymSetWithBody), varargs...)
+}
+
+// UpsertSynonymSetWithBodyWithResponse mocks base method.
+func (m *MockAPIClientInterface) UpsertSynonymSetWithBodyWithResponse(ctx context.Context, synonymSetName, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*api.UpsertSynonymSetResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, synonymSetName, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpsertSynonymSetWithBodyWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.UpsertSynonymSetResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpsertSynonymSetWithBodyWithResponse indicates an expected call of UpsertSynonymSetWithBodyWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertSynonymSetWithBodyWithResponse(ctx, synonymSetName, contentType, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, synonymSetName, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSynonymSetWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSynonymSetWithBodyWithResponse), varargs...)
+}
+
+// UpsertSynonymSetWithResponse mocks base method.
+func (m *MockAPIClientInterface) UpsertSynonymSetWithResponse(ctx context.Context, synonymSetName string, body api.UpsertSynonymSetJSONRequestBody, reqEditors ...api.RequestEditorFn) (*api.UpsertSynonymSetResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, synonymSetName, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpsertSynonymSetWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.UpsertSynonymSetResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpsertSynonymSetWithResponse indicates an expected call of UpsertSynonymSetWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) UpsertSynonymSetWithResponse(ctx, synonymSetName, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, synonymSetName, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertSynonymSetWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).UpsertSynonymSetWithResponse), varargs...)
 }
 
 // Vote mocks base method.
