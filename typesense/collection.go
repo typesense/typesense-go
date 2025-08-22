@@ -14,8 +14,7 @@ type CollectionInterface[T any] interface {
 	Document(documentID string) DocumentInterface[T]
 	Overrides() OverridesInterface
 	Override(overrideID string) OverrideInterface
-	Synonyms() SynonymsInterface
-	Synonym(synonymID string) SynonymInterface
+
 	Update(context.Context, *api.CollectionUpdateSchema) (*api.CollectionUpdateSchema, error)
 }
 
@@ -65,13 +64,7 @@ func (c *collection[T]) Override(overrideID string) OverrideInterface {
 	return &override{apiClient: c.apiClient, collectionName: c.name, overrideID: overrideID}
 }
 
-func (c *collection[T]) Synonyms() SynonymsInterface {
-	return &synonyms{apiClient: c.apiClient, collectionName: c.name}
-}
 
-func (c *collection[T]) Synonym(synonymID string) SynonymInterface {
-	return &synonym{apiClient: c.apiClient, collectionName: c.name, synonymID: synonymID}
-}
 
 func (c *collection[T]) Update(ctx context.Context, schema *api.CollectionUpdateSchema) (*api.CollectionUpdateSchema, error) {
 	response, err := c.apiClient.UpdateCollectionWithResponse(ctx, c.name,
