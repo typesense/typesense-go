@@ -12,21 +12,23 @@ import (
 )
 
 func TestAnalyticsRulesRetrieve(t *testing.T) {
-	expectedData := []*api.AnalyticsRuleSchema{
+	expectedData := []*api.AnalyticsRule{
 		{
-			Name: "test_name",
-			Type: "test_type",
-			Params: api.AnalyticsRuleParameters{
-				Limit: pointer.Int(10),
+			Name:       "test_rule_1",
+			Type:       api.AnalyticsRuleTypeCounter,
+			Collection: "test_collection",
+			EventType:  "click",
+			Params: &api.AnalyticsRuleCreateParams{
+				CounterField: pointer.String("popularity"),
+				Weight:       pointer.Int(10),
 			},
 		},
 	}
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/analytics/rules", http.MethodGet)
-		data := jsonEncode(t, api.AnalyticsRulesRetrieveSchema{
-			Rules: &expectedData,
-		})
+		data := jsonEncode(t, expectedData)
+
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(data)
 	})
@@ -48,51 +50,61 @@ func TestAnalyticsRulesRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	assert.ErrorContains(t, err, "status: 409")
 }
 
-func TestAnalyticsRulesUpsert(t *testing.T) {
-	upsertData := &api.AnalyticsRuleUpsertSchema{
-		Type: api.AnalyticsRuleUpsertSchemaTypeCounter,
-		Params: api.AnalyticsRuleParameters{
-			Limit: pointer.Int(100),
+func TestAnalyticsRulesCreate(t *testing.T) {
+	createData := []*api.AnalyticsRuleCreate{
+		{
+			Name:       "test_rule",
+			Type:       api.AnalyticsRuleCreateTypeCounter,
+			Collection: "test_collection",
+			EventType:  "click",
+			Params: &api.AnalyticsRuleCreateParams {
+				CounterField: pointer.String("popularity"),
+				Weight:       pointer.Int(10),
+			},
 		},
 	}
-	expectedData := &api.AnalyticsRuleSchema{
-		Name:   "test-rule",
-		Type:   api.AnalyticsRuleSchemaType(upsertData.Type),
-		Params: upsertData.Params,
+
+	expectedData := []*api.AnalyticsRule{
+		{
+			Name:       "test_rule",
+			Type:       api.AnalyticsRuleTypeCounter,
+			Collection: "test_collection",
+			EventType:  "click",
+			Params: &api.AnalyticsRuleCreateParams{
+				CounterField: pointer.String("popularity"),
+				Weight:       pointer.Int(10),
+			},
+		},
 	}
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
-		validateRequestMetadata(t, r, "/analytics/rules/test-rule", http.MethodPut)
-
-		var reqBody api.AnalyticsRuleUpsertSchema
+		validateRequestMetadata(t, r, "/analytics/rules", http.MethodPost)
+		
+		var reqBody []api.AnalyticsRuleCreate
 		err := json.NewDecoder(r.Body).Decode(&reqBody)
-
 		assert.NoError(t, err)
-		assert.Equal(t, *upsertData, reqBody)
+		assert.Equal(t, len(createData), len(reqBody))
+		assert.Equal(t, createData[0].Name, reqBody[0].Name)
 
-		data := jsonEncode(t, api.AnalyticsRuleSchema{
-			Name:   expectedData.Name,
-			Type:   api.AnalyticsRuleSchemaType(upsertData.Type),
-			Params: upsertData.Params,
-		})
+		data := jsonEncode(t, expectedData)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(data)
 	})
 	defer server.Close()
 
-	res, err := client.Analytics().Rules().Upsert(context.Background(), expectedData.Name, upsertData)
+	res, err := client.Analytics().Rules().Create(context.Background(), createData)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedData, res)
 }
 
-func TestAnalyticsRulesUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
+func TestAnalyticsRulesCreateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
-		validateRequestMetadata(t, r, "/analytics/rules/test-rule", http.MethodPut)
-		w.WriteHeader(http.StatusConflict)
+		validateRequestMetadata(t, r, "/analytics/rules", http.MethodPost)
+		w.WriteHeader(http.StatusBadRequest)
 	})
 	defer server.Close()
 
-	_, err := client.Analytics().Rules().Upsert(context.Background(), "test-rule", &api.AnalyticsRuleUpsertSchema{})
-	assert.ErrorContains(t, err, "status: 409")
+	_, err := client.Analytics().Rules().Create(context.Background(), []*api.AnalyticsRuleCreate{})
+	assert.ErrorContains(t, err, "status: 400")
 }

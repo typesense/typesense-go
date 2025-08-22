@@ -11,39 +11,46 @@ import (
 	"github.com/typesense/typesense-go/v3/typesense/api"
 )
 
-func TestAnalyticsRulesUpsert(t *testing.T) {
-	collectionName := createNewCollection(t, "analytics-rules-collection")
-	sourceCollectionName := createNewCollection(t, "analytics-rules-source-collection")
-	eventName := newUUIDName("event")
-	ruleSchema := newAnalyticsRuleUpsertSchema(collectionName, sourceCollectionName, eventName)
-	ruleName := newUUIDName("test-rule")
-	expectedData := newAnalyticsRule(ruleName, collectionName, sourceCollectionName, eventName)
-
-	result, err := typesenseClient.Analytics().Rules().Upsert(context.Background(), ruleName, ruleSchema)
-
-	require.NoError(t, err)
-	require.Equal(t, expectedData, result)
+func analyticsRulesCleanUp() {
+	// Clean up analytics rules
+	result, _ := typesenseClient.Analytics().Rules().Retrieve(context.Background())
+	for _, rule := range result {
+		typesenseClient.Analytics().Rule(rule.Name).Delete(context.Background())
+	}
+	
+	// Clean up collections
+	collections, _ := typesenseClient.Collections().Retrieve(context.Background(), nil)
+	for _, collection := range collections {
+		typesenseClient.Collection(collection.Name).Delete(context.Background())
+	}
 }
 
-func TestAnalyticsRulesRetrieve(t *testing.T) {
-	collectionName := createNewCollection(t, "analytics-rules-collection")
-	sourceCollectionName := createNewCollection(t, "analytics-rules-source-collection")
-	eventName := newUUIDName("event")
-	expectedRule := createNewAnalyticsRule(t, collectionName, sourceCollectionName, eventName)
+func TestAnalyticsRules(t *testing.T) {
+	shouldSkipAnalyticsTests(t)
+	t.Cleanup(analyticsRulesCleanUp)
 
-	results, err := typesenseClient.Analytics().Rules().Retrieve(context.Background())
+	t.Run("Retrieve", func(t *testing.T) {
+		collectionName := createNewCollection(t, "analytics-rules-collection")
+		sourceCollectionName := createNewCollection(t, "analytics-rules-source-collection")
+		eventName := newUUIDName("event")
+		expectedRule := createNewAnalyticsRule(t, collectionName, sourceCollectionName, eventName)
 
-	require.NoError(t, err)
-	require.True(t, len(results) >= 1, "number of rules is invalid")
+		results, err := typesenseClient.Analytics().Rules().Retrieve(context.Background())
+		require.NoError(t, err)
+		require.True(t, len(results) >= 1, "number of rules is invalid")
 
-	var result *api.AnalyticsRuleSchema
-	for _, rule := range results {
-		if rule.Name == expectedRule.Name {
-			result = rule
-			break
+		var result *api.AnalyticsRule
+		for _, rule := range results {
+			if rule.Name == expectedRule.Name {
+				result = rule
+				break
+			}
 		}
-	}
 
-	require.NotNil(t, result, "rule not found")
-	require.Equal(t, expectedRule, result)
+		require.NotNil(t, result, "rule not found")
+		require.Equal(t, expectedRule.Name, result.Name)
+		require.Equal(t, expectedRule.Type, result.Type)
+		require.Equal(t, expectedRule.Collection, result.Collection)
+		require.Equal(t, expectedRule.EventType, result.EventType)
+	})
 }

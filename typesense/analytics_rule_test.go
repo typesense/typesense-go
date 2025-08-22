@@ -11,11 +11,14 @@ import (
 )
 
 func TestAnalyticsRuleRetrieve(t *testing.T) {
-	expectedData := &api.AnalyticsRuleSchema{
-		Name: "test_rule",
-		Type: "test_type",
-		Params: api.AnalyticsRuleParameters{
-			Limit: pointer.Int(10),
+	expectedData := &api.AnalyticsRule{
+		Name:       "test_rule",
+		Type:       api.AnalyticsRuleTypeCounter,
+		Collection: "test_collection",
+		EventType:  "click",
+		Params: &api.AnalyticsRuleCreateParams{
+			CounterField: pointer.String("popularity"),
+			Weight:       pointer.Int(10),
 		},
 	}
 
@@ -45,7 +48,7 @@ func TestAnalyticsRuleRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 }
 
 func TestAnalyticsRuleDelete(t *testing.T) {
-	expectedData := &api.AnalyticsRuleDeleteResponse{
+	expectedData := &api.AnalyticsRule{
 		Name: "test_rule",
 	}
 
@@ -63,7 +66,7 @@ func TestAnalyticsRuleDelete(t *testing.T) {
 	assert.Equal(t, expectedData, res)
 }
 
-func TestAnalyticsRuleUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
+func TestAnalyticsRuleDeleteOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/analytics/rules/test_rule", http.MethodDelete)
 		w.WriteHeader(http.StatusConflict)
