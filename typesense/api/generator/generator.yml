@@ -42,6 +42,21 @@ components:
           format: double
           type: number
       type: object
+    AnalyticsEvent:
+      properties:
+        data:
+          $ref: '#/components/schemas/AnalyticsEventData'
+        event_type:
+          description: Type of event (e.g., click, conversion, query, visit)
+          type: string
+        name:
+          description: Name of the analytics rule this event corresponds to
+          type: string
+      required:
+        - name
+        - event_type
+        - data
+      type: object
     AnalyticsEventCreateResponse:
       properties:
         ok:
@@ -49,104 +64,144 @@ components:
       required:
         - ok
       type: object
-    AnalyticsEventCreateSchema:
+    AnalyticsEventData:
+      description: Event payload
       properties:
-        data:
-          type: object
-        name:
+        analytics_tag:
           type: string
-        type:
+        doc_id:
           type: string
-      required:
-        - type
-        - name
-        - data
-      type: object
-    AnalyticsRuleDeleteResponse:
-      properties:
-        name:
-          type: string
-      required:
-        - name
-      type: object
-    AnalyticsRuleParameters:
-      properties:
-        destination:
-          $ref: '#/components/schemas/AnalyticsRuleParametersDestination'
-        expand_query:
-          type: boolean
-        limit:
-          type: integer
-        source:
-          $ref: '#/components/schemas/AnalyticsRuleParametersSource'
-      required:
-        - source
-        - destination
-      type: object
-    AnalyticsRuleParametersDestination:
-      properties:
-        collection:
-          type: string
-        counter_field:
-          type: string
-      required:
-        - collection
-      type: object
-    AnalyticsRuleParametersSource:
-      properties:
-        collections:
+        doc_ids:
           items:
             type: string
           type: array
+        q:
+          type: string
+        user_id:
+          type: string
+      type: object
+    AnalyticsEventsResponse:
+      properties:
         events:
           items:
             properties:
+              collection:
+                type: string
+              doc_id:
+                type: string
+              doc_ids:
+                items:
+                  type: string
+                type: array
+              event_type:
+                type: string
               name:
                 type: string
-              type:
+              query:
                 type: string
-              weight:
-                format: float
-                type: number
-            required:
-              - type
-              - weight
-              - name
+              timestamp:
+                format: int64
+                type: integer
+              user_id:
+                type: string
             type: object
           type: array
       required:
-        - collections
+        - events
       type: object
-    AnalyticsRuleSchema:
+    AnalyticsRule:
       allOf:
-        - $ref: '#/components/schemas/AnalyticsRuleUpsertSchema'
-        - properties:
-            name:
-              type: string
-          required:
-            - name
-          type: object
-    AnalyticsRuleUpsertSchema:
+        - $ref: '#/components/schemas/AnalyticsRuleCreate'
+        - type: object
+    AnalyticsRuleCreate:
       properties:
+        collection:
+          type: string
+        event_type:
+          type: string
+        name:
+          type: string
         params:
-          $ref: '#/components/schemas/AnalyticsRuleParameters'
+          $ref: '#/components/schemas/AnalyticsRuleCreateParams'
+        rule_tag:
+          type: string
         type:
           enum:
             - popular_queries
             - nohits_queries
             - counter
+            - log
           type: string
       required:
+        - name
         - type
-        - params
+        - collection
+        - event_type
       type: object
-    AnalyticsRulesRetrieveSchema:
+    AnalyticsRuleCreateParams:
       properties:
-        rules:
+        capture_search_requests:
+          type: boolean
+        counter_field:
+          type: string
+        destination_collection:
+          type: string
+        expand_query:
+          type: boolean
+        limit:
+          type: integer
+        meta_fields:
           items:
-            $ref: '#/components/schemas/AnalyticsRuleSchema'
+            type: string
           type: array
-          x-go-type: '[]*AnalyticsRuleSchema'
+        weight:
+          type: integer
+      type: object
+    AnalyticsRuleUpdate:
+      description: Fields allowed to update on an analytics rule
+      properties:
+        name:
+          type: string
+        params:
+          $ref: '#/components/schemas/AnalyticsRuleUpdateParams'
+        rule_tag:
+          type: string
+      type: object
+    AnalyticsRuleUpdateParams:
+      properties:
+        capture_search_requests:
+          type: boolean
+        counter_field:
+          type: string
+        destination_collection:
+          type: string
+        expand_query:
+          type: boolean
+        limit:
+          type: integer
+        meta_fields:
+          items:
+            type: string
+          type: array
+        weight:
+          type: integer
+      type: object
+    AnalyticsStatus:
+      properties:
+        doc_counter_events:
+          type: integer
+        doc_log_events:
+          type: integer
+        log_prefix_queries:
+          type: integer
+        nohits_prefix_queries:
+          type: integer
+        popular_prefix_queries:
+          type: integer
+        query_counter_events:
+          type: integer
+        query_log_events:
+          type: integer
       type: object
     ApiKey:
       allOf:
@@ -449,22 +504,24 @@ components:
         field_name:
           type: string
         stats:
-          properties:
-            avg:
-              format: double
-              type: number
-            max:
-              format: double
-              type: number
-            min:
-              format: double
-              type: number
-            sum:
-              format: double
-              type: number
-            total_values:
-              type: integer
-          type: object
+          $ref: '#/components/schemas/FacetCountsStats'
+      type: object
+    FacetCountsStats:
+      properties:
+        avg:
+          format: double
+          type: number
+        max:
+          format: double
+          type: number
+        min:
+          format: double
+          type: number
+        sum:
+          format: double
+          type: number
+        total_values:
+          type: integer
       type: object
     Field:
       properties:
@@ -472,40 +529,7 @@ components:
           example: true
           type: boolean
         embed:
-          properties:
-            from:
-              items:
-                type: string
-              type: array
-            model_config:
-              properties:
-                access_token:
-                  type: string
-                api_key:
-                  type: string
-                client_id:
-                  type: string
-                client_secret:
-                  type: string
-                indexing_prefix:
-                  type: string
-                model_name:
-                  type: string
-                project_id:
-                  type: string
-                query_prefix:
-                  type: string
-                refresh_token:
-                  type: string
-                url:
-                  type: string
-              required:
-                - model_name
-              type: object
-          required:
-            - from
-            - model_config
-          type: object
+          $ref: '#/components/schemas/FieldEmbed'
         facet:
           example: false
           type: boolean
@@ -580,6 +604,41 @@ components:
       required:
         - name
         - type
+      type: object
+    FieldEmbed:
+      properties:
+        from:
+          items:
+            type: string
+          type: array
+        model_config:
+          properties:
+            access_token:
+              type: string
+            api_key:
+              type: string
+            client_id:
+              type: string
+            client_secret:
+              type: string
+            indexing_prefix:
+              type: string
+            model_name:
+              type: string
+            project_id:
+              type: string
+            query_prefix:
+              type: string
+            refresh_token:
+              type: string
+            url:
+              type: string
+          required:
+            - model_name
+          type: object
+      required:
+        - from
+        - model_config
       type: object
     HealthStatus:
       properties:
@@ -1482,14 +1541,16 @@ components:
         q:
           type: string
         voice_query:
-          properties:
-            transcribed_query:
-              type: string
-          type: object
+          $ref: '#/components/schemas/SearchRequestParamsVoice_query'
       required:
         - collection_name
         - q
         - per_page
+      type: object
+    SearchRequestParamsVoice_query:
+      properties:
+        transcribed_query:
+          type: string
       type: object
     SearchResult:
       properties:
@@ -1582,13 +1643,7 @@ components:
             $ref: '#/components/schemas/SearchHighlight'
           type: array
         hybrid_search_info:
-          description: Information about hybrid search scoring
-          properties:
-            rank_fusion_score:
-              description: Combined score from rank fusion of text and vector search
-              format: float
-              type: number
-          type: object
+          $ref: '#/components/schemas/SearchResultHitHybrid_search_info'
         search_index:
           description: Returned only for union query response. Indicates the index of the query which this document matched to.
           type: integer
@@ -1596,28 +1651,38 @@ components:
           format: int64
           type: integer
         text_match_info:
-          properties:
-            best_field_score:
-              type: string
-            best_field_weight:
-              type: integer
-            fields_matched:
-              type: integer
-            num_tokens_dropped:
-              format: int64
-              type: integer
-              x-go-type: uint64
-            score:
-              type: string
-            tokens_matched:
-              type: integer
-            typo_prefix_score:
-              type: integer
-          type: object
+          $ref: '#/components/schemas/SearchResultHitText_match_info'
         vector_distance:
           description: Distance between the query vector and matching document's vector value
           format: float
           type: number
+      type: object
+    SearchResultHitHybrid_search_info:
+      description: Information about hybrid search scoring
+      properties:
+        rank_fusion_score:
+          description: Combined score from rank fusion of text and vector search
+          format: float
+          type: number
+      type: object
+    SearchResultHitText_match_info:
+      properties:
+        best_field_score:
+          type: string
+        best_field_weight:
+          type: integer
+        fields_matched:
+          type: integer
+        num_tokens_dropped:
+          format: int64
+          type: integer
+          x-go-type: uint64
+        score:
+          type: string
+        tokens_matched:
+          type: integer
+        typo_prefix_score:
+          type: integer
       type: object
     SearchSynonym:
       allOf:
@@ -1946,18 +2011,55 @@ paths:
       tags:
         - collections
   /analytics/events:
+    get:
+      description: Retrieve the most recent events for a user and rule.
+      operationId: getAnalyticsEvents
+      parameters:
+        - in: query
+          name: user_id
+          required: true
+          schema:
+            type: string
+        - description: Analytics rule name
+          in: query
+          name: name
+          required: true
+          schema:
+            type: string
+        - description: Number of events to return (max 1000)
+          in: query
+          name: "n"
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsEventsResponse'
+          description: Events fetched
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: Bad request, see error message for details
+      summary: Retrieve analytics events
+      tags:
+        - analytics
     post:
-      description: Sending events for analytics e.g rank search results based on popularity.
+      description: Submit a single analytics event. The event must correspond to an existing analytics rule by name.
       operationId: createAnalyticsEvent
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnalyticsEventCreateSchema'
-        description: The Analytics event to be created
+              $ref: '#/components/schemas/AnalyticsEvent'
+        description: The analytics event to be created
         required: true
       responses:
-        "201":
+        "200":
           content:
             application/json:
               schema:
@@ -1972,44 +2074,80 @@ paths:
       summary: Create an analytics event
       tags:
         - analytics
-  /analytics/rules:
-    get:
-      description: Retrieve the details of all analytics rules
-      operationId: retrieveAnalyticsRules
+  /analytics/flush:
+    post:
+      description: Triggers a flush of analytics data to persistent storage.
+      operationId: flushAnalytics
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsRulesRetrieveSchema'
+                $ref: '#/components/schemas/AnalyticsEventCreateResponse'
+          description: Flush triggered
+      summary: Flush in-memory analytics to disk
+      tags:
+        - analytics
+  /analytics/rules:
+    get:
+      description: Retrieve all analytics rules. Use the optional rule_tag filter to narrow down results.
+      operationId: retrieveAnalyticsRules
+      parameters:
+        - description: Filter rules by rule_tag
+          in: query
+          name: rule_tag
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AnalyticsRule'
+                type: array
           description: Analytics rules fetched
-      summary: Retrieves all analytics rules
+      summary: Retrieve analytics rules
       tags:
         - analytics
     post:
-      description: When an analytics rule is created, we give it a name and describe the type, the source collections and the destination collection.
+      description: Create one or more analytics rules. You can send a single rule object or an array of rule objects.
       operationId: createAnalyticsRule
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnalyticsRuleSchema'
-        description: The Analytics rule to be created
+              oneOf:
+                - $ref: '#/components/schemas/AnalyticsRuleCreate'
+                - items:
+                    $ref: '#/components/schemas/AnalyticsRuleCreate'
+                  type: array
+        description: The analytics rule(s) to be created
         required: true
       responses:
-        "201":
+        "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsRuleSchema'
-          description: Analytics rule successfully created
+                oneOf:
+                  - $ref: '#/components/schemas/AnalyticsRule'
+                  - items:
+                      anyOf:
+                        - $ref: '#/components/schemas/AnalyticsRule'
+                        - properties:
+                            error:
+                              type: string
+                          type: object
+                    type: array
+          description: Analytics rule(s) successfully created
         "400":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
           description: Bad request, see error message for details
-      summary: Creates an analytics rule
+      summary: Create analytics rule(s)
       tags:
         - analytics
   /analytics/rules/{ruleName}:
@@ -2028,7 +2166,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsRuleDeleteResponse'
+                $ref: '#/components/schemas/AnalyticsRule'
           description: Analytics rule deleted
         "404":
           content:
@@ -2054,7 +2192,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsRuleSchema'
+                $ref: '#/components/schemas/AnalyticsRule'
           description: Analytics rule fetched
         "404":
           content:
@@ -2079,7 +2217,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnalyticsRuleUpsertSchema'
+              $ref: '#/components/schemas/AnalyticsRuleUpdate'
         description: The Analytics rule to be upserted
         required: true
       responses:
@@ -2087,7 +2225,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsRuleSchema'
+                $ref: '#/components/schemas/AnalyticsRule'
           description: Analytics rule successfully upserted
         "400":
           content:
@@ -2096,6 +2234,20 @@ paths:
                 $ref: '#/components/schemas/ApiResponse'
           description: Bad request, see error message for details
       summary: Upserts an analytics rule
+      tags:
+        - analytics
+  /analytics/status:
+    get:
+      description: Returns sizes of internal analytics buffers and queues.
+      operationId: getAnalyticsStatus
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsStatus'
+          description: Status fetched
+      summary: Get analytics subsystem status
       tags:
         - analytics
   /collections:

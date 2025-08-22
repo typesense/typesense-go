@@ -1083,6 +1083,46 @@ func (mr *MockAPIClientInterfaceMockRecorder) ExportDocumentsWithResponse(ctx, c
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExportDocumentsWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).ExportDocumentsWithResponse), varargs...)
 }
 
+// FlushAnalytics mocks base method.
+func (m *MockAPIClientInterface) FlushAnalytics(ctx context.Context, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "FlushAnalytics", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FlushAnalytics indicates an expected call of FlushAnalytics.
+func (mr *MockAPIClientInterfaceMockRecorder) FlushAnalytics(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FlushAnalytics", reflect.TypeOf((*MockAPIClientInterface)(nil).FlushAnalytics), varargs...)
+}
+
+// FlushAnalyticsWithResponse mocks base method.
+func (m *MockAPIClientInterface) FlushAnalyticsWithResponse(ctx context.Context, reqEditors ...api.RequestEditorFn) (*api.FlushAnalyticsResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "FlushAnalyticsWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.FlushAnalyticsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FlushAnalyticsWithResponse indicates an expected call of FlushAnalyticsWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) FlushAnalyticsWithResponse(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FlushAnalyticsWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).FlushAnalyticsWithResponse), varargs...)
+}
+
 // GetAlias mocks base method.
 func (m *MockAPIClientInterface) GetAlias(ctx context.Context, aliasName string, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -1161,6 +1201,86 @@ func (mr *MockAPIClientInterfaceMockRecorder) GetAliasesWithResponse(ctx any, re
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAliasesWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetAliasesWithResponse), varargs...)
+}
+
+// GetAnalyticsEvents mocks base method.
+func (m *MockAPIClientInterface) GetAnalyticsEvents(ctx context.Context, params *api.GetAnalyticsEventsParams, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, params}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetAnalyticsEvents", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAnalyticsEvents indicates an expected call of GetAnalyticsEvents.
+func (mr *MockAPIClientInterfaceMockRecorder) GetAnalyticsEvents(ctx, params any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, params}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAnalyticsEvents", reflect.TypeOf((*MockAPIClientInterface)(nil).GetAnalyticsEvents), varargs...)
+}
+
+// GetAnalyticsEventsWithResponse mocks base method.
+func (m *MockAPIClientInterface) GetAnalyticsEventsWithResponse(ctx context.Context, params *api.GetAnalyticsEventsParams, reqEditors ...api.RequestEditorFn) (*api.GetAnalyticsEventsResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, params}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetAnalyticsEventsWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.GetAnalyticsEventsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAnalyticsEventsWithResponse indicates an expected call of GetAnalyticsEventsWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) GetAnalyticsEventsWithResponse(ctx, params any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, params}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAnalyticsEventsWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetAnalyticsEventsWithResponse), varargs...)
+}
+
+// GetAnalyticsStatus mocks base method.
+func (m *MockAPIClientInterface) GetAnalyticsStatus(ctx context.Context, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetAnalyticsStatus", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAnalyticsStatus indicates an expected call of GetAnalyticsStatus.
+func (mr *MockAPIClientInterfaceMockRecorder) GetAnalyticsStatus(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAnalyticsStatus", reflect.TypeOf((*MockAPIClientInterface)(nil).GetAnalyticsStatus), varargs...)
+}
+
+// GetAnalyticsStatusWithResponse mocks base method.
+func (m *MockAPIClientInterface) GetAnalyticsStatusWithResponse(ctx context.Context, reqEditors ...api.RequestEditorFn) (*api.GetAnalyticsStatusResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetAnalyticsStatusWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.GetAnalyticsStatusResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAnalyticsStatusWithResponse indicates an expected call of GetAnalyticsStatusWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) GetAnalyticsStatusWithResponse(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAnalyticsStatusWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).GetAnalyticsStatusWithResponse), varargs...)
 }
 
 // GetCollection mocks base method.
@@ -2084,9 +2204,9 @@ func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAnalyticsRuleWithResponse(
 }
 
 // RetrieveAnalyticsRules mocks base method.
-func (m *MockAPIClientInterface) RetrieveAnalyticsRules(ctx context.Context, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+func (m *MockAPIClientInterface) RetrieveAnalyticsRules(ctx context.Context, params *api.RetrieveAnalyticsRulesParams, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx}
+	varargs := []any{ctx, params}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -2097,16 +2217,16 @@ func (m *MockAPIClientInterface) RetrieveAnalyticsRules(ctx context.Context, req
 }
 
 // RetrieveAnalyticsRules indicates an expected call of RetrieveAnalyticsRules.
-func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAnalyticsRules(ctx any, reqEditors ...any) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAnalyticsRules(ctx, params any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx}, reqEditors...)
+	varargs := append([]any{ctx, params}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveAnalyticsRules", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveAnalyticsRules), varargs...)
 }
 
 // RetrieveAnalyticsRulesWithResponse mocks base method.
-func (m *MockAPIClientInterface) RetrieveAnalyticsRulesWithResponse(ctx context.Context, reqEditors ...api.RequestEditorFn) (*api.RetrieveAnalyticsRulesResponse, error) {
+func (m *MockAPIClientInterface) RetrieveAnalyticsRulesWithResponse(ctx context.Context, params *api.RetrieveAnalyticsRulesParams, reqEditors ...api.RequestEditorFn) (*api.RetrieveAnalyticsRulesResponse, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx}
+	varargs := []any{ctx, params}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -2117,9 +2237,9 @@ func (m *MockAPIClientInterface) RetrieveAnalyticsRulesWithResponse(ctx context.
 }
 
 // RetrieveAnalyticsRulesWithResponse indicates an expected call of RetrieveAnalyticsRulesWithResponse.
-func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAnalyticsRulesWithResponse(ctx any, reqEditors ...any) *gomock.Call {
+func (mr *MockAPIClientInterfaceMockRecorder) RetrieveAnalyticsRulesWithResponse(ctx, params any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx}, reqEditors...)
+	varargs := append([]any{ctx, params}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveAnalyticsRulesWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).RetrieveAnalyticsRulesWithResponse), varargs...)
 }
 

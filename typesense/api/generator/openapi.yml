@@ -1381,17 +1381,17 @@ paths:
       tags:
         - analytics
       summary: Create an analytics event
-      description: Sending events for analytics e.g rank search results based on popularity.
+      description: Submit a single analytics event. The event must correspond to an existing analytics rule by name.
       operationId: createAnalyticsEvent
       requestBody:
-        description: The Analytics event to be created
+        description: The analytics event to be created
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnalyticsEventCreateSchema'
+              $ref: '#/components/schemas/AnalyticsEvent'
         required: true
       responses:
-        '201':
+        '200':
           description: Analytics event successfully created
           content:
             application/json:
@@ -1403,28 +1403,105 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+    get:
+      tags:
+        - analytics
+      summary: Retrieve analytics events
+      description: Retrieve the most recent events for a user and rule.
+      operationId: getAnalyticsEvents
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: name
+          in: query
+          description: Analytics rule name
+          required: true
+          schema:
+            type: string
+        - name: n
+          in: query
+          description: Number of events to return (max 1000)
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Events fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsEventsResponse'
+        '400':
+          description: Bad request, see error message for details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /analytics/flush:
+    post:
+      tags:
+        - analytics
+      summary: Flush in-memory analytics to disk
+      description: Triggers a flush of analytics data to persistent storage.
+      operationId: flushAnalytics
+      responses:
+        '200':
+          description: Flush triggered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsEventCreateResponse'
+  /analytics/status:
+    get:
+      tags:
+        - analytics
+      summary: Get analytics subsystem status
+      description: Returns sizes of internal analytics buffers and queues.
+      operationId: getAnalyticsStatus
+      responses:
+        '200':
+          description: Status fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsStatus'
   /analytics/rules:
     post:
       tags:
         - analytics
-      summary: Creates an analytics rule
-      description:
-        When an analytics rule is created, we give it a name and describe the type, the source collections and the destination collection.
+      summary: Create analytics rule(s)
+      description: Create one or more analytics rules. You can send a single rule object or an array of rule objects.
       operationId: createAnalyticsRule
       requestBody:
-        description: The Analytics rule to be created
+        description: The analytics rule(s) to be created
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AnalyticsRuleSchema"
+              oneOf:
+                - $ref: "#/components/schemas/AnalyticsRuleCreate"
+                - type: array
+                  items:
+                    $ref: "#/components/schemas/AnalyticsRuleCreate"
         required: true
       responses:
-        '201':
-          description: Analytics rule successfully created
+        '200':
+          description: Analytics rule(s) successfully created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AnalyticsRuleSchema"
+                oneOf:
+                  - $ref: "#/components/schemas/AnalyticsRule"
+                  - type: array
+                    items:
+                      anyOf:
+                        - $ref: "#/components/schemas/AnalyticsRule"
+                        - type: object
+                          properties:
+                            error:
+                              type: string
         '400':
           description: Bad request, see error message for details
           content:
@@ -1434,17 +1511,25 @@ paths:
     get:
       tags:
         - analytics
-      summary: Retrieves all analytics rules
-      description:
-        Retrieve the details of all analytics rules
+      summary: Retrieve analytics rules
+      description: Retrieve all analytics rules. Use the optional rule_tag filter to narrow down results.
       operationId: retrieveAnalyticsRules
+      parameters:
+        - in: query
+          name: rule_tag
+          schema:
+            type: string
+          required: false
+          description: Filter rules by rule_tag
       responses:
         '200':
           description: Analytics rules fetched
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AnalyticsRulesRetrieveSchema"
+                type: array
+                items:
+                  $ref: "#/components/schemas/AnalyticsRule"
   /analytics/rules/{ruleName}:
     put:
       tags:
@@ -1465,7 +1550,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AnalyticsRuleUpsertSchema"
+              $ref: "#/components/schemas/AnalyticsRuleUpdate"
         required: true
       responses:
         '200':
@@ -1473,7 +1558,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AnalyticsRuleSchema"
+                $ref: "#/components/schemas/AnalyticsRule"
         '400':
           description: Bad request, see error message for details
           content:
@@ -1500,7 +1585,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AnalyticsRuleSchema"
+                $ref: "#/components/schemas/AnalyticsRule"
         '404':
           description: Analytics rule not found
           content:
@@ -1527,7 +1612,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AnalyticsRuleDeleteResponse"
+                $ref: "#/components/schemas/AnalyticsRule"
         '404':
           description: Analytics rule not found
           content:
@@ -3632,105 +3717,133 @@ components:
       properties:
         ok:
           type: boolean
-    AnalyticsEventCreateSchema:
+    AnalyticsEvent:
       type: object
       required:
-        - type
         - name
+        - event_type
         - data
       properties:
-        type:
-          type: string
         name:
           type: string
+          description: Name of the analytics rule this event corresponds to
+        event_type:
+          type: string
+          description: Type of event (e.g., click, conversion, query, visit)
         data:
           type: object
-    AnalyticsRuleUpsertSchema:
+          description: Event payload
+          properties:
+            user_id:
+              type: string
+            doc_id:
+              type: string
+            doc_ids:
+              type: array
+              items:
+                type: string
+            q:
+              type: string
+            analytics_tag:
+              type: string
+    AnalyticsEventsResponse:
       type: object
       required:
-        - type
-        - params
+        - events
       properties:
-        type:
-          type: string
-          enum:
-            - popular_queries
-            - nohits_queries
-            - counter
-        params:
-          $ref: "#/components/schemas/AnalyticsRuleParameters"
-    AnalyticsRuleParameters:
-      type: object
-      required:
-        - source
-        - destination
-      properties:
-        source:
-          $ref: '#/components/schemas/AnalyticsRuleParametersSource'
-        destination:
-          $ref: '#/components/schemas/AnalyticsRuleParametersDestination'
-        limit:
-          type: integer
-        expand_query:
-          type: boolean
-    AnalyticsRuleParametersSource:
-      type: object
-      required:
-        - collections
-      properties:
-        collections:
-          type: array
-          items:
-            type: string
         events:
           type: array
           items:
             type: object
-            required:
-              - type
-              - weight
-              - name
             properties:
-              type:
-                type: string
-              weight:
-                type: number
-                format: float
-              name:
-                type: string
-    AnalyticsRuleParametersDestination:
-      type: object
-      required:
-        - collection
-      properties:
-        collection:
-          type: string
-        counter_field:
-          type: string
-    AnalyticsRuleDeleteResponse:
+              name: { type: string }
+              event_type: { type: string }
+              collection: { type: string }
+              timestamp: { type: integer, format: int64 }
+              user_id: { type: string }
+              doc_id: { type: string }
+              doc_ids:
+                type: array
+                items: { type: string }
+              query: { type: string }
+    AnalyticsRuleCreate:
       type: object
       required:
         - name
+        - type
+        - collection
+        - event_type
       properties:
         name:
           type: string
-    AnalyticsRuleSchema:
-      allOf:
-        - $ref: '#/components/schemas/AnalyticsRuleUpsertSchema'
-        - type: object
-          required:
-            - name
+        type:
+          type: string
+          enum: [popular_queries, nohits_queries, counter, log]
+        collection:
+          type: string
+        event_type:
+          type: string
+        rule_tag:
+          type: string
+        params:
+          type: object
           properties:
-            name:
+            destination_collection:
               type: string
-    AnalyticsRulesRetrieveSchema:
+            limit:
+              type: integer
+            capture_search_requests:
+              type: boolean
+            meta_fields:
+              type: array
+              items: { type: string }
+            expand_query:
+              type: boolean
+            counter_field:
+              type: string
+            weight:
+              type: integer
+    AnalyticsRuleUpdate:
+      type: object
+      description: Fields allowed to update on an analytics rule
+      properties:
+        name:
+          type: string
+        rule_tag:
+          type: string
+        params:
+          type: object
+          properties:
+            destination_collection:
+              type: string
+            limit:
+              type: integer
+            capture_search_requests:
+              type: boolean
+            meta_fields:
+              type: array
+              items: { type: string }
+            expand_query:
+              type: boolean
+            counter_field:
+              type: string
+            weight:
+              type: integer
+    AnalyticsRule:
+      allOf:
+        - $ref: '#/components/schemas/AnalyticsRuleCreate'
+        - type: object
+    AnalyticsStatus:
       type: object
       properties:
-        rules:
-          type: array
-          items:
-            $ref: "#/components/schemas/AnalyticsRuleSchema"
-          x-go-type: '[]*AnalyticsRuleSchema'
+        popular_prefix_queries: { type: integer }
+        nohits_prefix_queries: { type: integer }
+        log_prefix_queries: { type: integer }
+        query_log_events: { type: integer }
+        query_counter_events: { type: integer }
+        doc_log_events: { type: integer }
+        doc_counter_events: { type: integer }
+    
     APIStatsResponse:
       type: object
       properties:

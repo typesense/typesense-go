@@ -103,13 +103,19 @@ type ClientInterface interface {
 
 	UpsertAlias(ctx context.Context, aliasName string, body UpsertAliasJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// GetAnalyticsEvents request
+	GetAnalyticsEvents(ctx context.Context, params *GetAnalyticsEventsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// CreateAnalyticsEventWithBody request with any body
 	CreateAnalyticsEventWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	CreateAnalyticsEvent(ctx context.Context, body CreateAnalyticsEventJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// FlushAnalytics request
+	FlushAnalytics(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// RetrieveAnalyticsRules request
-	RetrieveAnalyticsRules(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	RetrieveAnalyticsRules(ctx context.Context, params *RetrieveAnalyticsRulesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateAnalyticsRuleWithBody request with any body
 	CreateAnalyticsRuleWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -126,6 +132,9 @@ type ClientInterface interface {
 	UpsertAnalyticsRuleWithBody(ctx context.Context, ruleName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	UpsertAnalyticsRule(ctx context.Context, ruleName string, body UpsertAnalyticsRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetAnalyticsStatus request
+	GetAnalyticsStatus(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetCollections request
 	GetCollections(ctx context.Context, params *GetCollectionsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -385,6 +394,18 @@ func (c *Client) UpsertAlias(ctx context.Context, aliasName string, body UpsertA
 	return c.Client.Do(req)
 }
 
+func (c *Client) GetAnalyticsEvents(ctx context.Context, params *GetAnalyticsEventsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetAnalyticsEventsRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) CreateAnalyticsEventWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateAnalyticsEventRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -409,8 +430,20 @@ func (c *Client) CreateAnalyticsEvent(ctx context.Context, body CreateAnalyticsE
 	return c.Client.Do(req)
 }
 
-func (c *Client) RetrieveAnalyticsRules(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewRetrieveAnalyticsRulesRequest(c.Server)
+func (c *Client) FlushAnalytics(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewFlushAnalyticsRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RetrieveAnalyticsRules(ctx context.Context, params *RetrieveAnalyticsRulesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetrieveAnalyticsRulesRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -483,6 +516,18 @@ func (c *Client) UpsertAnalyticsRuleWithBody(ctx context.Context, ruleName strin
 
 func (c *Client) UpsertAnalyticsRule(ctx context.Context, ruleName string, body UpsertAnalyticsRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpsertAnalyticsRuleRequest(c.Server, ruleName, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetAnalyticsStatus(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetAnalyticsStatusRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -1487,6 +1532,75 @@ func NewUpsertAliasRequestWithBody(server string, aliasName string, contentType 
 	return req, nil
 }
 
+// NewGetAnalyticsEventsRequest generates requests for GetAnalyticsEvents
+func NewGetAnalyticsEventsRequest(server string, params *GetAnalyticsEventsParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/analytics/events")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "user_id", runtime.ParamLocationQuery, params.UserId); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "name", runtime.ParamLocationQuery, params.Name); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "n", runtime.ParamLocationQuery, params.N); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewCreateAnalyticsEventRequest calls the generic CreateAnalyticsEvent builder with application/json body
 func NewCreateAnalyticsEventRequest(server string, body CreateAnalyticsEventJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -1527,8 +1641,35 @@ func NewCreateAnalyticsEventRequestWithBody(server string, contentType string, b
 	return req, nil
 }
 
+// NewFlushAnalyticsRequest generates requests for FlushAnalytics
+func NewFlushAnalyticsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/analytics/flush")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewRetrieveAnalyticsRulesRequest generates requests for RetrieveAnalyticsRules
-func NewRetrieveAnalyticsRulesRequest(server string) (*http.Request, error) {
+func NewRetrieveAnalyticsRulesRequest(server string, params *RetrieveAnalyticsRulesParams) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -1544,6 +1685,28 @@ func NewRetrieveAnalyticsRulesRequest(server string) (*http.Request, error) {
 	queryURL, err := serverURL.Parse(operationPath)
 	if err != nil {
 		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.RuleTag != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "rule_tag", runtime.ParamLocationQuery, *params.RuleTag); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
@@ -1705,6 +1868,33 @@ func NewUpsertAnalyticsRuleRequestWithBody(server string, ruleName string, conte
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetAnalyticsStatusRequest generates requests for GetAnalyticsStatus
+func NewGetAnalyticsStatusRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/analytics/status")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -6391,13 +6581,19 @@ type ClientWithResponsesInterface interface {
 
 	UpsertAliasWithResponse(ctx context.Context, aliasName string, body UpsertAliasJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertAliasResponse, error)
 
+	// GetAnalyticsEventsWithResponse request
+	GetAnalyticsEventsWithResponse(ctx context.Context, params *GetAnalyticsEventsParams, reqEditors ...RequestEditorFn) (*GetAnalyticsEventsResponse, error)
+
 	// CreateAnalyticsEventWithBodyWithResponse request with any body
 	CreateAnalyticsEventWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAnalyticsEventResponse, error)
 
 	CreateAnalyticsEventWithResponse(ctx context.Context, body CreateAnalyticsEventJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAnalyticsEventResponse, error)
 
+	// FlushAnalyticsWithResponse request
+	FlushAnalyticsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*FlushAnalyticsResponse, error)
+
 	// RetrieveAnalyticsRulesWithResponse request
-	RetrieveAnalyticsRulesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAnalyticsRulesResponse, error)
+	RetrieveAnalyticsRulesWithResponse(ctx context.Context, params *RetrieveAnalyticsRulesParams, reqEditors ...RequestEditorFn) (*RetrieveAnalyticsRulesResponse, error)
 
 	// CreateAnalyticsRuleWithBodyWithResponse request with any body
 	CreateAnalyticsRuleWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAnalyticsRuleResponse, error)
@@ -6414,6 +6610,9 @@ type ClientWithResponsesInterface interface {
 	UpsertAnalyticsRuleWithBodyWithResponse(ctx context.Context, ruleName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpsertAnalyticsRuleResponse, error)
 
 	UpsertAnalyticsRuleWithResponse(ctx context.Context, ruleName string, body UpsertAnalyticsRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertAnalyticsRuleResponse, error)
+
+	// GetAnalyticsStatusWithResponse request
+	GetAnalyticsStatusWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetAnalyticsStatusResponse, error)
 
 	// GetCollectionsWithResponse request
 	GetCollectionsWithResponse(ctx context.Context, params *GetCollectionsParams, reqEditors ...RequestEditorFn) (*GetCollectionsResponse, error)
@@ -6705,10 +6904,33 @@ func (r UpsertAliasResponse) StatusCode() int {
 	return 0
 }
 
+type GetAnalyticsEventsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AnalyticsEventsResponse
+	JSON400      *ApiResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r GetAnalyticsEventsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetAnalyticsEventsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type CreateAnalyticsEventResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *AnalyticsEventCreateResponse
+	JSON200      *AnalyticsEventCreateResponse
 	JSON400      *ApiResponse
 }
 
@@ -6728,10 +6950,32 @@ func (r CreateAnalyticsEventResponse) StatusCode() int {
 	return 0
 }
 
+type FlushAnalyticsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AnalyticsEventCreateResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r FlushAnalyticsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r FlushAnalyticsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type RetrieveAnalyticsRulesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *AnalyticsRulesRetrieveSchema
+	JSON200      *[]AnalyticsRule
 }
 
 // Status returns HTTPResponse.Status
@@ -6753,8 +6997,17 @@ func (r RetrieveAnalyticsRulesResponse) StatusCode() int {
 type CreateAnalyticsRuleResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *AnalyticsRuleSchema
-	JSON400      *ApiResponse
+	JSON200      *struct {
+		union json.RawMessage
+	}
+	JSON400 *ApiResponse
+}
+type CreateAnalyticsRule2001 = []CreateAnalyticsRule_200_1_Item
+type CreateAnalyticsRule20011 struct {
+	Error *string `json:"error,omitempty"`
+}
+type CreateAnalyticsRule_200_1_Item struct {
+	union json.RawMessage
 }
 
 // Status returns HTTPResponse.Status
@@ -6776,7 +7029,7 @@ func (r CreateAnalyticsRuleResponse) StatusCode() int {
 type DeleteAnalyticsRuleResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *AnalyticsRuleDeleteResponse
+	JSON200      *AnalyticsRule
 	JSON404      *ApiResponse
 }
 
@@ -6799,7 +7052,7 @@ func (r DeleteAnalyticsRuleResponse) StatusCode() int {
 type RetrieveAnalyticsRuleResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *AnalyticsRuleSchema
+	JSON200      *AnalyticsRule
 	JSON404      *ApiResponse
 }
 
@@ -6822,7 +7075,7 @@ func (r RetrieveAnalyticsRuleResponse) StatusCode() int {
 type UpsertAnalyticsRuleResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *AnalyticsRuleSchema
+	JSON200      *AnalyticsRule
 	JSON400      *ApiResponse
 }
 
@@ -6836,6 +7089,28 @@ func (r UpsertAnalyticsRuleResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r UpsertAnalyticsRuleResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetAnalyticsStatusResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AnalyticsStatus
+}
+
+// Status returns HTTPResponse.Status
+func (r GetAnalyticsStatusResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetAnalyticsStatusResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -8147,6 +8422,15 @@ func (c *ClientWithResponses) UpsertAliasWithResponse(ctx context.Context, alias
 	return ParseUpsertAliasResponse(rsp)
 }
 
+// GetAnalyticsEventsWithResponse request returning *GetAnalyticsEventsResponse
+func (c *ClientWithResponses) GetAnalyticsEventsWithResponse(ctx context.Context, params *GetAnalyticsEventsParams, reqEditors ...RequestEditorFn) (*GetAnalyticsEventsResponse, error) {
+	rsp, err := c.GetAnalyticsEvents(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetAnalyticsEventsResponse(rsp)
+}
+
 // CreateAnalyticsEventWithBodyWithResponse request with arbitrary body returning *CreateAnalyticsEventResponse
 func (c *ClientWithResponses) CreateAnalyticsEventWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAnalyticsEventResponse, error) {
 	rsp, err := c.CreateAnalyticsEventWithBody(ctx, contentType, body, reqEditors...)
@@ -8164,9 +8448,18 @@ func (c *ClientWithResponses) CreateAnalyticsEventWithResponse(ctx context.Conte
 	return ParseCreateAnalyticsEventResponse(rsp)
 }
 
+// FlushAnalyticsWithResponse request returning *FlushAnalyticsResponse
+func (c *ClientWithResponses) FlushAnalyticsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*FlushAnalyticsResponse, error) {
+	rsp, err := c.FlushAnalytics(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseFlushAnalyticsResponse(rsp)
+}
+
 // RetrieveAnalyticsRulesWithResponse request returning *RetrieveAnalyticsRulesResponse
-func (c *ClientWithResponses) RetrieveAnalyticsRulesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAnalyticsRulesResponse, error) {
-	rsp, err := c.RetrieveAnalyticsRules(ctx, reqEditors...)
+func (c *ClientWithResponses) RetrieveAnalyticsRulesWithResponse(ctx context.Context, params *RetrieveAnalyticsRulesParams, reqEditors ...RequestEditorFn) (*RetrieveAnalyticsRulesResponse, error) {
+	rsp, err := c.RetrieveAnalyticsRules(ctx, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -8223,6 +8516,15 @@ func (c *ClientWithResponses) UpsertAnalyticsRuleWithResponse(ctx context.Contex
 		return nil, err
 	}
 	return ParseUpsertAnalyticsRuleResponse(rsp)
+}
+
+// GetAnalyticsStatusWithResponse request returning *GetAnalyticsStatusResponse
+func (c *ClientWithResponses) GetAnalyticsStatusWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetAnalyticsStatusResponse, error) {
+	rsp, err := c.GetAnalyticsStatus(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetAnalyticsStatusResponse(rsp)
 }
 
 // GetCollectionsWithResponse request returning *GetCollectionsResponse
@@ -8980,6 +9282,39 @@ func ParseUpsertAliasResponse(rsp *http.Response) (*UpsertAliasResponse, error) 
 	return response, nil
 }
 
+// ParseGetAnalyticsEventsResponse parses an HTTP response from a GetAnalyticsEventsWithResponse call
+func ParseGetAnalyticsEventsResponse(rsp *http.Response) (*GetAnalyticsEventsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetAnalyticsEventsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AnalyticsEventsResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ApiResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseCreateAnalyticsEventResponse parses an HTTP response from a CreateAnalyticsEventWithResponse call
 func ParseCreateAnalyticsEventResponse(rsp *http.Response) (*CreateAnalyticsEventResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -8994,12 +9329,12 @@ func ParseCreateAnalyticsEventResponse(rsp *http.Response) (*CreateAnalyticsEven
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest AnalyticsEventCreateResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest ApiResponse
@@ -9007,6 +9342,32 @@ func ParseCreateAnalyticsEventResponse(rsp *http.Response) (*CreateAnalyticsEven
 			return nil, err
 		}
 		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseFlushAnalyticsResponse parses an HTTP response from a FlushAnalyticsWithResponse call
+func ParseFlushAnalyticsResponse(rsp *http.Response) (*FlushAnalyticsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &FlushAnalyticsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AnalyticsEventCreateResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
 
 	}
 
@@ -9028,7 +9389,7 @@ func ParseRetrieveAnalyticsRulesResponse(rsp *http.Response) (*RetrieveAnalytics
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest AnalyticsRulesRetrieveSchema
+		var dest []AnalyticsRule
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -9053,12 +9414,14 @@ func ParseCreateAnalyticsRuleResponse(rsp *http.Response) (*CreateAnalyticsRuleR
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest AnalyticsRuleSchema
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			union json.RawMessage
+		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest ApiResponse
@@ -9087,7 +9450,7 @@ func ParseDeleteAnalyticsRuleResponse(rsp *http.Response) (*DeleteAnalyticsRuleR
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest AnalyticsRuleDeleteResponse
+		var dest AnalyticsRule
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -9120,7 +9483,7 @@ func ParseRetrieveAnalyticsRuleResponse(rsp *http.Response) (*RetrieveAnalyticsR
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest AnalyticsRuleSchema
+		var dest AnalyticsRule
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -9153,7 +9516,7 @@ func ParseUpsertAnalyticsRuleResponse(rsp *http.Response) (*UpsertAnalyticsRuleR
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest AnalyticsRuleSchema
+		var dest AnalyticsRule
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -9165,6 +9528,32 @@ func ParseUpsertAnalyticsRuleResponse(rsp *http.Response) (*UpsertAnalyticsRuleR
 			return nil, err
 		}
 		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetAnalyticsStatusResponse parses an HTTP response from a GetAnalyticsStatusWithResponse call
+func ParseGetAnalyticsStatusResponse(rsp *http.Response) (*GetAnalyticsStatusResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetAnalyticsStatusResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AnalyticsStatus
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
 
 	}
 

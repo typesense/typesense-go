@@ -13,18 +13,20 @@ const (
 	Api_key_headerScopes = "api_key_header.Scopes"
 )
 
-// Defines values for AnalyticsRuleSchemaType.
+// Defines values for AnalyticsRuleType.
 const (
-	AnalyticsRuleSchemaTypeCounter        AnalyticsRuleSchemaType = "counter"
-	AnalyticsRuleSchemaTypeNohitsQueries  AnalyticsRuleSchemaType = "nohits_queries"
-	AnalyticsRuleSchemaTypePopularQueries AnalyticsRuleSchemaType = "popular_queries"
+	AnalyticsRuleTypeCounter        AnalyticsRuleType = "counter"
+	AnalyticsRuleTypeLog            AnalyticsRuleType = "log"
+	AnalyticsRuleTypeNohitsQueries  AnalyticsRuleType = "nohits_queries"
+	AnalyticsRuleTypePopularQueries AnalyticsRuleType = "popular_queries"
 )
 
-// Defines values for AnalyticsRuleUpsertSchemaType.
+// Defines values for AnalyticsRuleCreateType.
 const (
-	AnalyticsRuleUpsertSchemaTypeCounter        AnalyticsRuleUpsertSchemaType = "counter"
-	AnalyticsRuleUpsertSchemaTypeNohitsQueries  AnalyticsRuleUpsertSchemaType = "nohits_queries"
-	AnalyticsRuleUpsertSchemaTypePopularQueries AnalyticsRuleUpsertSchemaType = "popular_queries"
+	AnalyticsRuleCreateTypeCounter        AnalyticsRuleCreateType = "counter"
+	AnalyticsRuleCreateTypeLog            AnalyticsRuleCreateType = "log"
+	AnalyticsRuleCreateTypeNohitsQueries  AnalyticsRuleCreateType = "nohits_queries"
+	AnalyticsRuleCreateTypePopularQueries AnalyticsRuleCreateType = "popular_queries"
 )
 
 // Defines values for DirtyValues.
@@ -73,69 +75,110 @@ type APIStatsResponse struct {
 	WriteRequestsPerSecond      *float64            `json:"write_requests_per_second,omitempty"`
 }
 
+// AnalyticsEvent defines model for AnalyticsEvent.
+type AnalyticsEvent struct {
+	// Data Event payload
+	Data AnalyticsEventData `json:"data"`
+
+	// EventType Type of event (e.g., click, conversion, query, visit)
+	EventType string `json:"event_type"`
+
+	// Name Name of the analytics rule this event corresponds to
+	Name string `json:"name"`
+}
+
 // AnalyticsEventCreateResponse defines model for AnalyticsEventCreateResponse.
 type AnalyticsEventCreateResponse struct {
 	Ok bool `json:"ok"`
 }
 
-// AnalyticsEventCreateSchema defines model for AnalyticsEventCreateSchema.
-type AnalyticsEventCreateSchema struct {
-	Data map[string]interface{} `json:"data"`
-	Name string                 `json:"name"`
-	Type string                 `json:"type"`
+// AnalyticsEventData Event payload
+type AnalyticsEventData struct {
+	AnalyticsTag *string   `json:"analytics_tag,omitempty"`
+	DocId        *string   `json:"doc_id,omitempty"`
+	DocIds       *[]string `json:"doc_ids,omitempty"`
+	Q            *string   `json:"q,omitempty"`
+	UserId       *string   `json:"user_id,omitempty"`
 }
 
-// AnalyticsRuleDeleteResponse defines model for AnalyticsRuleDeleteResponse.
-type AnalyticsRuleDeleteResponse struct {
-	Name string `json:"name"`
+// AnalyticsEventsResponse defines model for AnalyticsEventsResponse.
+type AnalyticsEventsResponse struct {
+	Events []struct {
+		Collection *string   `json:"collection,omitempty"`
+		DocId      *string   `json:"doc_id,omitempty"`
+		DocIds     *[]string `json:"doc_ids,omitempty"`
+		EventType  *string   `json:"event_type,omitempty"`
+		Name       *string   `json:"name,omitempty"`
+		Query      *string   `json:"query,omitempty"`
+		Timestamp  *int64    `json:"timestamp,omitempty"`
+		UserId     *string   `json:"user_id,omitempty"`
+	} `json:"events"`
 }
 
-// AnalyticsRuleParameters defines model for AnalyticsRuleParameters.
-type AnalyticsRuleParameters struct {
-	Destination AnalyticsRuleParametersDestination `json:"destination"`
-	ExpandQuery *bool                              `json:"expand_query,omitempty"`
-	Limit       *int                               `json:"limit,omitempty"`
-	Source      AnalyticsRuleParametersSource      `json:"source"`
+// AnalyticsRule defines model for AnalyticsRule.
+type AnalyticsRule struct {
+	Collection string                     `json:"collection"`
+	EventType  string                     `json:"event_type"`
+	Name       string                     `json:"name"`
+	Params     *AnalyticsRuleCreateParams `json:"params,omitempty"`
+	RuleTag    *string                    `json:"rule_tag,omitempty"`
+	Type       AnalyticsRuleType          `json:"type"`
 }
 
-// AnalyticsRuleParametersDestination defines model for AnalyticsRuleParametersDestination.
-type AnalyticsRuleParametersDestination struct {
-	Collection   string  `json:"collection"`
-	CounterField *string `json:"counter_field,omitempty"`
+// AnalyticsRuleType defines model for AnalyticsRule.Type.
+type AnalyticsRuleType string
+
+// AnalyticsRuleCreate defines model for AnalyticsRuleCreate.
+type AnalyticsRuleCreate struct {
+	Collection string                     `json:"collection"`
+	EventType  string                     `json:"event_type"`
+	Name       string                     `json:"name"`
+	Params     *AnalyticsRuleCreateParams `json:"params,omitempty"`
+	RuleTag    *string                    `json:"rule_tag,omitempty"`
+	Type       AnalyticsRuleCreateType    `json:"type"`
 }
 
-// AnalyticsRuleParametersSource defines model for AnalyticsRuleParametersSource.
-type AnalyticsRuleParametersSource struct {
-	Collections []string `json:"collections"`
-	Events      *[]struct {
-		Name   string  `json:"name"`
-		Type   string  `json:"type"`
-		Weight float32 `json:"weight"`
-	} `json:"events,omitempty"`
+// AnalyticsRuleCreateType defines model for AnalyticsRuleCreate.Type.
+type AnalyticsRuleCreateType string
+
+// AnalyticsRuleCreateParams defines model for AnalyticsRuleCreateParams.
+type AnalyticsRuleCreateParams struct {
+	CaptureSearchRequests *bool     `json:"capture_search_requests,omitempty"`
+	CounterField          *string   `json:"counter_field,omitempty"`
+	DestinationCollection *string   `json:"destination_collection,omitempty"`
+	ExpandQuery           *bool     `json:"expand_query,omitempty"`
+	Limit                 *int      `json:"limit,omitempty"`
+	MetaFields            *[]string `json:"meta_fields,omitempty"`
+	Weight                *int      `json:"weight,omitempty"`
 }
 
-// AnalyticsRuleSchema defines model for AnalyticsRuleSchema.
-type AnalyticsRuleSchema struct {
-	Name   string                  `json:"name"`
-	Params AnalyticsRuleParameters `json:"params"`
-	Type   AnalyticsRuleSchemaType `json:"type"`
+// AnalyticsRuleUpdate Fields allowed to update on an analytics rule
+type AnalyticsRuleUpdate struct {
+	Name    *string                    `json:"name,omitempty"`
+	Params  *AnalyticsRuleUpdateParams `json:"params,omitempty"`
+	RuleTag *string                    `json:"rule_tag,omitempty"`
 }
 
-// AnalyticsRuleSchemaType defines model for AnalyticsRuleSchema.Type.
-type AnalyticsRuleSchemaType string
-
-// AnalyticsRuleUpsertSchema defines model for AnalyticsRuleUpsertSchema.
-type AnalyticsRuleUpsertSchema struct {
-	Params AnalyticsRuleParameters       `json:"params"`
-	Type   AnalyticsRuleUpsertSchemaType `json:"type"`
+// AnalyticsRuleUpdateParams defines model for AnalyticsRuleUpdateParams.
+type AnalyticsRuleUpdateParams struct {
+	CaptureSearchRequests *bool     `json:"capture_search_requests,omitempty"`
+	CounterField          *string   `json:"counter_field,omitempty"`
+	DestinationCollection *string   `json:"destination_collection,omitempty"`
+	ExpandQuery           *bool     `json:"expand_query,omitempty"`
+	Limit                 *int      `json:"limit,omitempty"`
+	MetaFields            *[]string `json:"meta_fields,omitempty"`
+	Weight                *int      `json:"weight,omitempty"`
 }
 
-// AnalyticsRuleUpsertSchemaType defines model for AnalyticsRuleUpsertSchema.Type.
-type AnalyticsRuleUpsertSchemaType string
-
-// AnalyticsRulesRetrieveSchema defines model for AnalyticsRulesRetrieveSchema.
-type AnalyticsRulesRetrieveSchema struct {
-	Rules *[]*AnalyticsRuleSchema `json:"rules,omitempty"`
+// AnalyticsStatus defines model for AnalyticsStatus.
+type AnalyticsStatus struct {
+	DocCounterEvents     *int `json:"doc_counter_events,omitempty"`
+	DocLogEvents         *int `json:"doc_log_events,omitempty"`
+	LogPrefixQueries     *int `json:"log_prefix_queries,omitempty"`
+	NohitsPrefixQueries  *int `json:"nohits_prefix_queries,omitempty"`
+	PopularPrefixQueries *int `json:"popular_prefix_queries,omitempty"`
+	QueryCounterEvents   *int `json:"query_counter_events,omitempty"`
+	QueryLogEvents       *int `json:"query_log_events,omitempty"`
 }
 
 // ApiKey defines model for ApiKey.
@@ -376,41 +419,30 @@ type FacetCounts struct {
 		Parent      *map[string]interface{} `json:"parent,omitempty"`
 		Value       *string                 `json:"value,omitempty"`
 	} `json:"counts,omitempty"`
-	FieldName *string `json:"field_name,omitempty"`
-	Stats     *struct {
-		Avg         *float64 `json:"avg,omitempty"`
-		Max         *float64 `json:"max,omitempty"`
-		Min         *float64 `json:"min,omitempty"`
-		Sum         *float64 `json:"sum,omitempty"`
-		TotalValues *int     `json:"total_values,omitempty"`
-	} `json:"stats,omitempty"`
+	FieldName *string           `json:"field_name,omitempty"`
+	Stats     *FacetCountsStats `json:"stats,omitempty"`
+}
+
+// FacetCountsStats defines model for FacetCountsStats.
+type FacetCountsStats struct {
+	Avg         *float64 `json:"avg,omitempty"`
+	Max         *float64 `json:"max,omitempty"`
+	Min         *float64 `json:"min,omitempty"`
+	Sum         *float64 `json:"sum,omitempty"`
+	TotalValues *int     `json:"total_values,omitempty"`
 }
 
 // Field defines model for Field.
 type Field struct {
-	Drop  *bool `json:"drop,omitempty"`
-	Embed *struct {
-		From        []string `json:"from"`
-		ModelConfig struct {
-			AccessToken    *string `json:"access_token,omitempty"`
-			ApiKey         *string `json:"api_key,omitempty"`
-			ClientId       *string `json:"client_id,omitempty"`
-			ClientSecret   *string `json:"client_secret,omitempty"`
-			IndexingPrefix *string `json:"indexing_prefix,omitempty"`
-			ModelName      string  `json:"model_name"`
-			ProjectId      *string `json:"project_id,omitempty"`
-			QueryPrefix    *string `json:"query_prefix,omitempty"`
-			RefreshToken   *string `json:"refresh_token,omitempty"`
-			Url            *string `json:"url,omitempty"`
-		} `json:"model_config"`
-	} `json:"embed,omitempty"`
-	Facet    *bool   `json:"facet,omitempty"`
-	Index    *bool   `json:"index,omitempty"`
-	Infix    *bool   `json:"infix,omitempty"`
-	Locale   *string `json:"locale,omitempty"`
-	Name     string  `json:"name"`
-	NumDim   *int    `json:"num_dim,omitempty"`
-	Optional *bool   `json:"optional,omitempty"`
+	Drop     *bool       `json:"drop,omitempty"`
+	Embed    *FieldEmbed `json:"embed,omitempty"`
+	Facet    *bool       `json:"facet,omitempty"`
+	Index    *bool       `json:"index,omitempty"`
+	Infix    *bool       `json:"infix,omitempty"`
+	Locale   *string     `json:"locale,omitempty"`
+	Name     string      `json:"name"`
+	NumDim   *int        `json:"num_dim,omitempty"`
+	Optional *bool       `json:"optional,omitempty"`
 
 	// RangeIndex Enables an index optimized for range filtering on numerical fields (e.g. rating:>3.5). Default: false.
 	RangeIndex *bool `json:"range_index,omitempty"`
@@ -437,6 +469,23 @@ type Field struct {
 
 	// VecDist The distance metric to be used for vector search. Default: `cosine`. You can also use `ip` for inner product.
 	VecDist *string `json:"vec_dist,omitempty"`
+}
+
+// FieldEmbed defines model for FieldEmbed.
+type FieldEmbed struct {
+	From        []string `json:"from"`
+	ModelConfig struct {
+		AccessToken    *string `json:"access_token,omitempty"`
+		ApiKey         *string `json:"api_key,omitempty"`
+		ClientId       *string `json:"client_id,omitempty"`
+		ClientSecret   *string `json:"client_secret,omitempty"`
+		IndexingPrefix *string `json:"indexing_prefix,omitempty"`
+		ModelName      string  `json:"model_name"`
+		ProjectId      *string `json:"project_id,omitempty"`
+		QueryPrefix    *string `json:"query_prefix,omitempty"`
+		RefreshToken   *string `json:"refresh_token,omitempty"`
+		Url            *string `json:"url,omitempty"`
+	} `json:"model_config"`
 }
 
 // HealthStatus defines model for HealthStatus.
@@ -1491,12 +1540,15 @@ type SearchParameters struct {
 
 // SearchRequestParams defines model for SearchRequestParams.
 type SearchRequestParams struct {
-	CollectionName string `json:"collection_name"`
-	PerPage        int    `json:"per_page"`
-	Q              string `json:"q"`
-	VoiceQuery     *struct {
-		TranscribedQuery *string `json:"transcribed_query,omitempty"`
-	} `json:"voice_query,omitempty"`
+	CollectionName string                         `json:"collection_name"`
+	PerPage        int                            `json:"per_page"`
+	Q              string                         `json:"q"`
+	VoiceQuery     *SearchRequestParamsVoiceQuery `json:"voice_query,omitempty"`
+}
+
+// SearchRequestParamsVoiceQuery defines model for SearchRequestParamsVoice_query.
+type SearchRequestParamsVoiceQuery struct {
+	TranscribedQuery *string `json:"transcribed_query,omitempty"`
 }
 
 // SearchResult defines model for SearchResult.
@@ -1552,26 +1604,32 @@ type SearchResultHit struct {
 	Highlights *[]SearchHighlight `json:"highlights,omitempty"`
 
 	// HybridSearchInfo Information about hybrid search scoring
-	HybridSearchInfo *struct {
-		// RankFusionScore Combined score from rank fusion of text and vector search
-		RankFusionScore *float32 `json:"rank_fusion_score,omitempty"`
-	} `json:"hybrid_search_info,omitempty"`
+	HybridSearchInfo *SearchResultHitHybridSearchInfo `json:"hybrid_search_info,omitempty"`
 
 	// SearchIndex Returned only for union query response. Indicates the index of the query which this document matched to.
-	SearchIndex   *int   `json:"search_index,omitempty"`
-	TextMatch     *int64 `json:"text_match,omitempty"`
-	TextMatchInfo *struct {
-		BestFieldScore   *string `json:"best_field_score,omitempty"`
-		BestFieldWeight  *int    `json:"best_field_weight,omitempty"`
-		FieldsMatched    *int    `json:"fields_matched,omitempty"`
-		NumTokensDropped *uint64 `json:"num_tokens_dropped,omitempty"`
-		Score            *string `json:"score,omitempty"`
-		TokensMatched    *int    `json:"tokens_matched,omitempty"`
-		TypoPrefixScore  *int    `json:"typo_prefix_score,omitempty"`
-	} `json:"text_match_info,omitempty"`
+	SearchIndex   *int                          `json:"search_index,omitempty"`
+	TextMatch     *int64                        `json:"text_match,omitempty"`
+	TextMatchInfo *SearchResultHitTextMatchInfo `json:"text_match_info,omitempty"`
 
 	// VectorDistance Distance between the query vector and matching document's vector value
 	VectorDistance *float32 `json:"vector_distance,omitempty"`
+}
+
+// SearchResultHitHybridSearchInfo Information about hybrid search scoring
+type SearchResultHitHybridSearchInfo struct {
+	// RankFusionScore Combined score from rank fusion of text and vector search
+	RankFusionScore *float32 `json:"rank_fusion_score,omitempty"`
+}
+
+// SearchResultHitTextMatchInfo defines model for SearchResultHitText_match_info.
+type SearchResultHitTextMatchInfo struct {
+	BestFieldScore   *string `json:"best_field_score,omitempty"`
+	BestFieldWeight  *int    `json:"best_field_weight,omitempty"`
+	FieldsMatched    *int    `json:"fields_matched,omitempty"`
+	NumTokensDropped *uint64 `json:"num_tokens_dropped,omitempty"`
+	Score            *string `json:"score,omitempty"`
+	TokensMatched    *int    `json:"tokens_matched,omitempty"`
+	TypoPrefixScore  *int    `json:"typo_prefix_score,omitempty"`
 }
 
 // StemmingDictionary defines model for StemmingDictionary.
@@ -1663,6 +1721,31 @@ type SynonymSetSchema struct {
 type VoiceQueryModelCollectionConfig struct {
 	ModelName *string `json:"model_name,omitempty"`
 }
+
+// GetAnalyticsEventsParams defines parameters for GetAnalyticsEvents.
+type GetAnalyticsEventsParams struct {
+	UserId string `form:"user_id" json:"user_id"`
+
+	// Name Analytics rule name
+	Name string `form:"name" json:"name"`
+
+	// N Number of events to return (max 1000)
+	N int `form:"n" json:"n"`
+}
+
+// RetrieveAnalyticsRulesParams defines parameters for RetrieveAnalyticsRules.
+type RetrieveAnalyticsRulesParams struct {
+	// RuleTag Filter rules by rule_tag
+	RuleTag *string `form:"rule_tag,omitempty" json:"rule_tag,omitempty"`
+}
+
+// CreateAnalyticsRuleJSONBody defines parameters for CreateAnalyticsRule.
+type CreateAnalyticsRuleJSONBody struct {
+	union json.RawMessage
+}
+
+// CreateAnalyticsRuleJSONBody1 defines parameters for CreateAnalyticsRule.
+type CreateAnalyticsRuleJSONBody1 = []AnalyticsRuleCreate
 
 // GetCollectionsParams defines parameters for GetCollections.
 type GetCollectionsParams struct {
@@ -1892,13 +1975,13 @@ type ImportStemmingDictionaryParams struct {
 type UpsertAliasJSONRequestBody = CollectionAliasSchema
 
 // CreateAnalyticsEventJSONRequestBody defines body for CreateAnalyticsEvent for application/json ContentType.
-type CreateAnalyticsEventJSONRequestBody = AnalyticsEventCreateSchema
+type CreateAnalyticsEventJSONRequestBody = AnalyticsEvent
 
 // CreateAnalyticsRuleJSONRequestBody defines body for CreateAnalyticsRule for application/json ContentType.
-type CreateAnalyticsRuleJSONRequestBody = AnalyticsRuleSchema
+type CreateAnalyticsRuleJSONRequestBody CreateAnalyticsRuleJSONBody
 
 // UpsertAnalyticsRuleJSONRequestBody defines body for UpsertAnalyticsRule for application/json ContentType.
-type UpsertAnalyticsRuleJSONRequestBody = AnalyticsRuleUpsertSchema
+type UpsertAnalyticsRuleJSONRequestBody = AnalyticsRuleUpdate
 
 // CreateCollectionJSONRequestBody defines body for CreateCollection for application/json ContentType.
 type CreateCollectionJSONRequestBody = CollectionSchema
