@@ -81,6 +81,9 @@ func main() {
 	// Remove additionalProperties from SearchResultHit -> document
 	log.Println("Removing additionalProperties from SearchResultHit")
 	searchResultHit(&m)
+	// Extract anonymous structs to named types
+	log.Println("Extracting anonymous structs to named types")
+	extractAnonymousStructs(&m)
 
 	log.Println("Writing updated spec to generator.yml")
 	generatorFile, err := os.Create("./typesense/api/generator/generator.yml")
@@ -305,5 +308,66 @@ func oAPICodeGen() {
 	err = exec.Command("sh", "./generator.sh").Run()
 	if err != nil {
 		log.Printf("Error generating client_gen.go and types_gen.go: %s", err.Error())
+	}
+}
+
+// extractAnonymousStructs converts anonymous structs to named types
+func extractAnonymousStructs(m *yml) {
+	schemas := (*m)["components"].(yml)["schemas"].(yml)
+	
+	// Track all anonymous structs we find
+	anonymousStructs := make(map[string]yml)
+	
+	// Iterate through all schemas to find anonymous structs
+	for schemaName, schema := range schemas {
+		if schemaMap, ok := schema.(yml); ok {
+			findAnonymousStructsInSchema(schemaMap, anonymousStructs, schemaName)
+		}
+	}
+	
+	// Create named types for all anonymous structs
+	for typeName, structDef := range anonymousStructs {
+		schemas[typeName] = structDef
+	}
+}
+
+// findAnonymousStructsInSchema looks for anonymous structs within a specific schema
+func findAnonymousStructsInSchema(schema yml, anonymousStructs map[string]yml, parentSchemaName string) {
+	if schema == nil || schema["properties"] == nil {
+		return
+	}
+	
+	properties := schema["properties"].(yml)
+	
+	// Check each property for anonymous structs
+	for propName, propSchema := range properties {
+		if propMap, ok := propSchema.(yml); ok {
+			// If this property is an object with properties, it might be an anonymous struct
+			if propMap["type"] == "object" && propMap["properties"] != nil {
+				// This is an anonymous struct - create a named type for it
+				typeName := parentSchemaName + strings.Title(propName)
+				
+				// Create the named type
+				namedType := make(yml)
+				namedType["type"] = "object"
+				namedType["properties"] = propMap["properties"]
+				if propMap["required"] != nil {
+					namedType["required"] = propMap["required"]
+				}
+				if propMap["description"] != nil {
+					namedType["description"] = propMap["description"]
+				}
+				
+				// Store it for later addition to schemas
+				anonymousStructs[typeName] = namedType
+				
+				// Replace the anonymous struct with a reference
+				// Clear the existing fields and add the reference
+				for key := range propMap {
+					delete(propMap, key)
+				}
+				propMap["$ref"] = "#/components/schemas/" + typeName
+			}
+		}
 	}
 }
