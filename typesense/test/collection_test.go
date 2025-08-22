@@ -14,7 +14,7 @@ import (
 
 func TestCollectionRetrieve(t *testing.T) {
 	collectionName := createNewCollection(t, "companies")
-	expectedResult := expectedNewCollection(collectionName)
+	expectedResult := expectedNewCollection(t, collectionName)
 
 	result, err := typesenseClient.Collection(collectionName).Retrieve(context.Background())
 	result.CreatedAt = pointer.Int64(0)
@@ -25,7 +25,7 @@ func TestCollectionRetrieve(t *testing.T) {
 
 func TestCollectionDelete(t *testing.T) {
 	collectionName := createNewCollection(t, "companies")
-	expectedResult := expectedNewCollection(collectionName)
+	expectedResult := expectedNewCollection(t, collectionName)
 
 	result, err := typesenseClient.Collection(collectionName).Delete(context.Background())
 	result.CreatedAt = pointer.Int64(0)

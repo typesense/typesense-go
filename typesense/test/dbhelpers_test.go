@@ -90,7 +90,62 @@ func newSchema(collectionName string) *api.CollectionSchema {
 	}
 }
 
-func expectedNewCollection(name string) *api.CollectionResponse {
+func expectedNewCollection(t *testing.T, name string) *api.CollectionResponse {
+	if !isV30OrAbove(t) {
+		return &api.CollectionResponse{
+			Name: name,
+			Fields: []api.Field{
+				{
+					Name:           "company_name",
+					Type:           "string",
+					Facet:          pointer.False(),
+					Optional:       pointer.False(),
+					Index:          pointer.True(),
+					Infix:          pointer.False(),
+					Locale:         pointer.String(""),
+					Sort:           pointer.False(),
+					Drop:           nil,
+					Store:          pointer.True(),
+					Stem:           pointer.False(),
+					StemDictionary: pointer.String(""),
+				},
+				{
+					Name:           "num_employees",
+					Type:           "int32",
+					Facet:          pointer.False(),
+					Optional:       pointer.False(),
+					Index:          pointer.True(),
+					Infix:          pointer.False(),
+					Locale:         pointer.String(""),
+					Sort:           pointer.True(),
+					Drop:           nil,
+					Store:          pointer.True(),
+					Stem:           pointer.False(),
+					StemDictionary: pointer.String(""),
+				},
+				{
+					Name:           "country",
+					Type:           "string",
+					Facet:          pointer.True(),
+					Optional:       pointer.True(),
+					Index:          pointer.True(),
+					Infix:          pointer.False(),
+					Locale:         pointer.String(""),
+					Sort:           pointer.False(),
+					Drop:           nil,
+					Store:          pointer.True(),
+					Stem:           pointer.False(),
+					StemDictionary: pointer.String(""),
+				},
+			},
+			EnableNestedFields:  pointer.False(),
+			DefaultSortingField: pointer.String(""),
+			TokenSeparators:     &[]string{},
+			SymbolsToIndex:      &[]string{},
+			NumDocuments:        pointer.Int64(0),
+			CreatedAt:           pointer.Int64(0),
+		}
+	}
 	return &api.CollectionResponse{
 		Name: name,
 		Fields: []api.Field{
@@ -140,7 +195,6 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 		EnableNestedFields:  pointer.False(),
 		DefaultSortingField: pointer.String(""),
 		TokenSeparators:     &[]string{},
-		SymbolsToIndex:      &[]string{},
 		SynonymSets:         &[]string{},
 		NumDocuments:        pointer.Int64(0),
 		CreatedAt:           pointer.Int64(0),
