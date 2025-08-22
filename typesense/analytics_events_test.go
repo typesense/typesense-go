@@ -17,7 +17,7 @@ func TestAnalyticsEventsCreate(t *testing.T) {
 		Data: struct {
 			AnalyticsTag *string   `json:"analytics_tag,omitempty"`
 			DocId        *string   `json:"doc_id,omitempty"`
-			DocIds       *[]string `json:"doc_ids,omitempty"`
+			DocIds       *[]string `json:"doc_ids,omitempty"` //nolint:revive // matches API type
 			Q            *string   `json:"q,omitempty"`
 			UserId       *string   `json:"user_id,omitempty"`
 		}{
@@ -32,7 +32,7 @@ func TestAnalyticsEventsCreate(t *testing.T) {
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/analytics/events", http.MethodPost)
-		
+
 		var reqBody api.AnalyticsEvent
 		err := json.NewDecoder(r.Body).Decode(&reqBody)
 		assert.NoError(t, err)
@@ -63,7 +63,7 @@ func TestAnalyticsEventsRetrieve(t *testing.T) {
 		Events: []struct {
 			Collection *string   `json:"collection,omitempty"`
 			DocId      *string   `json:"doc_id,omitempty"`
-			DocIds     *[]string `json:"doc_ids,omitempty"`
+			DocIds     *[]string `json:"doc_ids,omitempty"` //nolint:revive // matches API type
 			EventType  *string   `json:"event_type,omitempty"`
 			Name       *string   `json:"name,omitempty"`
 			Query      *string   `json:"query,omitempty"`
@@ -81,7 +81,7 @@ func TestAnalyticsEventsRetrieve(t *testing.T) {
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/analytics/events", http.MethodGet)
-		
+
 		// Check query parameters
 		assert.Equal(t, "test_rule", r.URL.Query().Get("name"))
 		assert.Equal(t, "user_123", r.URL.Query().Get("user_id"))

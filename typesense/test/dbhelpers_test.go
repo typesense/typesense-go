@@ -21,42 +21,42 @@ import (
 // isV30OrAbove checks if the Typesense version is v30 or above
 func isV30OrAbove(t *testing.T) bool {
 	t.Helper()
-	
+
 	debug, err := typesenseClient.Debug(context.Background())
 	if err != nil {
 		t.Logf("Failed to get debug info: %v", err)
 		return false
 	}
-	
+
 	if debug.JSON200 == nil || debug.JSON200.Version == nil {
 		t.Log("Debug response or version is nil")
 		return false
 	}
-	
+
 	version := *debug.JSON200.Version
 	if version == "nightly" {
 		return true
 	}
-	
+
 	// Extract version number from "v30.0.0" format
 	if !strings.HasPrefix(version, "v") {
 		t.Logf("Version format unexpected: %s", version)
 		return false
 	}
-	
+
 	numberedVersion := strings.Split(version, "v")[1]
 	parts := strings.Split(numberedVersion, ".")
 	if len(parts) == 0 {
 		t.Logf("Version parts empty: %s", numberedVersion)
 		return false
 	}
-	
+
 	majorVersion, err := strconv.Atoi(parts[0])
 	if err != nil {
 		t.Logf("Failed to parse major version: %v", err)
 		return false
 	}
-	
+
 	return majorVersion >= 30
 }
 
@@ -196,6 +196,7 @@ func expectedNewCollection(t *testing.T, name string) *api.CollectionResponse {
 		DefaultSortingField: pointer.String(""),
 		TokenSeparators:     &[]string{},
 		SynonymSets:         &[]string{},
+		SymbolsToIndex:      &[]string{},
 		NumDocuments:        pointer.Int64(0),
 		CreatedAt:           pointer.Int64(0),
 		Metadata: &map[string]interface{}{
@@ -357,8 +358,6 @@ func newSearchOverride(overrideID string) *api.SearchOverride {
 	}
 }
 
-
-
 func newSynonymSetCreateSchema() *api.SynonymSetCreateSchema {
 	return &api.SynonymSetCreateSchema{
 		Items: []api.SynonymItemSchema{
@@ -460,7 +459,7 @@ func newAnalyticsRule(ruleName string, collectionName string, sourceCollectionNa
 func createNewAnalyticsRule(t *testing.T, collectionName string, sourceCollectionName string, eventName string) *api.AnalyticsRule {
 	t.Helper()
 	ruleName := newUUIDName("test-rule")
-	
+
 	// Create the rule using the new API
 	ruleCreate := &api.AnalyticsRuleCreate{
 		Name:       ruleName,
@@ -472,11 +471,11 @@ func createNewAnalyticsRule(t *testing.T, collectionName string, sourceCollectio
 			Weight:       pointer.Int(1),
 		},
 	}
-	
+
 	// Create the rule via the API
 	_, err := typesenseClient.Analytics().Rules().Create(context.Background(), []*api.AnalyticsRuleCreate{ruleCreate})
 	require.NoError(t, err)
-	
+
 	// Return the expected rule structure
 	return newAnalyticsRule(ruleName, collectionName, sourceCollectionName, eventName)
 }
@@ -534,56 +533,56 @@ func retrieveDocuments(t *testing.T, collectionName string, docIDs ...string) []
 
 func newNLSearchModelCreateSchema() *api.NLSearchModelCreateSchema {
 	apiKey := os.Getenv("NL_SEARCH_MODEL_API_KEY")
-	
+
 	return &api.NLSearchModelCreateSchema{
-		ModelName:    pointer.String("openai/gpt-3.5-turbo"),
-		ApiKey:       pointer.String(apiKey),
-		MaxBytes:     pointer.Int(1000),
-		Temperature:  pointer.Float32(0.7),
-		SystemPrompt: pointer.String("You are a helpful assistant."),
-		TopP:         pointer.Float32(0.9),
-		TopK:         pointer.Int(40),
+		ModelName:     pointer.String("openai/gpt-3.5-turbo"),
+		ApiKey:        pointer.String(apiKey),
+		MaxBytes:      pointer.Int(1000),
+		Temperature:   pointer.Float32(0.7),
+		SystemPrompt:  pointer.String("You are a helpful assistant."),
+		TopP:          pointer.Float32(0.9),
+		TopK:          pointer.Int(40),
 		StopSequences: &[]string{"END", "STOP"},
-		ApiVersion:   pointer.String("v1"),
+		ApiVersion:    pointer.String("v1"),
 	}
 }
 
 func newNLSearchModelSchema(modelID string) *api.NLSearchModelSchema {
 	apiKey := os.Getenv("NL_SEARCH_MODEL_API_KEY")
-	
+
 	return &api.NLSearchModelSchema{
-		Id:           modelID,
-		ModelName:    pointer.String("openai/gpt-3.5-turbo"),
-		ApiKey:       pointer.String(apiKey),
-		MaxBytes:     pointer.Int(1000),
-		Temperature:  pointer.Float32(0.7),
-		SystemPrompt: pointer.String("You are a helpful assistant."),
-		TopP:         pointer.Float32(0.9),
-		TopK:         pointer.Int(40),
+		Id:            modelID,
+		ModelName:     pointer.String("openai/gpt-3.5-turbo"),
+		ApiKey:        pointer.String(apiKey),
+		MaxBytes:      pointer.Int(1000),
+		Temperature:   pointer.Float32(0.7),
+		SystemPrompt:  pointer.String("You are a helpful assistant."),
+		TopP:          pointer.Float32(0.9),
+		TopK:          pointer.Int(40),
 		StopSequences: &[]string{"END", "STOP"},
-		ApiVersion:   pointer.String("v1"),
+		ApiVersion:    pointer.String("v1"),
 	}
 }
 
 func newNLSearchModelUpdateSchema() *api.NLSearchModelUpdateSchema {
 	apiKey := os.Getenv("NL_SEARCH_MODEL_API_KEY")
-	
+
 	return &api.NLSearchModelUpdateSchema{
-		ModelName:    pointer.String("openai/gpt-4"),
-		ApiKey:       pointer.String(apiKey),
-		MaxBytes:     pointer.Int(2000),
-		Temperature:  pointer.Float32(0.5),
-		SystemPrompt: pointer.String("You are an expert assistant."),
-		TopP:         pointer.Float32(0.8),
-		TopK:         pointer.Int(50),
+		ModelName:     pointer.String("openai/gpt-4"),
+		ApiKey:        pointer.String(apiKey),
+		MaxBytes:      pointer.Int(2000),
+		Temperature:   pointer.Float32(0.5),
+		SystemPrompt:  pointer.String("You are an expert assistant."),
+		TopP:          pointer.Float32(0.8),
+		TopK:          pointer.Int(50),
 		StopSequences: &[]string{"END", "STOP", "QUIT"},
-		ApiVersion:   pointer.String("v1"),
+		ApiVersion:    pointer.String("v1"),
 	}
 }
 
-func shouldSkipNLSearchModelTests(t *testing.T)  {
+func shouldSkipNLSearchModelTests(t *testing.T) {
 	if os.Getenv("NL_SEARCH_MODEL_API_KEY") == "" {
-		
+
 		t.Skip("Skipping NL search model test: NL_SEARCH_MODEL_API_KEY not set")
 	}
 }

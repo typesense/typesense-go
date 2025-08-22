@@ -57,7 +57,7 @@ func TestAnalyticsRulesCreate(t *testing.T) {
 			Type:       api.AnalyticsRuleCreateTypeCounter,
 			Collection: "test_collection",
 			EventType:  "click",
-			Params: &api.AnalyticsRuleCreateParams {
+			Params: &api.AnalyticsRuleCreateParams{
 				CounterField: pointer.String("popularity"),
 				Weight:       pointer.Int(10),
 			},
@@ -79,7 +79,7 @@ func TestAnalyticsRulesCreate(t *testing.T) {
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/analytics/rules", http.MethodPost)
-		
+
 		var reqBody []api.AnalyticsRuleCreate
 		err := json.NewDecoder(r.Body).Decode(&reqBody)
 		assert.NoError(t, err)

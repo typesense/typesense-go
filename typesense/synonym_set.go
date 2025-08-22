@@ -53,4 +53,4 @@ func (s *synonymSet) Delete(ctx context.Context) (*api.SynonymSetDeleteSchema, e
 		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return response.JSON200, nil
-} 
+}

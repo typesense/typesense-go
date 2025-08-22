@@ -64,8 +64,6 @@ func (c *collection[T]) Override(overrideID string) OverrideInterface {
 	return &override{apiClient: c.apiClient, collectionName: c.name, overrideID: overrideID}
 }
 
-
-
 func (c *collection[T]) Update(ctx context.Context, schema *api.CollectionUpdateSchema) (*api.CollectionUpdateSchema, error) {
 	response, err := c.apiClient.UpdateCollectionWithResponse(ctx, c.name,
 		api.UpdateCollectionJSONRequestBody(*schema))
