@@ -390,51 +390,41 @@ func newPresetFromMultiSearchSearchesParameter(presetName string) *api.PresetSch
 	return preset
 }
 
-func newAnalyticsRuleUpsertSchema(collectionName string, sourceCollectionName string, eventName string) *api.AnalyticsRuleUpsertSchema {
-	return &api.AnalyticsRuleUpsertSchema{
-		Type: "counter",
-		Params: api.AnalyticsRuleParameters{
-			Source: api.AnalyticsRuleParametersSource{
-				Collections: []string{sourceCollectionName},
-				Events: &[]struct {
-					Name   string  "json:\"name\""
-					Type   string  "json:\"type\""
-					Weight float32 "json:\"weight\""
-				}{
-					{Type: "click", Weight: 1, Name: eventName},
-				},
-			},
-			Destination: api.AnalyticsRuleParametersDestination{
-				Collection:   collectionName,
-				CounterField: pointer.String("num_employees"),
-			},
-			Limit: pointer.Int(9999),
+func newAnalyticsRule(ruleName string, collectionName string, sourceCollectionName string, eventName string) *api.AnalyticsRule {
+	return &api.AnalyticsRule{
+		Name:       ruleName,
+		Type:       api.AnalyticsRuleTypeCounter,
+		Collection: collectionName,
+		EventType:  "click",
+		Params: &api.AnalyticsRuleCreateParams{
+			CounterField: pointer.String("num_employees"),
+			Weight:       pointer.Int(1),
 		},
 	}
 }
 
-func newAnalyticsRule(ruleName string, collectionName string, sourceCollectionName string, eventName string) *api.AnalyticsRuleSchema {
-	return &api.AnalyticsRuleSchema{
-		Name: ruleName,
-		Type: "counter",
-		Params: api.AnalyticsRuleParameters{
-			Source: api.AnalyticsRuleParametersSource{
-				Collections: []string{sourceCollectionName},
-				Events: &[]struct {
-					Name   string  "json:\"name\""
-					Type   string  "json:\"type\""
-					Weight float32 "json:\"weight\""
-				}{
-					{Type: "click", Weight: 1, Name: eventName},
-				},
-			},
-			Destination: api.AnalyticsRuleParametersDestination{
-				Collection:   collectionName,
-				CounterField: pointer.String("num_employees"),
-			},
-			Limit: pointer.Int(9999),
+func createNewAnalyticsRule(t *testing.T, collectionName string, sourceCollectionName string, eventName string) *api.AnalyticsRule {
+	t.Helper()
+	ruleName := newUUIDName("test-rule")
+	
+	// Create the rule using the new API
+	ruleCreate := &api.AnalyticsRuleCreate{
+		Name:       ruleName,
+		Type:       api.AnalyticsRuleCreateTypeCounter,
+		Collection: collectionName,
+		EventType:  "click",
+		Params: &api.AnalyticsRuleCreateParams{
+			CounterField: pointer.String("num_employees"),
+			Weight:       pointer.Int(1),
 		},
 	}
+	
+	// Create the rule via the API
+	_, err := typesenseClient.Analytics().Rules().Create(context.Background(), []*api.AnalyticsRuleCreate{ruleCreate})
+	require.NoError(t, err)
+	
+	// Return the expected rule structure
+	return newAnalyticsRule(ruleName, collectionName, sourceCollectionName, eventName)
 }
 
 func createNewCollection(t *testing.T, namePrefix string) string {
@@ -476,17 +466,6 @@ func createNewPreset(t *testing.T, presetValueIsFromSearchParameters ...bool) (s
 
 	require.NoError(t, err)
 	return presetName, result
-}
-
-func createNewAnalyticsRule(t *testing.T, collectionName string, sourceCollectionName string, eventName string) *api.AnalyticsRuleSchema {
-	t.Helper()
-	ruleSchema := newAnalyticsRuleUpsertSchema(collectionName, sourceCollectionName, eventName)
-	ruleName := newUUIDName("test-rule")
-
-	result, err := typesenseClient.Analytics().Rules().Upsert(context.Background(), ruleName, ruleSchema)
-
-	require.NoError(t, err)
-	return result
 }
 
 func retrieveDocuments(t *testing.T, collectionName string, docIDs ...string) []map[string]interface{} {
@@ -550,7 +529,14 @@ func newNLSearchModelUpdateSchema() *api.NLSearchModelUpdateSchema {
 
 func shouldSkipNLSearchModelTests(t *testing.T)  {
 	if os.Getenv("NL_SEARCH_MODEL_API_KEY") == "" {
+		
 		t.Skip("Skipping NL search model test: NL_SEARCH_MODEL_API_KEY not set")
+	}
+}
+
+func shouldSkipAnalyticsTests(t *testing.T) {
+	if !isV30OrAbove(t) {
+		t.Skip("Skipping analytics tests: requires Typesense v30 or above")
 	}
 }
 
