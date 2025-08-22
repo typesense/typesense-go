@@ -9,6 +9,8 @@ import (
 	"sort"
 	"strings"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"gopkg.in/yaml.v3"
 )
 
@@ -314,17 +316,17 @@ func oAPICodeGen() {
 // extractAnonymousStructs converts anonymous structs to named types
 func extractAnonymousStructs(m *yml) {
 	schemas := (*m)["components"].(yml)["schemas"].(yml)
-	
+
 	// Track all anonymous structs we find
 	anonymousStructs := make(map[string]yml)
-	
+
 	// Iterate through all schemas to find anonymous structs
 	for schemaName, schema := range schemas {
 		if schemaMap, ok := schema.(yml); ok {
 			findAnonymousStructsInSchema(schemaMap, anonymousStructs, schemaName)
 		}
 	}
-	
+
 	// Create named types for all anonymous structs
 	for typeName, structDef := range anonymousStructs {
 		schemas[typeName] = structDef
@@ -336,38 +338,48 @@ func findAnonymousStructsInSchema(schema yml, anonymousStructs map[string]yml, p
 	if schema == nil || schema["properties"] == nil {
 		return
 	}
-	
+
 	properties := schema["properties"].(yml)
-	
+
 	// Check each property for anonymous structs
 	for propName, propSchema := range properties {
 		if propMap, ok := propSchema.(yml); ok {
-			// If this property is an object with properties, it might be an anonymous struct
-			if propMap["type"] == "object" && propMap["properties"] != nil {
-				// This is an anonymous struct - create a named type for it
-				typeName := parentSchemaName + strings.Title(propName)
-				
-				// Create the named type
-				namedType := make(yml)
-				namedType["type"] = "object"
-				namedType["properties"] = propMap["properties"]
-				if propMap["required"] != nil {
-					namedType["required"] = propMap["required"]
-				}
-				if propMap["description"] != nil {
-					namedType["description"] = propMap["description"]
-				}
-				
-				// Store it for later addition to schemas
-				anonymousStructs[typeName] = namedType
-				
-				// Replace the anonymous struct with a reference
-				// Clear the existing fields and add the reference
-				for key := range propMap {
-					delete(propMap, key)
-				}
-				propMap["$ref"] = "#/components/schemas/" + typeName
-			}
+			processPropertyForAnonymousStruct(propMap, propName, parentSchemaName, anonymousStructs)
 		}
 	}
+}
+
+// processPropertyForAnonymousStruct handles the logic for processing a property that might be an anonymous struct
+func processPropertyForAnonymousStruct(propMap yml, propName, parentSchemaName string, anonymousStructs map[string]yml) {
+	if propMap["type"] == "object" && propMap["properties"] != nil {
+		// This is an anonymous struct - create a named type for it
+		typeName := parentSchemaName + cases.Title(language.English).String(propName)
+
+		createNamedType(propMap, typeName, anonymousStructs)
+
+		replaceWithReference(propMap, typeName)
+	}
+}
+
+// createNamedType creates a named type from an anonymous struct and stores it
+func createNamedType(propMap yml, typeName string, anonymousStructs map[string]yml) {
+	namedType := make(yml)
+	namedType["type"] = "object"
+	namedType["properties"] = propMap["properties"]
+	if propMap["required"] != nil {
+		namedType["required"] = propMap["required"]
+	}
+	if propMap["description"] != nil {
+		namedType["description"] = propMap["description"]
+	}
+
+	anonymousStructs[typeName] = namedType
+}
+
+// replaceWithReference replaces the anonymous struct with a reference to the named type
+func replaceWithReference(propMap yml, typeName string) {
+	for key := range propMap {
+		delete(propMap, key)
+	}
+	propMap["$ref"] = "#/components/schemas/" + typeName
 }
