@@ -97,6 +97,7 @@ func expectedNewCollection(name string) *api.CollectionResponse {
 		DefaultSortingField: pointer.String(""),
 		TokenSeparators:     &[]string{},
 		SymbolsToIndex:      &[]string{},
+		SynonymSets:         &[]string{},
 		NumDocuments:        pointer.Int64(0),
 		CreatedAt:           pointer.Int64(0),
 		Metadata: &map[string]interface{}{
@@ -258,29 +259,40 @@ func newSearchOverride(overrideID string) *api.SearchOverride {
 	}
 }
 
-type newSynonymOption func(*api.SearchSynonymSchema)
 
-func withSynonyms(synonyms ...string) newSynonymOption {
-	return func(s *api.SearchSynonymSchema) {
-		s.Synonyms = synonyms
+
+func newSynonymSetCreateSchema() *api.SynonymSetCreateSchema {
+	return &api.SynonymSetCreateSchema{
+		Items: []api.SynonymItemSchema{
+			{
+				Id:       "dummy",
+				Synonyms: []string{"foo", "bar", "baz"},
+			},
+		},
 	}
 }
 
-func newSearchSynonymSchema(opts ...newSynonymOption) *api.SearchSynonymSchema {
-	schema := &api.SearchSynonymSchema{
-		Synonyms: []string{"blazer", "coat", "jacket"},
+func newSynonymSetSchema(synonymSetName string) *api.SynonymSetSchema {
+	return &api.SynonymSetSchema{
+		Name: synonymSetName,
+		Items: []api.SynonymItemSchema{
+			{
+				Id:       "dummy",
+				Synonyms: []string{"foo", "bar", "baz"},
+			},
+		},
 	}
-	for _, opt := range opts {
-		opt(schema)
-	}
-	return schema
 }
 
-func newSearchSynonym(synonymID string) *api.SearchSynonym {
-	return &api.SearchSynonym{
-		Id:       pointer.String(synonymID),
-		Synonyms: []string{"blazer", "coat", "jacket"},
-	}
+func createNewSynonymSet(t *testing.T) (string, *api.SynonymSetSchema) {
+	t.Helper()
+	synonymSetName := newUUIDName("synonym-set-test")
+	synonymSetSchema := newSynonymSetCreateSchema()
+
+	result, err := typesenseClient.SynonymSets().Upsert(context.Background(), synonymSetName, synonymSetSchema)
+
+	require.NoError(t, err)
+	return synonymSetName, result
 }
 
 func newCollectionAlias(collectionName string, name string) *api.CollectionAlias {
