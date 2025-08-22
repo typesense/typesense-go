@@ -7,6 +7,8 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -15,6 +17,48 @@ import (
 	"github.com/typesense/typesense-go/v3/typesense/api"
 	"github.com/typesense/typesense-go/v3/typesense/api/pointer"
 )
+
+// isV30OrAbove checks if the Typesense version is v30 or above
+func isV30OrAbove(t *testing.T) bool {
+	t.Helper()
+	
+	debug, err := typesenseClient.Debug(context.Background())
+	if err != nil {
+		t.Logf("Failed to get debug info: %v", err)
+		return false
+	}
+	
+	if debug.JSON200 == nil || debug.JSON200.Version == nil {
+		t.Log("Debug response or version is nil")
+		return false
+	}
+	
+	version := *debug.JSON200.Version
+	if version == "nightly" {
+		return true
+	}
+	
+	// Extract version number from "v30.0.0" format
+	if !strings.HasPrefix(version, "v") {
+		t.Logf("Version format unexpected: %s", version)
+		return false
+	}
+	
+	numberedVersion := strings.Split(version, "v")[1]
+	parts := strings.Split(numberedVersion, ".")
+	if len(parts) == 0 {
+		t.Logf("Version parts empty: %s", numberedVersion)
+		return false
+	}
+	
+	majorVersion, err := strconv.Atoi(parts[0])
+	if err != nil {
+		t.Logf("Failed to parse major version: %v", err)
+		return false
+	}
+	
+	return majorVersion >= 30
+}
 
 func newUUIDName(namePrefix string) string {
 	nameUUID := uuid.New()
