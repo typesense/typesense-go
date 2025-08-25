@@ -52,10 +52,17 @@ func main() {
 		log.Fatalf("Aboring: %s", err.Error())
 	}
 
+	processOpenAPISpec(&m)
+	writeGeneratorFile(&m)
+	generateClient()
+
+	log.Println("Successfully Completed !")
+}
+
+func processOpenAPISpec(m *yml) {
 	configFile, err := os.Open("./typesense/api/generator/openapi.yml")
 	if err != nil {
 		log.Fatalf("Unable to open config file: %s", err.Error())
-		return
 	}
 
 	err = yaml.NewDecoder(configFile).Decode(&m)
@@ -65,46 +72,49 @@ func main() {
 
 	// Unwrapping the search parameters
 	log.Println("Unwrapping search parameters and multi_search parameters")
-	unwrapSearchParameters(&m)
-	unwrapMultiSearchParameters(&m)
+	unwrapSearchParameters(m)
+	unwrapMultiSearchParameters(m)
 	// Unwrapping import and export parameters
 	log.Println("Unwrapping documents import parameters")
-	unwrapImportDocuments(&m)
+	unwrapImportDocuments(m)
 	log.Println("Unwrapping documents export parameters")
-	unwrapExportDocuments(&m)
+	unwrapExportDocuments(m)
 	// Unwrapping update documents with condition parameters
 	log.Println("Unwrapping documents update with condition parameters")
-	unwrapUpdateDocumentsWithConditionParameters(&m)
+	unwrapUpdateDocumentsWithConditionParameters(m)
 	// Unwrapping delete document parameters
 	log.Println("Unwrapping documents delete parameters")
-	unwrapDeleteDocument(&m)
+	unwrapDeleteDocument(m)
 	log.Println("Unwrapping collections get parameters")
-	unwrapGetCollections(&m)
+	unwrapGetCollections(m)
 	// Remove additionalProperties from SearchResultHit -> document
 	log.Println("Removing additionalProperties from SearchResultHit")
-	searchResultHit(&m)
+	searchResultHit(m)
 	// Extract anonymous structs to named types
 	log.Println("Extracting anonymous structs to named types")
-	extractAnonymousStructs(&m)
+	extractAnonymousStructs(m)
+}
 
+func writeGeneratorFile(m *yml) {
 	log.Println("Writing updated spec to generator.yml")
 	generatorFile, err := os.Create("./typesense/api/generator/generator.yml")
 	if err != nil {
 		log.Fatalf("Unable to open config file: %s", err.Error())
-		return
 	}
 
 	encode := yaml.NewEncoder(generatorFile)
 	encode.SetIndent(2)
 	err = encode.Encode(m)
+	generatorFile.Close()
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
+}
 
+func generateClient() {
 	// Use generator.yml to generate client_gen.go and types_gen.go
 	log.Println("Generating client")
 	oAPICodeGen()
-	log.Println("Successfully Completed !")
 }
 
 func fetchOpenAPISpec() error {
