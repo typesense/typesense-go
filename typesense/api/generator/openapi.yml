@@ -814,7 +814,7 @@ paths:
     get:
       tags:
         - documents
-      summary: Retreive a document
+      summary: Retrieve a document
       description: Fetch an individual document from a collection by using its ID.
       operationId: getDocument
       parameters:
@@ -1339,6 +1339,66 @@ paths:
       responses:
         '200':
           description: Re-election is performed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessStatus"
+  /operations/cache/clear:
+    post:
+      tags:
+        - operations
+      summary: Clear the cached responses of search requests in the LRU cache.
+      description:
+        Clear the cached responses of search requests that are sent with `use_cache` parameter in the LRU cache.
+      operationId: clearCache
+      responses:
+        '200':
+          description: Clear cache succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessStatus"
+  /operations/db/compact:
+    post:
+      tags:
+        - operations
+      summary: Compacting the on-disk database
+      description:
+        Typesense uses RocksDB to store your documents on the disk. If you do frequent writes or updates, you could benefit from running a compaction of the underlying RocksDB database.
+        This could reduce the size of the database and decrease read latency. While the database will not block during this operation, we recommend running it during off-peak hours.
+      operationId: compactDb
+      responses:
+        '200':
+          description: Compacting the on-disk database succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessStatus"
+  /config:
+    post:
+      tags:
+        - operations
+      summary: Toggle Slow Request Log
+      description:
+        Enable logging of requests that take over a defined threshold of time.
+        Default is `-1` which disables slow request logging.
+        Slow requests are logged to the primary log file, with the prefix SLOW REQUEST.
+      operationId: toggleSlowRequestLog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                log-slow-requests-time-ms:
+                  type: integer
+              required:
+                - log-slow-requests-time-ms
+              example: |
+                {"log-slow-requests-time-ms": 2000}
+      responses:
+        '200':
+          description: Compacting the on-disk database succeeded.
           content:
             application/json:
               schema:
@@ -2941,7 +3001,7 @@ components:
 
         filter_by:
           description:
-            Filter conditions for refining youropen api validator search results. Separate
+            Filter conditions for refining your open api validator search results. Separate
             multiple conditions with &&.
           type: string
           example: "num_employees:>100 && country: [USA, UK]"
@@ -3981,7 +4041,7 @@ components:
       description: >
         Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document.
         Values: right_to_left (default), left_to_right, both_sides:3
-        A note on both_sides:3 - for queries upto 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results.
+        A note on both_sides:3 - for queries up to 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results.
         If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
     ConversationModelCreateSchema:
       required:

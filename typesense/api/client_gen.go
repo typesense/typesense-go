@@ -202,6 +202,11 @@ type ClientInterface interface {
 
 	UpsertSearchOverride(ctx context.Context, collectionName string, overrideId string, body UpsertSearchOverrideJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// ToggleSlowRequestLogWithBody request with any body
+	ToggleSlowRequestLogWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ToggleSlowRequestLog(ctx context.Context, body ToggleSlowRequestLogJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// RetrieveAllConversationModels request
 	RetrieveAllConversationModels(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -267,6 +272,12 @@ type ClientInterface interface {
 	UpdateNLSearchModelWithBody(ctx context.Context, modelId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	UpdateNLSearchModel(ctx context.Context, modelId string, body UpdateNLSearchModelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ClearCache request
+	ClearCache(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CompactDb request
+	CompactDb(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetSchemaChanges request
 	GetSchemaChanges(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -826,6 +837,30 @@ func (c *Client) UpsertSearchOverride(ctx context.Context, collectionName string
 	return c.Client.Do(req)
 }
 
+func (c *Client) ToggleSlowRequestLogWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewToggleSlowRequestLogRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ToggleSlowRequestLog(ctx context.Context, body ToggleSlowRequestLogJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewToggleSlowRequestLogRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) RetrieveAllConversationModels(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRetrieveAllConversationModelsRequest(c.Server)
 	if err != nil {
@@ -1104,6 +1139,30 @@ func (c *Client) UpdateNLSearchModelWithBody(ctx context.Context, modelId string
 
 func (c *Client) UpdateNLSearchModel(ctx context.Context, modelId string, body UpdateNLSearchModelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateNLSearchModelRequest(c.Server, modelId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ClearCache(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewClearCacheRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CompactDb(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCompactDbRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -4107,6 +4166,46 @@ func NewUpsertSearchOverrideRequestWithBody(server string, collectionName string
 	return req, nil
 }
 
+// NewToggleSlowRequestLogRequest calls the generic ToggleSlowRequestLog builder with application/json body
+func NewToggleSlowRequestLogRequest(server string, body ToggleSlowRequestLogJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewToggleSlowRequestLogRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewToggleSlowRequestLogRequestWithBody generates requests for ToggleSlowRequestLog with any type of body
+func NewToggleSlowRequestLogRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/config")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewRetrieveAllConversationModelsRequest generates requests for RetrieveAllConversationModels
 func NewRetrieveAllConversationModelsRequest(server string) (*http.Request, error) {
 	var err error
@@ -5853,6 +5952,60 @@ func NewUpdateNLSearchModelRequestWithBody(server string, modelId string, conten
 	return req, nil
 }
 
+// NewClearCacheRequest generates requests for ClearCache
+func NewClearCacheRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/operations/cache/clear")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCompactDbRequest generates requests for CompactDb
+func NewCompactDbRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/operations/db/compact")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewGetSchemaChangesRequest generates requests for GetSchemaChanges
 func NewGetSchemaChangesRequest(server string) (*http.Request, error) {
 	var err error
@@ -6680,6 +6833,11 @@ type ClientWithResponsesInterface interface {
 
 	UpsertSearchOverrideWithResponse(ctx context.Context, collectionName string, overrideId string, body UpsertSearchOverrideJSONRequestBody, reqEditors ...RequestEditorFn) (*UpsertSearchOverrideResponse, error)
 
+	// ToggleSlowRequestLogWithBodyWithResponse request with any body
+	ToggleSlowRequestLogWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ToggleSlowRequestLogResponse, error)
+
+	ToggleSlowRequestLogWithResponse(ctx context.Context, body ToggleSlowRequestLogJSONRequestBody, reqEditors ...RequestEditorFn) (*ToggleSlowRequestLogResponse, error)
+
 	// RetrieveAllConversationModelsWithResponse request
 	RetrieveAllConversationModelsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllConversationModelsResponse, error)
 
@@ -6745,6 +6903,12 @@ type ClientWithResponsesInterface interface {
 	UpdateNLSearchModelWithBodyWithResponse(ctx context.Context, modelId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateNLSearchModelResponse, error)
 
 	UpdateNLSearchModelWithResponse(ctx context.Context, modelId string, body UpdateNLSearchModelJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateNLSearchModelResponse, error)
+
+	// ClearCacheWithResponse request
+	ClearCacheWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ClearCacheResponse, error)
+
+	// CompactDbWithResponse request
+	CompactDbWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CompactDbResponse, error)
 
 	// GetSchemaChangesWithResponse request
 	GetSchemaChangesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSchemaChangesResponse, error)
@@ -7536,6 +7700,28 @@ func (r UpsertSearchOverrideResponse) StatusCode() int {
 	return 0
 }
 
+type ToggleSlowRequestLogResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *SuccessStatus
+}
+
+// Status returns HTTPResponse.Status
+func (r ToggleSlowRequestLogResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ToggleSlowRequestLogResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type RetrieveAllConversationModelsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -7940,6 +8126,50 @@ func (r UpdateNLSearchModelResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r UpdateNLSearchModelResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ClearCacheResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *SuccessStatus
+}
+
+// Status returns HTTPResponse.Status
+func (r ClearCacheResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ClearCacheResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CompactDbResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *SuccessStatus
+}
+
+// Status returns HTTPResponse.Status
+func (r CompactDbResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CompactDbResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -8737,6 +8967,23 @@ func (c *ClientWithResponses) UpsertSearchOverrideWithResponse(ctx context.Conte
 	return ParseUpsertSearchOverrideResponse(rsp)
 }
 
+// ToggleSlowRequestLogWithBodyWithResponse request with arbitrary body returning *ToggleSlowRequestLogResponse
+func (c *ClientWithResponses) ToggleSlowRequestLogWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ToggleSlowRequestLogResponse, error) {
+	rsp, err := c.ToggleSlowRequestLogWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseToggleSlowRequestLogResponse(rsp)
+}
+
+func (c *ClientWithResponses) ToggleSlowRequestLogWithResponse(ctx context.Context, body ToggleSlowRequestLogJSONRequestBody, reqEditors ...RequestEditorFn) (*ToggleSlowRequestLogResponse, error) {
+	rsp, err := c.ToggleSlowRequestLog(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseToggleSlowRequestLogResponse(rsp)
+}
+
 // RetrieveAllConversationModelsWithResponse request returning *RetrieveAllConversationModelsResponse
 func (c *ClientWithResponses) RetrieveAllConversationModelsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RetrieveAllConversationModelsResponse, error) {
 	rsp, err := c.RetrieveAllConversationModels(ctx, reqEditors...)
@@ -8945,6 +9192,24 @@ func (c *ClientWithResponses) UpdateNLSearchModelWithResponse(ctx context.Contex
 		return nil, err
 	}
 	return ParseUpdateNLSearchModelResponse(rsp)
+}
+
+// ClearCacheWithResponse request returning *ClearCacheResponse
+func (c *ClientWithResponses) ClearCacheWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ClearCacheResponse, error) {
+	rsp, err := c.ClearCache(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseClearCacheResponse(rsp)
+}
+
+// CompactDbWithResponse request returning *CompactDbResponse
+func (c *ClientWithResponses) CompactDbWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CompactDbResponse, error) {
+	rsp, err := c.CompactDb(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCompactDbResponse(rsp)
 }
 
 // GetSchemaChangesWithResponse request returning *GetSchemaChangesResponse
@@ -10159,6 +10424,32 @@ func ParseUpsertSearchOverrideResponse(rsp *http.Response) (*UpsertSearchOverrid
 	return response, nil
 }
 
+// ParseToggleSlowRequestLogResponse parses an HTTP response from a ToggleSlowRequestLogWithResponse call
+func ParseToggleSlowRequestLogResponse(rsp *http.Response) (*ToggleSlowRequestLogResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ToggleSlowRequestLogResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SuccessStatus
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseRetrieveAllConversationModelsResponse parses an HTTP response from a RetrieveAllConversationModelsWithResponse call
 func ParseRetrieveAllConversationModelsResponse(rsp *http.Response) (*RetrieveAllConversationModelsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -10707,6 +10998,58 @@ func ParseUpdateNLSearchModelResponse(rsp *http.Response) (*UpdateNLSearchModelR
 			return nil, err
 		}
 		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseClearCacheResponse parses an HTTP response from a ClearCacheWithResponse call
+func ParseClearCacheResponse(rsp *http.Response) (*ClearCacheResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ClearCacheResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SuccessStatus
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCompactDbResponse parses an HTTP response from a CompactDbWithResponse call
+func ParseCompactDbResponse(rsp *http.Response) (*CompactDbResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CompactDbResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SuccessStatus
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
 
 	}
 

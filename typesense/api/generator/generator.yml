@@ -480,7 +480,7 @@ components:
       type: string
     DropTokensMode:
       description: |
-        Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries upto 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
+        Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries up to 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
       enum:
         - right_to_left
         - left_to_right
@@ -1333,7 +1333,7 @@ components:
             Choose the underlying faceting strategy used. Comma separated string of allows values: exhaustive, top_values or automatic (default).
           type: string
         filter_by:
-          description: Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
+          description: Filter conditions for refining your open api validator search results. Separate multiple conditions with &&.
           example: 'num_employees:>100 && country: [USA, UK]'
           type: string
         filter_curated_hits:
@@ -2616,7 +2616,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
           description: The document or collection was not found
-      summary: Retreive a document
+      summary: Retrieve a document
       tags:
         - documents
     patch:
@@ -3211,6 +3211,32 @@ paths:
       tags:
         - documents
         - curation
+  /config:
+    post:
+      description: Enable logging of requests that take over a defined threshold of time. Default is `-1` which disables slow request logging. Slow requests are logged to the primary log file, with the prefix SLOW REQUEST.
+      operationId: toggleSlowRequestLog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example: |
+                {"log-slow-requests-time-ms": 2000}
+              properties:
+                log-slow-requests-time-ms:
+                  type: integer
+              required:
+                - log-slow-requests-time-ms
+              type: object
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatus'
+          description: Compacting the on-disk database succeeded.
+      summary: Toggle Slow Request Log
+      tags:
+        - operations
   /conversations/models:
     get:
       description: Retrieve all conversation models
@@ -3909,6 +3935,34 @@ paths:
       summary: Update a NL search model
       tags:
         - nl_search_models
+  /operations/cache/clear:
+    post:
+      description: Clear the cached responses of search requests that are sent with `use_cache` parameter in the LRU cache.
+      operationId: clearCache
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatus'
+          description: Clear cache succeeded.
+      summary: Clear the cached responses of search requests in the LRU cache.
+      tags:
+        - operations
+  /operations/db/compact:
+    post:
+      description: Typesense uses RocksDB to store your documents on the disk. If you do frequent writes or updates, you could benefit from running a compaction of the underlying RocksDB database. This could reduce the size of the database and decrease read latency. While the database will not block during this operation, we recommend running it during off-peak hours.
+      operationId: compactDb
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatus'
+          description: Compacting the on-disk database succeeded.
+      summary: Compacting the on-disk database
+      tags:
+        - operations
   /operations/schema_changes:
     get:
       description: Returns the status of any ongoing schema change operations. If no schema changes are in progress, returns an empty response.

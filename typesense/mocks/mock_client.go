@@ -43,6 +43,86 @@ func (m *MockAPIClientInterface) EXPECT() *MockAPIClientInterfaceMockRecorder {
 	return m.recorder
 }
 
+// ClearCache mocks base method.
+func (m *MockAPIClientInterface) ClearCache(ctx context.Context, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ClearCache", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ClearCache indicates an expected call of ClearCache.
+func (mr *MockAPIClientInterfaceMockRecorder) ClearCache(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ClearCache", reflect.TypeOf((*MockAPIClientInterface)(nil).ClearCache), varargs...)
+}
+
+// ClearCacheWithResponse mocks base method.
+func (m *MockAPIClientInterface) ClearCacheWithResponse(ctx context.Context, reqEditors ...api.RequestEditorFn) (*api.ClearCacheResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ClearCacheWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.ClearCacheResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ClearCacheWithResponse indicates an expected call of ClearCacheWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) ClearCacheWithResponse(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ClearCacheWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).ClearCacheWithResponse), varargs...)
+}
+
+// CompactDb mocks base method.
+func (m *MockAPIClientInterface) CompactDb(ctx context.Context, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CompactDb", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CompactDb indicates an expected call of CompactDb.
+func (mr *MockAPIClientInterfaceMockRecorder) CompactDb(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CompactDb", reflect.TypeOf((*MockAPIClientInterface)(nil).CompactDb), varargs...)
+}
+
+// CompactDbWithResponse mocks base method.
+func (m *MockAPIClientInterface) CompactDbWithResponse(ctx context.Context, reqEditors ...api.RequestEditorFn) (*api.CompactDbResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CompactDbWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.CompactDbResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CompactDbWithResponse indicates an expected call of CompactDbWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) CompactDbWithResponse(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CompactDbWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).CompactDbWithResponse), varargs...)
+}
+
 // CreateAnalyticsEvent mocks base method.
 func (m *MockAPIClientInterface) CreateAnalyticsEvent(ctx context.Context, body api.CreateAnalyticsEventJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -2641,6 +2721,86 @@ func (mr *MockAPIClientInterfaceMockRecorder) TakeSnapshotWithResponse(ctx, para
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, params}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TakeSnapshotWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).TakeSnapshotWithResponse), varargs...)
+}
+
+// ToggleSlowRequestLog mocks base method.
+func (m *MockAPIClientInterface) ToggleSlowRequestLog(ctx context.Context, body api.ToggleSlowRequestLogJSONRequestBody, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ToggleSlowRequestLog", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ToggleSlowRequestLog indicates an expected call of ToggleSlowRequestLog.
+func (mr *MockAPIClientInterfaceMockRecorder) ToggleSlowRequestLog(ctx, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ToggleSlowRequestLog", reflect.TypeOf((*MockAPIClientInterface)(nil).ToggleSlowRequestLog), varargs...)
+}
+
+// ToggleSlowRequestLogWithBody mocks base method.
+func (m *MockAPIClientInterface) ToggleSlowRequestLogWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ToggleSlowRequestLogWithBody", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ToggleSlowRequestLogWithBody indicates an expected call of ToggleSlowRequestLogWithBody.
+func (mr *MockAPIClientInterfaceMockRecorder) ToggleSlowRequestLogWithBody(ctx, contentType, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ToggleSlowRequestLogWithBody", reflect.TypeOf((*MockAPIClientInterface)(nil).ToggleSlowRequestLogWithBody), varargs...)
+}
+
+// ToggleSlowRequestLogWithBodyWithResponse mocks base method.
+func (m *MockAPIClientInterface) ToggleSlowRequestLogWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...api.RequestEditorFn) (*api.ToggleSlowRequestLogResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, contentType, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ToggleSlowRequestLogWithBodyWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.ToggleSlowRequestLogResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ToggleSlowRequestLogWithBodyWithResponse indicates an expected call of ToggleSlowRequestLogWithBodyWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) ToggleSlowRequestLogWithBodyWithResponse(ctx, contentType, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, contentType, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ToggleSlowRequestLogWithBodyWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).ToggleSlowRequestLogWithBodyWithResponse), varargs...)
+}
+
+// ToggleSlowRequestLogWithResponse mocks base method.
+func (m *MockAPIClientInterface) ToggleSlowRequestLogWithResponse(ctx context.Context, body api.ToggleSlowRequestLogJSONRequestBody, reqEditors ...api.RequestEditorFn) (*api.ToggleSlowRequestLogResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, body}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ToggleSlowRequestLogWithResponse", varargs...)
+	ret0, _ := ret[0].(*api.ToggleSlowRequestLogResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ToggleSlowRequestLogWithResponse indicates an expected call of ToggleSlowRequestLogWithResponse.
+func (mr *MockAPIClientInterfaceMockRecorder) ToggleSlowRequestLogWithResponse(ctx, body any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, body}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ToggleSlowRequestLogWithResponse", reflect.TypeOf((*MockAPIClientInterface)(nil).ToggleSlowRequestLogWithResponse), varargs...)
 }
 
 // UpdateCollection mocks base method.

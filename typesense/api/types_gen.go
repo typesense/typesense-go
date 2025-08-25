@@ -408,7 +408,7 @@ type ConversationModelUpdateSchema struct {
 // DirtyValues defines model for DirtyValues.
 type DirtyValues string
 
-// DropTokensMode Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries upto 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
+// DropTokensMode Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries up to 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
 type DropTokensMode string
 
 // FacetCounts defines model for FacetCounts.
@@ -513,7 +513,7 @@ type MultiSearchCollectionParameters struct {
 	// ConversationModelId The Id of Conversation Model to be used.
 	ConversationModelId *string `json:"conversation_model_id,omitempty"`
 
-	// DropTokensMode Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries upto 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
+	// DropTokensMode Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries up to 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
 	DropTokensMode *DropTokensMode `json:"drop_tokens_mode,omitempty"`
 
 	// DropTokensThreshold If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
@@ -714,7 +714,7 @@ type MultiSearchParameters struct {
 	// ConversationModelId The Id of Conversation Model to be used.
 	ConversationModelId *string `json:"conversation_model_id,omitempty"`
 
-	// DropTokensMode Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries upto 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
+	// DropTokensMode Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries up to 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
 	DropTokensMode *DropTokensMode `json:"drop_tokens_mode,omitempty"`
 
 	// DropTokensThreshold If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
@@ -1336,7 +1336,7 @@ type SearchParameters struct {
 	// ConversationModelId The Id of Conversation Model to be used.
 	ConversationModelId *string `json:"conversation_model_id,omitempty"`
 
-	// DropTokensMode Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries upto 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
+	// DropTokensMode Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries up to 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
 	DropTokensMode *DropTokensMode `json:"drop_tokens_mode,omitempty"`
 
 	// DropTokensThreshold If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
@@ -1375,7 +1375,7 @@ type SearchParameters struct {
 	// FacetStrategy Choose the underlying faceting strategy used. Comma separated string of allows values: exhaustive, top_values or automatic (default).
 	FacetStrategy *string `json:"facet_strategy,omitempty"`
 
-	// FilterBy Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
+	// FilterBy Filter conditions for refining your open api validator search results. Separate multiple conditions with &&.
 	FilterBy *string `json:"filter_by,omitempty"`
 
 	// FilterCuratedHits Whether the filter_by condition of the search query should be applicable to curated results (override definitions, pinned hits, hidden hits, etc.). Default: false
@@ -1882,6 +1882,11 @@ type UpdateDocumentParams struct {
 	DirtyValues *DirtyValues `form:"dirty_values,omitempty" json:"dirty_values,omitempty"`
 }
 
+// ToggleSlowRequestLogJSONBody defines parameters for ToggleSlowRequestLog.
+type ToggleSlowRequestLogJSONBody struct {
+	LogSlowRequestsTimeMs int `json:"log-slow-requests-time-ms"`
+}
+
 // MultiSearchParams defines parameters for MultiSearch.
 type MultiSearchParams struct {
 	CacheTtl                           *int            `form:"cache_ttl,omitempty" json:"cache_ttl,omitempty"`
@@ -2000,6 +2005,9 @@ type UpdateDocumentJSONRequestBody = UpdateDocumentJSONBody
 
 // UpsertSearchOverrideJSONRequestBody defines body for UpsertSearchOverride for application/json ContentType.
 type UpsertSearchOverrideJSONRequestBody = SearchOverrideSchema
+
+// ToggleSlowRequestLogJSONRequestBody defines body for ToggleSlowRequestLog for application/json ContentType.
+type ToggleSlowRequestLogJSONRequestBody ToggleSlowRequestLogJSONBody
 
 // CreateConversationModelJSONRequestBody defines body for CreateConversationModel for application/json ContentType.
 type CreateConversationModelJSONRequestBody = ConversationModelCreateSchema
