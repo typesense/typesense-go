@@ -26,6 +26,9 @@ func updateExistingSchema() *api.CollectionUpdateSchema {
 				Index: pointer.False(),
 			},
 		},
+		Metadata: &map[string]interface{}{
+			"revision": 2,
+		},
 	}
 }
 

@@ -130,14 +130,14 @@ func TestCollectionsRetrieve(t *testing.T) {
 	assert.Nil(t, copier.Copy(&mockedResult, &expectedResult))
 
 	mockAPIClient.EXPECT().
-		GetCollectionsWithResponse(gomock.Not(gomock.Nil())).
+		GetCollectionsWithResponse(gomock.Not(gomock.Nil()), gomock.Not(gomock.Nil())).
 		Return(&api.GetCollectionsResponse{
 			JSON200: &mockedResult,
 		}, nil).
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Collections().Retrieve(context.Background())
+	result, err := client.Collections().Retrieve(context.Background(), &api.GetCollectionsParams{})
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -149,12 +149,12 @@ func TestCollectionsRetrieveOnApiClientErrorReturnsError(t *testing.T) {
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
-		GetCollectionsWithResponse(gomock.Not(gomock.Nil())).
+		GetCollectionsWithResponse(gomock.Not(gomock.Nil()), gomock.Not(gomock.Nil())).
 		Return(nil, errors.New("failed request")).
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collections().Retrieve(context.Background())
+	_, err := client.Collections().Retrieve(context.Background(), &api.GetCollectionsParams{})
 	assert.Error(t, err)
 }
 
@@ -164,7 +164,7 @@ func TestCollectionsRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	mockAPIClient.EXPECT().
-		GetCollectionsWithResponse(gomock.Not(gomock.Nil())).
+		GetCollectionsWithResponse(gomock.Not(gomock.Nil()), gomock.Not(gomock.Nil())).
 		Return(&api.GetCollectionsResponse{
 			HTTPResponse: &http.Response{
 				StatusCode: 500,
@@ -174,6 +174,6 @@ func TestCollectionsRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	_, err := client.Collections().Retrieve(context.Background())
+	_, err := client.Collections().Retrieve(context.Background(), &api.GetCollectionsParams{})
 	assert.Error(t, err)
 }

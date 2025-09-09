@@ -1,7 +1,7 @@
 linters:
   enable:
     - dogsled
-    - exportloopref
+    - copyloopvar
     - funlen
     - gocognit
     - goconst

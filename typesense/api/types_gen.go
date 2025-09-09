@@ -208,6 +208,9 @@ type CollectionResponse struct {
 	// Fields A list of fields for querying, filtering and faceting
 	Fields []Field `json:"fields"`
 
+	// Metadata Optional details about the collection, e.g., when it was created, who created it etc.
+	Metadata *map[string]interface{} `json:"metadata,omitempty"`
+
 	// Name Name of the collection
 	Name string `json:"name"`
 
@@ -235,6 +238,9 @@ type CollectionSchema struct {
 	// Fields A list of fields for querying, filtering and faceting
 	Fields []Field `json:"fields"`
 
+	// Metadata Optional details about the collection, e.g., when it was created, who created it etc.
+	Metadata *map[string]interface{} `json:"metadata,omitempty"`
+
 	// Name Name of the collection
 	Name string `json:"name"`
 
@@ -252,6 +258,9 @@ type CollectionSchema struct {
 type CollectionUpdateSchema struct {
 	// Fields A list of fields for querying, filtering and faceting
 	Fields []Field `json:"fields"`
+
+	// Metadata Optional details about the collection, e.g., when it was created, who created it etc.
+	Metadata *map[string]interface{} `json:"metadata,omitempty"`
 }
 
 // ConversationModelCreateSchema defines model for ConversationModelCreateSchema.
@@ -856,21 +865,17 @@ type MultiSearchResultItem struct {
 	OutOf *int `json:"out_of,omitempty"`
 
 	// Page The search result page number
-	Page          *int `json:"page,omitempty"`
-	RequestParams *struct {
-		CollectionName string `json:"collection_name"`
-		PerPage        int    `json:"per_page"`
-		Q              string `json:"q"`
-		VoiceQuery     *struct {
-			TranscribedQuery *string `json:"transcribed_query,omitempty"`
-		} `json:"voice_query,omitempty"`
-	} `json:"request_params,omitempty"`
+	Page          *int                 `json:"page,omitempty"`
+	RequestParams *SearchRequestParams `json:"request_params,omitempty"`
 
 	// SearchCutoff Whether the search was cut off
 	SearchCutoff *bool `json:"search_cutoff,omitempty"`
 
 	// SearchTimeMs The number of milliseconds the search took
 	SearchTimeMs *int `json:"search_time_ms,omitempty"`
+
+	// UnionRequestParams Returned only for union query response.
+	UnionRequestParams *[]SearchRequestParams `json:"union_request_params,omitempty"`
 }
 
 // MultiSearchSearchesParameter defines model for MultiSearchSearchesParameter.
@@ -880,6 +885,192 @@ type MultiSearchSearchesParameter struct {
 	// Union When true, merges the search results from each search query into a single ordered set of hits.
 	Union *bool `json:"union,omitempty"`
 }
+
+// NLSearchModelBase defines model for NLSearchModelBase.
+type NLSearchModelBase struct {
+	// AccessToken Access token for GCP Vertex AI
+	AccessToken *string `json:"access_token,omitempty"`
+
+	// AccountId Account ID for Cloudflare-specific models
+	AccountId *string `json:"account_id,omitempty"`
+
+	// ApiKey API key for the NL model service
+	ApiKey *string `json:"api_key,omitempty"`
+
+	// ApiUrl Custom API URL for the NL model service
+	ApiUrl *string `json:"api_url,omitempty"`
+
+	// ApiVersion API version for the NL model service
+	ApiVersion *string `json:"api_version,omitempty"`
+
+	// ClientId Client ID for GCP Vertex AI
+	ClientId *string `json:"client_id,omitempty"`
+
+	// ClientSecret Client secret for GCP Vertex AI
+	ClientSecret *string `json:"client_secret,omitempty"`
+
+	// MaxBytes Maximum number of bytes to process
+	MaxBytes *int `json:"max_bytes,omitempty"`
+
+	// MaxOutputTokens Maximum output tokens for GCP Vertex AI
+	MaxOutputTokens *int `json:"max_output_tokens,omitempty"`
+
+	// ModelName Name of the NL model to use
+	ModelName *string `json:"model_name,omitempty"`
+
+	// ProjectId Project ID for GCP Vertex AI
+	ProjectId *string `json:"project_id,omitempty"`
+
+	// RefreshToken Refresh token for GCP Vertex AI
+	RefreshToken *string `json:"refresh_token,omitempty"`
+
+	// Region Region for GCP Vertex AI
+	Region *string `json:"region,omitempty"`
+
+	// StopSequences Stop sequences for the NL model (Google-specific)
+	StopSequences *[]string `json:"stop_sequences,omitempty"`
+
+	// SystemPrompt System prompt for the NL model
+	SystemPrompt *string `json:"system_prompt,omitempty"`
+
+	// Temperature Temperature parameter for the NL model
+	Temperature *float32 `json:"temperature,omitempty"`
+
+	// TopK Top-k parameter for the NL model (Google-specific)
+	TopK *int `json:"top_k,omitempty"`
+
+	// TopP Top-p parameter for the NL model (Google-specific)
+	TopP *float32 `json:"top_p,omitempty"`
+}
+
+// NLSearchModelCreateSchema defines model for NLSearchModelCreateSchema.
+type NLSearchModelCreateSchema struct {
+	// AccessToken Access token for GCP Vertex AI
+	AccessToken *string `json:"access_token,omitempty"`
+
+	// AccountId Account ID for Cloudflare-specific models
+	AccountId *string `json:"account_id,omitempty"`
+
+	// ApiKey API key for the NL model service
+	ApiKey *string `json:"api_key,omitempty"`
+
+	// ApiUrl Custom API URL for the NL model service
+	ApiUrl *string `json:"api_url,omitempty"`
+
+	// ApiVersion API version for the NL model service
+	ApiVersion *string `json:"api_version,omitempty"`
+
+	// ClientId Client ID for GCP Vertex AI
+	ClientId *string `json:"client_id,omitempty"`
+
+	// ClientSecret Client secret for GCP Vertex AI
+	ClientSecret *string `json:"client_secret,omitempty"`
+
+	// Id Optional ID for the NL search model
+	Id *string `json:"id,omitempty"`
+
+	// MaxBytes Maximum number of bytes to process
+	MaxBytes *int `json:"max_bytes,omitempty"`
+
+	// MaxOutputTokens Maximum output tokens for GCP Vertex AI
+	MaxOutputTokens *int `json:"max_output_tokens,omitempty"`
+
+	// ModelName Name of the NL model to use
+	ModelName *string `json:"model_name,omitempty"`
+
+	// ProjectId Project ID for GCP Vertex AI
+	ProjectId *string `json:"project_id,omitempty"`
+
+	// RefreshToken Refresh token for GCP Vertex AI
+	RefreshToken *string `json:"refresh_token,omitempty"`
+
+	// Region Region for GCP Vertex AI
+	Region *string `json:"region,omitempty"`
+
+	// StopSequences Stop sequences for the NL model (Google-specific)
+	StopSequences *[]string `json:"stop_sequences,omitempty"`
+
+	// SystemPrompt System prompt for the NL model
+	SystemPrompt *string `json:"system_prompt,omitempty"`
+
+	// Temperature Temperature parameter for the NL model
+	Temperature *float32 `json:"temperature,omitempty"`
+
+	// TopK Top-k parameter for the NL model (Google-specific)
+	TopK *int `json:"top_k,omitempty"`
+
+	// TopP Top-p parameter for the NL model (Google-specific)
+	TopP *float32 `json:"top_p,omitempty"`
+}
+
+// NLSearchModelDeleteSchema defines model for NLSearchModelDeleteSchema.
+type NLSearchModelDeleteSchema struct {
+	// Id ID of the deleted NL search model
+	Id string `json:"id"`
+}
+
+// NLSearchModelSchema defines model for NLSearchModelSchema.
+type NLSearchModelSchema struct {
+	// AccessToken Access token for GCP Vertex AI
+	AccessToken *string `json:"access_token,omitempty"`
+
+	// AccountId Account ID for Cloudflare-specific models
+	AccountId *string `json:"account_id,omitempty"`
+
+	// ApiKey API key for the NL model service
+	ApiKey *string `json:"api_key,omitempty"`
+
+	// ApiUrl Custom API URL for the NL model service
+	ApiUrl *string `json:"api_url,omitempty"`
+
+	// ApiVersion API version for the NL model service
+	ApiVersion *string `json:"api_version,omitempty"`
+
+	// ClientId Client ID for GCP Vertex AI
+	ClientId *string `json:"client_id,omitempty"`
+
+	// ClientSecret Client secret for GCP Vertex AI
+	ClientSecret *string `json:"client_secret,omitempty"`
+
+	// Id ID of the NL search model
+	Id string `json:"id"`
+
+	// MaxBytes Maximum number of bytes to process
+	MaxBytes *int `json:"max_bytes,omitempty"`
+
+	// MaxOutputTokens Maximum output tokens for GCP Vertex AI
+	MaxOutputTokens *int `json:"max_output_tokens,omitempty"`
+
+	// ModelName Name of the NL model to use
+	ModelName *string `json:"model_name,omitempty"`
+
+	// ProjectId Project ID for GCP Vertex AI
+	ProjectId *string `json:"project_id,omitempty"`
+
+	// RefreshToken Refresh token for GCP Vertex AI
+	RefreshToken *string `json:"refresh_token,omitempty"`
+
+	// Region Region for GCP Vertex AI
+	Region *string `json:"region,omitempty"`
+
+	// StopSequences Stop sequences for the NL model (Google-specific)
+	StopSequences *[]string `json:"stop_sequences,omitempty"`
+
+	// SystemPrompt System prompt for the NL model
+	SystemPrompt *string `json:"system_prompt,omitempty"`
+
+	// Temperature Temperature parameter for the NL model
+	Temperature *float32 `json:"temperature,omitempty"`
+
+	// TopK Top-k parameter for the NL model (Google-specific)
+	TopK *int `json:"top_k,omitempty"`
+
+	// TopP Top-p parameter for the NL model (Google-specific)
+	TopP *float32 `json:"top_p,omitempty"`
+}
+
+// NLSearchModelUpdateSchema defines model for NLSearchModelUpdateSchema.
+type NLSearchModelUpdateSchema = NLSearchModelCreateSchema
 
 // PresetDeleteSchema defines model for PresetDeleteSchema.
 type PresetDeleteSchema struct {
@@ -1190,6 +1381,12 @@ type SearchParameters struct {
 	// MinLen2typo Minimum word length for 2-typo correction to be applied. The value of num_typos is still treated as the maximum allowed typos.
 	MinLen2typo *int `json:"min_len_2typo,omitempty"`
 
+	// NlModelId The ID of the natural language model to use.
+	NlModelId *string `json:"nl_model_id,omitempty"`
+
+	// NlQuery Whether to use natural language processing to parse the query.
+	NlQuery *bool `json:"nl_query,omitempty"`
+
 	// NumTypos The number of typographical errors (1 or 2) that would be tolerated. Default: 2
 	NumTypos *string `json:"num_typos,omitempty"`
 
@@ -1280,6 +1477,16 @@ type SearchParameters struct {
 	VoiceQuery *string `json:"voice_query,omitempty"`
 }
 
+// SearchRequestParams defines model for SearchRequestParams.
+type SearchRequestParams struct {
+	CollectionName string `json:"collection_name"`
+	PerPage        int    `json:"per_page"`
+	Q              string `json:"q"`
+	VoiceQuery     *struct {
+		TranscribedQuery *string `json:"transcribed_query,omitempty"`
+	} `json:"voice_query,omitempty"`
+}
+
 // SearchResult defines model for SearchResult.
 type SearchResult struct {
 	Conversation *SearchResultConversation `json:"conversation,omitempty"`
@@ -1297,21 +1504,17 @@ type SearchResult struct {
 	OutOf *int `json:"out_of,omitempty"`
 
 	// Page The search result page number
-	Page          *int `json:"page,omitempty"`
-	RequestParams *struct {
-		CollectionName string `json:"collection_name"`
-		PerPage        int    `json:"per_page"`
-		Q              string `json:"q"`
-		VoiceQuery     *struct {
-			TranscribedQuery *string `json:"transcribed_query,omitempty"`
-		} `json:"voice_query,omitempty"`
-	} `json:"request_params,omitempty"`
+	Page          *int                 `json:"page,omitempty"`
+	RequestParams *SearchRequestParams `json:"request_params,omitempty"`
 
 	// SearchCutoff Whether the search was cut off
 	SearchCutoff *bool `json:"search_cutoff,omitempty"`
 
 	// SearchTimeMs The number of milliseconds the search took
 	SearchTimeMs *int `json:"search_time_ms,omitempty"`
+
+	// UnionRequestParams Returned only for union query response.
+	UnionRequestParams *[]SearchRequestParams `json:"union_request_params,omitempty"`
 }
 
 // SearchResultConversation defines model for SearchResultConversation.
@@ -1334,8 +1537,17 @@ type SearchResultHit struct {
 	Highlight *map[string]interface{} `json:"highlight,omitempty"`
 
 	// Highlights (Deprecated) Contains highlighted portions of the search fields
-	Highlights    *[]SearchHighlight `json:"highlights,omitempty"`
-	TextMatch     *int64             `json:"text_match,omitempty"`
+	Highlights *[]SearchHighlight `json:"highlights,omitempty"`
+
+	// HybridSearchInfo Information about hybrid search scoring
+	HybridSearchInfo *struct {
+		// RankFusionScore Combined score from rank fusion of text and vector search
+		RankFusionScore *float32 `json:"rank_fusion_score,omitempty"`
+	} `json:"hybrid_search_info,omitempty"`
+
+	// SearchIndex Returned only for union query response. Indicates the index of the query which this document matched to.
+	SearchIndex   *int   `json:"search_index,omitempty"`
+	TextMatch     *int64 `json:"text_match,omitempty"`
 	TextMatchInfo *struct {
 		BestFieldScore   *string `json:"best_field_score,omitempty"`
 		BestFieldWeight  *int    `json:"best_field_weight,omitempty"`
@@ -1441,6 +1653,13 @@ type VoiceQueryModelCollectionConfig struct {
 	ModelName *string `json:"model_name,omitempty"`
 }
 
+// GetCollectionsParams defines parameters for GetCollections.
+type GetCollectionsParams struct {
+	ExcludeFields *string `form:"exclude_fields,omitempty" json:"exclude_fields,omitempty"`
+	Limit         *int    `form:"limit,omitempty" json:"limit,omitempty"`
+	Offset        *int    `form:"offset,omitempty" json:"offset,omitempty"`
+}
+
 // DeleteDocumentsParams defines parameters for DeleteDocuments.
 type DeleteDocumentsParams struct {
 	BatchSize      *int    `form:"batch_size,omitempty" json:"batch_size,omitempty"`
@@ -1526,6 +1745,8 @@ type SearchCollectionParams struct {
 	MaxFilterByCandidates              *int            `form:"max_filter_by_candidates,omitempty" json:"max_filter_by_candidates,omitempty"`
 	MinLen1typo                        *int            `form:"min_len_1typo,omitempty" json:"min_len_1typo,omitempty"`
 	MinLen2typo                        *int            `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
+	NlModelId                          *string         `form:"nl_model_id,omitempty" json:"nl_model_id,omitempty"`
+	NlQuery                            *bool           `form:"nl_query,omitempty" json:"nl_query,omitempty"`
 	NumTypos                           *string         `form:"num_typos,omitempty" json:"num_typos,omitempty"`
 	Offset                             *int            `form:"offset,omitempty" json:"offset,omitempty"`
 	OverrideTags                       *string         `form:"override_tags,omitempty" json:"override_tags,omitempty"`
@@ -1606,6 +1827,8 @@ type MultiSearchParams struct {
 	MaxFilterByCandidates              *int            `form:"max_filter_by_candidates,omitempty" json:"max_filter_by_candidates,omitempty"`
 	MinLen1typo                        *int            `form:"min_len_1typo,omitempty" json:"min_len_1typo,omitempty"`
 	MinLen2typo                        *int            `form:"min_len_2typo,omitempty" json:"min_len_2typo,omitempty"`
+	NlModelId                          *string         `form:"nl_model_id,omitempty" json:"nl_model_id,omitempty"`
+	NlQuery                            *bool           `form:"nl_query,omitempty" json:"nl_query,omitempty"`
 	NumTypos                           *string         `form:"num_typos,omitempty" json:"num_typos,omitempty"`
 	Offset                             *int            `form:"offset,omitempty" json:"offset,omitempty"`
 	OverrideTags                       *string         `form:"override_tags,omitempty" json:"override_tags,omitempty"`
@@ -1696,6 +1919,12 @@ type CreateKeyJSONRequestBody = ApiKeySchema
 
 // MultiSearchJSONRequestBody defines body for MultiSearch for application/json ContentType.
 type MultiSearchJSONRequestBody = MultiSearchSearchesParameter
+
+// CreateNLSearchModelJSONRequestBody defines body for CreateNLSearchModel for application/json ContentType.
+type CreateNLSearchModelJSONRequestBody = NLSearchModelCreateSchema
+
+// UpdateNLSearchModelJSONRequestBody defines body for UpdateNLSearchModel for application/json ContentType.
+type UpdateNLSearchModelJSONRequestBody = NLSearchModelUpdateSchema
 
 // UpsertPresetJSONRequestBody defines body for UpsertPreset for application/json ContentType.
 type UpsertPresetJSONRequestBody = PresetUpsertSchema
