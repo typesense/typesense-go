@@ -374,6 +374,8 @@ func TestApiCallCanAbortRequest(t *testing.T) {
 		func(_ http.ResponseWriter, r *http.Request) {
 			appendHistory(&requestURLHistory, r)
 			cancel()
+			// block until the client closes the connection
+			<-r.Context().Done()
 		},
 		func(_ http.ResponseWriter, r *http.Request) {
 			appendHistory(&requestURLHistory, r)
