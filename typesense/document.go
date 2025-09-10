@@ -29,7 +29,7 @@ func (d *document[T]) Retrieve(ctx context.Context) (resp T, err error) {
 	if err != nil {
 		return resp, err
 	}
-	if !(strings.Contains(response.Header.Get("Content-Type"), "json") && response.StatusCode == 200) {
+	if !strings.Contains(response.Header.Get("Content-Type"), "json") || response.StatusCode != 200 {
 		body, _ := io.ReadAll(response.Body)
 		response.Body.Close()
 		return resp, &HTTPError{Status: response.StatusCode, Body: body}
@@ -47,7 +47,7 @@ func (d *document[T]) Update(ctx context.Context, document any, params *api.Docu
 	if err != nil {
 		return resp, err
 	}
-	if !(strings.Contains(response.Header.Get("Content-Type"), "json") && response.StatusCode == 200) {
+	if !strings.Contains(response.Header.Get("Content-Type"), "json") || response.StatusCode != 200 {
 		body, _ := io.ReadAll(response.Body)
 		response.Body.Close()
 		return resp, &HTTPError{Status: response.StatusCode, Body: body}
@@ -65,7 +65,7 @@ func (d *document[T]) Delete(ctx context.Context) (resp T, err error) {
 	if err != nil {
 		return resp, err
 	}
-	if !(strings.Contains(response.Header.Get("Content-Type"), "json") && response.StatusCode == 200) {
+	if !strings.Contains(response.Header.Get("Content-Type"), "json") || response.StatusCode != 200 {
 		body, _ := io.ReadAll(response.Body)
 		response.Body.Close()
 		return resp, &HTTPError{Status: response.StatusCode, Body: body}
