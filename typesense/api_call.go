@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/typesense/typesense-go/v3/typesense/api/circuit"
+	"github.com/typesense/typesense-go/v4/typesense/api/circuit"
 )
 
 type APICall struct {
