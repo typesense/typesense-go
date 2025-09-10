@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/typesense/typesense-go/v3/typesense/api"
+	"github.com/typesense/typesense-go/v4/typesense/api"
 )
 
 func TestKeyCreate(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/typesense/typesense-go/v3/typesense/api"
+	"github.com/typesense/typesense-go/v4/typesense/api"
 )
 
 func TestAnalyticsEventsCreate(t *testing.T) {
