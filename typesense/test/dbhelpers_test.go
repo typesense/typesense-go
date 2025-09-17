@@ -6,6 +6,7 @@ package test
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -440,4 +441,71 @@ func retrieveDocuments(t *testing.T, collectionName string, docIDs ...string) []
 		results[i] = doc
 	}
 	return results
+}
+
+func newNLSearchModelCreateSchema() *api.NLSearchModelCreateSchema {
+	apiKey := os.Getenv("NL_SEARCH_MODEL_API_KEY")
+	
+	return &api.NLSearchModelCreateSchema{
+		ModelName:    pointer.String("openai/gpt-3.5-turbo"),
+		ApiKey:       pointer.String(apiKey),
+		MaxBytes:     pointer.Int(1000),
+		Temperature:  pointer.Float32(0.7),
+		SystemPrompt: pointer.String("You are a helpful assistant."),
+		TopP:         pointer.Float32(0.9),
+		TopK:         pointer.Int(40),
+		StopSequences: &[]string{"END", "STOP"},
+		ApiVersion:   pointer.String("v1"),
+	}
+}
+
+func newNLSearchModelSchema(modelID string) *api.NLSearchModelSchema {
+	apiKey := os.Getenv("NL_SEARCH_MODEL_API_KEY")
+	
+	return &api.NLSearchModelSchema{
+		Id:           modelID,
+		ModelName:    pointer.String("openai/gpt-3.5-turbo"),
+		ApiKey:       pointer.String(apiKey),
+		MaxBytes:     pointer.Int(1000),
+		Temperature:  pointer.Float32(0.7),
+		SystemPrompt: pointer.String("You are a helpful assistant."),
+		TopP:         pointer.Float32(0.9),
+		TopK:         pointer.Int(40),
+		StopSequences: &[]string{"END", "STOP"},
+		ApiVersion:   pointer.String("v1"),
+	}
+}
+
+func newNLSearchModelUpdateSchema() *api.NLSearchModelUpdateSchema {
+	apiKey := os.Getenv("NL_SEARCH_MODEL_API_KEY")
+	
+	return &api.NLSearchModelUpdateSchema{
+		ModelName:    pointer.String("openai/gpt-4"),
+		ApiKey:       pointer.String(apiKey),
+		MaxBytes:     pointer.Int(2000),
+		Temperature:  pointer.Float32(0.5),
+		SystemPrompt: pointer.String("You are an expert assistant."),
+		TopP:         pointer.Float32(0.8),
+		TopK:         pointer.Int(50),
+		StopSequences: &[]string{"END", "STOP", "QUIT"},
+		ApiVersion:   pointer.String("v1"),
+	}
+}
+
+func shouldSkipNLSearchModelTests(t *testing.T)  {
+	if os.Getenv("NL_SEARCH_MODEL_API_KEY") == "" {
+		t.Skip("Skipping NL search model test: NL_SEARCH_MODEL_API_KEY not set")
+	}
+}
+
+func createNewNLSearchModel(t *testing.T) (string, *api.NLSearchModelSchema) {
+	t.Helper()
+	modelID := newUUIDName("nl-model-test")
+	modelSchema := newNLSearchModelCreateSchema()
+	modelSchema.Id = pointer.String(modelID)
+
+	result, err := typesenseClient.NLSearchModels().Create(context.Background(), modelSchema)
+
+	require.NoError(t, err)
+	return modelID, result
 }
