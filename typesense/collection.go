@@ -12,8 +12,6 @@ type CollectionInterface[T any] interface {
 	Delete(ctx context.Context) (*api.CollectionResponse, error)
 	Documents() DocumentsInterface
 	Document(documentID string) DocumentInterface[T]
-	Overrides() OverridesInterface
-	Override(overrideID string) OverrideInterface
 
 	Update(context.Context, *api.CollectionUpdateSchema) (*api.CollectionUpdateSchema, error)
 }
@@ -54,14 +52,6 @@ func (c *collection[T]) Documents() DocumentsInterface {
 
 func (c *collection[T]) Document(documentID string) DocumentInterface[T] {
 	return &document[T]{apiClient: c.apiClient, collectionName: c.name, documentID: documentID}
-}
-
-func (c *collection[T]) Overrides() OverridesInterface {
-	return &overrides{apiClient: c.apiClient, collectionName: c.name}
-}
-
-func (c *collection[T]) Override(overrideID string) OverrideInterface {
-	return &override{apiClient: c.apiClient, collectionName: c.name, overrideID: overrideID}
 }
 
 func (c *collection[T]) Update(ctx context.Context, schema *api.CollectionUpdateSchema) (*api.CollectionUpdateSchema, error) {
