@@ -18,12 +18,13 @@ type APIClientInterface interface {
 }
 
 type Client struct {
-	apiConfig   *ClientConfig
-	apiClient   APIClientInterface
-	collections CollectionsInterface
-	aliases     AliasesInterface
-	MultiSearch MultiSearchInterface
-	synonymSets SynonymSetsInterface
+	apiConfig    *ClientConfig
+	apiClient    APIClientInterface
+	collections  CollectionsInterface
+	aliases      AliasesInterface
+	MultiSearch  MultiSearchInterface
+	synonymSets  SynonymSetsInterface
+	curationSets CurationSetsInterface
 }
 
 func (c *Client) Collections() CollectionsInterface {
@@ -92,6 +93,14 @@ func (c *Client) SynonymSets() SynonymSetsInterface {
 
 func (c *Client) SynonymSet(synonymSetName string) SynonymSetInterface {
 	return &synonymSet{apiClient: c.apiClient, synonymSetName: synonymSetName}
+}
+
+func (c *Client) CurationSets() CurationSetsInterface {
+	return c.curationSets
+}
+
+func (c *Client) CurationSet(curationSetName string) CurationSetInterface {
+	return &curationSet{apiClient: c.apiClient, curationSetName: curationSetName}
 }
 
 func (c *Client) Stopwords() StopwordsInterface {
@@ -351,5 +360,6 @@ func NewClient(opts ...ClientOption) *Client {
 	c.aliases = &aliases{c.apiClient}
 	c.MultiSearch = &multiSearch{c.apiClient}
 	c.synonymSets = &synonymSets{c.apiClient}
+	c.curationSets = &curationSets{c.apiClient}
 	return c
 }
