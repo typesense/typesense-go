@@ -301,60 +301,68 @@ func newKey() *api.ApiKey {
 	}
 }
 
-func newSearchOverrideSchema() *api.SearchOverrideSchema {
-	schema := &api.SearchOverrideSchema{
-		Rule: api.SearchOverrideRule{
-			Query: pointer.String("apple"),
-			Match: pointer.Any(api.Exact),
-		},
-		Includes: &[]api.SearchOverrideInclude{
-			{
-				Id:       "422",
-				Position: 1,
-			},
-			{
-				Id:       "54",
-				Position: 2,
-			},
-		},
-		Excludes: &[]api.SearchOverrideExclude{
-			{
-				Id: "287",
-			},
-		},
-		RemoveMatchedTokens: pointer.True(),
-		FilterCuratedHits:   pointer.False(),
-		StopProcessing:      pointer.True(),
-	}
 
-	return schema
+
+func newCurationSetCreateSchema() *api.CurationSetCreateSchema {
+	return &api.CurationSetCreateSchema{
+		Items: []api.CurationItemCreateSchema{
+			{
+				Id: pointer.String("dummy"),
+				Rule: api.CurationRule{
+					Query: pointer.String("apple"),
+					Match: pointer.Any(api.Exact),
+				},
+				Includes: &[]api.CurationInclude{
+					{
+						Id: "422",
+					},
+					{
+						Id: "54",
+					},
+				},
+				Excludes: &[]api.CurationExclude{
+					{
+						Id: "287",
+					},
+				},
+				RemoveMatchedTokens: pointer.True(),
+				FilterBy:            pointer.String("category:=Electronics"),
+				StopProcessing:      pointer.True(),
+			},
+		},
+		Description: pointer.String("Test curation set"),
+	}
 }
 
-func newSearchOverride(overrideID string) *api.SearchOverride {
-	return &api.SearchOverride{
-		Id: pointer.String(overrideID),
-		Rule: api.SearchOverrideRule{
-			Query: pointer.String("apple"),
-			Match: pointer.Any(api.Exact),
-		},
-		Includes: &[]api.SearchOverrideInclude{
+func newCurationSetSchema(curationSetName string) *api.CurationSetSchema {
+	return &api.CurationSetSchema{
+		Name: curationSetName,
+		Items: []api.CurationItemCreateSchema{
 			{
-				Id:       "422",
-				Position: 1,
-			},
-			{
-				Id:       "54",
-				Position: 2,
+				Id: pointer.String("dummy"),
+				Rule: api.CurationRule{
+					Query: pointer.String("apple"),
+					Match: pointer.Any(api.Exact),
+				},
+				Includes: &[]api.CurationInclude{
+					{
+						Id: "422",
+					},
+					{
+						Id: "54",
+					},
+				},
+				Excludes: &[]api.CurationExclude{
+					{
+						Id: "287",
+					},
+				},
+				RemoveMatchedTokens: pointer.True(),
+				FilterBy:            pointer.String("category:=Electronics"),
+				StopProcessing:      pointer.True(),
 			},
 		},
-		Excludes: &[]api.SearchOverrideExclude{
-			{
-				Id: "287",
-			},
-		},
-		RemoveMatchedTokens: pointer.True(),
-		FilterCuratedHits:   pointer.False(),
-		StopProcessing:      pointer.True(),
+		Description: pointer.String("Test curation set"),
 	}
 }
 
