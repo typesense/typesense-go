@@ -18,7 +18,6 @@ import (
 	"github.com/typesense/typesense-go/v3/typesense/api/pointer"
 )
 
-// isV30OrAbove checks if the Typesense version is v30 or above
 func isV30OrAbove(t *testing.T) bool {
 	t.Helper()
 
@@ -38,13 +37,12 @@ func isV30OrAbove(t *testing.T) bool {
 		return true
 	}
 
-	// Extract version number from "v30.0.0" format
-	if !strings.HasPrefix(version, "v") {
-		t.Logf("Version format unexpected: %s", version)
-		return false
+	var numberedVersion string
+	if strings.HasPrefix(version, "v") {
+		numberedVersion = strings.Split(version, "v")[1]
+	} else {
+		numberedVersion = version
 	}
-
-	numberedVersion := strings.Split(version, "v")[1]
 	parts := strings.Split(numberedVersion, ".")
 	if len(parts) == 0 {
 		t.Logf("Version parts empty: %s", numberedVersion)
