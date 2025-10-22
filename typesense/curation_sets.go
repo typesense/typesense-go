@@ -46,4 +46,3 @@ func (c *curationSets) Retrieve(ctx context.Context) ([]api.CurationSetSchema, e
 
 	return curationSets, nil
 }
-
