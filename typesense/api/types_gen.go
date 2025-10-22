@@ -29,6 +29,12 @@ const (
 	AnalyticsRuleCreateTypePopularQueries AnalyticsRuleCreateType = "popular_queries"
 )
 
+// Defines values for CurationRuleMatch.
+const (
+	Contains CurationRuleMatch = "contains"
+	Exact    CurationRuleMatch = "exact"
+)
+
 // Defines values for DirtyValues.
 const (
 	CoerceOrDrop   DirtyValues = "coerce_or_drop"
@@ -50,12 +56,6 @@ const (
 	Emplace IndexAction = "emplace"
 	Update  IndexAction = "update"
 	Upsert  IndexAction = "upsert"
-)
-
-// Defines values for SearchOverrideRuleMatch.
-const (
-	Contains SearchOverrideRuleMatch = "contains"
-	Exact    SearchOverrideRuleMatch = "exact"
 )
 
 // APIStatsResponse defines model for APIStatsResponse.
@@ -405,6 +405,151 @@ type ConversationModelUpdateSchema struct {
 	VllmUrl *string `json:"vllm_url,omitempty"`
 }
 
+// CurationExclude defines model for CurationExclude.
+type CurationExclude struct {
+	// Id document id that should be excluded from the search results.
+	Id string `json:"id"`
+}
+
+// CurationInclude defines model for CurationInclude.
+type CurationInclude struct {
+	// Id document id that should be included
+	Id string `json:"id"`
+
+	// Position position number where document should be included in the search results
+	Position int `json:"position"`
+}
+
+// CurationItemCreateSchema defines model for CurationItemCreateSchema.
+type CurationItemCreateSchema struct {
+	// EffectiveFromTs A Unix timestamp that indicates the date/time from which the curation will be active. You can use this to create rules that start applying from a future point in time.
+	EffectiveFromTs *int `json:"effective_from_ts,omitempty"`
+
+	// EffectiveToTs A Unix timestamp that indicates the date/time until which the curation will be active. You can use this to create rules that stop applying after a period of time.
+	EffectiveToTs *int `json:"effective_to_ts,omitempty"`
+
+	// Excludes List of document `id`s that should be excluded from the search results.
+	Excludes *[]CurationExclude `json:"excludes,omitempty"`
+
+	// FilterBy A filter by clause that is applied to any search query that matches the curation rule.
+	FilterBy *string `json:"filter_by,omitempty"`
+
+	// FilterCuratedHits When set to true, the filter conditions of the query is applied to the curated records as well. Default: false.
+	FilterCuratedHits *bool `json:"filter_curated_hits,omitempty"`
+
+	// Id ID of the curation item
+	Id *string `json:"id,omitempty"`
+
+	// Includes List of document `id`s that should be included in the search results with their corresponding `position`s.
+	Includes *[]CurationInclude `json:"includes,omitempty"`
+
+	// Metadata Return a custom JSON object in the Search API response, when this rule is triggered. This can can be used to display a pre-defined message (eg: a promotion banner) on the front-end when a particular rule is triggered.
+	Metadata *map[string]interface{} `json:"metadata,omitempty"`
+
+	// RemoveMatchedTokens Indicates whether search query tokens that exist in the curation's rule should be removed from the search query.
+	RemoveMatchedTokens *bool `json:"remove_matched_tokens,omitempty"`
+
+	// ReplaceQuery Replaces the current search query with this value, when the search query matches the curation rule.
+	ReplaceQuery *string      `json:"replace_query,omitempty"`
+	Rule         CurationRule `json:"rule"`
+
+	// SortBy A sort by clause that is applied to any search query that matches the curation rule.
+	SortBy *string `json:"sort_by,omitempty"`
+
+	// StopProcessing When set to true, curation processing will stop at the first matching rule. When set to false curation processing will continue and multiple curation actions will be triggered in sequence. Curations are processed in the lexical sort order of their id field.
+	StopProcessing *bool `json:"stop_processing,omitempty"`
+}
+
+// CurationItemDeleteSchema defines model for CurationItemDeleteSchema.
+type CurationItemDeleteSchema struct {
+	// Id ID of the deleted curation item
+	Id string `json:"id"`
+}
+
+// CurationItemSchema defines model for CurationItemSchema.
+type CurationItemSchema struct {
+	// EffectiveFromTs A Unix timestamp that indicates the date/time from which the curation will be active. You can use this to create rules that start applying from a future point in time.
+	EffectiveFromTs *int `json:"effective_from_ts,omitempty"`
+
+	// EffectiveToTs A Unix timestamp that indicates the date/time until which the curation will be active. You can use this to create rules that stop applying after a period of time.
+	EffectiveToTs *int `json:"effective_to_ts,omitempty"`
+
+	// Excludes List of document `id`s that should be excluded from the search results.
+	Excludes *[]CurationExclude `json:"excludes,omitempty"`
+
+	// FilterBy A filter by clause that is applied to any search query that matches the curation rule.
+	FilterBy *string `json:"filter_by,omitempty"`
+
+	// FilterCuratedHits When set to true, the filter conditions of the query is applied to the curated records as well. Default: false.
+	FilterCuratedHits *bool  `json:"filter_curated_hits,omitempty"`
+	Id                string `json:"id"`
+
+	// Includes List of document `id`s that should be included in the search results with their corresponding `position`s.
+	Includes *[]CurationInclude `json:"includes,omitempty"`
+
+	// Metadata Return a custom JSON object in the Search API response, when this rule is triggered. This can can be used to display a pre-defined message (eg: a promotion banner) on the front-end when a particular rule is triggered.
+	Metadata *map[string]interface{} `json:"metadata,omitempty"`
+
+	// RemoveMatchedTokens Indicates whether search query tokens that exist in the curation's rule should be removed from the search query.
+	RemoveMatchedTokens *bool `json:"remove_matched_tokens,omitempty"`
+
+	// ReplaceQuery Replaces the current search query with this value, when the search query matches the curation rule.
+	ReplaceQuery *string      `json:"replace_query,omitempty"`
+	Rule         CurationRule `json:"rule"`
+
+	// SortBy A sort by clause that is applied to any search query that matches the curation rule.
+	SortBy *string `json:"sort_by,omitempty"`
+
+	// StopProcessing When set to true, curation processing will stop at the first matching rule. When set to false curation processing will continue and multiple curation actions will be triggered in sequence. Curations are processed in the lexical sort order of their id field.
+	StopProcessing *bool `json:"stop_processing,omitempty"`
+}
+
+// CurationRule defines model for CurationRule.
+type CurationRule struct {
+	// FilterBy Indicates that the curation should apply when the filter_by parameter in a search query exactly matches the string specified here (including backticks, spaces, brackets, etc).
+	FilterBy *string `json:"filter_by,omitempty"`
+
+	// Match Indicates whether the match on the query term should be `exact` or `contains`. If we want to match all queries that contained the word `apple`, we will use the `contains` match instead.
+	Match *CurationRuleMatch `json:"match,omitempty"`
+
+	// Query Indicates what search queries should be curated
+	Query *string `json:"query,omitempty"`
+
+	// Tags List of tag values to associate with this curation rule.
+	Tags *[]string `json:"tags,omitempty"`
+}
+
+// CurationRuleMatch Indicates whether the match on the query term should be `exact` or `contains`. If we want to match all queries that contained the word `apple`, we will use the `contains` match instead.
+type CurationRuleMatch string
+
+// CurationSetCreateSchema defines model for CurationSetCreateSchema.
+type CurationSetCreateSchema struct {
+	// Description Optional description for the curation set
+	Description *string `json:"description,omitempty"`
+
+	// Items Array of curation items
+	Items []CurationItemCreateSchema `json:"items"`
+}
+
+// CurationSetDeleteSchema defines model for CurationSetDeleteSchema.
+type CurationSetDeleteSchema struct {
+	// Name Name of the deleted curation set
+	Name string `json:"name"`
+}
+
+// CurationSetRetrieveSchema defines model for CurationSetRetrieveSchema.
+type CurationSetRetrieveSchema = CurationSetCreateSchema
+
+// CurationSetSchema defines model for CurationSetSchema.
+type CurationSetSchema struct {
+	// Description Optional description for the curation set
+	Description *string `json:"description,omitempty"`
+
+	// Items Array of curation items
+	Items []CurationItemCreateSchema `json:"items"`
+	Name  string                     `json:"name"`
+}
+
 // DirtyValues defines model for DirtyValues.
 type DirtyValues string
 
@@ -518,6 +663,9 @@ type MultiSearchCollectionParameters struct {
 
 	// DropTokensThreshold If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
 	DropTokensThreshold *int `json:"drop_tokens_threshold,omitempty"`
+
+	// EnableAnalytics Flag for enabling/disabling analytics aggregation for specific search queries (for e.g. those originating from a test script).
+	EnableAnalytics *bool `json:"enable_analytics,omitempty"`
 
 	// EnableOverrides If you have some overrides defined but want to disable all of them during query time, you can do that by setting this parameter to false
 	EnableOverrides *bool `json:"enable_overrides,omitempty"`
@@ -720,6 +868,9 @@ type MultiSearchParameters struct {
 	// DropTokensThreshold If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
 	DropTokensThreshold *int `json:"drop_tokens_threshold,omitempty"`
 
+	// EnableAnalytics Flag for enabling/disabling analytics aggregation for specific search queries (for e.g. those originating from a test script).
+	EnableAnalytics *bool `json:"enable_analytics,omitempty"`
+
 	// EnableOverrides If you have some overrides defined but want to disable all of them during query time, you can do that by setting this parameter to false
 	EnableOverrides *bool `json:"enable_overrides,omitempty"`
 
@@ -918,6 +1069,9 @@ type MultiSearchResultItem struct {
 
 	// Hits The documents that matched the search query
 	Hits *[]SearchResultHit `json:"hits,omitempty"`
+
+	// Metadata Custom JSON object that can be returned in the search response
+	Metadata *map[string]interface{} `json:"metadata,omitempty"`
 
 	// OutOf The total number of documents in the collection
 	OutOf *int `json:"out_of,omitempty"`
@@ -1203,125 +1357,6 @@ type SearchHighlight struct {
 	Values *[]string `json:"values,omitempty"`
 }
 
-// SearchOverride defines model for SearchOverride.
-type SearchOverride struct {
-	// EffectiveFromTs A Unix timestamp that indicates the date/time from which the override will be active. You can use this to create override rules that start applying from a future point in time.
-	EffectiveFromTs *int `json:"effective_from_ts,omitempty"`
-
-	// EffectiveToTs A Unix timestamp that indicates the date/time until which the override will be active. You can use this to create override rules that stop applying after a period of time.
-	EffectiveToTs *int `json:"effective_to_ts,omitempty"`
-
-	// Excludes List of document `id`s that should be excluded from the search results.
-	Excludes *[]SearchOverrideExclude `json:"excludes,omitempty"`
-
-	// FilterBy A filter by clause that is applied to any search query that matches the override rule.
-	FilterBy *string `json:"filter_by,omitempty"`
-
-	// FilterCuratedHits When set to true, the filter conditions of the query is applied to the curated records as well. Default: false.
-	FilterCuratedHits *bool   `json:"filter_curated_hits,omitempty"`
-	Id                *string `json:"id,omitempty"`
-
-	// Includes List of document `id`s that should be included in the search results with their corresponding `position`s.
-	Includes *[]SearchOverrideInclude `json:"includes,omitempty"`
-
-	// Metadata Return a custom JSON object in the Search API response, when this rule is triggered. This can can be used to display a pre-defined message (eg: a promotion banner) on the front-end when a particular rule is triggered.
-	Metadata *map[string]interface{} `json:"metadata,omitempty"`
-
-	// RemoveMatchedTokens Indicates whether search query tokens that exist in the override's rule should be removed from the search query.
-	RemoveMatchedTokens *bool `json:"remove_matched_tokens,omitempty"`
-
-	// ReplaceQuery Replaces the current search query with this value, when the search query matches the override rule.
-	ReplaceQuery *string            `json:"replace_query,omitempty"`
-	Rule         SearchOverrideRule `json:"rule"`
-
-	// SortBy A sort by clause that is applied to any search query that matches the override rule.
-	SortBy *string `json:"sort_by,omitempty"`
-
-	// StopProcessing When set to true, override processing will stop at the first matching rule. When set to false override processing will continue and multiple override actions will be triggered in sequence. Overrides are processed in the lexical sort order of their id field. Default: true.
-	StopProcessing *bool `json:"stop_processing,omitempty"`
-}
-
-// SearchOverrideDeleteResponse defines model for SearchOverrideDeleteResponse.
-type SearchOverrideDeleteResponse struct {
-	// Id The id of the override that was deleted
-	Id string `json:"id"`
-}
-
-// SearchOverrideExclude defines model for SearchOverrideExclude.
-type SearchOverrideExclude struct {
-	// Id document id that should be excluded from the search results.
-	Id string `json:"id"`
-}
-
-// SearchOverrideInclude defines model for SearchOverrideInclude.
-type SearchOverrideInclude struct {
-	// Id document id that should be included
-	Id string `json:"id"`
-
-	// Position position number where document should be included in the search results
-	Position int `json:"position"`
-}
-
-// SearchOverrideRule defines model for SearchOverrideRule.
-type SearchOverrideRule struct {
-	// FilterBy Indicates that the override should apply when the filter_by parameter in a search query exactly matches the string specified here (including backticks, spaces, brackets, etc).
-	FilterBy *string `json:"filter_by,omitempty"`
-
-	// Match Indicates whether the match on the query term should be `exact` or `contains`. If we want to match all queries that contained the word `apple`, we will use the `contains` match instead.
-	Match *SearchOverrideRuleMatch `json:"match,omitempty"`
-
-	// Query Indicates what search queries should be overridden
-	Query *string `json:"query,omitempty"`
-
-	// Tags List of tag values to associate with this override rule.
-	Tags *[]string `json:"tags,omitempty"`
-}
-
-// SearchOverrideRuleMatch Indicates whether the match on the query term should be `exact` or `contains`. If we want to match all queries that contained the word `apple`, we will use the `contains` match instead.
-type SearchOverrideRuleMatch string
-
-// SearchOverrideSchema defines model for SearchOverrideSchema.
-type SearchOverrideSchema struct {
-	// EffectiveFromTs A Unix timestamp that indicates the date/time from which the override will be active. You can use this to create override rules that start applying from a future point in time.
-	EffectiveFromTs *int `json:"effective_from_ts,omitempty"`
-
-	// EffectiveToTs A Unix timestamp that indicates the date/time until which the override will be active. You can use this to create override rules that stop applying after a period of time.
-	EffectiveToTs *int `json:"effective_to_ts,omitempty"`
-
-	// Excludes List of document `id`s that should be excluded from the search results.
-	Excludes *[]SearchOverrideExclude `json:"excludes,omitempty"`
-
-	// FilterBy A filter by clause that is applied to any search query that matches the override rule.
-	FilterBy *string `json:"filter_by,omitempty"`
-
-	// FilterCuratedHits When set to true, the filter conditions of the query is applied to the curated records as well. Default: false.
-	FilterCuratedHits *bool `json:"filter_curated_hits,omitempty"`
-
-	// Includes List of document `id`s that should be included in the search results with their corresponding `position`s.
-	Includes *[]SearchOverrideInclude `json:"includes,omitempty"`
-
-	// Metadata Return a custom JSON object in the Search API response, when this rule is triggered. This can can be used to display a pre-defined message (eg: a promotion banner) on the front-end when a particular rule is triggered.
-	Metadata *map[string]interface{} `json:"metadata,omitempty"`
-
-	// RemoveMatchedTokens Indicates whether search query tokens that exist in the override's rule should be removed from the search query.
-	RemoveMatchedTokens *bool `json:"remove_matched_tokens,omitempty"`
-
-	// ReplaceQuery Replaces the current search query with this value, when the search query matches the override rule.
-	ReplaceQuery *string            `json:"replace_query,omitempty"`
-	Rule         SearchOverrideRule `json:"rule"`
-
-	// SortBy A sort by clause that is applied to any search query that matches the override rule.
-	SortBy *string `json:"sort_by,omitempty"`
-
-	// StopProcessing When set to true, override processing will stop at the first matching rule. When set to false override processing will continue and multiple override actions will be triggered in sequence. Overrides are processed in the lexical sort order of their id field. Default: true.
-	StopProcessing *bool `json:"stop_processing,omitempty"`
-}
-
-// SearchOverridesResponse defines model for SearchOverridesResponse.
-type SearchOverridesResponse struct {
-	Overrides []*SearchOverride `json:"overrides"`
-}
-
 // SearchParameters defines model for SearchParameters.
 type SearchParameters struct {
 	// CacheTtl The duration (in seconds) that determines how long the search query is cached. This value can be set on a per-query basis. Default: 60.
@@ -1341,6 +1376,9 @@ type SearchParameters struct {
 
 	// DropTokensThreshold If the number of results found for a specific query is less than this number, Typesense will attempt to drop the tokens in the query until enough results are found. Tokens that have the least individual hits are dropped first. Set to 0 to disable. Default: 10
 	DropTokensThreshold *int `json:"drop_tokens_threshold,omitempty"`
+
+	// EnableAnalytics Flag for enabling/disabling analytics aggregation for specific search queries (for e.g. those originating from a test script).
+	EnableAnalytics *bool `json:"enable_analytics,omitempty"`
 
 	// EnableHighlightV1 Flag for enabling/disabling the deprecated, old highlight structure in the response. Default: true
 	EnableHighlightV1 *bool `json:"enable_highlight_v1,omitempty"`
@@ -1564,6 +1602,9 @@ type SearchResult struct {
 	// Hits The documents that matched the search query
 	Hits *[]SearchResultHit `json:"hits,omitempty"`
 
+	// Metadata Custom JSON object that can be returned in the search response
+	Metadata *map[string]interface{} `json:"metadata,omitempty"`
+
 	// OutOf The total number of documents in the collection
 	OutOf *int `json:"out_of,omitempty"`
 
@@ -1673,6 +1714,12 @@ type StopwordsSetsRetrieveAllSchema struct {
 // SuccessStatus defines model for SuccessStatus.
 type SuccessStatus struct {
 	Success bool `json:"success"`
+}
+
+// SynonymItemDeleteSchema defines model for SynonymItemDeleteSchema.
+type SynonymItemDeleteSchema struct {
+	// Id ID of the deleted synonym item
+	Id string `json:"id"`
 }
 
 // SynonymItemSchema defines model for SynonymItemSchema.
@@ -1807,6 +1854,7 @@ type SearchCollectionParams struct {
 	ConversationModelId                *string         `form:"conversation_model_id,omitempty" json:"conversation_model_id,omitempty"`
 	DropTokensMode                     *DropTokensMode `form:"drop_tokens_mode,omitempty" json:"drop_tokens_mode,omitempty"`
 	DropTokensThreshold                *int            `form:"drop_tokens_threshold,omitempty" json:"drop_tokens_threshold,omitempty"`
+	EnableAnalytics                    *bool           `form:"enable_analytics,omitempty" json:"enable_analytics,omitempty"`
 	EnableHighlightV1                  *bool           `form:"enable_highlight_v1,omitempty" json:"enable_highlight_v1,omitempty"`
 	EnableOverrides                    *bool           `form:"enable_overrides,omitempty" json:"enable_overrides,omitempty"`
 	EnableSynonyms                     *bool           `form:"enable_synonyms,omitempty" json:"enable_synonyms,omitempty"`
@@ -1895,6 +1943,7 @@ type MultiSearchParams struct {
 	ConversationModelId                *string         `form:"conversation_model_id,omitempty" json:"conversation_model_id,omitempty"`
 	DropTokensMode                     *DropTokensMode `form:"drop_tokens_mode,omitempty" json:"drop_tokens_mode,omitempty"`
 	DropTokensThreshold                *int            `form:"drop_tokens_threshold,omitempty" json:"drop_tokens_threshold,omitempty"`
+	EnableAnalytics                    *bool           `form:"enable_analytics,omitempty" json:"enable_analytics,omitempty"`
 	EnableHighlightV1                  *bool           `form:"enable_highlight_v1,omitempty" json:"enable_highlight_v1,omitempty"`
 	EnableOverrides                    *bool           `form:"enable_overrides,omitempty" json:"enable_overrides,omitempty"`
 	EnableSynonyms                     *bool           `form:"enable_synonyms,omitempty" json:"enable_synonyms,omitempty"`
@@ -2003,9 +2052,6 @@ type IndexDocumentJSONRequestBody = IndexDocumentJSONBody
 // UpdateDocumentJSONRequestBody defines body for UpdateDocument for application/json ContentType.
 type UpdateDocumentJSONRequestBody = UpdateDocumentJSONBody
 
-// UpsertSearchOverrideJSONRequestBody defines body for UpsertSearchOverride for application/json ContentType.
-type UpsertSearchOverrideJSONRequestBody = SearchOverrideSchema
-
 // ToggleSlowRequestLogJSONRequestBody defines body for ToggleSlowRequestLog for application/json ContentType.
 type ToggleSlowRequestLogJSONRequestBody ToggleSlowRequestLogJSONBody
 
@@ -2014,6 +2060,12 @@ type CreateConversationModelJSONRequestBody = ConversationModelCreateSchema
 
 // UpdateConversationModelJSONRequestBody defines body for UpdateConversationModel for application/json ContentType.
 type UpdateConversationModelJSONRequestBody = ConversationModelUpdateSchema
+
+// UpsertCurationSetJSONRequestBody defines body for UpsertCurationSet for application/json ContentType.
+type UpsertCurationSetJSONRequestBody = CurationSetCreateSchema
+
+// UpsertCurationSetItemJSONRequestBody defines body for UpsertCurationSetItem for application/json ContentType.
+type UpsertCurationSetItemJSONRequestBody = CurationItemCreateSchema
 
 // CreateKeyJSONRequestBody defines body for CreateKey for application/json ContentType.
 type CreateKeyJSONRequestBody = ApiKeySchema
@@ -2038,6 +2090,9 @@ type UpsertStopwordsSetJSONRequestBody = StopwordsSetUpsertSchema
 
 // UpsertSynonymSetJSONRequestBody defines body for UpsertSynonymSet for application/json ContentType.
 type UpsertSynonymSetJSONRequestBody = SynonymSetCreateSchema
+
+// UpsertSynonymSetItemJSONRequestBody defines body for UpsertSynonymSetItem for application/json ContentType.
+type UpsertSynonymSetItemJSONRequestBody = SynonymItemSchema
 
 // AsSearchParameters returns the union data inside the PresetSchema_Value as a SearchParameters
 func (t PresetSchema_Value) AsSearchParameters() (SearchParameters, error) {

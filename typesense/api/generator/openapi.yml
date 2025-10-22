@@ -35,11 +35,6 @@ tags:
     externalDocs:
       description: Find out more
       url: https://typesense.org/api/#index-document
-  - name: curation
-    description: Hand-curate search results based on conditional business rules
-    externalDocs:
-      description: Find out more
-      url: https://typesense.org/docs/0.23.0/api/#curation
   - name: analytics
     description: Typesense can aggregate search queries for both analytics purposes and for query suggestions.
     externalDocs:
@@ -77,6 +72,8 @@ tags:
     externalDocs:
       description: Find out more
       url: https://typesense.org/docs/28.0/api/synonyms.html
+  - name: curation_sets
+    description: Manage curation sets
   - name: stemming
     description: Manage stemming dictionaries
     externalDocs:
@@ -460,129 +457,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-  /collections/{collectionName}/overrides:
-    get:
-      tags:
-        - documents
-        - curation
-      summary: List all collection overrides
-      operationId: getSearchOverrides
-      parameters:
-        - name: collectionName
-          in: path
-          description: The name of the collection
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: List of all search overrides
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SearchOverridesResponse"
-  /collections/{collectionName}/overrides/{overrideId}:
-    get:
-      tags:
-        - documents
-        - override
-      summary: Retrieve a single search override
-      description: Retrieve the details of a search override, given its id.
-      operationId: getSearchOverride
-      parameters:
-        - name: collectionName
-          in: path
-          description: The name of the collection
-          required: true
-          schema:
-            type: string
-        - name: overrideId
-          in: path
-          description: The id of the search override
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Search override fetched
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SearchOverride"
-    put:
-      tags:
-        - documents
-        - curation
-      summary: Create or update an override to promote certain documents over others
-      description:
-        Create or update an override to promote certain documents over others.
-        Using overrides, you can include or exclude specific documents for a given query.
-      operationId: upsertSearchOverride
-      parameters:
-        - name: collectionName
-          in: path
-          description: The name of the collection
-          required: true
-          schema:
-            type: string
-        - name: overrideId
-          in: path
-          description: The ID of the search override to create/update
-          required: true
-          schema:
-            type: string
-      requestBody:
-        description: The search override object to be created/updated
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SearchOverrideSchema"
-        required: true
-      responses:
-        '200':
-          description: Created/updated search override
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SearchOverride"
-        '404':
-          description: Search override not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiResponse"
-    delete:
-      tags:
-        - documents
-        - curation
-      summary: Delete an override associated with a collection
-      operationId: deleteSearchOverride
-      parameters:
-        - name: collectionName
-          in: path
-          description: The name of the collection
-          required: true
-          schema:
-            type: string
-        - name: overrideId
-          in: path
-          description: The ID of the search override to delete
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: The ID of the deleted search override
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SearchOverrideDeleteResponse"
-        '404':
-          description: Search override not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiResponse"
 
   /synonym_sets:
     get:
@@ -628,6 +502,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
+    
     put:
       tags:
         - synonyms
@@ -683,6 +558,380 @@ paths:
                 $ref: "#/components/schemas/SynonymSetDeleteSchema"
         "404":
           description: Synonym set not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+
+  /synonym_sets/{synonymSetName}/items:
+    get:
+      tags:
+        - synonyms
+      summary: List items in a synonym set
+      description: Retrieve all synonym items in a set
+      operationId: retrieveSynonymSetItems
+      parameters:
+        - name: synonymSetName
+          in: path
+          description: The name of the synonym set to retrieve items for
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of synonym items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SynonymItemSchema"
+        "404":
+          description: Synonym set not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+
+  /synonym_sets/{synonymSetName}/items/{itemId}:
+    get:
+      tags:
+        - synonyms
+      summary: Retrieve a synonym set item
+      description: Retrieve a specific synonym item by its id
+      operationId: retrieveSynonymSetItem
+      parameters:
+        - name: synonymSetName
+          in: path
+          description: The name of the synonym set
+          required: true
+          schema:
+            type: string
+        - name: itemId
+          in: path
+          description: The id of the synonym item to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Synonym item fetched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SynonymItemSchema"
+        "404":
+          description: Synonym item not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+    put:
+      tags:
+        - synonyms
+      summary: Create or update a synonym set item
+      description: Create or update a synonym set item with the given id
+      operationId: upsertSynonymSetItem
+      parameters:
+        - name: synonymSetName
+          in: path
+          description: The name of the synonym set
+          required: true
+          schema:
+            type: string
+        - name: itemId
+          in: path
+          description: The id of the synonym item to upsert
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The synonym item to be created/updated
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SynonymItemSchema"
+        required: true
+      responses:
+        "200":
+          description: Synonym item successfully created/updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SynonymItemSchema"
+        "400":
+          description: Bad request, see error message for details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+    delete:
+      tags:
+        - synonyms
+      summary: Delete a synonym set item
+      description: Delete a specific synonym item by its id
+      operationId: deleteSynonymSetItem
+      parameters:
+        - name: synonymSetName
+          in: path
+          description: The name of the synonym set
+          required: true
+          schema:
+            type: string
+        - name: itemId
+          in: path
+          description: The id of the synonym item to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Synonym item successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SynonymItemDeleteSchema"
+        "404":
+          description: Synonym item not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+
+  /curation_sets:
+    get:
+      tags:
+        - curation_sets
+      summary: List all curation sets
+      description: Retrieve all curation sets
+      operationId: retrieveCurationSets
+      responses:
+        "200":
+          description: List of all curation sets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CurationSetSchema"
+
+  /curation_sets/{curationSetName}:
+    get:
+      tags:
+        - curation_sets
+      summary: Retrieve a curation set
+      description: Retrieve a specific curation set by its name
+      operationId: retrieveCurationSet
+      parameters:
+        - name: curationSetName
+          in: path
+          description: The name of the curation set to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Curation set fetched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurationSetRetrieveSchema"
+        "404":
+          description: Curation set not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+    put:
+      tags:
+        - curation_sets
+      summary: Create or update a curation set
+      description: Create or update a curation set with the given name
+      operationId: upsertCurationSet
+      parameters:
+        - name: curationSetName
+          in: path
+          description: The name of the curation set to create/update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The curation set to be created/updated
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CurationSetCreateSchema"
+        required: true
+      responses:
+        "200":
+          description: Curation set successfully created/updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurationSetSchema"
+        "400":
+          description: Bad request, see error message for details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+    delete:
+      tags:
+        - curation_sets
+      summary: Delete a curation set
+      description: Delete a specific curation set by its name
+      operationId: deleteCurationSet
+      parameters:
+        - name: curationSetName
+          in: path
+          description: The name of the curation set to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Curation set successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurationSetDeleteSchema"
+        "404":
+          description: Curation set not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+
+  /curation_sets/{curationSetName}/items:
+    get:
+      tags:
+        - curation_sets
+      summary: List items in a curation set
+      description: Retrieve all curation items in a set
+      operationId: retrieveCurationSetItems
+      parameters:
+        - name: curationSetName
+          in: path
+          description: The name of the curation set to retrieve items for
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of curation items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CurationItemSchema"
+        "404":
+          description: Curation set not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+
+  /curation_sets/{curationSetName}/items/{itemId}:
+    get:
+      tags:
+        - curation_sets
+      summary: Retrieve a curation set item
+      description: Retrieve a specific curation item by its id
+      operationId: retrieveCurationSetItem
+      parameters:
+        - name: curationSetName
+          in: path
+          description: The name of the curation set
+          required: true
+          schema:
+            type: string
+        - name: itemId
+          in: path
+          description: The id of the curation item to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Curation item fetched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurationItemSchema"
+        "404":
+          description: Curation item not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+    put:
+      tags:
+        - curation_sets
+      summary: Create or update a curation set item
+      description: Create or update a curation set item with the given id
+      operationId: upsertCurationSetItem
+      parameters:
+        - name: curationSetName
+          in: path
+          description: The name of the curation set
+          required: true
+          schema:
+            type: string
+        - name: itemId
+          in: path
+          description: The id of the curation item to upsert
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The curation item to be created/updated
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CurationItemCreateSchema"
+        required: true
+      responses:
+        "200":
+          description: Curation item successfully created/updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurationItemSchema"
+        "400":
+          description: Bad request, see error message for details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+    delete:
+      tags:
+        - curation_sets
+      summary: Delete a curation set item
+      description: Delete a specific curation item by its id
+      operationId: deleteCurationSetItem
+      parameters:
+        - name: curationSetName
+          in: path
+          description: The name of the curation set
+          required: true
+          schema:
+            type: string
+        - name: itemId
+          in: path
+          description: The id of the curation item to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Curation item successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurationItemDeleteSchema"
+        "404":
+          description: Curation item not found
           content:
             application/json:
               schema:
@@ -2479,6 +2728,10 @@ components:
           description: Returned only for union query response.
           items:
             $ref: "#/components/schemas/SearchRequestParams"
+        metadata:
+          type: object
+          description: Custom JSON object that can be returned in the search response
+          additionalProperties: true
     SearchRequestParams:
       type: object
       required:
@@ -2644,136 +2897,6 @@ components:
           items:
             type: object
             x-go-type: "interface{}"
-    SearchOverrideSchema:
-      type: object
-      required:
-        - rule
-      properties:
-        rule:
-          $ref: "#/components/schemas/SearchOverrideRule"
-        includes:
-          type: array
-          description:
-            List of document `id`s that should be included in the search results with their
-            corresponding `position`s.
-          items:
-            $ref: "#/components/schemas/SearchOverrideInclude"
-        excludes:
-          type: array
-          description: List of document `id`s that should be excluded from the search results.
-          items:
-            $ref: "#/components/schemas/SearchOverrideExclude"
-        filter_by:
-          type: string
-          description: >
-            A filter by clause that is applied to any search query that matches the override rule.
-        remove_matched_tokens:
-          type: boolean
-          description: >
-            Indicates whether search query tokens that exist in the override's rule should be removed from the search query.
-        metadata:
-          type: object
-          description: >
-            Return a custom JSON object in the Search API response, when this rule is triggered. This can can be used to display a pre-defined message (eg: a promotion banner) on the front-end when a particular rule is triggered.
-        sort_by:
-          type: string
-          description: >
-            A sort by clause that is applied to any search query that matches the override rule.
-        replace_query:
-          type: string
-          description: >
-            Replaces the current search query with this value, when the search query matches the override rule.
-        filter_curated_hits:
-          type: boolean
-          description: >
-            When set to true, the filter conditions of the query is applied to the curated records as well.
-            Default: false.
-        effective_from_ts:
-          type: integer
-          description: >
-            A Unix timestamp that indicates the date/time from which the override will be active. You can use this to create override rules that start applying from a future point in time.
-        effective_to_ts:
-          type: integer
-          description: >
-            A Unix timestamp that indicates the date/time until which the override will be active. You can use this to create override rules that stop applying after a period of time.
-        stop_processing:
-          type: boolean
-          description: >
-            When set to true, override processing will stop at the first matching rule. When set to false override processing will continue and multiple override actions will be triggered in sequence.
-            Overrides are processed in the lexical sort order of their id field.
-            Default: true.
-    SearchOverride:
-      allOf:
-        - $ref: "#/components/schemas/SearchOverrideSchema"
-        - type: object
-          required:
-            - id
-          properties:
-            id:
-              type: string
-              readOnly: true
-    SearchOverrideDeleteResponse:
-      type: object
-      required:
-        - id
-      properties:
-        id:
-          type: string
-          description: The id of the override that was deleted
-    SearchOverrideRule:
-      type: object
-      properties:
-        tags:
-          type: array
-          description: List of tag values to associate with this override rule.
-          items:
-            type: string
-        query:
-          type: string
-          description: Indicates what search queries should be overridden
-        match:
-          type: string
-          description: >
-            Indicates whether the match on the query term should be `exact` or `contains`.
-            If we want to match all queries that contained
-            the word `apple`, we will use the `contains` match instead.
-          enum:
-            - exact
-            - contains
-        filter_by:
-          type: string
-          description: >
-            Indicates that the override should apply when the filter_by parameter in a search query exactly matches the string specified here (including backticks, spaces, brackets, etc).
-    SearchOverrideInclude:
-      type: object
-      required:
-        - id
-        - position
-      properties:
-        id:
-          type: string
-          description: document id that should be included
-        position:
-          type: integer
-          description: position number where document should be included in the search results
-    SearchOverrideExclude:
-      type: object
-      required:
-        - id
-      properties:
-        id:
-          type: string
-          description: document id that should be excluded from the search results.
-    SearchOverridesResponse:
-      type: object
-      required:
-        - overrides
-      properties:
-        overrides:
-          type: array
-          x-go-type: "[]*SearchOverride"
-          items:
-            $ref: "#/components/schemas/SearchOverride"
     SearchSynonymSchema:
       type: object
       required:
@@ -3120,6 +3243,13 @@ components:
           description: >
             Flag for enabling/disabling the deprecated, old highlight structure in the response.
             Default: true
+          type: boolean
+          default: true
+
+        enable_analytics:
+          description: >
+            Flag for enabling/disabling analytics aggregation for specific search
+            queries (for e.g. those originating from a test script).
           type: boolean
           default: true
 
@@ -3539,6 +3669,14 @@ components:
           type: boolean
           description: >
             If you have some synonyms defined but want to disable all of them for a particular search query, set enable_synonyms to false. Default: true
+
+        enable_analytics:
+          description: >
+            Flag for enabling/disabling analytics aggregation for specific search
+            queries (for e.g. those originating from a test script).
+          type: boolean
+          default: true
+
         synonym_prefix:
           type: boolean
           description: >
@@ -4296,6 +4434,177 @@ components:
         name:
           type: string
           description: Name of the deleted synonym set
+
+    SynonymItemDeleteSchema:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: ID of the deleted synonym item
+
+    CurationItemCreateSchema:
+      type: object
+      required:
+        - rule
+      properties:
+        rule:
+          $ref: '#/components/schemas/CurationRule'
+        includes:
+          type: array
+          description:
+            List of document `id`s that should be included in the search results with their
+            corresponding `position`s.
+          items:
+            $ref: '#/components/schemas/CurationInclude'
+        excludes:
+          type: array
+          description: List of document `id`s that should be excluded from the search results.
+          items:
+            $ref: '#/components/schemas/CurationExclude'
+        filter_by:
+          type: string
+          description: >
+            A filter by clause that is applied to any search query that matches the curation rule.
+        remove_matched_tokens:
+          type: boolean
+          description: >
+            Indicates whether search query tokens that exist in the curation's rule should be removed from the search query.
+        metadata:
+          type: object
+          description: >
+            Return a custom JSON object in the Search API response, when this rule is triggered. This can can be used to display a pre-defined message (eg: a promotion banner) on the front-end when a particular rule is triggered.
+        sort_by:
+          type: string
+          description: >
+            A sort by clause that is applied to any search query that matches the curation rule.
+        replace_query:
+          type: string
+          description: >
+            Replaces the current search query with this value, when the search query matches the curation rule.
+        filter_curated_hits:
+          type: boolean
+          description: >
+            When set to true, the filter conditions of the query is applied to the curated records as well.
+            Default: false.
+        effective_from_ts:
+          type: integer
+          description: >
+            A Unix timestamp that indicates the date/time from which the curation will be active. You can use this to create rules that start applying from a future point in time.
+        effective_to_ts:
+          type: integer
+          description: >
+            A Unix timestamp that indicates the date/time until which the curation will be active. You can use this to create rules that stop applying after a period of time.
+        stop_processing:
+          type: boolean
+          description: >
+            When set to true, curation processing will stop at the first matching rule. When set to false curation processing will continue and multiple curation actions will be triggered in sequence.
+            Curations are processed in the lexical sort order of their id field.
+        id:
+          type: string
+          description: ID of the curation item
+
+
+    CurationItemSchema:
+      allOf:
+        - $ref: '#/components/schemas/CurationItemCreateSchema'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+
+    CurationSetCreateSchema:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          description: Array of curation items
+          items:
+            $ref: '#/components/schemas/CurationItemCreateSchema'
+        description:
+          type: string
+          description: Optional description for the curation set
+
+    CurationSetSchema:
+      allOf:
+        - $ref: '#/components/schemas/CurationSetCreateSchema'
+        - type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
+
+    CurationRule:
+      type: object
+      properties:
+        tags:
+          type: array
+          description: List of tag values to associate with this curation rule.
+          items:
+            type: string
+        query:
+          type: string
+          description: Indicates what search queries should be curated
+        match:
+          type: string
+          description: >
+            Indicates whether the match on the query term should be `exact` or `contains`.
+            If we want to match all queries that contained the word `apple`, we will use the `contains` match instead.
+          enum:
+            - exact
+            - contains
+        filter_by:
+          type: string
+          description: >
+            Indicates that the curation should apply when the filter_by parameter in a search query exactly matches the string specified here (including backticks, spaces, brackets, etc).
+
+    CurationInclude:
+      type: object
+      required:
+        - id
+        - position
+      properties:
+        id:
+          type: string
+          description: document id that should be included
+        position:
+          type: integer
+          description: position number where document should be included in the search results
+
+    CurationExclude:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: document id that should be excluded from the search results.
+
+    CurationSetRetrieveSchema:
+      $ref: '#/components/schemas/CurationSetCreateSchema'
+
+    CurationSetDeleteSchema:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Name of the deleted curation set
+    CurationItemDeleteSchema:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: ID of the deleted curation item
 
   securitySchemes:
     api_key_header:
