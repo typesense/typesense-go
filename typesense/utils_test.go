@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,8 +16,14 @@ func newTestServerAndClient(handler func(w http.ResponseWriter, r *http.Request)
 }
 
 func validateRequestMetadata(t *testing.T, r *http.Request, expectedEndpoint string, expectedMethod string) {
-	if r.RequestURI != expectedEndpoint {
-		t.Fatal("Invalid request endpoint!")
+	if strings.Contains(expectedEndpoint, "?") {
+		if r.URL.String() != expectedEndpoint {
+			t.Fatal("Invalid request endpoint!")
+		}
+	} else {
+		if r.URL.Path != expectedEndpoint {
+			t.Fatal("Invalid request endpoint!")
+		}
 	}
 	if r.Method != expectedMethod {
 		t.Fatal("Invalid HTTP method!")
