@@ -3,8 +3,6 @@
 
 version: 2
 
-builds: []
-
 before:
   hooks:
     - go mod tidy
