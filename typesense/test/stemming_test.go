@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"github.com/typesense/typesense-go/v3/typesense/api"
+	"github.com/typesense/typesense-go/v4/typesense/api"
 )
 
 func TestStemmingDictionary(t *testing.T) {

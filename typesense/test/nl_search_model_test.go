@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/typesense/typesense-go/v3/typesense/api/pointer"
+	"github.com/typesense/typesense-go/v4/typesense/api/pointer"
 )
 
 func nlSearchModelsCleanUp() {

@@ -3,7 +3,7 @@ package typesense
 import (
 	"context"
 
-	"github.com/typesense/typesense-go/v3/typesense/api"
+	"github.com/typesense/typesense-go/v4/typesense/api"
 )
 
 // CurationSetInterface is a type for individual Curation Set API operations
