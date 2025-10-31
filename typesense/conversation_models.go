@@ -22,10 +22,10 @@ func (c *conversationModels) Create(ctx context.Context, schema *api.Conversatio
 	if err != nil {
 		return nil, err
 	}
-	if response.JSON200 == nil {
+	if response.JSON201 == nil {
 		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
-	return response.JSON200, nil
+	return response.JSON201, nil
 }
 
 func (c *conversationModels) Retrieve(ctx context.Context) ([]*api.ConversationModelSchema, error) {

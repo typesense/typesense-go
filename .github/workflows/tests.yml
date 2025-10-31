@@ -11,21 +11,25 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    services:
-      typesense:
-        image: typesense/typesense:28.0.rc35
-        ports:
-          - 8108:8108/tcp
-        volumes:
-          - /tmp/typesense-server-data:/data
-        env:
-          TYPESENSE_DATA_DIR: '/data'
-          TYPESENSE_API_KEY: 'test_key'
-          TYPESENSE_ENABLE_CORS: true
-          TYPESENSE_URL: 'http://localhost:8108'
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Start Typesense
+        run: |
+          docker run -d \
+          -p 8108:8108 \
+          --name typesense \
+          -v /tmp/typesense-data:/data \
+          -v /tmp/typesense-analytics-data:/analytics-data \
+          typesense/typesense:30.0.alpha1 \
+          --api-key=test_key \
+          --data-dir=/data \
+          --enable-search-analytics=true \
+          --analytics-dir=/analytics-data \
+          --analytics-flush-interval=60 \
+          --analytics-minute-rate-limit=50 \
+          --enable-cors
 
       - name: Setup Go
         uses: actions/setup-go@v5

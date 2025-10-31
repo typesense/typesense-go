@@ -3,6 +3,7 @@
 package typesense
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -17,11 +18,13 @@ type APIClientInterface interface {
 }
 
 type Client struct {
-	apiConfig   *ClientConfig
-	apiClient   APIClientInterface
-	collections CollectionsInterface
-	aliases     AliasesInterface
-	MultiSearch MultiSearchInterface
+	apiConfig    *ClientConfig
+	apiClient    APIClientInterface
+	collections  CollectionsInterface
+	aliases      AliasesInterface
+	MultiSearch  MultiSearchInterface
+	synonymSets  SynonymSetsInterface
+	curationSets CurationSetsInterface
 }
 
 func (c *Client) Collections() CollectionsInterface {
@@ -84,6 +87,22 @@ func (c *Client) NLSearchModel(modelID string) NLSearchModelInterface {
 	return &nlSearchModel{apiClient: c.apiClient, modelID: modelID}
 }
 
+func (c *Client) SynonymSets() SynonymSetsInterface {
+	return c.synonymSets
+}
+
+func (c *Client) SynonymSet(synonymSetName string) SynonymSetInterface {
+	return &synonymSet{apiClient: c.apiClient, synonymSetName: synonymSetName}
+}
+
+func (c *Client) CurationSets() CurationSetsInterface {
+	return c.curationSets
+}
+
+func (c *Client) CurationSet(curationSetName string) CurationSetInterface {
+	return &curationSet{apiClient: c.apiClient, curationSetName: curationSetName}
+}
+
 func (c *Client) Stopwords() StopwordsInterface {
 	return &stopwords{apiClient: c.apiClient}
 }
@@ -98,6 +117,11 @@ func (c *Client) Stats() StatsInterface {
 
 func (c *Client) Metrics() MetricsInterface {
 	return &metrics{apiClient: c.apiClient}
+}
+
+// Debug retrieves debug information from the Typesense server
+func (c *Client) Debug(ctx context.Context) (*api.DebugResponse, error) {
+	return c.apiClient.DebugWithResponse(ctx)
 }
 
 type HTTPError struct {
@@ -335,5 +359,7 @@ func NewClient(opts ...ClientOption) *Client {
 	c.collections = &collections{c.apiClient}
 	c.aliases = &aliases{c.apiClient}
 	c.MultiSearch = &multiSearch{c.apiClient}
+	c.synonymSets = &synonymSets{c.apiClient}
+	c.curationSets = &curationSets{c.apiClient}
 	return c
 }
