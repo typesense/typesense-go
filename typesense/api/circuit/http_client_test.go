@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/typesense/typesense-go/v3/typesense/api/circuit/mocks"
+	"github.com/typesense/typesense-go/v4/typesense/api/circuit/mocks"
 	"go.uber.org/mock/gomock"
 )
 

@@ -3,7 +3,7 @@ package typesense
 import (
 	"context"
 
-	"github.com/typesense/typesense-go/v3/typesense/api"
+	"github.com/typesense/typesense-go/v4/typesense/api"
 )
 
 // SynonymSetInterface is a type for individual Synonym Set API operations
