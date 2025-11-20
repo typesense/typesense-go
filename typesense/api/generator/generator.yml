@@ -1075,6 +1075,10 @@ components:
           items:
             $ref: '#/components/schemas/MultiSearchResultItem'
           type: array
+        hits:
+          items:
+            $ref: '#/components/schemas/SearchResultHit'
+          type: array
       required:
         - results
       type: object
