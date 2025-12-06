@@ -594,7 +594,10 @@ type Field struct {
 
 	// Reference Name of a field in another collection that should be linked to this collection so that it can be joined during query.
 	Reference *string `json:"reference,omitempty"`
-	Sort      *bool   `json:"sort,omitempty"`
+
+	// AsyncReference When set to true, documents will be indexed successfully even when the referenced document doesn't exist yet. The resolution of references will happen automatically when the referenced documents get indexed later.
+	AsyncReference *bool `json:"async_reference,omitempty"`
+	Sort           *bool `json:"sort,omitempty"`
 
 	// Stem Values are stemmed before indexing in-memory. Default: false.
 	Stem *bool `json:"stem,omitempty"`
