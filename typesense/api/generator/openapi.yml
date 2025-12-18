@@ -3043,6 +3043,10 @@ components:
             $ref: "#/components/schemas/MultiSearchResultItem"
         conversation:
           $ref: "#/components/schemas/SearchResultConversation"
+        hits:
+          items:
+            $ref: '#/components/schemas/SearchResultHit'
+          type: array
     MultiSearchResultItem:
       allOf:
       - $ref: "#/components/schemas/SearchResult"
