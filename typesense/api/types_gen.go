@@ -1384,6 +1384,9 @@ type SearchParameters struct {
 	// EnableHighlightV1 Flag for enabling/disabling the deprecated, old highlight structure in the response. Default: true
 	EnableHighlightV1 *bool `json:"enable_highlight_v1,omitempty"`
 
+	// EnableLazyFilter If you have large value to filtered but the tokens in the query are expected to match very few documents
+	EnableLazyFilter *bool `json:"enable_lazy_filter,omitempty"`
+
 	// EnableOverrides If you have some overrides defined but want to disable all of them during query time, you can do that by setting this parameter to false
 	EnableOverrides *bool `json:"enable_overrides,omitempty"`
 
@@ -1857,6 +1860,7 @@ type SearchCollectionParams struct {
 	DropTokensThreshold                *int            `form:"drop_tokens_threshold,omitempty" json:"drop_tokens_threshold,omitempty"`
 	EnableAnalytics                    *bool           `form:"enable_analytics,omitempty" json:"enable_analytics,omitempty"`
 	EnableHighlightV1                  *bool           `form:"enable_highlight_v1,omitempty" json:"enable_highlight_v1,omitempty"`
+	EnableLazyFilter                   *bool           `form:"enable_lazy_filter,omitempty" json:"enable_lazy_filter,omitempty"`
 	EnableOverrides                    *bool           `form:"enable_overrides,omitempty" json:"enable_overrides,omitempty"`
 	EnableSynonyms                     *bool           `form:"enable_synonyms,omitempty" json:"enable_synonyms,omitempty"`
 	EnableTyposForAlphaNumericalTokens *bool           `form:"enable_typos_for_alpha_numerical_tokens,omitempty" json:"enable_typos_for_alpha_numerical_tokens,omitempty"`
@@ -1946,6 +1950,7 @@ type MultiSearchParams struct {
 	DropTokensThreshold                *int            `form:"drop_tokens_threshold,omitempty" json:"drop_tokens_threshold,omitempty"`
 	EnableAnalytics                    *bool           `form:"enable_analytics,omitempty" json:"enable_analytics,omitempty"`
 	EnableHighlightV1                  *bool           `form:"enable_highlight_v1,omitempty" json:"enable_highlight_v1,omitempty"`
+	EnableLazyFilter                   *bool           `form:"enable_lazy_filter,omitempty" json:"enable_lazy_filter,omitempty"`	
 	EnableOverrides                    *bool           `form:"enable_overrides,omitempty" json:"enable_overrides,omitempty"`
 	EnableSynonyms                     *bool           `form:"enable_synonyms,omitempty" json:"enable_synonyms,omitempty"`
 	EnableTyposForAlphaNumericalTokens *bool           `form:"enable_typos_for_alpha_numerical_tokens,omitempty" json:"enable_typos_for_alpha_numerical_tokens,omitempty"`
