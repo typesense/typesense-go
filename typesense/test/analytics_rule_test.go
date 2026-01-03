@@ -18,7 +18,7 @@ func analyticsRuleCleanUp() {
 	for _, rule := range result {
 		typesenseClient.Analytics().Rule(rule.Name).Delete(context.Background())
 	}
-	
+
 	// Clean up collections
 	collections, _ := typesenseClient.Collections().Retrieve(context.Background(), nil)
 	for _, collection := range collections {
@@ -32,12 +32,12 @@ func TestAnalyticsRule(t *testing.T) {
 
 	t.Run("Create", func(t *testing.T) {
 		collectionName := createNewCollection(t, "analytics-rules-collection")
-		
+
 		// Create the rule directly using the Create API
 		ruleName := newUUIDName("test-rule")
 		ruleCreate := &api.AnalyticsRuleCreate{
 			Name:       ruleName,
-			Type:       api.AnalyticsRuleCreateTypeCounter,
+			Type:       api.Counter,
 			Collection: collectionName,
 			EventType:  "click",
 			Params: &api.AnalyticsRuleCreateParams{
@@ -49,10 +49,10 @@ func TestAnalyticsRule(t *testing.T) {
 		result, err := typesenseClient.Analytics().Rules().Create(context.Background(), []*api.AnalyticsRuleCreate{ruleCreate})
 		require.NoError(t, err)
 		require.Len(t, result, 1)
-		
+
 		createdRule := result[0]
 		require.Equal(t, ruleName, createdRule.Name)
-		require.Equal(t, api.AnalyticsRuleTypeCounter, createdRule.Type)
+		require.Equal(t, api.Counter, createdRule.Type)
 		require.Equal(t, collectionName, createdRule.Collection)
 		require.Equal(t, "click", createdRule.EventType)
 	})

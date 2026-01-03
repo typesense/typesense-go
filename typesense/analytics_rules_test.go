@@ -15,7 +15,7 @@ func TestAnalyticsRulesRetrieve(t *testing.T) {
 	expectedData := []*api.AnalyticsRule{
 		{
 			Name:       "test_rule_1",
-			Type:       api.AnalyticsRuleTypeCounter,
+			Type:       api.Counter,
 			Collection: "test_collection",
 			EventType:  "click",
 			Params: &api.AnalyticsRuleCreateParams{
@@ -54,7 +54,7 @@ func TestAnalyticsRulesCreate(t *testing.T) {
 	createData := []*api.AnalyticsRuleCreate{
 		{
 			Name:       "test_rule",
-			Type:       api.AnalyticsRuleCreateTypeCounter,
+			Type:       api.Counter,
 			Collection: "test_collection",
 			EventType:  "click",
 			Params: &api.AnalyticsRuleCreateParams{
@@ -67,7 +67,7 @@ func TestAnalyticsRulesCreate(t *testing.T) {
 	expectedData := []*api.AnalyticsRule{
 		{
 			Name:       "test_rule",
-			Type:       api.AnalyticsRuleTypeCounter,
+			Type:       api.Counter,
 			Collection: "test_collection",
 			EventType:  "click",
 			Params: &api.AnalyticsRuleCreateParams{

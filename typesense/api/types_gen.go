@@ -15,18 +15,10 @@ const (
 
 // Defines values for AnalyticsRuleType.
 const (
-	AnalyticsRuleTypeCounter        AnalyticsRuleType = "counter"
-	AnalyticsRuleTypeLog            AnalyticsRuleType = "log"
-	AnalyticsRuleTypeNohitsQueries  AnalyticsRuleType = "nohits_queries"
-	AnalyticsRuleTypePopularQueries AnalyticsRuleType = "popular_queries"
-)
-
-// Defines values for AnalyticsRuleCreateType.
-const (
-	AnalyticsRuleCreateTypeCounter        AnalyticsRuleCreateType = "counter"
-	AnalyticsRuleCreateTypeLog            AnalyticsRuleCreateType = "log"
-	AnalyticsRuleCreateTypeNohitsQueries  AnalyticsRuleCreateType = "nohits_queries"
-	AnalyticsRuleCreateTypePopularQueries AnalyticsRuleCreateType = "popular_queries"
+	Counter        AnalyticsRuleType = "counter"
+	Log            AnalyticsRuleType = "log"
+	NohitsQueries  AnalyticsRuleType = "nohits_queries"
+	PopularQueries AnalyticsRuleType = "popular_queries"
 )
 
 // Defines values for CurationRuleMatch.
@@ -125,9 +117,6 @@ type AnalyticsRule struct {
 	Type       AnalyticsRuleType          `json:"type"`
 }
 
-// AnalyticsRuleType defines model for AnalyticsRule.Type.
-type AnalyticsRuleType string
-
 // AnalyticsRuleCreate defines model for AnalyticsRuleCreate.
 type AnalyticsRuleCreate struct {
 	Collection string                     `json:"collection"`
@@ -135,11 +124,8 @@ type AnalyticsRuleCreate struct {
 	Name       string                     `json:"name"`
 	Params     *AnalyticsRuleCreateParams `json:"params,omitempty"`
 	RuleTag    *string                    `json:"rule_tag,omitempty"`
-	Type       AnalyticsRuleCreateType    `json:"type"`
+	Type       AnalyticsRuleType          `json:"type"`
 }
-
-// AnalyticsRuleCreateType defines model for AnalyticsRuleCreate.Type.
-type AnalyticsRuleCreateType string
 
 // AnalyticsRuleCreateParams defines model for AnalyticsRuleCreateParams.
 type AnalyticsRuleCreateParams struct {
@@ -151,6 +137,9 @@ type AnalyticsRuleCreateParams struct {
 	MetaFields            *[]string `json:"meta_fields,omitempty"`
 	Weight                *int      `json:"weight,omitempty"`
 }
+
+// AnalyticsRuleType defines model for AnalyticsRuleType.
+type AnalyticsRuleType string
 
 // AnalyticsRuleUpdate Fields allowed to update on an analytics rule
 type AnalyticsRuleUpdate struct {
@@ -537,9 +526,6 @@ type CurationSetDeleteSchema struct {
 	Name string `json:"name"`
 }
 
-// CurationSetRetrieveSchema defines model for CurationSetRetrieveSchema.
-type CurationSetRetrieveSchema = CurationSetCreateSchema
-
 // CurationSetSchema defines model for CurationSetSchema.
 type CurationSetSchema struct {
 	// Description Optional description for the curation set
@@ -579,25 +565,24 @@ type FacetCountsStats struct {
 
 // Field defines model for Field.
 type Field struct {
-	Drop     *bool       `json:"drop,omitempty"`
-	Embed    *FieldEmbed `json:"embed,omitempty"`
-	Facet    *bool       `json:"facet,omitempty"`
-	Index    *bool       `json:"index,omitempty"`
-	Infix    *bool       `json:"infix,omitempty"`
-	Locale   *string     `json:"locale,omitempty"`
-	Name     string      `json:"name"`
-	NumDim   *int        `json:"num_dim,omitempty"`
-	Optional *bool       `json:"optional,omitempty"`
+	// AsyncReference Allow documents to be indexed successfully even when the referenced document doesn't exist yet.
+	AsyncReference *bool       `json:"async_reference,omitempty"`
+	Drop           *bool       `json:"drop,omitempty"`
+	Embed          *FieldEmbed `json:"embed,omitempty"`
+	Facet          *bool       `json:"facet,omitempty"`
+	Index          *bool       `json:"index,omitempty"`
+	Infix          *bool       `json:"infix,omitempty"`
+	Locale         *string     `json:"locale,omitempty"`
+	Name           string      `json:"name"`
+	NumDim         *int        `json:"num_dim,omitempty"`
+	Optional       *bool       `json:"optional,omitempty"`
 
 	// RangeIndex Enables an index optimized for range filtering on numerical fields (e.g. rating:>3.5). Default: false.
 	RangeIndex *bool `json:"range_index,omitempty"`
 
 	// Reference Name of a field in another collection that should be linked to this collection so that it can be joined during query.
 	Reference *string `json:"reference,omitempty"`
-
-	// AsyncReference When set to true, documents will be indexed successfully even when the referenced document doesn't exist yet. The resolution of references will happen automatically when the referenced documents get indexed later.
-	AsyncReference *bool `json:"async_reference,omitempty"`
-	Sort           *bool `json:"sort,omitempty"`
+	Sort      *bool   `json:"sort,omitempty"`
 
 	// Stem Values are stemmed before indexing in-memory. Default: false.
 	Stem *bool `json:"stem,omitempty"`
@@ -1743,6 +1728,21 @@ type SynonymItemSchema struct {
 	Synonyms []string `json:"synonyms"`
 }
 
+// SynonymItemUpsertSchema defines model for SynonymItemUpsertSchema.
+type SynonymItemUpsertSchema struct {
+	// Locale Locale for the synonym, leave blank to use the standard tokenizer
+	Locale *string `json:"locale,omitempty"`
+
+	// Root For 1-way synonyms, indicates the root word that words in the synonyms parameter map to
+	Root *string `json:"root,omitempty"`
+
+	// SymbolsToIndex By default, special characters are dropped from synonyms. Use this attribute to specify which special characters should be indexed as is
+	SymbolsToIndex *[]string `json:"symbols_to_index,omitempty"`
+
+	// Synonyms Array of words that should be considered as synonyms
+	Synonyms []string `json:"synonyms"`
+}
+
 // SynonymSetCreateSchema defines model for SynonymSetCreateSchema.
 type SynonymSetCreateSchema struct {
 	// Items Array of synonym items
@@ -1754,9 +1754,6 @@ type SynonymSetDeleteSchema struct {
 	// Name Name of the deleted synonym set
 	Name string `json:"name"`
 }
-
-// SynonymSetRetrieveSchema defines model for SynonymSetRetrieveSchema.
-type SynonymSetRetrieveSchema = SynonymSetCreateSchema
 
 // SynonymSetSchema defines model for SynonymSetSchema.
 type SynonymSetSchema struct {
@@ -2095,7 +2092,7 @@ type UpsertStopwordsSetJSONRequestBody = StopwordsSetUpsertSchema
 type UpsertSynonymSetJSONRequestBody = SynonymSetCreateSchema
 
 // UpsertSynonymSetItemJSONRequestBody defines body for UpsertSynonymSetItem for application/json ContentType.
-type UpsertSynonymSetItemJSONRequestBody = SynonymItemSchema
+type UpsertSynonymSetItemJSONRequestBody = SynonymItemUpsertSchema
 
 // AsSearchParameters returns the union data inside the PresetSchema_Value as a SearchParameters
 func (t PresetSchema_Value) AsSearchParameters() (SearchParameters, error) {

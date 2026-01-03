@@ -126,12 +126,7 @@ components:
         rule_tag:
           type: string
         type:
-          enum:
-            - popular_queries
-            - nohits_queries
-            - counter
-            - log
-          type: string
+          $ref: '#/components/schemas/AnalyticsRuleType'
       required:
         - name
         - type
@@ -157,6 +152,13 @@ components:
         weight:
           type: integer
       type: object
+    AnalyticsRuleType:
+      enum:
+        - popular_queries
+        - nohits_queries
+        - counter
+        - log
+      type: string
     AnalyticsRuleUpdate:
       description: Fields allowed to update on an analytics rule
       properties:
@@ -607,8 +609,6 @@ components:
       required:
         - name
       type: object
-    CurationSetRetrieveSchema:
-      $ref: '#/components/schemas/CurationSetCreateSchema'
     CurationSetSchema:
       allOf:
         - $ref: '#/components/schemas/CurationSetCreateSchema'
@@ -672,6 +672,10 @@ components:
       type: object
     Field:
       properties:
+        async_reference:
+          description: |
+            Allow documents to be indexed successfully even when the referenced document doesn't exist yet.
+          type: boolean
         drop:
           example: true
           type: boolean
@@ -1863,10 +1867,17 @@ components:
         - id
       type: object
     SynonymItemSchema:
+      allOf:
+        - properties:
+            id:
+              description: Unique identifier for the synonym item
+              type: string
+          required:
+            - id
+          type: object
+        - $ref: '#/components/schemas/SynonymItemUpsertSchema'
+    SynonymItemUpsertSchema:
       properties:
-        id:
-          description: Unique identifier for the synonym item
-          type: string
         locale:
           description: Locale for the synonym, leave blank to use the standard tokenizer
           type: string
@@ -1884,7 +1895,6 @@ components:
             type: string
           type: array
       required:
-        - id
         - synonyms
       type: object
     SynonymSetCreateSchema:
@@ -1905,8 +1915,6 @@ components:
       required:
         - name
       type: object
-    SynonymSetRetrieveSchema:
-      $ref: '#/components/schemas/SynonymSetCreateSchema'
     SynonymSetSchema:
       allOf:
         - $ref: '#/components/schemas/SynonymSetCreateSchema'
@@ -2179,7 +2187,7 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/AnalyticsRule'
                   - items:
-                      anyOf:
+                      oneOf:
                         - $ref: '#/components/schemas/AnalyticsRule'
                         - properties:
                             error:
@@ -3162,7 +3170,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessStatus'
-          description: Compacting the on-disk database succeeded.
+          description: Toggle Slow Request Log database succeeded.
       summary: Toggle Slow Request Log
       tags:
         - operations
@@ -3333,7 +3341,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CurationSetRetrieveSchema'
+                $ref: '#/components/schemas/CurationSetSchema'
           description: Curation set fetched
         "404":
           content:
@@ -4557,7 +4565,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SynonymSetRetrieveSchema'
+                $ref: '#/components/schemas/SynonymSetSchema'
           description: Synonym set fetched
         "404":
           content:
@@ -4715,7 +4723,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SynonymItemSchema'
+              $ref: '#/components/schemas/SynonymItemUpsertSchema'
         description: The synonym item to be created/updated
         required: true
       responses:

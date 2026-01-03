@@ -299,8 +299,6 @@ func newKey() *api.ApiKey {
 	}
 }
 
-
-
 func newCurationSetCreateSchema() *api.CurationSetCreateSchema {
 	return &api.CurationSetCreateSchema{
 		Items: []api.CurationItemCreateSchema{
@@ -452,7 +450,7 @@ func newPresetFromMultiSearchSearchesParameter(presetName string) *api.PresetSch
 func newAnalyticsRule(ruleName string, collectionName string, sourceCollectionName string, eventName string) *api.AnalyticsRule {
 	return &api.AnalyticsRule{
 		Name:       ruleName,
-		Type:       api.AnalyticsRuleTypeCounter,
+		Type:       api.Counter,
 		Collection: collectionName,
 		EventType:  "click",
 		Params: &api.AnalyticsRuleCreateParams{
@@ -469,7 +467,7 @@ func createNewAnalyticsRule(t *testing.T, collectionName string, sourceCollectio
 	// Create the rule using the new API
 	ruleCreate := &api.AnalyticsRuleCreate{
 		Name:       ruleName,
-		Type:       api.AnalyticsRuleCreateTypeCounter,
+		Type:       api.Counter,
 		Collection: collectionName,
 		EventType:  "click",
 		Params: &api.AnalyticsRuleCreateParams{

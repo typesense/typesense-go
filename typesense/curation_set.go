@@ -9,7 +9,7 @@ import (
 // CurationSetInterface is a type for individual Curation Set API operations
 type CurationSetInterface interface {
 	// Retrieve a single curation set
-	Retrieve(ctx context.Context) (*api.CurationSetRetrieveSchema, error)
+	Retrieve(ctx context.Context) (*api.CurationSetSchema, error)
 	// Update a curation set
 	Upsert(ctx context.Context, curationSetSchema *api.CurationSetCreateSchema) (*api.CurationSetSchema, error)
 	// Delete a curation set
@@ -22,7 +22,7 @@ type curationSet struct {
 	curationSetName string
 }
 
-func (c *curationSet) Retrieve(ctx context.Context) (*api.CurationSetRetrieveSchema, error) {
+func (c *curationSet) Retrieve(ctx context.Context) (*api.CurationSetSchema, error) {
 	response, err := c.apiClient.RetrieveCurationSetWithResponse(ctx, c.curationSetName)
 	if err != nil {
 		return nil, err

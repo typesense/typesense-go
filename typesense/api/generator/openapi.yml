@@ -495,14 +495,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SynonymSetRetrieveSchema"
+                $ref: "#/components/schemas/SynonymSetSchema"
         "404":
           description: Synonym set not found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-    
+
     put:
       tags:
         - synonyms
@@ -650,7 +650,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SynonymItemSchema"
+              $ref: "#/components/schemas/SynonymItemUpsertSchema"
         required: true
       responses:
         "200":
@@ -735,7 +735,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CurationSetRetrieveSchema"
+                $ref: "#/components/schemas/CurationSetSchema"
         "404":
           description: Curation set not found
           content:
@@ -1647,7 +1647,7 @@ paths:
                 {"log-slow-requests-time-ms": 2000}
       responses:
         '200':
-          description: Compacting the on-disk database succeeded.
+          description: Toggle Slow Request Log database succeeded.
           content:
             application/json:
               schema:
@@ -1805,7 +1805,7 @@ paths:
                   - $ref: "#/components/schemas/AnalyticsRule"
                   - type: array
                     items:
-                      anyOf:
+                      oneOf:
                         - $ref: "#/components/schemas/AnalyticsRule"
                         - type: object
                           properties:
@@ -2565,7 +2565,7 @@ components:
         async_reference:
           type: boolean
           description: >
-            When set to true, documents will be indexed successfully even when the referenced document doesn't exist yet. The resolution of references will happen automatically when the referenced documents get indexed later.
+            Allow documents to be indexed successfully even when the referenced document doesn't exist yet.
         num_dim:
           type: integer
           example: 256
@@ -3979,8 +3979,7 @@ components:
         name:
           type: string
         type:
-          type: string
-          enum: [popular_queries, nohits_queries, counter, log]
+          $ref: "#/components/schemas/AnalyticsRuleType"
         collection:
           type: string
         event_type:
@@ -4005,6 +4004,9 @@ components:
               type: string
             weight:
               type: integer
+    AnalyticsRuleType:
+      type: string
+      enum: [popular_queries, nohits_queries, counter, log]
     AnalyticsRuleUpdate:
       type: object
       description: Fields allowed to update on an analytics rule
@@ -4045,7 +4047,7 @@ components:
         query_counter_events: { type: integer }
         doc_log_events: { type: integer }
         doc_counter_events: { type: integer }
-    
+
     APIStatsResponse:
       type: object
       properties:
@@ -4368,15 +4370,11 @@ components:
           type: string
           description: ID of the deleted NL search model
 
-    SynonymItemSchema:
+    SynonymItemUpsertSchema:
       type: object
       required:
-        - id
         - synonyms
       properties:
-        id:
-          type: string
-          description: Unique identifier for the synonym item
         synonyms:
           type: array
           description: Array of words that should be considered as synonyms
@@ -4393,6 +4391,17 @@ components:
           description: By default, special characters are dropped from synonyms. Use this attribute to specify which special characters should be indexed as is
           items:
             type: string
+
+    SynonymItemSchema:
+      allOf:
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the synonym item
+        - $ref: "#/components/schemas/SynonymItemUpsertSchema"
 
     SynonymSetCreateSchema:
       type: object
@@ -4426,9 +4435,6 @@ components:
           description: Array of synonym sets
           items:
             $ref: "#/components/schemas/SynonymSetSchema"
-
-    SynonymSetRetrieveSchema:
-      $ref: "#/components/schemas/SynonymSetCreateSchema"
 
     SynonymSetDeleteSchema:
       type: object
@@ -4589,9 +4595,6 @@ components:
         id:
           type: string
           description: document id that should be excluded from the search results.
-
-    CurationSetRetrieveSchema:
-      $ref: '#/components/schemas/CurationSetCreateSchema'
 
     CurationSetDeleteSchema:
       type: object

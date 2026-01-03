@@ -13,7 +13,7 @@ import (
 func TestAnalyticsRuleRetrieve(t *testing.T) {
 	expectedData := &api.AnalyticsRule{
 		Name:       "test_rule",
-		Type:       api.AnalyticsRuleTypeCounter,
+		Type:       api.Counter,
 		Collection: "test_collection",
 		EventType:  "click",
 		Params: &api.AnalyticsRuleCreateParams{

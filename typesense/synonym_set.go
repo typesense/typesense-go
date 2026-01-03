@@ -9,7 +9,7 @@ import (
 // SynonymSetInterface is a type for individual Synonym Set API operations
 type SynonymSetInterface interface {
 	// Retrieve a single synonym set
-	Retrieve(ctx context.Context) (*api.SynonymSetRetrieveSchema, error)
+	Retrieve(ctx context.Context) (*api.SynonymSetSchema, error)
 	// Update a synonym set
 	Upsert(ctx context.Context, synonymSetSchema *api.SynonymSetCreateSchema) (*api.SynonymSetSchema, error)
 	// Delete a synonym set
@@ -22,7 +22,7 @@ type synonymSet struct {
 	synonymSetName string
 }
 
-func (s *synonymSet) Retrieve(ctx context.Context) (*api.SynonymSetRetrieveSchema, error) {
+func (s *synonymSet) Retrieve(ctx context.Context) (*api.SynonymSetSchema, error) {
 	response, err := s.apiClient.RetrieveSynonymSetWithResponse(ctx, s.synonymSetName)
 	if err != nil {
 		return nil, err

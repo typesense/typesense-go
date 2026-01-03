@@ -8311,7 +8311,7 @@ func (r DeleteCurationSetResponse) StatusCode() int {
 type RetrieveCurationSetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *CurationSetRetrieveSchema
+	JSON200      *CurationSetSchema
 	JSON404      *ApiResponse
 }
 
@@ -9178,7 +9178,7 @@ func (r DeleteSynonymSetResponse) StatusCode() int {
 type RetrieveSynonymSetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *SynonymSetRetrieveSchema
+	JSON200      *SynonymSetSchema
 	JSON404      *ApiResponse
 }
 
@@ -11336,7 +11336,7 @@ func ParseRetrieveCurationSetResponse(rsp *http.Response) (*RetrieveCurationSetR
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest CurationSetRetrieveSchema
+		var dest CurationSetSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -12505,7 +12505,7 @@ func ParseRetrieveSynonymSetResponse(rsp *http.Response) (*RetrieveSynonymSetRes
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest SynonymSetRetrieveSchema
+		var dest SynonymSetSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
