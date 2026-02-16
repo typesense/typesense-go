@@ -240,6 +240,51 @@ func TestClientConfigOptions(t *testing.T) {
 			},
 		},
 		{
+			name: "WithConfigPartialKeepsDefaults",
+			options: []ClientOption{
+				WithClientConfig(&ClientConfig{
+					ServerURL: "http://example.com",
+					APIKey:    "API_KEY_1",
+				}),
+			},
+			verify: func(t *testing.T, client *Client) {
+				assert.Equal(t, "http://example.com", client.apiConfig.ServerURL)
+				assert.Equal(t, "API_KEY_1", client.apiConfig.APIKey)
+				assert.Equal(t, defaultRetryInterval, client.apiConfig.RetryInterval)
+				assert.Equal(t, defaultHealthcheckInterval, client.apiConfig.HealthcheckInterval)
+				assert.Equal(t, defaultConnectionTimeout, client.apiConfig.ConnectionTimeout)
+				assert.Equal(t, defaultCircuitBreakerName, client.apiConfig.CircuitBreakerName)
+				assert.Equal(t, circuit.DefaultGoBreakerMaxRequests, client.apiConfig.CircuitBreakerMaxRequests)
+				assert.Equal(t, circuit.DefaultGoBreakerInterval, client.apiConfig.CircuitBreakerInterval)
+				assert.Equal(t, circuit.DefaultGoBreakerTimeout, client.apiConfig.CircuitBreakerTimeout)
+				assert.Equal(t,
+					reflect.ValueOf(circuit.DefaultReadyToTrip).Pointer(),
+					reflect.ValueOf(client.apiConfig.CircuitBreakerReadyToTrip).Pointer(),
+					"readyToTrip is not valid")
+				assert.NotNil(t, client.apiClient)
+			},
+		},
+		{
+			name: "WithNilConfig",
+			options: []ClientOption{
+				WithClientConfig(nil),
+			},
+			verify: func(t *testing.T, client *Client) {
+				assert.Equal(t, defaultRetryInterval, client.apiConfig.RetryInterval)
+				assert.Equal(t, defaultHealthcheckInterval, client.apiConfig.HealthcheckInterval)
+				assert.Equal(t, defaultConnectionTimeout, client.apiConfig.ConnectionTimeout)
+				assert.Equal(t, defaultCircuitBreakerName, client.apiConfig.CircuitBreakerName)
+				assert.Equal(t, circuit.DefaultGoBreakerMaxRequests, client.apiConfig.CircuitBreakerMaxRequests)
+				assert.Equal(t, circuit.DefaultGoBreakerInterval, client.apiConfig.CircuitBreakerInterval)
+				assert.Equal(t, circuit.DefaultGoBreakerTimeout, client.apiConfig.CircuitBreakerTimeout)
+				assert.Equal(t,
+					reflect.ValueOf(circuit.DefaultReadyToTrip).Pointer(),
+					reflect.ValueOf(client.apiConfig.CircuitBreakerReadyToTrip).Pointer(),
+					"readyToTrip is not valid")
+				assert.NotNil(t, client.apiClient)
+			},
+		},
+		{
 			name: "WithCustomHTTPClient",
 			options: []ClientOption{
 				WithCustomHTTPClient(&http.Client{
