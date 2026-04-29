@@ -5,9 +5,11 @@ package test
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/typesense/typesense-go/v4/typesense"
 	"github.com/typesense/typesense-go/v4/typesense/api"
 	"github.com/typesense/typesense-go/v4/typesense/api/pointer"
 )
@@ -84,6 +86,31 @@ func TestMultiSearch(t *testing.T) {
 	for i, doc := range *result.Results[2].Hits {
 		require.Equal(t, *doc.Document, expectedDocs2[i])
 	}
+}
+
+func TestMultiSearchUnionTopLevelErrorReturnsHTTPError(t *testing.T) {
+	_, err := typesenseClient.MultiSearch.Perform(
+		context.Background(),
+		&api.MultiSearchParams{
+			Q: pointer.String("query"),
+		},
+		api.MultiSearchSearchesParameter{
+			Searches: []api.MultiSearchCollectionParameters{
+				{
+					Collection: pointer.String("non-existent"),
+				},
+			},
+			Union: pointer.True(),
+		},
+	)
+	require.Error(t, err)
+
+	var httpErr *typesense.HTTPError
+	require.True(t, errors.As(err, &httpErr))
+	require.Equal(t, 404, httpErr.Status)
+	require.Contains(t, string(httpErr.Body), `"code"`)
+	require.Contains(t, string(httpErr.Body), `"error"`)
+	require.Contains(t, string(httpErr.Body), "collection not found")
 }
 
 func TestMultiSearchGroupBy(t *testing.T) {
