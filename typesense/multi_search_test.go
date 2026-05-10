@@ -1,13 +1,13 @@
 package typesense
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"testing"
-
-	"bytes"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/typesense/typesense-go/v4/typesense/api"
@@ -204,6 +204,78 @@ func TestMultiSearchResultDeserialization(t *testing.T) {
 	err := json.Unmarshal([]byte(inputJSON), result)
 	assert.Nil(t, err)
 	assert.Equal(t, expected, result)
+}
+
+func TestMultiSearchPerformUnion(t *testing.T) {
+	expectedParams := newMultiSearchParams()
+	expectedBody := newMultiSearchBodyParams()
+	union := true
+	expectedBody.Union = &union
+
+	expectedResult := &api.SearchResult{
+		Found: pointer.Int(2),
+		Hits: &[]api.SearchResultHit{
+			{
+				Document: &map[string]interface{}{
+					"id":            "124",
+					"company_name":  "Stark Industries",
+					"num_employees": float64(5215),
+					"country":       "USA",
+				},
+				SearchIndex: pointer.Int(1),
+			},
+		},
+		OutOf:        pointer.Int(179203),
+		Page:         pointer.Int(0),
+		SearchCutoff: pointer.False(),
+		SearchTimeMs: pointer.Int(8),
+		UnionRequestParams: &[]api.SearchRequestParams{
+			{
+				CollectionName: "events",
+				Q:              "iran",
+				PerPage:        10,
+			},
+			{
+				CollectionName: "events",
+				Q:              "iran",
+				PerPage:        10,
+			},
+		},
+	}
+
+	expectedResponseBytes, err := json.Marshal(expectedResult)
+	assert.Nil(t, err)
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
+	mockAPIClient.EXPECT().
+		MultiSearch(gomock.Not(gomock.Nil()), expectedParams, api.MultiSearchJSONRequestBody(expectedBody)).
+		Return(&http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(bytes.NewReader(expectedResponseBytes)),
+		}, nil).Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	params := newMultiSearchParams()
+	body := newMultiSearchBodyParams()
+	result, err := client.MultiSearch.PerformUnion(context.Background(), params, body)
+
+	assert.Nil(t, err)
+	assert.Equal(t, expectedResult, result)
+}
+
+func TestMultiSearchPerformUnionRejectsUnionFalse(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	client := NewClient(WithAPIClient(mocks.NewMockAPIClientInterface(ctrl)))
+	params := newMultiSearchParams()
+	body := newMultiSearchBodyParams()
+	union := false
+	body.Union = &union
+
+	_, err := client.MultiSearch.PerformUnion(context.Background(), params, body)
+	assert.NotNil(t, err)
 }
 
 func TestMultiSearch(t *testing.T) {

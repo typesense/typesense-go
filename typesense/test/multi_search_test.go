@@ -373,3 +373,51 @@ func TestMultiSearchWithStopwords(t *testing.T) {
 	// Check second result
 	require.Equal(t, 0, len(*result.Results[1].Hits), "Number of docs in second result did not equal")
 }
+
+func TestMultiSearchUnion(t *testing.T) {
+	collectionName1 := createNewCollection(t, "companies")
+	collectionName2 := createNewCollection(t, "companies")
+
+	createDocument(t, collectionName1, newDocument("201", withCompanyName("Stark Alpha"), withNumEmployees(10)))
+	createDocument(t, collectionName2, newDocument("301", withCompanyName("Stark Beta"), withNumEmployees(20)))
+
+	params := &api.MultiSearchParams{
+		Page:    pointer.Int(1),
+		PerPage: pointer.Int(10),
+	}
+
+	searches := api.MultiSearchSearchesParameter{
+		Searches: []api.MultiSearchCollectionParameters{
+			{
+				Collection: pointer.String(collectionName1),
+				Q:          pointer.String("*"),
+				QueryBy:    pointer.String("company_name"),
+				FilterBy:   pointer.String("company_name:Stark Alpha"),
+			},
+			{
+				Collection: pointer.String(collectionName2),
+				Q:          pointer.String("*"),
+				QueryBy:    pointer.String("company_name"),
+				FilterBy:   pointer.String("company_name:Stark Beta"),
+			},
+		},
+	}
+
+	result, err := typesenseClient.MultiSearch.PerformUnion(context.Background(), params, searches)
+	require.NoError(t, err)
+	require.NotNil(t, result)
+	require.NotNil(t, result.Hits)
+	require.Equal(t, 2, len(*result.Hits))
+	require.NotNil(t, result.UnionRequestParams)
+	require.Equal(t, 2, len(*result.UnionRequestParams))
+
+	foundNames := map[string]bool{}
+	for _, hit := range *result.Hits {
+		require.NotNil(t, hit.Document)
+		if name, ok := (*hit.Document)["company_name"].(string); ok {
+			foundNames[name] = true
+		}
+	}
+	require.True(t, foundNames["Stark Alpha"])
+	require.True(t, foundNames["Stark Beta"])
+}

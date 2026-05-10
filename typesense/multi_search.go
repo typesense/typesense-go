@@ -4,13 +4,16 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
+	"net/http"
 
 	"github.com/typesense/typesense-go/v4/typesense/api"
 )
 
 type MultiSearchInterface interface {
 	Perform(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.MultiSearchResult, error)
+	PerformUnion(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.SearchResult, error)
 	PerformWithContentType(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter, contentType string) (*api.MultiSearchResponse, error)
 }
 
@@ -19,6 +22,9 @@ type multiSearch struct {
 }
 
 func (m *multiSearch) Perform(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.MultiSearchResult, error) {
+	if searchParams.Union != nil && *searchParams.Union {
+		return nil, errors.New("union must be false for Perform; use PerformUnion")
+	}
 	response, err := m.apiClient.MultiSearchWithResponse(ctx, commonSearchParams, api.MultiSearchJSONRequestBody(searchParams))
 	if err != nil {
 		return nil, err
@@ -30,6 +36,34 @@ func (m *multiSearch) Perform(ctx context.Context, commonSearchParams *api.Multi
 		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return response.JSON200, nil
+}
+
+func (m *multiSearch) PerformUnion(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.SearchResult, error) {
+	if searchParams.Union != nil && !*searchParams.Union {
+		return nil, errors.New("union must be true for PerformUnion")
+	}
+	union := true
+	searchParams.Union = &union
+
+	httpResp, err := m.apiClient.MultiSearch(ctx, commonSearchParams, api.MultiSearchJSONRequestBody(searchParams))
+	if err != nil {
+		return nil, err
+	}
+	defer httpResp.Body.Close()
+
+	responseBody, err := io.ReadAll(httpResp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if httpResp.StatusCode < http.StatusOK || httpResp.StatusCode >= http.StatusMultipleChoices {
+		return nil, &HTTPError{Status: httpResp.StatusCode, Body: responseBody}
+	}
+
+	var result api.SearchResult
+	if err := json.Unmarshal(responseBody, &result); err != nil {
+		return nil, err
+	}
+	return &result, nil
 }
 
 func (m *multiSearch) PerformWithContentType(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter, contentType string) (*api.MultiSearchResponse, error) {
