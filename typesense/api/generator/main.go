@@ -27,7 +27,7 @@ type MapKV struct {
 }
 
 func sortedSlice(params map[string]interface{}) []MapKV {
-	kvs := []MapKV{}
+	kvs := make([]MapKV, 0, len(params))
 
 	for k, v := range params {
 		kvs = append(kvs, MapKV{k, v})
@@ -55,6 +55,7 @@ func main() {
 	processOpenAPISpec(&m)
 	writeGeneratorFile(&m)
 	generateClient()
+	injectWrapperDocs("./typesense/api/generator/openapi.yml", "./typesense")
 
 	log.Println("Successfully Completed !")
 }
