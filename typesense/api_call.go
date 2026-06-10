@@ -47,11 +47,15 @@ func NewAPICall(client circuit.HTTPRequestDoer, config *ClientConfig) *APICall {
 		retryInterval:        config.RetryInterval,
 	}
 
-	// default numRetries is the number of nodes (+1 if nearestNode is specified)
+	// default numRetries is the number of nodes (+1 if nearestNode is specified),
+	// and falls back to 3.
 	if config.NumRetries == 0 {
 		apiCall.numRetriesPerRequest = len(config.Nodes)
 		if config.NearestNode != "" {
 			apiCall.numRetriesPerRequest++
+		}
+		if apiCall.numRetriesPerRequest == 0 {
+			apiCall.numRetriesPerRequest = 3
 		}
 	}
 

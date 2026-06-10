@@ -10,9 +10,21 @@ import (
 
 // CurationSetsInterface is a type for Curation Sets API operations
 type CurationSetsInterface interface {
-	// Create or update a curation set
+	// Create or update a curation set.
+	//
+	// Create or update a curation set with the given name
+	//
+	// HTTP: PUT /curation_sets/{curationSetName}
+	//
+	// See: https://typesense.org/docs/latest/api/curation.html
 	Upsert(ctx context.Context, curationSetName string, curationSetSchema *api.CurationSetCreateSchema) (*api.CurationSetSchema, error)
+	// List all curation sets.
+	//
 	// Retrieve all curation sets
+	//
+	// HTTP: GET /curation_sets
+	//
+	// See: https://typesense.org/docs/latest/api/curation.html
 	Retrieve(ctx context.Context) ([]api.CurationSetSchema, error)
 }
 
@@ -21,6 +33,13 @@ type curationSets struct {
 	apiClient APIClientInterface
 }
 
+// Create or update a curation set.
+//
+// # Create or update a curation set with the given name
+//
+// HTTP: PUT /curation_sets/{curationSetName}
+//
+// See: https://typesense.org/docs/latest/api/curation.html
 func (c *curationSets) Upsert(ctx context.Context, curationSetName string, curationSetSchema *api.CurationSetCreateSchema) (*api.CurationSetSchema, error) {
 	response, err := c.apiClient.UpsertCurationSetWithResponse(ctx, curationSetName, api.UpsertCurationSetJSONRequestBody(*curationSetSchema))
 	if err != nil {
@@ -32,6 +51,13 @@ func (c *curationSets) Upsert(ctx context.Context, curationSetName string, curat
 	return response.JSON200, nil
 }
 
+// List all curation sets.
+//
+// # Retrieve all curation sets
+//
+// HTTP: GET /curation_sets
+//
+// See: https://typesense.org/docs/latest/api/curation.html
 func (c *curationSets) Retrieve(ctx context.Context) ([]api.CurationSetSchema, error) {
 	response, err := c.apiClient.RetrieveCurationSetsWithResponse(ctx)
 	if err != nil {

@@ -119,7 +119,11 @@ func (c *Client) Metrics() MetricsInterface {
 	return &metrics{apiClient: c.apiClient}
 }
 
-// Debug retrieves debug information from the Typesense server
+// Print debugging information.
+//
+// HTTP: GET /debug
+//
+// See: https://typesense.org/docs/latest/api/cluster-operations.html#debug
 func (c *Client) Debug(ctx context.Context) (*api.DebugResponse, error) {
 	return c.apiClient.DebugWithResponse(ctx)
 }

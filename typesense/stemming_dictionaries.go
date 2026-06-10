@@ -12,7 +12,21 @@ import (
 
 type StemmingDictionariesInterface interface {
 	Upsert(ctx context.Context, dictionaryId string, wordRootCombinations []api.StemmingDictionaryWord) ([]*api.StemmingDictionaryWord, error)
+	// Import a stemming dictionary.
+	//
+	// Upload a JSONL file containing word mappings to create or update a stemming dictionary.
+	//
+	// HTTP: POST /stemming/dictionaries/import
+	//
+	// See: https://typesense.org/docs/latest/api/stemming.html
 	UpsertJsonl(ctx context.Context, dictionaryId string, body io.Reader) (io.ReadCloser, error)
+	// List all stemming dictionaries.
+	//
+	// Retrieve a list of all available stemming dictionaries.
+	//
+	// HTTP: GET /stemming/dictionaries
+	//
+	// See: https://typesense.org/docs/latest/api/stemming.html
 	Retrieve(ctx context.Context) (*api.ListStemmingDictionariesResponse, error)
 }
 
@@ -47,6 +61,13 @@ func (s *stemmingDictionaries) Upsert(ctx context.Context, dictionaryId string, 
 	return result, nil
 }
 
+// Import a stemming dictionary.
+//
+// Upload a JSONL file containing word mappings to create or update a stemming dictionary.
+//
+// HTTP: POST /stemming/dictionaries/import
+//
+// See: https://typesense.org/docs/latest/api/stemming.html
 func (s *stemmingDictionaries) UpsertJsonl(ctx context.Context, dictionaryId string, body io.Reader) (io.ReadCloser, error) {
 	params := &api.ImportStemmingDictionaryParams{
 		Id: dictionaryId,
@@ -65,6 +86,13 @@ func (s *stemmingDictionaries) UpsertJsonl(ctx context.Context, dictionaryId str
 	return response.Body, nil
 }
 
+// List all stemming dictionaries.
+//
+// Retrieve a list of all available stemming dictionaries.
+//
+// HTTP: GET /stemming/dictionaries
+//
+// See: https://typesense.org/docs/latest/api/stemming.html
 func (s *stemmingDictionaries) Retrieve(ctx context.Context) (*api.ListStemmingDictionariesResponse, error) {
 	response, err := s.apiClient.ListStemmingDictionariesWithResponse(ctx)
 	if err != nil {

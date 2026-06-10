@@ -7,7 +7,21 @@ import (
 )
 
 type PresetsInterface interface {
+	// Retrieves all presets.
+	//
+	// Retrieve the details of all presets
+	//
+	// HTTP: GET /presets
+	//
+	// See: https://typesense.org/docs/latest/api/search.html#presets
 	Retrieve(ctx context.Context) ([]*api.PresetSchema, error)
+	// Upserts a preset.
+	//
+	// Create or update an existing preset.
+	//
+	// HTTP: PUT /presets/{presetId}
+	//
+	// See: https://typesense.org/docs/latest/api/search.html#presets
 	Upsert(ctx context.Context, presetName string, presetValue *api.PresetUpsertSchema) (*api.PresetSchema, error)
 }
 
@@ -15,6 +29,13 @@ type presets struct {
 	apiClient APIClientInterface
 }
 
+// Retrieves all presets.
+//
+// # Retrieve the details of all presets
+//
+// HTTP: GET /presets
+//
+// See: https://typesense.org/docs/latest/api/search.html#presets
 func (p *presets) Retrieve(ctx context.Context) ([]*api.PresetSchema, error) {
 	response, err := p.apiClient.RetrieveAllPresetsWithResponse(ctx)
 	if err != nil {
@@ -26,6 +47,13 @@ func (p *presets) Retrieve(ctx context.Context) ([]*api.PresetSchema, error) {
 	return response.JSON200.Presets, nil
 }
 
+// Upserts a preset.
+//
+// Create or update an existing preset.
+//
+// HTTP: PUT /presets/{presetId}
+//
+// See: https://typesense.org/docs/latest/api/search.html#presets
 func (p *presets) Upsert(ctx context.Context, presetName string, presetValue *api.PresetUpsertSchema) (*api.PresetSchema, error) {
 	response, err := p.apiClient.UpsertPresetWithResponse(ctx, presetName, *presetValue)
 	if err != nil {
