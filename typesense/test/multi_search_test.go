@@ -373,3 +373,109 @@ func TestMultiSearchWithStopwords(t *testing.T) {
 	// Check second result
 	require.Equal(t, 0, len(*result.Results[1].Hits), "Number of docs in second result did not equal")
 }
+
+func TestMultiSearchPerformUnion(t *testing.T) {
+	collectionName1 := createNewCollection(t, "companies")
+	collectionName2 := createNewCollection(t, "companies")
+
+	documents1 := []interface{}{
+		newDocument("123", withCompanyName("Stark Industries 1"), withNumEmployees(50)),
+		newDocument("125", withCompanyName("Stark Industries 2"), withNumEmployees(150)),
+	}
+	documents2 := []interface{}{
+		newDocument("127", withCompanyName("Wayne Enterprises 1"), withNumEmployees(250)),
+		newDocument("129", withCompanyName("Wayne Enterprises 2"), withNumEmployees(500)),
+	}
+
+	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create)}
+
+	_, err := typesenseClient.Collection(collectionName1).Documents().Import(context.Background(), documents1, params)
+	require.NoError(t, err)
+
+	_, err = typesenseClient.Collection(collectionName2).Documents().Import(context.Background(), documents2, params)
+	require.NoError(t, err)
+
+	searchParams := &api.MultiSearchParams{
+		Q:       pointer.String("*"),
+		QueryBy: pointer.String("company_name"),
+		SortBy:  pointer.String("num_employees:desc"),
+		Page:    pointer.Int(1),
+		PerPage: pointer.Int(10),
+	}
+
+	searches := api.MultiSearchSearchesParameter{
+		Searches: []api.MultiSearchCollectionParameters{
+			{
+				Collection: pointer.String(collectionName1),
+			},
+			{
+				Collection: pointer.String(collectionName2),
+			},
+		},
+		// PerformUnion will internally enforce Union=true.
+	}
+
+	result, err := typesenseClient.MultiSearch.PerformUnion(context.Background(), searchParams, searches)
+	require.NoError(t, err)
+
+	require.NotNil(t, result)
+	require.NotNil(t, result.Hits)
+
+	// Because of global SortBy: num_employees:desc, the first hit should be Wayne Enterprises 2 (500 employees)
+	firstHitDoc := *(*result.Hits)[0].Document
+	require.Equal(t, "Wayne Enterprises 2", firstHitDoc["company_name"])
+	require.Equal(t, float64(500), firstHitDoc["num_employees"])
+
+	// The last hit should be Stark Industries 1 (50)
+	lastHitDoc := *(*result.Hits)[3].Document
+	require.Equal(t, "Stark Industries 1", lastHitDoc["company_name"])
+	require.Equal(t, float64(50), lastHitDoc["num_employees"])
+
+	require.NotNil(t, result.Found)
+	require.Equal(t, 4, *result.Found)
+
+	require.NotNil(t, result.OutOf)
+	require.Equal(t, 4, *result.OutOf)
+
+	require.NotNil(t, result.Page)
+	require.Equal(t, 1, *result.Page)
+
+	require.NotNil(t, result.UnionRequestParams)
+	require.Equal(t, 2, len(*result.UnionRequestParams))
+
+	// Validate the first sub-query (corresponds to collectionName1)
+	param1 := (*result.UnionRequestParams)[0]
+	require.Equal(t, collectionName1, param1.CollectionName)
+	require.Equal(t, "*", param1.Q)
+	require.Equal(t, 10, param1.PerPage)
+
+	// Validate the second sub-query (corresponds to collectionName2)
+	param2 := (*result.UnionRequestParams)[1]
+	require.Equal(t, collectionName2, param2.CollectionName)
+	require.Equal(t, "*", param2.Q)
+	require.Equal(t, 10, param2.PerPage)
+}
+
+func TestMultiSearchPerformUnionTopLevelErrorReturnsHTTPError(t *testing.T) {
+	_, err := typesenseClient.MultiSearch.PerformUnion(
+		context.Background(),
+		&api.MultiSearchParams{
+			Q: pointer.String("query"),
+		},
+		api.MultiSearchSearchesParameter{
+			Searches: []api.MultiSearchCollectionParameters{
+				{
+					Collection: pointer.String("non-existent-collection"),
+				},
+			},
+		},
+	)
+	require.Error(t, err)
+
+	var httpErr *typesense.HTTPError
+	require.True(t, errors.As(err, &httpErr))
+	require.Equal(t, 404, httpErr.Status)
+	require.Contains(t, string(httpErr.Body), `"code"`)
+	require.Contains(t, string(httpErr.Body), `"error"`)
+	require.Contains(t, string(httpErr.Body), "collection not found")
+}
