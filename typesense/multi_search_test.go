@@ -452,7 +452,7 @@ func TestMultiSearchPerformUnionValidation(t *testing.T) {
 	_, err := client.MultiSearch.PerformUnion(context.Background(), params, body)
 
 	assert.NotNil(t, err)
-	assert.Equal(t, "Invalid parameter: cannot set `Union` to `false` when calling PerformUnion", err.Error())
+	assert.Equal(t, "invalid parameter: cannot set union to false when calling PerformUnion", err.Error())
 }
 
 func TestMultiSearchPerformUnionOnTopLevelErrorResponseReturnsError(t *testing.T) {

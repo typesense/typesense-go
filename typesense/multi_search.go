@@ -60,7 +60,7 @@ func (m *multiSearch) PerformWithContentType(ctx context.Context, commonSearchPa
 
 func (m *multiSearch) PerformUnion(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.SearchResult, error) {
 	if searchParams.Union != nil && !*searchParams.Union {
-		return nil, errors.New("Invalid parameter: cannot set `Union` to `false` when calling PerformUnion")
+		return nil, errors.New("invalid parameter: cannot set union to false when calling PerformUnion")
 	}
 
 	// Force the Union parameter to be true
