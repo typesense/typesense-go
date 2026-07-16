@@ -404,3 +404,133 @@ func TestMultiSearchRAG(t *testing.T) {
 		},
 	}, res)
 }
+
+func newPerformUnionExpectedBodyParams() api.MultiSearchSearchesParameter {
+	body := newMultiSearchBodyParams()
+	unionTrue := true
+	body.Union = &unionTrue
+	return body
+}
+
+func TestMultiSearchPerformUnion(t *testing.T) {
+	expectedParams := newMultiSearchParams()
+	expectedResult := newSearchResult()
+	expectedBody := newPerformUnionExpectedBodyParams()
+
+	responseBody, err := json.Marshal(expectedResult)
+	assert.Nil(t, err)
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
+
+	mockAPIClient.EXPECT().
+		MultiSearchWithResponse(gomock.Not(gomock.Nil()), expectedParams, api.MultiSearchJSONRequestBody(expectedBody)).
+		Return(&api.MultiSearchResponse{
+			JSON200: &api.MultiSearchResult{},
+			Body:    responseBody,
+		}, nil).Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	params := newMultiSearchParams()
+	body := newMultiSearchBodyParams()
+
+	result, err := client.MultiSearch.PerformUnion(context.Background(), params, body)
+
+	assert.Nil(t, err)
+	assert.Equal(t, expectedResult, result)
+}
+
+func TestMultiSearchPerformUnionValidation(t *testing.T) {
+	client := NewClient(WithAPIClient(nil))
+	params := newMultiSearchParams()
+
+	body := newMultiSearchBodyParams()
+	unionFalse := false
+	body.Union = &unionFalse // Explicitly setting Union to false
+
+	_, err := client.MultiSearch.PerformUnion(context.Background(), params, body)
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "invalid parameter: cannot set union to false when calling PerformUnion", err.Error())
+}
+
+func TestMultiSearchPerformUnionOnTopLevelErrorResponseReturnsError(t *testing.T) {
+	expectedParams := newMultiSearchParams()
+	expectedBody := newPerformUnionExpectedBodyParams()
+	responseBody := []byte(`{
+		"code": 404,
+		"error": "` + "`my-collection`" + ` collection not found."
+	}`)
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
+
+	mockAPIClient.EXPECT().
+		MultiSearchWithResponse(gomock.Not(gomock.Nil()), expectedParams, api.MultiSearchJSONRequestBody(expectedBody)).
+		Return(&api.MultiSearchResponse{
+			HTTPResponse: &http.Response{
+				StatusCode: http.StatusNotFound,
+			},
+			Body: responseBody,
+		}, nil).Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	params := newMultiSearchParams()
+
+	_, err := client.MultiSearch.PerformUnion(context.Background(), params, newMultiSearchBodyParams())
+
+	var httpErr *HTTPError
+	assert.ErrorAs(t, err, &httpErr)
+	assert.Equal(t, 404, httpErr.Status)
+	assert.Equal(t, responseBody, httpErr.Body)
+}
+
+func TestMultiSearchPerformUnionOnHttpStatusErrorCodeReturnsError(t *testing.T) {
+	expectedParams := newMultiSearchParams()
+	expectedBody := newPerformUnionExpectedBodyParams()
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
+
+	mockAPIClient.EXPECT().
+		MultiSearchWithResponse(gomock.Not(gomock.Nil()), expectedParams, api.MultiSearchJSONRequestBody(expectedBody)).
+		Return(&api.MultiSearchResponse{
+			HTTPResponse: &http.Response{
+				StatusCode: 500,
+			},
+			Body: []byte("Internal Server error"),
+		}, nil).Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	params := newMultiSearchParams()
+
+	_, err := client.MultiSearch.PerformUnion(context.Background(), params, newMultiSearchBodyParams())
+	assert.NotNil(t, err)
+
+	var httpErr *HTTPError
+	assert.ErrorAs(t, err, &httpErr)
+	assert.Equal(t, 500, httpErr.Status)
+}
+
+func TestMultiSearchPerformUnionOnApiClientError(t *testing.T) {
+	expectedParams := newMultiSearchParams()
+	expectedBody := newPerformUnionExpectedBodyParams()
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
+
+	mockAPIClient.EXPECT().
+		MultiSearchWithResponse(gomock.Not(gomock.Nil()), expectedParams, api.MultiSearchJSONRequestBody(expectedBody)).
+		Return(nil, errors.New("failed request")).Times(1)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	params := newMultiSearchParams()
+
+	_, err := client.MultiSearch.PerformUnion(context.Background(), params, newMultiSearchBodyParams())
+	assert.NotNil(t, err)
+	assert.Equal(t, "failed request", err.Error())
+}
