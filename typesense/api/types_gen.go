@@ -295,7 +295,7 @@ type CollectionSchema struct {
 // CollectionUpdateSchema defines model for CollectionUpdateSchema.
 type CollectionUpdateSchema struct {
 	// Fields A list of fields for querying, filtering and faceting
-	Fields []Field `json:"fields"`
+	Fields []Field `json:"fields,omitempty"`
 
 	// Metadata Optional details about the collection, e.g., when it was created, who created it etc.
 	Metadata *map[string]interface{} `json:"metadata,omitempty"`

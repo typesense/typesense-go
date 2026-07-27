@@ -90,6 +90,9 @@ func processOpenAPISpec(m *yml) {
 	// Remove additionalProperties from SearchResultHit -> document
 	log.Println("Removing additionalProperties from SearchResultHit")
 	searchResultHit(m)
+	// Keep CollectionUpdateSchema -> fields as a plain slice
+	log.Println("Skipping the optional pointer for CollectionUpdateSchema fields")
+	collectionUpdateFields(m)
 	// Extract anonymous structs to named types
 	log.Println("Extracting anonymous structs to named types")
 	extractAnonymousStructs(m)
@@ -145,6 +148,22 @@ func searchResultHit(m *yml) {
 	properties := (*m)["components"].(yml)["schemas"].(yml)["SearchResultHit"].(yml)["properties"].(yml)
 	document := properties["document"].(yml)
 	delete(document, "additionalProperties")
+}
+
+// collectionUpdateFields keeps CollectionUpdateSchema -> fields generated as []Field
+// rather than *[]Field.
+//
+// The collection update endpoint accepts an update that changes only `metadata`, so
+// the spec does not list `fields` as required. oapi-codegen renders an optional array
+// as a pointer, which would break every caller constructing a CollectionUpdateSchema.
+// x-go-type-skip-optional-pointer leaves the slice unwrapped, and `omitempty` is still
+// applied because the property is optional -- so a nil or empty Fields sends no
+// `fields` key at all. That is what the endpoint needs: it rejects both `"fields":null`
+// and `"fields":[]` with a 400.
+func collectionUpdateFields(m *yml) {
+	properties := (*m)["components"].(yml)["schemas"].(yml)["CollectionUpdateSchema"].(yml)["properties"].(yml)
+	fields := properties["fields"].(yml)
+	fields["x-go-type-skip-optional-pointer"] = true
 }
 
 func unwrapDeleteDocument(m *yml) {

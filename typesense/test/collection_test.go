@@ -58,3 +58,33 @@ func TestCollectionUpdate(t *testing.T) {
 	require.Equal(t, pointer.True(), result.Fields[0].Drop)
 	require.Equal(t, "2", (*result.Metadata)["revision"].(string))
 }
+
+// Updating only the metadata has to leave `fields` out of the request entirely, since
+// Typesense rejects both `"fields":null` and `"fields":[]` with a 400.
+func TestCollectionUpdateMetadataOnly(t *testing.T) {
+	for _, tt := range []struct {
+		name   string
+		fields []api.Field
+	}{
+		{name: "nil fields", fields: nil},
+		{name: "empty fields", fields: []api.Field{}},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			collectionName := createNewCollection(t, "companies")
+
+			result, err := typesenseClient.Collection(collectionName).Update(context.Background(),
+				&api.CollectionUpdateSchema{
+					Fields:   tt.fields,
+					Metadata: &map[string]interface{}{"revision": "2"},
+				})
+			require.NoError(t, err)
+			require.Equal(t, "2", (*result.Metadata)["revision"].(string))
+
+			// Confirm the change reached the collection and left the schema alone.
+			updated, err := typesenseClient.Collection(collectionName).Retrieve(context.Background())
+			require.NoError(t, err)
+			require.Equal(t, "2", (*updated.Metadata)["revision"].(string))
+			require.Len(t, updated.Fields, 3)
+		})
+	}
+}

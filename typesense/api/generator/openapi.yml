@@ -2479,9 +2479,8 @@ components:
           description: >
             Optional details about the collection, e.g., when it was created, who created it etc.
     CollectionUpdateSchema:
-      required:
-        - fields
       type: object
+      minProperties: 1
       properties:
         fields:
           type: array

@@ -380,6 +380,7 @@ components:
         - fields
       type: object
     CollectionUpdateSchema:
+      minProperties: 1
       properties:
         fields:
           description: A list of fields for querying, filtering and faceting
@@ -396,6 +397,7 @@ components:
           items:
             $ref: '#/components/schemas/Field'
           type: array
+          x-go-type-skip-optional-pointer: true
         metadata:
           description: |
             Optional details about the collection, e.g., when it was created, who created it etc.
@@ -406,8 +408,6 @@ components:
             example: synonym_set_1
             type: string
           type: array
-      required:
-        - fields
       type: object
     ConversationModelCreateSchema:
       allOf:
@@ -1075,13 +1075,13 @@ components:
       properties:
         conversation:
           $ref: '#/components/schemas/SearchResultConversation'
-        results:
-          items:
-            $ref: '#/components/schemas/MultiSearchResultItem'
-          type: array
         hits:
           items:
             $ref: '#/components/schemas/SearchResultHit'
+          type: array
+        results:
+          items:
+            $ref: '#/components/schemas/MultiSearchResultItem'
           type: array
       required:
         - results

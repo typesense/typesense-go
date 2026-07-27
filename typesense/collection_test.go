@@ -2,6 +2,7 @@ package typesense
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"testing"
@@ -176,6 +177,46 @@ func TestCollectionUpdate(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedResult, result)
+}
+
+// A collection update that changes only the metadata must not send a `fields` key at
+// all: Typesense rejects both `"fields":null` and `"fields":[]` with a 400. This relies
+// on the `omitempty` tag generated for CollectionUpdateSchema.Fields.
+func TestCollectionUpdateSchemaOmitsEmptyFields(t *testing.T) {
+	tests := []struct {
+		name       string
+		fields     []api.Field
+		wantFields bool
+	}{
+		{
+			name:   "nil fields",
+			fields: nil,
+		},
+		{
+			name:   "empty fields",
+			fields: []api.Field{},
+		},
+		{
+			name:       "populated fields",
+			fields:     []api.Field{{Name: "country", Drop: pointer.True()}},
+			wantFields: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			body, err := json.Marshal(&api.CollectionUpdateSchema{
+				Fields:   tt.fields,
+				Metadata: &map[string]interface{}{"revision": "2"},
+			})
+			assert.NoError(t, err)
+
+			payload := map[string]json.RawMessage{}
+			assert.NoError(t, json.Unmarshal(body, &payload))
+
+			_, hasFields := payload["fields"]
+			assert.Equal(t, tt.wantFields, hasFields, "body: %s", body)
+		})
+	}
 }
 
 func TestCollectionUpdateOnApiClientErrorReturnsError(t *testing.T) {
