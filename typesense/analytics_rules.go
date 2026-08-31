@@ -11,7 +11,21 @@ import (
 )
 
 type AnalyticsRulesInterface interface {
+	// Create analytics rule(s).
+	//
+	// Create one or more analytics rules. You can send a single rule object or an array of rule objects.
+	//
+	// HTTP: POST /analytics/rules
+	//
+	// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
 	Create(ctx context.Context, rules []*api.AnalyticsRuleCreate) ([]*api.AnalyticsRule, error)
+	// Retrieve analytics rules.
+	//
+	// Retrieve all analytics rules. Use the optional rule_tag filter to narrow down results.
+	//
+	// HTTP: GET /analytics/rules
+	//
+	// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
 	Retrieve(ctx context.Context) ([]*api.AnalyticsRule, error)
 }
 
@@ -19,6 +33,13 @@ type analyticsRules struct {
 	apiClient APIClientInterface
 }
 
+// Create analytics rule(s).
+//
+// Create one or more analytics rules. You can send a single rule object or an array of rule objects.
+//
+// HTTP: POST /analytics/rules
+//
+// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
 func (a *analyticsRules) Create(ctx context.Context, rules []*api.AnalyticsRuleCreate) ([]*api.AnalyticsRule, error) {
 	// Convert []*AnalyticsRuleCreate to []AnalyticsRuleCreate for the API call
 	ruleCreates := make([]api.AnalyticsRuleCreate, len(rules))
@@ -73,6 +94,13 @@ func (a *analyticsRules) Create(ctx context.Context, rules []*api.AnalyticsRuleC
 	return nil, fmt.Errorf("failed to parse response: %s", string(responseBody))
 }
 
+// Retrieve analytics rules.
+//
+// Retrieve all analytics rules. Use the optional rule_tag filter to narrow down results.
+//
+// HTTP: GET /analytics/rules
+//
+// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
 func (a *analyticsRules) Retrieve(ctx context.Context) ([]*api.AnalyticsRule, error) {
 	response, err := a.apiClient.RetrieveAnalyticsRulesWithResponse(ctx, &api.RetrieveAnalyticsRulesParams{})
 	if err != nil {

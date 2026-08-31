@@ -7,7 +7,21 @@ import (
 )
 
 type StopwordInterface interface {
+	// Retrieves a stopwords set.
+	//
+	// Retrieve the details of a stopwords set, given it's name.
+	//
+	// HTTP: GET /stopwords/{setId}
+	//
+	// See: https://typesense.org/docs/latest/api/stopwords.html
 	Retrieve(ctx context.Context) (*api.StopwordsSetSchema, error)
+	// Delete a stopwords set.
+	//
+	// Permanently deletes a stopwords set, given it's name.
+	//
+	// HTTP: DELETE /stopwords/{setId}
+	//
+	// See: https://typesense.org/docs/latest/api/stopwords.html
 	Delete(ctx context.Context) (*struct {
 		Id string "json:\"id\""
 	}, error)
@@ -18,6 +32,13 @@ type stopword struct {
 	stopwordsSetId string
 }
 
+// Retrieves a stopwords set.
+//
+// Retrieve the details of a stopwords set, given it's name.
+//
+// HTTP: GET /stopwords/{setId}
+//
+// See: https://typesense.org/docs/latest/api/stopwords.html
 func (s *stopword) Retrieve(ctx context.Context) (*api.StopwordsSetSchema, error) {
 	response, err := s.apiClient.RetrieveStopwordsSetWithResponse(ctx, s.stopwordsSetId)
 	if err != nil {
@@ -29,6 +50,13 @@ func (s *stopword) Retrieve(ctx context.Context) (*api.StopwordsSetSchema, error
 	return &response.JSON200.Stopwords, nil
 }
 
+// Delete a stopwords set.
+//
+// Permanently deletes a stopwords set, given it's name.
+//
+// HTTP: DELETE /stopwords/{setId}
+//
+// See: https://typesense.org/docs/latest/api/stopwords.html
 func (s *stopword) Delete(ctx context.Context) (*struct {
 	Id string "json:\"id\""
 }, error) {

@@ -5,6 +5,11 @@ import (
 	"time"
 )
 
+// Checks if Typesense server is ready to accept requests.
+//
+// HTTP: GET /health
+//
+// See: https://typesense.org/docs/latest/api/cluster-operations.html#health
 func (c *Client) Health(ctx context.Context, timeout time.Duration) (bool, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()

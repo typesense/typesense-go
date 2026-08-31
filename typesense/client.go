@@ -18,108 +18,197 @@ type APIClientInterface interface {
 }
 
 type Client struct {
-	apiConfig    *ClientConfig
-	apiClient    APIClientInterface
-	collections  CollectionsInterface
-	aliases      AliasesInterface
+	apiConfig   *ClientConfig
+	apiClient   APIClientInterface
+	collections CollectionsInterface
+	aliases     AliasesInterface
+	// MultiSearch sends multiple search requests in a single HTTP request,
+	// avoiding the round-trip latency of issuing them separately. Also
+	// supports federated search across multiple collections.
+	//
+	// See: https://typesense.org/docs/latest/api/federated-multi-search.html
 	MultiSearch  MultiSearchInterface
 	synonymSets  SynonymSetsInterface
 	curationSets CurationSetsInterface
 }
 
+// Collections manages collections in the Typesense cluster. A collection is
+// defined by a schema and holds the documents you search against.
+//
+// See: https://typesense.org/docs/latest/api/collections.html
 func (c *Client) Collections() CollectionsInterface {
 	return c.collections
 }
 
+// GenericCollection returns a handle for a single collection whose documents
+// deserialize into T. Use this when you want to work with a typed Go struct
+// instead of map[string]any.
+//
+// See: https://typesense.org/docs/latest/api/collections.html
 func GenericCollection[T any](c *Client, collectionName string) CollectionInterface[T] {
 	return &collection[T]{apiClient: c.apiClient, name: collectionName}
 }
 
+// Collection returns a handle for the collection with the given name. Use
+// the returned interface to retrieve, update, or delete the collection, and
+// to access its documents.
+//
+// See: https://typesense.org/docs/latest/api/collections.html
 func (c *Client) Collection(collectionName string) CollectionInterface[map[string]any] {
 	return GenericCollection[map[string]any](c, collectionName)
 }
 
+// Aliases manages collection aliases. An alias is a virtual name that points
+// to a real collection, useful for zero-downtime reindexing.
+//
+// See: https://typesense.org/docs/latest/api/collection-alias.html
 func (c *Client) Aliases() AliasesInterface {
 	return c.aliases
 }
 
+// Alias returns a handle for the alias with the given name.
+//
+// See: https://typesense.org/docs/latest/api/collection-alias.html
 func (c *Client) Alias(aliasName string) AliasInterface {
 	return &alias{apiClient: c.apiClient, name: aliasName}
 }
 
+// Analytics manages analytics rules and events. Typesense can aggregate
+// search queries for analytics purposes and query suggestions.
+//
+// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
 func (c *Client) Analytics() AnalyticsInterface {
 	return &analytics{apiClient: c.apiClient}
 }
 
+// Stemming manages stemming dictionaries used during indexing and search.
+//
+// See: https://typesense.org/docs/latest/api/stemming.html
 func (c *Client) Stemming() StemmingInterface {
 	return &stemming{apiClient: c.apiClient}
 }
 
+// Conversations manages conversational search (RAG) models and history.
+//
+// See: https://typesense.org/docs/latest/api/conversational-search-rag.html
 func (c *Client) Conversations() ConversationsInterface {
 	return &conversations{apiClient: c.apiClient}
 }
 
+// Keys manages API keys with fine-grain access control.
+//
+// See: https://typesense.org/docs/latest/api/api-keys.html
 func (c *Client) Keys() KeysInterface {
 	return &keys{apiClient: c.apiClient}
 }
 
+// Key returns a handle for the API key with the given id.
+//
+// See: https://typesense.org/docs/latest/api/api-keys.html
 func (c *Client) Key(keyID int64) KeyInterface {
 	return &key{apiClient: c.apiClient, keyID: keyID}
 }
 
+// Operations exposes cluster-level operations: snapshots, leader votes,
+// on-disk compaction, cache clearing, and toggling the slow-request log.
+//
+// See: https://typesense.org/docs/latest/api/cluster-operations.html
 func (c *Client) Operations() OperationsInterface {
 	return &operations{apiClient: c.apiClient}
 }
 
+// Presets manages stored search-parameter presets that can be referenced by
+// name in subsequent search requests.
+//
+// See: https://typesense.org/docs/latest/api/search.html#presets
 func (c *Client) Presets() PresetsInterface {
 	return &presets{apiClient: c.apiClient}
 }
 
+// Preset returns a handle for the preset with the given name.
+//
+// See: https://typesense.org/docs/latest/api/search.html#presets
 func (c *Client) Preset(presetName string) PresetInterface {
 	return &preset{apiClient: c.apiClient, presetName: presetName}
 }
 
+// NLSearchModels manages natural-language search models.
+//
+// See: https://typesense.org/docs/latest/api/natural-language-search.html
 func (c *Client) NLSearchModels() NLSearchModelsInterface {
 	return &nlSearchModels{apiClient: c.apiClient}
 }
 
+// NLSearchModel returns a handle for the NL search model with the given id.
+//
+// See: https://typesense.org/docs/latest/api/natural-language-search.html
 func (c *Client) NLSearchModel(modelID string) NLSearchModelInterface {
 	return &nlSearchModel{apiClient: c.apiClient, modelID: modelID}
 }
 
+// SynonymSets manages synonym sets shared across collections.
+//
+// See: https://typesense.org/docs/latest/api/synonyms.html
 func (c *Client) SynonymSets() SynonymSetsInterface {
 	return c.synonymSets
 }
 
+// SynonymSet returns a handle for the synonym set with the given name.
+//
+// See: https://typesense.org/docs/latest/api/synonyms.html
 func (c *Client) SynonymSet(synonymSetName string) SynonymSetInterface {
 	return &synonymSet{apiClient: c.apiClient, synonymSetName: synonymSetName}
 }
 
+// CurationSets manages curation sets that override or boost results for
+// specific queries.
+//
+// See: https://typesense.org/docs/latest/api/curation.html
 func (c *Client) CurationSets() CurationSetsInterface {
 	return c.curationSets
 }
 
+// CurationSet returns a handle for the curation set with the given name.
+//
+// See: https://typesense.org/docs/latest/api/curation.html
 func (c *Client) CurationSet(curationSetName string) CurationSetInterface {
 	return &curationSet{apiClient: c.apiClient, curationSetName: curationSetName}
 }
 
+// Stopwords manages stopword sets used to filter out common terms during
+// indexing and search.
+//
+// See: https://typesense.org/docs/latest/api/stopwords.html
 func (c *Client) Stopwords() StopwordsInterface {
 	return &stopwords{apiClient: c.apiClient}
 }
 
+// Stopword returns a handle for the stopword set with the given id.
+//
+// See: https://typesense.org/docs/latest/api/stopwords.html
 func (c *Client) Stopword(stopwordsSetId string) StopwordInterface {
 	return &stopword{apiClient: c.apiClient, stopwordsSetId: stopwordsSetId}
 }
 
+// Stats returns the cluster API stats endpoint (request counts and latencies).
+//
+// See: https://typesense.org/docs/latest/api/cluster-operations.html#api-stats
 func (c *Client) Stats() StatsInterface {
 	return &stats{apiClient: c.apiClient}
 }
 
+// Metrics returns the cluster metrics endpoint (CPU, memory, disk usage).
+//
+// See: https://typesense.org/docs/latest/api/cluster-operations.html#cluster-metrics
 func (c *Client) Metrics() MetricsInterface {
 	return &metrics{apiClient: c.apiClient}
 }
 
-// Debug retrieves debug information from the Typesense server
+// Print debugging information.
+//
+// HTTP: GET /debug
+//
+// See: https://typesense.org/docs/latest/api/cluster-operations.html#debug
 func (c *Client) Debug(ctx context.Context) (*api.DebugResponse, error) {
 	return c.apiClient.DebugWithResponse(ctx)
 }

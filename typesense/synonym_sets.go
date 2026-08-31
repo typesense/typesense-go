@@ -10,9 +10,21 @@ import (
 
 // SynonymSetsInterface is a type for Synonym Sets API operations
 type SynonymSetsInterface interface {
-	// Create or update a synonym set
+	// Create or update a synonym set.
+	//
+	// Create or update a synonym set with the given name
+	//
+	// HTTP: PUT /synonym_sets/{synonymSetName}
+	//
+	// See: https://typesense.org/docs/latest/api/synonyms.html
 	Upsert(ctx context.Context, synonymSetName string, synonymSetSchema *api.SynonymSetCreateSchema) (*api.SynonymSetSchema, error)
+	// List all synonym sets.
+	//
 	// Retrieve all synonym sets
+	//
+	// HTTP: GET /synonym_sets
+	//
+	// See: https://typesense.org/docs/latest/api/synonyms.html
 	Retrieve(ctx context.Context) ([]api.SynonymSetSchema, error)
 }
 
@@ -21,6 +33,13 @@ type synonymSets struct {
 	apiClient APIClientInterface
 }
 
+// Create or update a synonym set.
+//
+// # Create or update a synonym set with the given name
+//
+// HTTP: PUT /synonym_sets/{synonymSetName}
+//
+// See: https://typesense.org/docs/latest/api/synonyms.html
 func (s *synonymSets) Upsert(ctx context.Context, synonymSetName string, synonymSetSchema *api.SynonymSetCreateSchema) (*api.SynonymSetSchema, error) {
 	response, err := s.apiClient.UpsertSynonymSetWithResponse(ctx, synonymSetName, api.UpsertSynonymSetJSONRequestBody(*synonymSetSchema))
 	if err != nil {
@@ -32,6 +51,13 @@ func (s *synonymSets) Upsert(ctx context.Context, synonymSetName string, synonym
 	return response.JSON200, nil
 }
 
+// List all synonym sets.
+//
+// # Retrieve all synonym sets
+//
+// HTTP: GET /synonym_sets
+//
+// See: https://typesense.org/docs/latest/api/synonyms.html
 func (s *synonymSets) Retrieve(ctx context.Context) ([]api.SynonymSetSchema, error) {
 	response, err := s.apiClient.RetrieveSynonymSetsWithResponse(ctx)
 	if err != nil {
