@@ -285,23 +285,59 @@ func WithCircuitBreakerOnStateChange(onStateChange circuit.GoBreakerOnStateChang
 	}
 }
 
-// WithClientConfig allows to pass all configs at once
+// WithClientConfig allows passing multiple configs at once.
+// Zero-value fields are ignored so NewClient defaults remain effective
+// when callers provide only a partial config.
 func WithClientConfig(config *ClientConfig) ClientOption {
 	return func(c *Client) {
-		c.apiConfig.ServerURL = config.ServerURL
-		c.apiConfig.NearestNode = config.NearestNode
-		c.apiConfig.Nodes = config.Nodes
-		c.apiConfig.NumRetries = config.NumRetries
-		c.apiConfig.RetryInterval = config.RetryInterval
-		c.apiConfig.HealthcheckInterval = config.HealthcheckInterval
-		c.apiConfig.APIKey = config.APIKey
-		c.apiConfig.ConnectionTimeout = config.ConnectionTimeout
-		c.apiConfig.CircuitBreakerName = config.CircuitBreakerName
-		c.apiConfig.CircuitBreakerMaxRequests = config.CircuitBreakerMaxRequests
-		c.apiConfig.CircuitBreakerInterval = config.CircuitBreakerInterval
-		c.apiConfig.CircuitBreakerTimeout = config.CircuitBreakerTimeout
-		c.apiConfig.CircuitBreakerReadyToTrip = config.CircuitBreakerReadyToTrip
-		c.apiConfig.CircuitBreakerOnStateChange = config.CircuitBreakerOnStateChange
+		if config == nil {
+			return
+		}
+		if config.ServerURL != "" {
+			c.apiConfig.ServerURL = config.ServerURL
+		}
+		if config.NearestNode != "" {
+			c.apiConfig.NearestNode = config.NearestNode
+		}
+		if config.Nodes != nil {
+			c.apiConfig.Nodes = config.Nodes
+		}
+		if config.NumRetries >= 0 {
+			c.apiConfig.NumRetries = config.NumRetries
+		}
+		if config.RetryInterval > 0 {
+			c.apiConfig.RetryInterval = config.RetryInterval
+		}
+		if config.HealthcheckInterval > 0 {
+			c.apiConfig.HealthcheckInterval = config.HealthcheckInterval
+		}
+		if config.APIKey != "" {
+			c.apiConfig.APIKey = config.APIKey
+		}
+		if config.ConnectionTimeout > 0 {
+			c.apiConfig.ConnectionTimeout = config.ConnectionTimeout
+		}
+		if config.CircuitBreakerName != "" {
+			c.apiConfig.CircuitBreakerName = config.CircuitBreakerName
+		}
+		if config.CircuitBreakerMaxRequests > 0 {
+			c.apiConfig.CircuitBreakerMaxRequests = config.CircuitBreakerMaxRequests
+		}
+		if config.CircuitBreakerInterval > 0 {
+			c.apiConfig.CircuitBreakerInterval = config.CircuitBreakerInterval
+		}
+		if config.CircuitBreakerTimeout > 0 {
+			c.apiConfig.CircuitBreakerTimeout = config.CircuitBreakerTimeout
+		}
+		if config.CircuitBreakerReadyToTrip != nil {
+			c.apiConfig.CircuitBreakerReadyToTrip = config.CircuitBreakerReadyToTrip
+		}
+		if config.CircuitBreakerOnStateChange != nil {
+			c.apiConfig.CircuitBreakerOnStateChange = config.CircuitBreakerOnStateChange
+		}
+		if config.CustomHTTPClient != nil {
+			c.apiConfig.CustomHTTPClient = config.CustomHTTPClient
+		}
 	}
 }
 
