@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -444,4 +446,58 @@ func TestApiCallRetryWithRequestBody(t *testing.T) {
 	assert.Equal(t, 203, res2.StatusCode)
 
 	assert.Equal(t, serverURLs, requestURLHistory)
+}
+
+// opaqueReader hides the concrete type from net/http, so req.GetBody is left nil,
+// the same as a caller passing an *os.File to Documents().ImportJsonl.
+type opaqueReader struct{ r io.Reader }
+
+func (o opaqueReader) Read(p []byte) (int, error) { return o.r.Read(p) }
+
+func TestAPICallRetryPreservesUnreplayableBody(t *testing.T) {
+	const payload = `{"id":"1","title":"first"}` + "\n" + `{"id":"2","title":"second"}` + "\n"
+
+	var mu sync.Mutex
+	var bodies []string
+
+	record := func(w http.ResponseWriter, r *http.Request, status int) {
+		b, _ := io.ReadAll(r.Body)
+		mu.Lock()
+		bodies = append(bodies, string(b))
+		mu.Unlock()
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(status)
+		_, _ = w.Write([]byte(`{"success":true}` + "\n"))
+	}
+
+	first := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		record(w, r, http.StatusInternalServerError)
+	}))
+	defer first.Close()
+	second := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		record(w, r, http.StatusOK)
+	}))
+	defer second.Close()
+
+	client := NewClient(
+		WithNodes([]string{first.URL, second.URL}),
+		WithAPIKey("API_KEY"),
+		WithRetryInterval(time.Millisecond),
+		WithHealthcheckInterval(time.Hour),
+	)
+
+	body, err := client.Collection("companies").Documents().ImportJsonl(
+		context.Background(), opaqueReader{strings.NewReader(payload)}, &api.ImportDocumentsParams{})
+	if err == nil {
+		defer body.Close()
+		_, _ = io.ReadAll(body)
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+	if assert.Len(t, bodies, 2, "expected the failed node and the retry node to each receive one request") {
+		assert.Equal(t, payload, bodies[0], "first node did not receive the payload")
+		assert.Equal(t, payload, bodies[1], "retry sent a different body than the first attempt")
+	}
+	assert.NoError(t, err)
 }

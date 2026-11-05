@@ -83,6 +83,16 @@ func (a *APICall) Do(req *http.Request) (*http.Response, error) {
 		if err != nil {
 			return nil, err
 		}
+	} else if req.Body != nil {
+		// net/http leaves GetBody nil for reader types it does not recognise, so
+		// read the body here or the first attempt consumes it and retries send nothing.
+		defer req.Body.Close()
+
+		var err error
+		bodyBytes, err = io.ReadAll(req.Body)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	for numTries := 0; numTries < a.numRetriesPerRequest; numTries++ {
