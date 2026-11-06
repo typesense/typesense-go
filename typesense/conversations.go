@@ -2,7 +2,13 @@ package typesense
 
 // ConversationsInterface is a type for Conversations API operations
 type ConversationsInterface interface {
+	// Models manages conversation models, which configure the LLM used for conversational search.
+	//
+	// See: https://typesense.org/docs/latest/api/conversational-search-rag.html
 	Models() ConversationModelsInterface
+	// Model returns a handle for the conversation model with the given id.
+	//
+	// See: https://typesense.org/docs/latest/api/conversational-search-rag.html
 	Model(modelId string) ConversationModelInterface
 }
 

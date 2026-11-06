@@ -55,6 +55,7 @@ func main() {
 	processOpenAPISpec(&m)
 	writeGeneratorFile(&m)
 	generateClient()
+	injectWrapperDocs("./typesense/api/generator/openapi.yml", "./typesense")
 
 	log.Println("Successfully Completed !")
 }

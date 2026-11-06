@@ -11,11 +11,31 @@ import (
 )
 
 type MultiSearchInterface interface {
+	// Send multiple search requests in a single HTTP request.
+	//
+	// This is especially useful to avoid round-trip network latencies incurred otherwise if each of these requests are sent in separate HTTP requests. You can also use this feature to do a federated search across multiple collections in a single HTTP request.
+	//
+	// HTTP: POST /multi_search
+	//
+	// See: https://typesense.org/docs/latest/api/federated-multi-search.html
 	Perform(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.MultiSearchResult, error)
+	// Send multiple search requests in a single HTTP request.
+	//
+	// This is especially useful to avoid round-trip network latencies incurred otherwise if each of these requests are sent in separate HTTP requests. You can also use this feature to do a federated search across multiple collections in a single HTTP request.
+	//
+	// HTTP: POST /multi_search
+	//
+	// See: https://typesense.org/docs/latest/api/federated-multi-search.html
 	PerformWithContentType(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter, contentType string) (*api.MultiSearchResponse, error)
-	// PerformUnion performs a multi-search and merges the results into a single `SearchResult`.
-	// The `Union` field in searchParams is automatically set to `true`. If it is explicitly
-	// passed as `false`, this method will return an error.
+	// Run multiple searches as a union and return their hits merged into one result.
+	//
+	// Set union to true and decode the response as a single SearchResult, with the hits of every search in one ordered list. Fail without sending the request if searchParams sets union to false.
+	//
+	// HTTP: POST /multi_search
+	//
+	// See: https://typesense.org/docs/latest/api/federated-multi-search.html
+	//
+	//docgen:keep
 	PerformUnion(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.SearchResult, error)
 }
 
@@ -23,6 +43,13 @@ type multiSearch struct {
 	apiClient APIClientInterface
 }
 
+// Send multiple search requests in a single HTTP request.
+//
+// This is especially useful to avoid round-trip network latencies incurred otherwise if each of these requests are sent in separate HTTP requests. You can also use this feature to do a federated search across multiple collections in a single HTTP request.
+//
+// HTTP: POST /multi_search
+//
+// See: https://typesense.org/docs/latest/api/federated-multi-search.html
 func (m *multiSearch) Perform(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.MultiSearchResult, error) {
 	response, err := m.apiClient.MultiSearchWithResponse(ctx, commonSearchParams, api.MultiSearchJSONRequestBody(searchParams))
 	if err != nil {
@@ -37,6 +64,13 @@ func (m *multiSearch) Perform(ctx context.Context, commonSearchParams *api.Multi
 	return response.JSON200, nil
 }
 
+// Send multiple search requests in a single HTTP request.
+//
+// This is especially useful to avoid round-trip network latencies incurred otherwise if each of these requests are sent in separate HTTP requests. You can also use this feature to do a federated search across multiple collections in a single HTTP request.
+//
+// HTTP: POST /multi_search
+//
+// See: https://typesense.org/docs/latest/api/federated-multi-search.html
 func (m *multiSearch) PerformWithContentType(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter, contentType string) (*api.MultiSearchResponse, error) {
 	body := api.MultiSearchJSONRequestBody(searchParams)
 	var requestReader io.Reader
@@ -58,6 +92,15 @@ func (m *multiSearch) PerformWithContentType(ctx context.Context, commonSearchPa
 	return response, nil
 }
 
+// Run multiple searches as a union and return their hits merged into one result.
+//
+// Set union to true and decode the response as a single SearchResult, with the hits of every search in one ordered list. Fail without sending the request if searchParams sets union to false.
+//
+// HTTP: POST /multi_search
+//
+// See: https://typesense.org/docs/latest/api/federated-multi-search.html
+//
+//docgen:keep
 func (m *multiSearch) PerformUnion(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.SearchResult, error) {
 	if searchParams.Union != nil && !*searchParams.Union {
 		return nil, errors.New("invalid parameter: cannot set union to false when calling PerformUnion")
