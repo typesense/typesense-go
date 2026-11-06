@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go/ast"
+	"go/format"
 	"go/parser"
 	"go/token"
 	"log"
@@ -15,18 +16,19 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// reads the OpenAPI spec, walks each wrapper .go file in
+// injectWrapperDocs reads the OpenAPI spec, walks each wrapper .go file in
 // wrapperDir, and rewrites doc comments on methods whose body issues a single
 // direct apiClient.<Op>(...) call. The comment text comes verbatim from the
 // spec's summary/description for the matched operation. Interface methods that
-// match an annotated impl method get the same comment.
+// match an annotated impl method get the same comment. An existing doc on a
+// matched method is replaced; only its Deprecated: paragraph and directive
+// lines are kept. Like the rest of the generator, it exits on any error.
 func injectWrapperDocs(specPath, wrapperDir string) {
 	log.Println("Injecting wrapper doc comments from OpenAPI spec")
 
 	ops, err := loadOpIndex(specPath)
 	if err != nil {
-		log.Printf("docgen: failed to load spec: %s", err)
-		return
+		log.Fatalf("docgen: failed to load spec: %s", err)
 	}
 
 	// Build map of Go func names (as oapi-codegen emits) → operation info.
@@ -39,8 +41,7 @@ func injectWrapperDocs(specPath, wrapperDir string) {
 
 	entries, err := os.ReadDir(wrapperDir)
 	if err != nil {
-		log.Printf("docgen: cannot read wrapper dir: %s", err)
-		return
+		log.Fatalf("docgen: cannot read wrapper dir: %s", err)
 	}
 
 	touched := 0
@@ -54,8 +55,7 @@ func injectWrapperDocs(specPath, wrapperDir string) {
 		path := filepath.Join(wrapperDir, e.Name())
 		changed, err := annotateFile(path, funcToOp)
 		if err != nil {
-			log.Printf("docgen: %s: %s", e.Name(), err)
-			continue
+			log.Fatalf("docgen: %s: %s", e.Name(), err)
 		}
 		if changed {
 			touched++
@@ -75,11 +75,11 @@ type opInfo struct {
 
 const docsBaseURL = "https://typesense.org/docs/latest/api/"
 
+// tagToDocs maps an operation's first spec tag to its docs page.
 var tagToDocs = map[string]string{
 	"collections":      "collections.html",
 	"documents":        "documents.html",
 	"keys":             "api-keys.html",
-	"aliases":          "collection-alias.html",
 	"synonyms":         "synonyms.html",
 	"curation_sets":    "curation.html",
 	"stopwords":        "stopwords.html",
@@ -93,6 +93,18 @@ var tagToDocs = map[string]string{
 	"operations":       "cluster-operations.html",
 }
 
+// opToDocs overrides tagToDocs for operations documented on another page.
+var opToDocs = map[string]string{
+	"getAliases":       "collection-alias.html",
+	"getAlias":         "collection-alias.html",
+	"upsertAlias":      "collection-alias.html",
+	"deleteAlias":      "collection-alias.html",
+	"multiSearch":      "federated-multi-search.html",
+	"retrieveAPIStats": "cluster-operations.html#api-stats",
+	"retrieveMetrics":  "cluster-operations.html#cluster-metrics",
+}
+
+// loadOpIndex reads the spec at specPath and indexes its operations by operationId.
 func loadOpIndex(specPath string) (map[string]*opInfo, error) {
 	f, err := os.Open(specPath)
 	if err != nil {
@@ -143,6 +155,7 @@ func loadOpIndex(specPath string) (map[string]*opInfo, error) {
 	return ops, nil
 }
 
+// goFuncNamesForOp returns the client method names oapi-codegen emits for opID.
 func goFuncNamesForOp(opID string) []string {
 	base := upperFirst(opID)
 	return []string{
@@ -153,6 +166,7 @@ func goFuncNamesForOp(opID string) []string {
 	}
 }
 
+// upperFirst returns s with its first rune upper-cased.
 func upperFirst(s string) string {
 	if s == "" {
 		return s
@@ -162,14 +176,11 @@ func upperFirst(s string) string {
 	return string(r)
 }
 
-type funcSite struct {
-	decl *ast.FuncDecl
-	op   *opInfo
-}
-
-type ifaceSite struct {
-	field *ast.Field
-	op    *opInfo
+// site is a method or interface method declaration to document with op.
+type site struct {
+	pos token.Pos
+	doc *ast.CommentGroup
+	op  *opInfo
 }
 
 type docPatch struct {
@@ -178,7 +189,7 @@ type docPatch struct {
 	lines     []string
 }
 
-// parses path, finds methods that resolve to exactly one OpenAPI
+// annotateFile parses path, finds methods that resolve to exactly one OpenAPI
 // operation, and rewrites doc comments above those methods and any matching
 // interface method declarations in the same file. Returns true if the file was
 // modified.
@@ -195,16 +206,18 @@ func annotateFile(path string, funcToOp map[string]*opInfo) (bool, error) {
 	}
 
 	sites, methodOp := collectMethodSites(file, funcToOp)
-	ifaceSites := collectInterfaceSites(file, methodOp)
-
-	if len(sites) == 0 && len(ifaceSites) == 0 {
+	sites = append(sites, collectInterfaceSites(file, methodOp)...)
+	if len(sites) == 0 {
 		return false, nil
 	}
 
-	patches := buildPatches(fset, sites, ifaceSites)
-	out, err := applyPatches(src, patches)
+	out, err := applyPatches(src, buildPatches(fset, sites))
 	if err != nil {
 		return false, err
+	}
+	out, err = format.Source(out)
+	if err != nil {
+		return false, fmt.Errorf("gofmt: %w", err)
 	}
 	if string(out) == string(src) {
 		return false, nil
@@ -226,8 +239,8 @@ func annotateFile(path string, funcToOp map[string]*opInfo) (bool, error) {
 // unique OpenAPI operation, along with a map from method name to its op. The
 // map drops names that resolve to different ops across receivers so the
 // interface-side annotation pass can skip ambiguous matches.
-func collectMethodSites(file *ast.File, funcToOp map[string]*opInfo) ([]funcSite, map[string]*opInfo) {
-	sites := make([]funcSite, 0, len(file.Decls))
+func collectMethodSites(file *ast.File, funcToOp map[string]*opInfo) ([]site, map[string]*opInfo) {
+	sites := make([]site, 0, len(file.Decls))
 	methodOp := map[string]*opInfo{}
 	for _, decl := range file.Decls {
 		fn, ok := decl.(*ast.FuncDecl)
@@ -238,7 +251,7 @@ func collectMethodSites(file *ast.File, funcToOp map[string]*opInfo) ([]funcSite
 		if op == nil {
 			continue
 		}
-		sites = append(sites, funcSite{decl: fn, op: op})
+		sites = append(sites, site{pos: fn.Pos(), doc: fn.Doc, op: op})
 		if existing, dup := methodOp[fn.Name.Name]; dup && existing != op {
 			methodOp[fn.Name.Name] = nil
 		} else if !dup {
@@ -250,8 +263,8 @@ func collectMethodSites(file *ast.File, funcToOp map[string]*opInfo) ([]funcSite
 
 // collectInterfaceSites returns interface method fields whose name matches an
 // impl method in methodOp, so they can be annotated with the same doc.
-func collectInterfaceSites(file *ast.File, methodOp map[string]*opInfo) []ifaceSite {
-	sites := make([]ifaceSite, 0, len(methodOp))
+func collectInterfaceSites(file *ast.File, methodOp map[string]*opInfo) []site {
+	sites := make([]site, 0, len(methodOp))
 	for _, decl := range file.Decls {
 		gd, ok := decl.(*ast.GenDecl)
 		if !ok || gd.Tok != token.TYPE {
@@ -274,32 +287,23 @@ func collectInterfaceSites(file *ast.File, methodOp map[string]*opInfo) []ifaceS
 				if op == nil {
 					continue
 				}
-				sites = append(sites, ifaceSite{field: field, op: op})
+				sites = append(sites, site{pos: field.Pos(), doc: field.Doc, op: op})
 			}
 		}
 	}
 	return sites
 }
 
-// buildPatches converts func and interface sites into ordered docPatches,
-// sorted by descending start line so applying them keeps earlier line numbers
-// valid.
-func buildPatches(fset *token.FileSet, sites []funcSite, ifaceSites []ifaceSite) []docPatch {
-	patches := make([]docPatch, 0, len(sites)+len(ifaceSites))
+// buildPatches converts sites into docPatches, sorted by descending start line
+// so applying them keeps earlier line numbers valid.
+func buildPatches(fset *token.FileSet, sites []site) []docPatch {
+	patches := make([]docPatch, 0, len(sites))
 	for _, s := range sites {
-		startLine, endLine, indent := commentSpan(fset, s.decl.Pos(), s.decl.Doc)
+		startLine, endLine := commentSpan(fset, s.pos, s.doc)
 		patches = append(patches, docPatch{
 			startLine: startLine,
 			endLine:   endLine,
-			lines:     renderDoc(s.decl.Name.Name, s.op, indent),
-		})
-	}
-	for _, s := range ifaceSites {
-		startLine, endLine, indent := commentSpan(fset, s.field.Pos(), s.field.Doc)
-		patches = append(patches, docPatch{
-			startLine: startLine,
-			endLine:   endLine,
-			lines:     renderDoc(s.field.Names[0].Name, s.op, indent),
+			lines:     renderDoc(s.op, s.doc),
 		})
 	}
 	sort.Slice(patches, func(i, j int) bool { return patches[i].startLine > patches[j].startLine })
@@ -322,7 +326,7 @@ func applyPatches(src []byte, patches []docPatch) ([]byte, error) {
 	return []byte(strings.Join(lines, "\n")), nil
 }
 
-// returns the OpenAPI operation that a function body calls iff it
+// uniqueAPIOp returns the OpenAPI operation that a function body calls iff it
 // contains exactly one apiClient.<Name>(...) call where <Name> maps to a known
 // operation. Returns nil otherwise (zero matches, multiple matches, or
 // ambiguous matches).
@@ -363,64 +367,115 @@ func uniqueAPIOp(body *ast.BlockStmt, funcToOp map[string]*opInfo) *opInfo {
 	return found
 }
 
-// returns the [startLine, endLine) range of lines that should be
-// replaced for a declaration, and the leading whitespace indent on the decl
-// line. startLine equals the line of an existing doc comment (if any) or the
-// decl line itself when no doc is present. endLine is always the decl line.
-func commentSpan(fset *token.FileSet, declPos token.Pos, doc *ast.CommentGroup) (int, int, string) {
+// commentSpan returns the [startLine, endLine) range of lines that should be
+// replaced for a declaration. startLine equals the line of an existing doc
+// comment (if any) or the decl line itself when no doc is present. endLine is
+// always the decl line. Rendered lines are not indented: format.Source indents
+// them to match the declaration.
+func commentSpan(fset *token.FileSet, declPos token.Pos, doc *ast.CommentGroup) (int, int) {
 	declLine := fset.Position(declPos).Line
 	startLine := declLine
 	if doc != nil {
 		startLine = fset.Position(doc.Pos()).Line
 	}
-	// Read the decl line text to figure out indentation.
-	indent := ""
-	col := fset.Position(declPos).Column - 1
-	if col > 0 {
-		indent = strings.Repeat(" ", col)
-	}
-	return startLine, declLine, indent
+	return startLine, declLine
 }
 
-func renderDoc(_ string, op *opInfo, indent string) []string {
+// keptLines returns the parts of an existing doc that a rewrite must carry
+// over: its Deprecated: paragraph and directive lines such as //go:generate or
+// //nolint:revive.
+func keptLines(doc *ast.CommentGroup) (deprecated, directives []string) {
+	if doc == nil {
+		return nil, nil
+	}
+	inDeprecated := false
+	for _, c := range doc.List {
+		t := c.Text
+		switch {
+		case len(t) > 2 && strings.HasPrefix(t, "//") && t[2] != ' ' && t[2] != '\t':
+			directives = append(directives, t)
+		case strings.HasPrefix(t, "// Deprecated:"), inDeprecated && t != "//":
+			inDeprecated = true
+			deprecated = append(deprecated, t)
+		default:
+			inDeprecated = false
+		}
+	}
+	return deprecated, directives
+}
+
+// descriptionLines splits desc into lines and ends each paragraph with
+// punctuation, or Go renders a one-line paragraph as a heading. Markdown lists
+// and code fences pass through as plain text; no spec description is
+// multi-line today.
+func descriptionLines(desc string) []string {
+	lines := strings.Split(desc, "\n")
+	for i := range lines {
+		lines[i] = strings.TrimRight(lines[i], " \t")
+		if i+1 == len(lines) || strings.TrimSpace(lines[i+1]) == "" {
+			lines[i] = ensureTrailingPeriod(lines[i])
+		}
+	}
+	return lines
+}
+
+// renderDoc returns the doc comment lines for op, keeping the Deprecated:
+// paragraph and directives of the existing doc.
+func renderDoc(op *opInfo, doc *ast.CommentGroup) []string {
 	var lines []string
 
-	summary := firstSentence(op.Summary)
+	summary := firstLine(op.Summary)
 	if summary == "" {
-		summary = firstSentence(op.Description)
+		summary = firstLine(op.Description)
 	}
 	if summary != "" {
-		lines = append(lines, indent+"// "+ensureTrailingPeriod(upperFirst(summary)))
+		lines = append(lines, "// "+ensureTrailingPeriod(upperFirst(summary)))
 	}
 
-	// include the full description only when it adds information beyond the summary.
-	if op.Description != "" && !strings.EqualFold(strings.TrimSpace(op.Description), strings.TrimSpace(op.Summary)) {
-		desc := strings.TrimSpace(op.Description)
-		if firstSentence(desc) != firstSentence(op.Summary) {
-			lines = append(lines, indent+"//")
-			for _, l := range strings.Split(desc, "\n") {
-				l = strings.TrimRight(l, " \t")
-				if l == "" {
-					lines = append(lines, indent+"//")
-				} else {
-					lines = append(lines, indent+"// "+l)
-				}
+	// Drop the description's first line when it only repeats the summary.
+	desc := op.Description
+	if first := firstLine(desc); strings.EqualFold(ensureTrailingPeriod(first), ensureTrailingPeriod(summary)) {
+		desc = strings.TrimSpace(strings.TrimPrefix(desc, first))
+	}
+	if desc != "" {
+		lines = append(lines, "//")
+		for _, l := range descriptionLines(desc) {
+			if l == "" {
+				lines = append(lines, "//")
+			} else {
+				lines = append(lines, "// "+l)
 			}
 		}
 	}
 
-	lines = append(lines, indent+"//")
-	lines = append(lines, indent+fmt.Sprintf("// HTTP: %s %s", op.Method, op.Path))
+	lines = append(lines, "//")
+	lines = append(lines, fmt.Sprintf("// HTTP: %s %s", op.Method, op.Path))
 
-	if section := tagToDocs[op.Tag]; section != "" {
-		lines = append(lines, indent+"//")
-		lines = append(lines, indent+"// See: "+docsBaseURL+section)
+	section := tagToDocs[op.Tag]
+	if s, ok := opToDocs[op.OperationID]; ok {
+		section = s
+	}
+	if section != "" {
+		lines = append(lines, "//")
+		lines = append(lines, "// See: "+docsBaseURL+section)
+	}
+
+	deprecated, directives := keptLines(doc)
+	if len(deprecated) > 0 {
+		lines = append(lines, "//")
+		lines = append(lines, deprecated...)
+	}
+	// Directives go last, after a blank line, which is where gofmt puts them.
+	if len(directives) > 0 {
+		lines = append(lines, "//")
+		lines = append(lines, directives...)
 	}
 
 	return lines
 }
 
-func firstSentence(s string) string {
+// firstLine returns the first line of s, trimmed.
+func firstLine(s string) string {
 	s = strings.TrimSpace(s)
 	if s == "" {
 		return ""
@@ -432,11 +487,15 @@ func firstSentence(s string) string {
 	return strings.TrimSpace(s)
 }
 
+// ensureTrailingPeriod appends a period to s unless it already ends in
+// terminal punctuation.
 func ensureTrailingPeriod(s string) string {
 	if s == "" {
 		return s
 	}
-	if strings.HasSuffix(s, ".") || strings.HasSuffix(s, "?") || strings.HasSuffix(s, "!") {
+	// Look past closing parens so "(see the docs.)" is left alone.
+	last := strings.TrimRight(s, ")")
+	if strings.HasSuffix(last, ".") || strings.HasSuffix(last, "?") || strings.HasSuffix(last, "!") || strings.HasSuffix(last, ":") {
 		return s
 	}
 	return s + "."
