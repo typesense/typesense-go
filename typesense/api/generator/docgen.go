@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"slices"
 	"sort"
 	"strings"
@@ -23,7 +24,9 @@ import (
 // summary and description for the matched operation. Interface methods that
 // match an annotated impl method get the same comment. An existing doc on a
 // matched method is replaced; only its Deprecated: paragraph and directive
-// lines are kept. Like the rest of the generator, it exits on any error.
+// lines are kept. A doc with a //docgen:keep line is left as written, for when
+// the spec text is wrong or doesn't describe what the wrapper does. Like the
+// rest of the generator, it exits on any error.
 func injectWrapperDocs(specPath, wrapperDir string) {
 	log.Println("Injecting wrapper doc comments from OpenAPI spec")
 
@@ -206,6 +209,7 @@ func annotateFile(path string, funcToOp map[string]*opInfo) (bool, error) {
 
 	sites, methodOp := collectMethodSites(file, funcToOp)
 	sites = append(sites, collectInterfaceSites(file, methodOp)...)
+	sites = slices.DeleteFunc(sites, func(s site) bool { return keepsDoc(s.doc) })
 	if len(sites) == 0 {
 		return false, nil
 	}
@@ -359,9 +363,20 @@ func uniqueAPIOp(body *ast.BlockStmt, funcToOp map[string]*opInfo) *opInfo {
 	return found
 }
 
+// directiveRe matches the lines go/ast treats as directives, such as
+// //go:generate or //nolint:revive. gofmt rewrites any other //text line to
+// "// text", so carrying those over as directives would change the next run.
+var directiveRe = regexp.MustCompile(`^//(line |extern |export |[a-z0-9]+:[a-z0-9])`)
+
+// keepDirective marks a hand-written doc that docgen must leave alone.
+const keepDirective = "//docgen:keep"
+
+func keepsDoc(doc *ast.CommentGroup) bool {
+	return doc != nil && slices.ContainsFunc(doc.List, func(c *ast.Comment) bool { return c.Text == keepDirective })
+}
+
 // keptLines returns the parts of an existing doc that a rewrite must carry
-// over: its Deprecated: paragraph and directive lines such as //go:generate or
-// //nolint:revive.
+// over: its Deprecated: paragraph and directive lines.
 func keptLines(doc *ast.CommentGroup) (deprecated, directives []string) {
 	if doc == nil {
 		return nil, nil
@@ -370,7 +385,7 @@ func keptLines(doc *ast.CommentGroup) (deprecated, directives []string) {
 	for _, c := range doc.List {
 		t := c.Text
 		switch {
-		case len(t) > 2 && strings.HasPrefix(t, "//") && t[2] != ' ' && t[2] != '\t':
+		case directiveRe.MatchString(t):
 			directives = append(directives, t)
 		case strings.HasPrefix(t, "// Deprecated:"), inDeprecated && t != "//":
 			inDeprecated = true
@@ -411,11 +426,7 @@ func renderDoc(op *opInfo, doc *ast.CommentGroup) []string {
 		lines = append(lines, "// "+ensureTrailingPeriod(upperFirst(summary)))
 	}
 
-	// Drop the description's first line when it only repeats the summary.
-	desc := op.Description
-	if first := firstLine(desc); strings.EqualFold(ensureTrailingPeriod(first), ensureTrailingPeriod(summary)) {
-		desc = strings.TrimSpace(strings.TrimPrefix(desc, first))
-	}
+	desc := trimSummary(op.Description, summary)
 	if desc != "" {
 		lines = append(lines, "//")
 		for _, l := range descriptionLines(desc) {
@@ -451,6 +462,19 @@ func renderDoc(op *opInfo, doc *ast.CommentGroup) []string {
 	}
 
 	return lines
+}
+
+// trimSummary drops summary from the start of desc, ignoring case, when desc
+// opens with it as its whole first line or as a whole sentence.
+func trimSummary(desc, summary string) string {
+	s := ensureTrailingPeriod(summary)
+	if first := firstLine(desc); strings.EqualFold(ensureTrailingPeriod(first), s) {
+		return strings.TrimSpace(strings.TrimPrefix(desc, first))
+	}
+	if len(desc) > len(s) && strings.EqualFold(desc[:len(s)], s) && unicode.IsSpace(rune(desc[len(s)])) {
+		return strings.TrimSpace(desc[len(s):])
+	}
+	return desc
 }
 
 func firstLine(s string) string {
