@@ -10,7 +10,7 @@ import (
 type AliasesInterface interface {
 	// Create or update a collection alias.
 	//
-	// Create or update a collection alias. An alias is a virtual collection name that points to a real collection. If you're familiar with symbolic links on Linux, it's very similar to that. Aliases are useful when you want to reindex your data in the background on a new collection and switch your application to it without any changes to your code.
+	// An alias is a virtual collection name that points to a real collection. If you're familiar with symbolic links on Linux, it's very similar to that. Aliases are useful when you want to reindex your data in the background on a new collection and switch your application to it without any changes to your code.
 	//
 	// HTTP: PUT /aliases/{aliasName}
 	//
@@ -33,7 +33,7 @@ type aliases struct {
 
 // Create or update a collection alias.
 //
-// Create or update a collection alias. An alias is a virtual collection name that points to a real collection. If you're familiar with symbolic links on Linux, it's very similar to that. Aliases are useful when you want to reindex your data in the background on a new collection and switch your application to it without any changes to your code.
+// An alias is a virtual collection name that points to a real collection. If you're familiar with symbolic links on Linux, it's very similar to that. Aliases are useful when you want to reindex your data in the background on a new collection and switch your application to it without any changes to your code.
 //
 // HTTP: PUT /aliases/{aliasName}
 //

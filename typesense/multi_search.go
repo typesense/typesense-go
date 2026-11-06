@@ -27,13 +27,15 @@ type MultiSearchInterface interface {
 	//
 	// See: https://typesense.org/docs/latest/api/federated-multi-search.html
 	PerformWithContentType(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter, contentType string) (*api.MultiSearchResponse, error)
-	// Send multiple search requests in a single HTTP request.
+	// Run multiple searches as a union and return their hits merged into one result.
 	//
-	// This is especially useful to avoid round-trip network latencies incurred otherwise if each of these requests are sent in separate HTTP requests. You can also use this feature to do a federated search across multiple collections in a single HTTP request.
+	// Set union to true and decode the response as a single SearchResult, with the hits of every search in one ordered list. Fail without sending the request if searchParams sets union to false.
 	//
 	// HTTP: POST /multi_search
 	//
 	// See: https://typesense.org/docs/latest/api/federated-multi-search.html
+	//
+	//docgen:keep
 	PerformUnion(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.SearchResult, error)
 }
 
@@ -90,13 +92,15 @@ func (m *multiSearch) PerformWithContentType(ctx context.Context, commonSearchPa
 	return response, nil
 }
 
-// Send multiple search requests in a single HTTP request.
+// Run multiple searches as a union and return their hits merged into one result.
 //
-// This is especially useful to avoid round-trip network latencies incurred otherwise if each of these requests are sent in separate HTTP requests. You can also use this feature to do a federated search across multiple collections in a single HTTP request.
+// Set union to true and decode the response as a single SearchResult, with the hits of every search in one ordered list. Fail without sending the request if searchParams sets union to false.
 //
 // HTTP: POST /multi_search
 //
 // See: https://typesense.org/docs/latest/api/federated-multi-search.html
+//
+//docgen:keep
 func (m *multiSearch) PerformUnion(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.SearchResult, error) {
 	if searchParams.Union != nil && !*searchParams.Union {
 		return nil, errors.New("invalid parameter: cannot set union to false when calling PerformUnion")

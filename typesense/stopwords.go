@@ -17,11 +17,13 @@ type StopwordsInterface interface {
 	Retrieve(ctx context.Context) ([]api.StopwordsSetSchema, error)
 	// Upserts a stopwords set.
 	//
-	// When an analytics rule is created, we give it a name and describe the type, the source collections and the destination collection.
+	// Create the stopwords set with the given id, or overwrite it if it exists, and return the stored set.
 	//
 	// HTTP: PUT /stopwords/{setId}
 	//
 	// See: https://typesense.org/docs/latest/api/stopwords.html
+	//
+	//docgen:keep
 	Upsert(ctx context.Context, stopwordsSetId string, stopwordsSetUpsertSchema *api.StopwordsSetUpsertSchema) (*api.StopwordsSetSchema, error)
 }
 
@@ -49,11 +51,13 @@ func (s *stopwords) Retrieve(ctx context.Context) ([]api.StopwordsSetSchema, err
 
 // Upserts a stopwords set.
 //
-// When an analytics rule is created, we give it a name and describe the type, the source collections and the destination collection.
+// Create the stopwords set with the given id, or overwrite it if it exists, and return the stored set.
 //
 // HTTP: PUT /stopwords/{setId}
 //
 // See: https://typesense.org/docs/latest/api/stopwords.html
+//
+//docgen:keep
 func (s *stopwords) Upsert(ctx context.Context, stopwordsSetId string, stopwordsSetUpsertSchema *api.StopwordsSetUpsertSchema) (*api.StopwordsSetSchema, error) {
 	response, err := s.apiClient.UpsertStopwordsSetWithResponse(ctx, stopwordsSetId, *stopwordsSetUpsertSchema)
 	if err != nil {

@@ -188,7 +188,7 @@ func (c *Client) Stopword(stopwordsSetId string) StopwordInterface {
 	return &stopword{apiClient: c.apiClient, stopwordsSetId: stopwordsSetId}
 }
 
-// Stats returns the cluster API stats endpoint (request counts and latencies).
+// Stats returns the cluster API stats endpoint (request rates and latencies).
 //
 // See: https://typesense.org/docs/latest/api/cluster-operations.html#api-stats
 func (c *Client) Stats() StatsInterface {

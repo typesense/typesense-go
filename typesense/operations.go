@@ -9,7 +9,7 @@ import (
 type OperationsInterface interface {
 	// Creates a point-in-time snapshot of a Typesense node's state and data in the specified directory.
 	//
-	// Creates a point-in-time snapshot of a Typesense node's state and data in the specified directory. You can then backup the snapshot directory that gets created and later restore it as a data directory, as needed.
+	// You can then backup the snapshot directory that gets created and later restore it as a data directory, as needed.
 	//
 	// HTTP: POST /operations/snapshot
 	//
@@ -17,7 +17,7 @@ type OperationsInterface interface {
 	Snapshot(ctx context.Context, snapshotPath string) (bool, error)
 	// Triggers a follower node to initiate the raft voting process, which triggers leader re-election.
 	//
-	// Triggers a follower node to initiate the raft voting process, which triggers leader re-election. The follower node that you run this operation against will become the new leader, once this command succeeds.
+	// The follower node that you run this operation against will become the new leader, once this command succeeds.
 	//
 	// HTTP: POST /operations/vote
 	//
@@ -31,7 +31,7 @@ type operations struct {
 
 // Creates a point-in-time snapshot of a Typesense node's state and data in the specified directory.
 //
-// Creates a point-in-time snapshot of a Typesense node's state and data in the specified directory. You can then backup the snapshot directory that gets created and later restore it as a data directory, as needed.
+// You can then backup the snapshot directory that gets created and later restore it as a data directory, as needed.
 //
 // HTTP: POST /operations/snapshot
 //
@@ -50,7 +50,7 @@ func (o *operations) Snapshot(ctx context.Context, snapshotPath string) (bool, e
 
 // Triggers a follower node to initiate the raft voting process, which triggers leader re-election.
 //
-// Triggers a follower node to initiate the raft voting process, which triggers leader re-election. The follower node that you run this operation against will become the new leader, once this command succeeds.
+// The follower node that you run this operation against will become the new leader, once this command succeeds.
 //
 // HTTP: POST /operations/vote
 //

@@ -9,7 +9,7 @@ import (
 type KeyInterface interface {
 	// Retrieve (metadata about) a key.
 	//
-	// Retrieve (metadata about) a key. Only the key prefix is returned when you retrieve a key. Due to security reasons, only the create endpoint returns the full API key.
+	// Only the key prefix is returned when you retrieve a key. Due to security reasons, only the create endpoint returns the full API key.
 	//
 	// HTTP: GET /keys/{keyId}
 	//
@@ -30,7 +30,7 @@ type key struct {
 
 // Retrieve (metadata about) a key.
 //
-// Retrieve (metadata about) a key. Only the key prefix is returned when you retrieve a key. Due to security reasons, only the create endpoint returns the full API key.
+// Only the key prefix is returned when you retrieve a key. Due to security reasons, only the create endpoint returns the full API key.
 //
 // HTTP: GET /keys/{keyId}
 //
