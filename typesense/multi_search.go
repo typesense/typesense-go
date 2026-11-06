@@ -27,9 +27,13 @@ type MultiSearchInterface interface {
 	//
 	// See: https://typesense.org/docs/latest/api/federated-multi-search.html
 	PerformWithContentType(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter, contentType string) (*api.MultiSearchResponse, error)
-	// PerformUnion performs a multi-search and merges the results into a single `SearchResult`.
-	// The `Union` field in searchParams is automatically set to `true`. If it is explicitly
-	// passed as `false`, this method will return an error.
+	// Send multiple search requests in a single HTTP request.
+	//
+	// This is especially useful to avoid round-trip network latencies incurred otherwise if each of these requests are sent in separate HTTP requests. You can also use this feature to do a federated search across multiple collections in a single HTTP request.
+	//
+	// HTTP: POST /multi_search
+	//
+	// See: https://typesense.org/docs/latest/api/federated-multi-search.html
 	PerformUnion(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.SearchResult, error)
 }
 
@@ -86,6 +90,13 @@ func (m *multiSearch) PerformWithContentType(ctx context.Context, commonSearchPa
 	return response, nil
 }
 
+// Send multiple search requests in a single HTTP request.
+//
+// This is especially useful to avoid round-trip network latencies incurred otherwise if each of these requests are sent in separate HTTP requests. You can also use this feature to do a federated search across multiple collections in a single HTTP request.
+//
+// HTTP: POST /multi_search
+//
+// See: https://typesense.org/docs/latest/api/federated-multi-search.html
 func (m *multiSearch) PerformUnion(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.SearchResult, error) {
 	if searchParams.Union != nil && !*searchParams.Union {
 		return nil, errors.New("invalid parameter: cannot set union to false when calling PerformUnion")
