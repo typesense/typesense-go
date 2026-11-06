@@ -24,11 +24,11 @@ type CollectionInterface[T any] interface {
 	//
 	// See: https://typesense.org/docs/latest/api/collections.html
 	Delete(ctx context.Context) (*api.CollectionResponse, error)
-	// Documents manages the documents in this collection. Use the returned interface to index, import, search, export, and bulk update or delete them.
+	// Documents manages the documents in this collection.
 	//
 	// See: https://typesense.org/docs/latest/api/documents.html
 	Documents() DocumentsInterface
-	// Document returns a handle for the document with the given id in this collection. Use the returned interface to retrieve, update, or delete it.
+	// Document returns a handle for the document with the given id in this collection.
 	//
 	// See: https://typesense.org/docs/latest/api/documents.html
 	Document(documentID string) DocumentInterface[T]

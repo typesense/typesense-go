@@ -49,9 +49,7 @@ func GenericCollection[T any](c *Client, collectionName string) CollectionInterf
 	return &collection[T]{apiClient: c.apiClient, name: collectionName}
 }
 
-// Collection returns a handle for the collection with the given name. Use
-// the returned interface to retrieve, update, or delete the collection, and
-// to access its documents.
+// Collection returns a handle for the collection with the given name.
 //
 // See: https://typesense.org/docs/latest/api/collections.html
 func (c *Client) Collection(collectionName string) CollectionInterface[map[string]any] {

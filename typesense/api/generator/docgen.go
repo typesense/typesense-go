@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"unicode"
@@ -18,8 +19,8 @@ import (
 
 // injectWrapperDocs reads the OpenAPI spec, walks each wrapper .go file in
 // wrapperDir, and rewrites doc comments on methods whose body issues a single
-// direct apiClient.<Op>(...) call. The comment text comes verbatim from the
-// spec's summary/description for the matched operation. Interface methods that
+// direct apiClient.<Op>(...) call. The comment text comes from the spec's
+// summary and description for the matched operation. Interface methods that
 // match an annotated impl method get the same comment. An existing doc on a
 // matched method is replaced; only its Deprecated: paragraph and directive
 // lines are kept. Like the rest of the generator, it exits on any error.
@@ -31,7 +32,6 @@ func injectWrapperDocs(specPath, wrapperDir string) {
 		log.Fatalf("docgen: failed to load spec: %s", err)
 	}
 
-	// Build map of Go func names (as oapi-codegen emits) → operation info.
 	funcToOp := make(map[string]*opInfo, len(ops)*4)
 	for _, op := range ops {
 		for _, name := range goFuncNamesForOp(op.OperationID) {
@@ -46,10 +46,7 @@ func injectWrapperDocs(specPath, wrapperDir string) {
 
 	touched := 0
 	for _, e := range entries {
-		if e.IsDir() || !strings.HasSuffix(e.Name(), ".go") {
-			continue
-		}
-		if strings.HasSuffix(e.Name(), "_test.go") {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".go") || strings.HasSuffix(e.Name(), "_test.go") {
 			continue
 		}
 		path := filepath.Join(wrapperDir, e.Name())
@@ -117,8 +114,11 @@ func loadOpIndex(specPath string) (map[string]*opInfo, error) {
 		return nil, err
 	}
 
+	paths, ok := spec["paths"].(yml)
+	if !ok {
+		return nil, fmt.Errorf("%s has no paths", specPath)
+	}
 	ops := map[string]*opInfo{}
-	paths, _ := spec["paths"].(yml)
 	for pathKey, pathVal := range paths {
 		pathItem, ok := pathVal.(yml)
 		if !ok {
@@ -166,7 +166,6 @@ func goFuncNamesForOp(opID string) []string {
 	}
 }
 
-// upperFirst returns s with its first rune upper-cased.
 func upperFirst(s string) string {
 	if s == "" {
 		return s
@@ -211,11 +210,7 @@ func annotateFile(path string, funcToOp map[string]*opInfo) (bool, error) {
 		return false, nil
 	}
 
-	out, err := applyPatches(src, buildPatches(fset, sites))
-	if err != nil {
-		return false, err
-	}
-	out, err = format.Source(out)
+	out, err := format.Source(applyPatches(src, buildPatches(fset, sites)))
 	if err != nil {
 		return false, fmt.Errorf("gofmt: %w", err)
 	}
@@ -236,9 +231,9 @@ func annotateFile(path string, funcToOp map[string]*opInfo) (bool, error) {
 }
 
 // collectMethodSites returns the set of method declarations that resolve to a
-// unique OpenAPI operation, along with a map from method name to its op. The
-// map drops names that resolve to different ops across receivers so the
-// interface-side annotation pass can skip ambiguous matches.
+// unique OpenAPI operation, along with a map from method name to its op. Names
+// that resolve to different ops across receivers map to nil, so the
+// interface-side pass skips them.
 func collectMethodSites(file *ast.File, funcToOp map[string]*opInfo) ([]site, map[string]*opInfo) {
 	sites := make([]site, 0, len(file.Decls))
 	methodOp := map[string]*opInfo{}
@@ -299,10 +294,14 @@ func collectInterfaceSites(file *ast.File, methodOp map[string]*opInfo) []site {
 func buildPatches(fset *token.FileSet, sites []site) []docPatch {
 	patches := make([]docPatch, 0, len(sites))
 	for _, s := range sites {
-		startLine, endLine := commentSpan(fset, s.pos, s.doc)
+		declLine := fset.Position(s.pos).Line
+		startLine := declLine
+		if s.doc != nil {
+			startLine = fset.Position(s.doc.Pos()).Line
+		}
 		patches = append(patches, docPatch{
 			startLine: startLine,
-			endLine:   endLine,
+			endLine:   declLine,
 			lines:     renderDoc(s.op, s.doc),
 		})
 	}
@@ -313,23 +312,16 @@ func buildPatches(fset *token.FileSet, sites []site) []docPatch {
 // applyPatches rewrites src by replacing the [startLine, endLine) range of each
 // patch with its rendered lines. Patches must already be sorted in descending
 // startLine order.
-func applyPatches(src []byte, patches []docPatch) ([]byte, error) {
+func applyPatches(src []byte, patches []docPatch) []byte {
 	lines := strings.Split(string(src), "\n")
 	for _, p := range patches {
-		s := p.startLine - 1
-		e := p.endLine - 1
-		if s < 0 || e > len(lines) || s > e {
-			return nil, fmt.Errorf("patch out of bounds: start=%d end=%d total=%d", p.startLine, p.endLine, len(lines))
-		}
-		lines = append(lines[:s], append(append([]string{}, p.lines...), lines[e:]...)...)
+		lines = slices.Concat(lines[:p.startLine-1], p.lines, lines[p.endLine-1:])
 	}
-	return []byte(strings.Join(lines, "\n")), nil
+	return []byte(strings.Join(lines, "\n"))
 }
 
-// uniqueAPIOp returns the OpenAPI operation that a function body calls iff it
-// contains exactly one apiClient.<Name>(...) call where <Name> maps to a known
-// operation. Returns nil otherwise (zero matches, multiple matches, or
-// ambiguous matches).
+// uniqueAPIOp returns the operation that every apiClient.<Name>(...) call in
+// body maps to, or nil when body calls no known operation or more than one.
 func uniqueAPIOp(body *ast.BlockStmt, funcToOp map[string]*opInfo) *opInfo {
 	var found *opInfo
 	multiple := false
@@ -365,20 +357,6 @@ func uniqueAPIOp(body *ast.BlockStmt, funcToOp map[string]*opInfo) *opInfo {
 		return nil
 	}
 	return found
-}
-
-// commentSpan returns the [startLine, endLine) range of lines that should be
-// replaced for a declaration. startLine equals the line of an existing doc
-// comment (if any) or the decl line itself when no doc is present. endLine is
-// always the decl line. Rendered lines are not indented: format.Source indents
-// them to match the declaration.
-func commentSpan(fset *token.FileSet, declPos token.Pos, doc *ast.CommentGroup) (int, int) {
-	declLine := fset.Position(declPos).Line
-	startLine := declLine
-	if doc != nil {
-		startLine = fset.Position(doc.Pos()).Line
-	}
-	return startLine, declLine
 }
 
 // keptLines returns the parts of an existing doc that a rewrite must carry
@@ -420,7 +398,8 @@ func descriptionLines(desc string) []string {
 }
 
 // renderDoc returns the doc comment lines for op, keeping the Deprecated:
-// paragraph and directives of the existing doc.
+// paragraph and directives of the existing doc. Lines are unindented;
+// format.Source indents them to match the declaration.
 func renderDoc(op *opInfo, doc *ast.CommentGroup) []string {
 	var lines []string
 
@@ -474,26 +453,20 @@ func renderDoc(op *opInfo, doc *ast.CommentGroup) []string {
 	return lines
 }
 
-// firstLine returns the first line of s, trimmed.
 func firstLine(s string) string {
 	s = strings.TrimSpace(s)
-	if s == "" {
-		return ""
-	}
-	// take everything up to the first newline, that's usually the lead sentence.
 	if idx := strings.IndexByte(s, '\n'); idx >= 0 {
 		s = s[:idx]
 	}
 	return strings.TrimSpace(s)
 }
 
-// ensureTrailingPeriod appends a period to s unless it already ends in
-// terminal punctuation.
+// ensureTrailingPeriod appends a period to s unless it is empty or already
+// ends in '.', '?', '!' or ':', ignoring closing parens.
 func ensureTrailingPeriod(s string) string {
 	if s == "" {
 		return s
 	}
-	// Look past closing parens so "(see the docs.)" is left alone.
 	last := strings.TrimRight(s, ")")
 	if strings.HasSuffix(last, ".") || strings.HasSuffix(last, "?") || strings.HasSuffix(last, "!") || strings.HasSuffix(last, ":") {
 		return s
