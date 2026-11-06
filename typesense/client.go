@@ -88,7 +88,7 @@ func (c *Client) Stemming() StemmingInterface {
 	return &stemming{apiClient: c.apiClient}
 }
 
-// Conversations manages conversational search (RAG) models and history.
+// Conversations manages conversational search (RAG) models.
 //
 // See: https://typesense.org/docs/latest/api/conversational-search-rag.html
 func (c *Client) Conversations() ConversationsInterface {
@@ -109,8 +109,8 @@ func (c *Client) Key(keyID int64) KeyInterface {
 	return &key{apiClient: c.apiClient, keyID: keyID}
 }
 
-// Operations exposes cluster-level operations: snapshots, leader votes,
-// on-disk compaction, cache clearing, and toggling the slow-request log.
+// Operations exposes cluster operations: taking snapshots and triggering a
+// leader re-election.
 //
 // See: https://typesense.org/docs/latest/api/cluster-operations.html
 func (c *Client) Operations() OperationsInterface {

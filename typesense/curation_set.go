@@ -10,7 +10,7 @@ import (
 type CurationSetInterface interface {
 	// Retrieve a curation set.
 	//
-	// Retrieve a specific curation set by its name
+	// Retrieve a specific curation set by its name.
 	//
 	// HTTP: GET /curation_sets/{curationSetName}
 	//
@@ -18,7 +18,7 @@ type CurationSetInterface interface {
 	Retrieve(ctx context.Context) (*api.CurationSetSchema, error)
 	// Create or update a curation set.
 	//
-	// Create or update a curation set with the given name
+	// Create or update a curation set with the given name.
 	//
 	// HTTP: PUT /curation_sets/{curationSetName}
 	//
@@ -26,7 +26,7 @@ type CurationSetInterface interface {
 	Upsert(ctx context.Context, curationSetSchema *api.CurationSetCreateSchema) (*api.CurationSetSchema, error)
 	// Delete a curation set.
 	//
-	// Delete a specific curation set by its name
+	// Delete a specific curation set by its name.
 	//
 	// HTTP: DELETE /curation_sets/{curationSetName}
 	//
@@ -42,7 +42,7 @@ type curationSet struct {
 
 // Retrieve a curation set.
 //
-// # Retrieve a specific curation set by its name
+// Retrieve a specific curation set by its name.
 //
 // HTTP: GET /curation_sets/{curationSetName}
 //
@@ -60,7 +60,7 @@ func (c *curationSet) Retrieve(ctx context.Context) (*api.CurationSetSchema, err
 
 // Create or update a curation set.
 //
-// # Create or update a curation set with the given name
+// Create or update a curation set with the given name.
 //
 // HTTP: PUT /curation_sets/{curationSetName}
 //
@@ -78,7 +78,7 @@ func (c *curationSet) Upsert(ctx context.Context, curationSetSchema *api.Curatio
 
 // Delete a curation set.
 //
-// # Delete a specific curation set by its name
+// Delete a specific curation set by its name.
 //
 // HTTP: DELETE /curation_sets/{curationSetName}
 //

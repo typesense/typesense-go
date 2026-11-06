@@ -26,6 +26,12 @@ type KeysInterface interface {
 	//
 	// See: https://typesense.org/docs/latest/api/api-keys.html
 	Retrieve(context.Context) ([]*api.ApiKey, error)
+	// Generate a scoped search key.
+	//
+	// Return a key derived from searchKey, a search-only API key, that embeds params as search parameters users cannot override.
+	// The key is computed locally with HMAC-SHA256, without a request to the server.
+	//
+	// See: https://typesense.org/docs/latest/api/api-keys.html#generate-scoped-search-key
 	GenerateScopedSearchKey(searchKey string, params map[string]interface{}) (string, error)
 }
 

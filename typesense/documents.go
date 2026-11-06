@@ -20,7 +20,13 @@ const (
 
 // DocumentsInterface is a type for Documents API operations
 type DocumentsInterface interface {
-	// Create returns indexed document
+	// Create a document.
+	//
+	// Index a new document, failing if a document with the same id already exists.
+	//
+	// HTTP: POST /collections/{collectionName}/documents
+	//
+	// See: https://typesense.org/docs/latest/api/documents.html
 	Create(ctx context.Context, document interface{}, params *api.DocumentIndexParameters) (map[string]interface{}, error)
 	// Update documents with conditional query.
 	//
@@ -30,7 +36,13 @@ type DocumentsInterface interface {
 	//
 	// See: https://typesense.org/docs/latest/api/documents.html
 	Update(ctx context.Context, updateFields interface{}, params *api.UpdateDocumentsParams) (int, error)
-	// Upsert returns indexed/updated document
+	// Upsert a document.
+	//
+	// Create a new document, or replace the existing document with the same id.
+	//
+	// HTTP: POST /collections/{collectionName}/documents?action=upsert
+	//
+	// See: https://typesense.org/docs/latest/api/documents.html
 	Upsert(ctx context.Context, document interface{}, params *api.DocumentIndexParameters) (map[string]interface{}, error)
 	// Delete a bunch of documents.
 	//
@@ -56,8 +68,13 @@ type DocumentsInterface interface {
 	//
 	// See: https://typesense.org/docs/latest/api/documents.html
 	Export(ctx context.Context, params *api.ExportDocumentsParams) (io.ReadCloser, error)
-	// Import returns json array. Each item of the response indicates
-	// the result of each document present in the request body (in the same order).
+	// Import a slice of documents into a collection.
+	//
+	// Encode the documents as JSON lines and return one result per document, in request order.
+	//
+	// HTTP: POST /collections/{collectionName}/documents/import
+	//
+	// See: https://typesense.org/docs/latest/api/documents.html
 	Import(ctx context.Context, documents []interface{}, params *api.ImportDocumentsParams) ([]*api.ImportDocumentResponse, error)
 	// Import documents into a collection.
 	//

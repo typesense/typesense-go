@@ -17,7 +17,7 @@ type MultiSearchInterface interface {
 	//
 	// HTTP: POST /multi_search
 	//
-	// See: https://typesense.org/docs/latest/api/documents.html
+	// See: https://typesense.org/docs/latest/api/federated-multi-search.html
 	Perform(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.MultiSearchResult, error)
 	// Send multiple search requests in a single HTTP request.
 	//
@@ -25,7 +25,7 @@ type MultiSearchInterface interface {
 	//
 	// HTTP: POST /multi_search
 	//
-	// See: https://typesense.org/docs/latest/api/documents.html
+	// See: https://typesense.org/docs/latest/api/federated-multi-search.html
 	PerformWithContentType(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter, contentType string) (*api.MultiSearchResponse, error)
 	// PerformUnion performs a multi-search and merges the results into a single `SearchResult`.
 	// The `Union` field in searchParams is automatically set to `true`. If it is explicitly
@@ -43,7 +43,7 @@ type multiSearch struct {
 //
 // HTTP: POST /multi_search
 //
-// See: https://typesense.org/docs/latest/api/documents.html
+// See: https://typesense.org/docs/latest/api/federated-multi-search.html
 func (m *multiSearch) Perform(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.MultiSearchResult, error) {
 	response, err := m.apiClient.MultiSearchWithResponse(ctx, commonSearchParams, api.MultiSearchJSONRequestBody(searchParams))
 	if err != nil {
@@ -64,7 +64,7 @@ func (m *multiSearch) Perform(ctx context.Context, commonSearchParams *api.Multi
 //
 // HTTP: POST /multi_search
 //
-// See: https://typesense.org/docs/latest/api/documents.html
+// See: https://typesense.org/docs/latest/api/federated-multi-search.html
 func (m *multiSearch) PerformWithContentType(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter, contentType string) (*api.MultiSearchResponse, error) {
 	body := api.MultiSearchJSONRequestBody(searchParams)
 	var requestReader io.Reader

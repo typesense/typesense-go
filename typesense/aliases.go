@@ -14,7 +14,7 @@ type AliasesInterface interface {
 	//
 	// HTTP: PUT /aliases/{aliasName}
 	//
-	// See: https://typesense.org/docs/latest/api/collections.html
+	// See: https://typesense.org/docs/latest/api/collection-alias.html
 	Upsert(ctx context.Context, aliasName string, aliasSchema *api.CollectionAliasSchema) (*api.CollectionAlias, error)
 	// List all aliases.
 	//
@@ -22,7 +22,7 @@ type AliasesInterface interface {
 	//
 	// HTTP: GET /aliases
 	//
-	// See: https://typesense.org/docs/latest/api/collections.html
+	// See: https://typesense.org/docs/latest/api/collection-alias.html
 	Retrieve(ctx context.Context) ([]*api.CollectionAlias, error)
 }
 
@@ -37,7 +37,7 @@ type aliases struct {
 //
 // HTTP: PUT /aliases/{aliasName}
 //
-// See: https://typesense.org/docs/latest/api/collections.html
+// See: https://typesense.org/docs/latest/api/collection-alias.html
 func (a *aliases) Upsert(ctx context.Context, aliasName string, aliasSchema *api.CollectionAliasSchema) (*api.CollectionAlias, error) {
 	response, err := a.apiClient.UpsertAliasWithResponse(ctx,
 		aliasName, api.UpsertAliasJSONRequestBody(*aliasSchema))
@@ -56,7 +56,7 @@ func (a *aliases) Upsert(ctx context.Context, aliasName string, aliasSchema *api
 //
 // HTTP: GET /aliases
 //
-// See: https://typesense.org/docs/latest/api/collections.html
+// See: https://typesense.org/docs/latest/api/collection-alias.html
 func (a *aliases) Retrieve(ctx context.Context) ([]*api.CollectionAlias, error) {
 	response, err := a.apiClient.GetAliasesWithResponse(ctx)
 	if err != nil {

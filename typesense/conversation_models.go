@@ -16,7 +16,7 @@ type ConversationModelsInterface interface {
 	Create(ctx context.Context, schema *api.ConversationModelCreateSchema) (*api.ConversationModelSchema, error)
 	// List all conversation models.
 	//
-	// Retrieve all conversation models
+	// Retrieve all conversation models.
 	//
 	// HTTP: GET /conversations/models
 	//
@@ -47,7 +47,7 @@ func (c *conversationModels) Create(ctx context.Context, schema *api.Conversatio
 
 // List all conversation models.
 //
-// # Retrieve all conversation models
+// Retrieve all conversation models.
 //
 // HTTP: GET /conversations/models
 //

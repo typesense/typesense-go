@@ -10,7 +10,7 @@ import (
 type SynonymSetInterface interface {
 	// Retrieve a synonym set.
 	//
-	// Retrieve a specific synonym set by its name
+	// Retrieve a specific synonym set by its name.
 	//
 	// HTTP: GET /synonym_sets/{synonymSetName}
 	//
@@ -18,7 +18,7 @@ type SynonymSetInterface interface {
 	Retrieve(ctx context.Context) (*api.SynonymSetSchema, error)
 	// Create or update a synonym set.
 	//
-	// Create or update a synonym set with the given name
+	// Create or update a synonym set with the given name.
 	//
 	// HTTP: PUT /synonym_sets/{synonymSetName}
 	//
@@ -26,7 +26,7 @@ type SynonymSetInterface interface {
 	Upsert(ctx context.Context, synonymSetSchema *api.SynonymSetCreateSchema) (*api.SynonymSetSchema, error)
 	// Delete a synonym set.
 	//
-	// Delete a specific synonym set by its name
+	// Delete a specific synonym set by its name.
 	//
 	// HTTP: DELETE /synonym_sets/{synonymSetName}
 	//
@@ -42,7 +42,7 @@ type synonymSet struct {
 
 // Retrieve a synonym set.
 //
-// # Retrieve a specific synonym set by its name
+// Retrieve a specific synonym set by its name.
 //
 // HTTP: GET /synonym_sets/{synonymSetName}
 //
@@ -60,7 +60,7 @@ func (s *synonymSet) Retrieve(ctx context.Context) (*api.SynonymSetSchema, error
 
 // Create or update a synonym set.
 //
-// # Create or update a synonym set with the given name
+// Create or update a synonym set with the given name.
 //
 // HTTP: PUT /synonym_sets/{synonymSetName}
 //
@@ -78,7 +78,7 @@ func (s *synonymSet) Upsert(ctx context.Context, synonymSetSchema *api.SynonymSe
 
 // Delete a synonym set.
 //
-// # Delete a specific synonym set by its name
+// Delete a specific synonym set by its name.
 //
 // HTTP: DELETE /synonym_sets/{synonymSetName}
 //

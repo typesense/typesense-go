@@ -12,7 +12,7 @@ import (
 type SynonymSetsInterface interface {
 	// Create or update a synonym set.
 	//
-	// Create or update a synonym set with the given name
+	// Create or update a synonym set with the given name.
 	//
 	// HTTP: PUT /synonym_sets/{synonymSetName}
 	//
@@ -20,7 +20,7 @@ type SynonymSetsInterface interface {
 	Upsert(ctx context.Context, synonymSetName string, synonymSetSchema *api.SynonymSetCreateSchema) (*api.SynonymSetSchema, error)
 	// List all synonym sets.
 	//
-	// Retrieve all synonym sets
+	// Retrieve all synonym sets.
 	//
 	// HTTP: GET /synonym_sets
 	//
@@ -35,7 +35,7 @@ type synonymSets struct {
 
 // Create or update a synonym set.
 //
-// # Create or update a synonym set with the given name
+// Create or update a synonym set with the given name.
 //
 // HTTP: PUT /synonym_sets/{synonymSetName}
 //
@@ -53,7 +53,7 @@ func (s *synonymSets) Upsert(ctx context.Context, synonymSetName string, synonym
 
 // List all synonym sets.
 //
-// # Retrieve all synonym sets
+// Retrieve all synonym sets.
 //
 // HTTP: GET /synonym_sets
 //

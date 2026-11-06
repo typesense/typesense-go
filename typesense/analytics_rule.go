@@ -9,7 +9,7 @@ import (
 type AnalyticsRuleInterface interface {
 	// Delete an analytics rule.
 	//
-	// Permanently deletes an analytics rule, given it's name
+	// Permanently deletes an analytics rule, given it's name.
 	//
 	// HTTP: DELETE /analytics/rules/{ruleName}
 	//
@@ -17,7 +17,7 @@ type AnalyticsRuleInterface interface {
 	Delete(ctx context.Context) (*api.AnalyticsRule, error)
 	// Retrieves an analytics rule.
 	//
-	// Retrieve the details of an analytics rule, given it's name
+	// Retrieve the details of an analytics rule, given it's name.
 	//
 	// HTTP: GET /analytics/rules/{ruleName}
 	//
@@ -40,7 +40,7 @@ type analyticsRule struct {
 
 // Delete an analytics rule.
 //
-// # Permanently deletes an analytics rule, given it's name
+// Permanently deletes an analytics rule, given it's name.
 //
 // HTTP: DELETE /analytics/rules/{ruleName}
 //
@@ -58,7 +58,7 @@ func (a *analyticsRule) Delete(ctx context.Context) (*api.AnalyticsRule, error) 
 
 // Retrieves an analytics rule.
 //
-// # Retrieve the details of an analytics rule, given it's name
+// Retrieve the details of an analytics rule, given it's name.
 //
 // HTTP: GET /analytics/rules/{ruleName}
 //

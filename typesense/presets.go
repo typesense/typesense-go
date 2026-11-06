@@ -9,7 +9,7 @@ import (
 type PresetsInterface interface {
 	// Retrieves all presets.
 	//
-	// Retrieve the details of all presets
+	// Retrieve the details of all presets.
 	//
 	// HTTP: GET /presets
 	//
@@ -31,7 +31,7 @@ type presets struct {
 
 // Retrieves all presets.
 //
-// # Retrieve the details of all presets
+// Retrieve the details of all presets.
 //
 // HTTP: GET /presets
 //

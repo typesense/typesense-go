@@ -13,7 +13,7 @@ type StatsInterface interface {
 	//
 	// HTTP: GET /stats.json
 	//
-	// See: https://typesense.org/docs/latest/api/cluster-operations.html
+	// See: https://typesense.org/docs/latest/api/cluster-operations.html#api-stats
 	Retrieve(ctx context.Context) (*api.APIStatsResponse, error)
 }
 
@@ -27,7 +27,7 @@ type stats struct {
 //
 // HTTP: GET /stats.json
 //
-// See: https://typesense.org/docs/latest/api/cluster-operations.html
+// See: https://typesense.org/docs/latest/api/cluster-operations.html#api-stats
 func (s *stats) Retrieve(ctx context.Context) (*api.APIStatsResponse, error) {
 	response, err := s.apiClient.RetrieveAPIStatsWithResponse(ctx)
 	if err != nil {

@@ -9,7 +9,7 @@ import (
 type StopwordsInterface interface {
 	// Retrieves all stopwords sets.
 	//
-	// Retrieve the details of all stopwords sets
+	// Retrieve the details of all stopwords sets.
 	//
 	// HTTP: GET /stopwords
 	//
@@ -31,7 +31,7 @@ type stopwords struct {
 
 // Retrieves all stopwords sets.
 //
-// # Retrieve the details of all stopwords sets
+// Retrieve the details of all stopwords sets.
 //
 // HTTP: GET /stopwords
 //

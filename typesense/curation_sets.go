@@ -12,7 +12,7 @@ import (
 type CurationSetsInterface interface {
 	// Create or update a curation set.
 	//
-	// Create or update a curation set with the given name
+	// Create or update a curation set with the given name.
 	//
 	// HTTP: PUT /curation_sets/{curationSetName}
 	//
@@ -20,7 +20,7 @@ type CurationSetsInterface interface {
 	Upsert(ctx context.Context, curationSetName string, curationSetSchema *api.CurationSetCreateSchema) (*api.CurationSetSchema, error)
 	// List all curation sets.
 	//
-	// Retrieve all curation sets
+	// Retrieve all curation sets.
 	//
 	// HTTP: GET /curation_sets
 	//
@@ -35,7 +35,7 @@ type curationSets struct {
 
 // Create or update a curation set.
 //
-// # Create or update a curation set with the given name
+// Create or update a curation set with the given name.
 //
 // HTTP: PUT /curation_sets/{curationSetName}
 //
@@ -53,7 +53,7 @@ func (c *curationSets) Upsert(ctx context.Context, curationSetName string, curat
 
 // List all curation sets.
 //
-// # Retrieve all curation sets
+// Retrieve all curation sets.
 //
 // HTTP: GET /curation_sets
 //

@@ -11,7 +11,7 @@ type MetricsInterface interface {
 	//
 	// HTTP: GET /metrics.json
 	//
-	// See: https://typesense.org/docs/latest/api/cluster-operations.html
+	// See: https://typesense.org/docs/latest/api/cluster-operations.html#cluster-metrics
 	Retrieve(ctx context.Context) (map[string]interface{}, error)
 }
 
@@ -25,7 +25,7 @@ type metrics struct {
 //
 // HTTP: GET /metrics.json
 //
-// See: https://typesense.org/docs/latest/api/cluster-operations.html
+// See: https://typesense.org/docs/latest/api/cluster-operations.html#cluster-metrics
 func (m *metrics) Retrieve(ctx context.Context) (map[string]interface{}, error) {
 	response, err := m.apiClient.RetrieveMetricsWithResponse(ctx)
 	if err != nil {

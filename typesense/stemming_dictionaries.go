@@ -11,6 +11,13 @@ import (
 )
 
 type StemmingDictionariesInterface interface {
+	// Create or update a stemming dictionary.
+	//
+	// Encode the word-to-root mappings as JSON lines, import them into the dictionary with the given id, and return the imported mappings.
+	//
+	// HTTP: POST /stemming/dictionaries/import?id={dictionaryId}
+	//
+	// See: https://typesense.org/docs/latest/api/stemming.html
 	Upsert(ctx context.Context, dictionaryId string, wordRootCombinations []api.StemmingDictionaryWord) ([]*api.StemmingDictionaryWord, error)
 	// Import a stemming dictionary.
 	//
