@@ -35,6 +35,16 @@ type AnalyticsRulesInterface interface {
 	//
 	// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
 	RetrieveWithParams(ctx context.Context, params *api.RetrieveAnalyticsRulesParams) ([]*api.AnalyticsRule, error)
+	// Create analytics rules in one request.
+	//
+	// The server answers 200 even when some rules fail. Responses come back in request order, and a rejected rule has Error set.
+	//
+	// HTTP: POST /analytics/rules
+	//
+	// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
+	//
+	//docgen:keep
+	CreateMany(ctx context.Context, rules []*api.AnalyticsRuleCreate) ([]*api.AnalyticsRuleCreateResponse, error)
 }
 
 type analyticsRules struct {
@@ -148,4 +158,41 @@ func (a *analyticsRules) RetrieveWithParams(ctx context.Context, params *api.Ret
 		rules[i] = &rule
 	}
 	return rules, nil
+}
+
+// Create analytics rules in one request.
+//
+// The server answers 200 even when some rules fail. Responses come back in request order, and a rejected rule has Error set.
+//
+// HTTP: POST /analytics/rules
+//
+// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
+//
+//docgen:keep
+func (a *analyticsRules) CreateMany(ctx context.Context, rules []*api.AnalyticsRuleCreate) ([]*api.AnalyticsRuleCreateResponse, error) {
+	jsonData, err := json.Marshal(rules)
+	if err != nil {
+		return nil, err
+	}
+
+	// The generated parser can't decode an array body into its union type.
+	httpResp, err := a.apiClient.CreateAnalyticsRuleWithBody(ctx, "application/json", bytes.NewReader(jsonData))
+	if err != nil {
+		return nil, err
+	}
+	defer httpResp.Body.Close()
+
+	responseBody, err := io.ReadAll(httpResp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if httpResp.StatusCode < 200 || httpResp.StatusCode >= 300 {
+		return nil, &HTTPError{Status: httpResp.StatusCode, Body: responseBody}
+	}
+
+	var responses []*api.AnalyticsRuleCreateResponse
+	if err := json.Unmarshal(responseBody, &responses); err != nil {
+		return nil, err
+	}
+	return responses, nil
 }

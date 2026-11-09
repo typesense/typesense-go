@@ -156,3 +156,68 @@ func TestAnalyticsRulesCreateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	_, err := client.Analytics().Rules().Create(context.Background(), []*api.AnalyticsRuleCreate{})
 	assert.ErrorContains(t, err, "status: 400")
 }
+
+func TestAnalyticsRulesCreateMany(t *testing.T) {
+	newRule := &api.AnalyticsRuleCreate{
+		Name:       "test_rule",
+		Type:       api.Counter,
+		Collection: "test_collection",
+		EventType:  "click",
+		Params: &api.AnalyticsRuleCreateParams{
+			CounterField: pointer.String("popularity"),
+			Weight:       pointer.Int(10),
+		},
+	}
+	existingRule := &api.AnalyticsRuleCreate{Name: "existing_rule", Type: api.Counter, Collection: "test_collection", EventType: "click"}
+
+	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
+		validateRequestMetadata(t, r, "/analytics/rules", http.MethodPost)
+
+		var reqBody []api.AnalyticsRuleCreate
+		assert.NoError(t, json.NewDecoder(r.Body).Decode(&reqBody))
+		assert.Equal(t, []api.AnalyticsRuleCreate{*newRule, *existingRule}, reqBody)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`[
+			{"name": "test_rule", "type": "counter", "collection": "test_collection", "event_type": "click", "params": {"counter_field": "popularity", "weight": 10}},
+			{"error": "Rule already exists"}
+		]`))
+	})
+	defer server.Close()
+
+	res, err := client.Analytics().Rules().CreateMany(context.Background(), []*api.AnalyticsRuleCreate{newRule, existingRule})
+	assert.NoError(t, err)
+	assert.Equal(t, []*api.AnalyticsRuleCreateResponse{
+		{AnalyticsRule: api.AnalyticsRule{
+			Name:       newRule.Name,
+			Type:       newRule.Type,
+			Collection: newRule.Collection,
+			EventType:  newRule.EventType,
+			Params:     newRule.Params,
+		}},
+		{Error: "Rule already exists"},
+	}, res)
+}
+
+func TestAnalyticsRulesCreateManyOnHttpStatusErrorCodeReturnsError(t *testing.T) {
+	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
+		validateRequestMetadata(t, r, "/analytics/rules", http.MethodPost)
+		w.WriteHeader(http.StatusBadRequest)
+	})
+	defer server.Close()
+
+	_, err := client.Analytics().Rules().CreateMany(context.Background(), []*api.AnalyticsRuleCreate{})
+	assert.ErrorContains(t, err, "status: 400")
+}
+
+func TestAnalyticsRulesCreateManyOnObjectResponseReturnsError(t *testing.T) {
+	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
+		validateRequestMetadata(t, r, "/analytics/rules", http.MethodPost)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"name": "test_rule", "type": "counter", "collection": "test_collection", "event_type": "click"}`))
+	})
+	defer server.Close()
+
+	_, err := client.Analytics().Rules().CreateMany(context.Background(), []*api.AnalyticsRuleCreate{{Name: "test_rule"}})
+	assert.Error(t, err)
+}

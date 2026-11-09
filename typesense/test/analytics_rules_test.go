@@ -85,4 +85,33 @@ func TestAnalyticsRules(t *testing.T) {
 		require.NoError(t, err)
 		require.GreaterOrEqual(t, len(all), 2)
 	})
+
+	t.Run("CreateMany", func(t *testing.T) {
+		collectionName := createNewCollection(t, "analytics-rules-collection")
+		sourceCollectionName := createNewCollection(t, "analytics-rules-source-collection")
+		existingRule := createNewAnalyticsRule(t, collectionName, sourceCollectionName, newUUIDName("event"))
+
+		newRule := &api.AnalyticsRuleCreate{
+			Name:       newUUIDName("test-rule"),
+			Type:       api.Counter,
+			Collection: collectionName,
+			EventType:  "click",
+			Params:     existingRule.Params,
+		}
+		duplicateRule := &api.AnalyticsRuleCreate{
+			Name:       existingRule.Name,
+			Type:       existingRule.Type,
+			Collection: existingRule.Collection,
+			EventType:  existingRule.EventType,
+			Params:     existingRule.Params,
+		}
+
+		responses, err := typesenseClient.Analytics().Rules().CreateMany(context.Background(), []*api.AnalyticsRuleCreate{newRule, duplicateRule})
+		require.NoError(t, err)
+		require.Len(t, responses, 2)
+		require.Empty(t, responses[0].Error)
+		require.Equal(t, newRule.Name, responses[0].Name)
+		require.NotEmpty(t, responses[1].Error)
+		require.Empty(t, responses[1].Name)
+	})
 }
