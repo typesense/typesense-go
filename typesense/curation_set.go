@@ -32,6 +32,14 @@ type CurationSetInterface interface {
 	//
 	// See: https://typesense.org/docs/latest/api/curation.html
 	Delete(ctx context.Context) (*api.CurationSetDeleteSchema, error)
+	// Items manages the items in this curation set.
+	//
+	// See: https://typesense.org/docs/latest/api/curation.html
+	Items() CurationSetItemsInterface
+	// Item returns a handle for the item with the given id in this curation set.
+	//
+	// See: https://typesense.org/docs/latest/api/curation.html
+	Item(itemID string) CurationSetItemInterface
 }
 
 // curationSet is internal implementation of CurationSetInterface
@@ -92,4 +100,12 @@ func (c *curationSet) Delete(ctx context.Context) (*api.CurationSetDeleteSchema,
 		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return response.JSON200, nil
+}
+
+func (c *curationSet) Items() CurationSetItemsInterface {
+	return &curationSetItems{apiClient: c.apiClient, curationSetName: c.curationSetName}
+}
+
+func (c *curationSet) Item(itemID string) CurationSetItemInterface {
+	return &curationSetItem{apiClient: c.apiClient, curationSetName: c.curationSetName, itemID: itemID}
 }
