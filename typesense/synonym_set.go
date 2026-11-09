@@ -32,6 +32,14 @@ type SynonymSetInterface interface {
 	//
 	// See: https://typesense.org/docs/latest/api/synonyms.html
 	Delete(ctx context.Context) (*api.SynonymSetDeleteSchema, error)
+	// Items manages the items in this synonym set.
+	//
+	// See: https://typesense.org/docs/latest/api/synonyms.html
+	Items() SynonymSetItemsInterface
+	// Item returns a handle for the item with the given id in this synonym set.
+	//
+	// See: https://typesense.org/docs/latest/api/synonyms.html
+	Item(itemID string) SynonymSetItemInterface
 }
 
 // synonymSet is internal implementation of SynonymSetInterface
@@ -92,4 +100,12 @@ func (s *synonymSet) Delete(ctx context.Context) (*api.SynonymSetDeleteSchema, e
 		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
 	}
 	return response.JSON200, nil
+}
+
+func (s *synonymSet) Items() SynonymSetItemsInterface {
+	return &synonymSetItems{apiClient: s.apiClient, synonymSetName: s.synonymSetName}
+}
+
+func (s *synonymSet) Item(itemID string) SynonymSetItemInterface {
+	return &synonymSetItem{apiClient: s.apiClient, synonymSetName: s.synonymSetName, itemID: itemID}
 }
