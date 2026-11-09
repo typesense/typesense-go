@@ -45,6 +45,16 @@ type AnalyticsRulesInterface interface {
 	//
 	//docgen:keep
 	CreateMany(ctx context.Context, rules []*api.AnalyticsRuleCreate) ([]*api.AnalyticsRuleCreateResponse, error)
+	// Create or update an analytics rule.
+	//
+	// Create the rule with the given name, or update it if it exists. An update merges into the stored rule and needs the same type, collection and event type. The name in the path wins over rule.Name.
+	//
+	// HTTP: PUT /analytics/rules/{ruleName}
+	//
+	// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
+	//
+	//docgen:keep
+	Upsert(ctx context.Context, ruleName string, rule *api.AnalyticsRuleCreate) (*api.AnalyticsRule, error)
 }
 
 type analyticsRules struct {
@@ -195,4 +205,29 @@ func (a *analyticsRules) CreateMany(ctx context.Context, rules []*api.AnalyticsR
 		return nil, err
 	}
 	return responses, nil
+}
+
+// Create or update an analytics rule.
+//
+// Create the rule with the given name, or update it if it exists. An update merges into the stored rule and needs the same type, collection and event type. The name in the path wins over rule.Name.
+//
+// HTTP: PUT /analytics/rules/{ruleName}
+//
+// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
+//
+//docgen:keep
+func (a *analyticsRules) Upsert(ctx context.Context, ruleName string, rule *api.AnalyticsRuleCreate) (*api.AnalyticsRule, error) {
+	jsonData, err := json.Marshal(rule)
+	if err != nil {
+		return nil, err
+	}
+	// The spec types this body as AnalyticsRuleUpdate, which can't create a rule.
+	response, err := a.apiClient.UpsertAnalyticsRuleWithBodyWithResponse(ctx, ruleName, "application/json", bytes.NewReader(jsonData))
+	if err != nil {
+		return nil, err
+	}
+	if response.JSON200 == nil {
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
+	}
+	return response.JSON200, nil
 }

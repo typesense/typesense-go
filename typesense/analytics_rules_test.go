@@ -221,3 +221,54 @@ func TestAnalyticsRulesCreateManyOnObjectResponseReturnsError(t *testing.T) {
 	_, err := client.Analytics().Rules().CreateMany(context.Background(), []*api.AnalyticsRuleCreate{{Name: "test_rule"}})
 	assert.Error(t, err)
 }
+
+func TestAnalyticsRulesUpsert(t *testing.T) {
+	upsertData := &api.AnalyticsRuleCreate{
+		Name:       "test_rule",
+		Type:       api.Counter,
+		Collection: "test_collection",
+		EventType:  "click",
+		Params: &api.AnalyticsRuleCreateParams{
+			CounterField: pointer.String("popularity"),
+			Weight:       pointer.Int(10),
+		},
+	}
+	expectedData := &api.AnalyticsRule{
+		Name:       upsertData.Name,
+		Type:       upsertData.Type,
+		Collection: upsertData.Collection,
+		EventType:  upsertData.EventType,
+		Params:     upsertData.Params,
+	}
+
+	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
+		validateRequestMetadata(t, r, "/analytics/rules/test_rule", http.MethodPut)
+
+		var reqBody api.AnalyticsRuleCreate
+		assert.NoError(t, json.NewDecoder(r.Body).Decode(&reqBody))
+		assert.Equal(t, *upsertData, reqBody)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonEncode(t, expectedData))
+	})
+	defer server.Close()
+
+	res, err := client.Analytics().Rules().Upsert(context.Background(), "test_rule", upsertData)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedData, res)
+}
+
+func TestAnalyticsRulesUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
+	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
+		validateRequestMetadata(t, r, "/analytics/rules/test_rule", http.MethodPut)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"message": "Rule type cannot be changed"}`))
+	})
+	defer server.Close()
+
+	_, err := client.Analytics().Rules().Upsert(context.Background(), "test_rule", &api.AnalyticsRuleCreate{Type: api.Log})
+	var httpErr *HTTPError
+	assert.ErrorAs(t, err, &httpErr)
+	assert.Equal(t, http.StatusBadRequest, httpErr.Status)
+}

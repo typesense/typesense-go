@@ -114,4 +114,32 @@ func TestAnalyticsRules(t *testing.T) {
 		require.NotEmpty(t, responses[1].Error)
 		require.Empty(t, responses[1].Name)
 	})
+
+	t.Run("Upsert", func(t *testing.T) {
+		collectionName := createNewCollection(t, "analytics-rules-collection")
+		ruleName := newUUIDName("test-rule")
+		rule := &api.AnalyticsRuleCreate{
+			Name:       ruleName,
+			Type:       api.Counter,
+			Collection: collectionName,
+			EventType:  "click",
+			Params: &api.AnalyticsRuleCreateParams{
+				CounterField: pointer.String("num_employees"),
+				Weight:       pointer.Int(1),
+			},
+		}
+
+		created, err := typesenseClient.Analytics().Rules().Upsert(context.Background(), ruleName, rule)
+		require.NoError(t, err)
+		require.Equal(t, ruleName, created.Name)
+		require.Equal(t, 1, *created.Params.Weight)
+
+		rule.Params.Weight = pointer.Int(5)
+		_, err = typesenseClient.Analytics().Rules().Upsert(context.Background(), ruleName, rule)
+		require.NoError(t, err)
+
+		updated, err := typesenseClient.Analytics().Rule(ruleName).Retrieve(context.Background())
+		require.NoError(t, err)
+		require.Equal(t, 5, *updated.Params.Weight)
+	})
 }
