@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/typesense/typesense-go/v4/typesense/api"
+	"github.com/typesense/typesense-go/v4/typesense/api/pointer"
 )
 
 func analyticsRulesCleanUp() {
@@ -52,5 +53,36 @@ func TestAnalyticsRules(t *testing.T) {
 		require.Equal(t, expectedRule.Type, result.Type)
 		require.Equal(t, expectedRule.Collection, result.Collection)
 		require.Equal(t, expectedRule.EventType, result.EventType)
+	})
+
+	t.Run("RetrieveWithParams", func(t *testing.T) {
+		collectionName := createNewCollection(t, "analytics-rules-collection")
+		sourceCollectionName := createNewCollection(t, "analytics-rules-source-collection")
+		createNewAnalyticsRule(t, collectionName, sourceCollectionName, newUUIDName("event"))
+
+		ruleTag := newUUIDName("homepage")
+		taggedRule := &api.AnalyticsRuleCreate{
+			Name:       newUUIDName("test-rule"),
+			Type:       api.Counter,
+			Collection: collectionName,
+			EventType:  "click",
+			RuleTag:    pointer.String(ruleTag),
+			Params: &api.AnalyticsRuleCreateParams{
+				CounterField: pointer.String("num_employees"),
+				Weight:       pointer.Int(1),
+			},
+		}
+		created, err := typesenseClient.Analytics().Rules().Create(context.Background(), []*api.AnalyticsRuleCreate{taggedRule})
+		require.NoError(t, err)
+		require.Equal(t, taggedRule.Name, created[0].Name)
+
+		results, err := typesenseClient.Analytics().Rules().RetrieveWithParams(context.Background(), &api.RetrieveAnalyticsRulesParams{RuleTag: pointer.String(ruleTag)})
+		require.NoError(t, err)
+		require.Len(t, results, 1)
+		require.Equal(t, taggedRule.Name, results[0].Name)
+
+		all, err := typesenseClient.Analytics().Rules().RetrieveWithParams(context.Background(), nil)
+		require.NoError(t, err)
+		require.GreaterOrEqual(t, len(all), 2)
 	})
 }

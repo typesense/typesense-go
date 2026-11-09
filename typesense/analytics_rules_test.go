@@ -50,6 +50,54 @@ func TestAnalyticsRulesRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	assert.ErrorContains(t, err, "status: 409")
 }
 
+func TestAnalyticsRulesRetrieveWithParams(t *testing.T) {
+	expectedData := []*api.AnalyticsRule{
+		{
+			Name:       "test_rule_1",
+			Type:       api.Counter,
+			Collection: "test_collection",
+			EventType:  "click",
+			RuleTag:    pointer.String("homepage"),
+		},
+	}
+
+	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
+		validateRequestMetadata(t, r, "/analytics/rules?rule_tag=homepage", http.MethodGet)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonEncode(t, expectedData))
+	})
+	defer server.Close()
+
+	res, err := client.Analytics().Rules().RetrieveWithParams(context.Background(), &api.RetrieveAnalyticsRulesParams{RuleTag: pointer.String("homepage")})
+	assert.NoError(t, err)
+	assert.Equal(t, expectedData, res)
+}
+
+func TestAnalyticsRulesRetrieveWithNilParamsSendsNoQuery(t *testing.T) {
+	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
+		validateRequestMetadata(t, r, "/analytics/rules", http.MethodGet)
+		assert.Empty(t, r.URL.RawQuery)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte("[]"))
+	})
+	defer server.Close()
+
+	res, err := client.Analytics().Rules().RetrieveWithParams(context.Background(), nil)
+	assert.NoError(t, err)
+	assert.Empty(t, res)
+}
+
+func TestAnalyticsRulesRetrieveWithParamsOnHttpStatusErrorCodeReturnsError(t *testing.T) {
+	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
+		validateRequestMetadata(t, r, "/analytics/rules", http.MethodGet)
+		w.WriteHeader(http.StatusConflict)
+	})
+	defer server.Close()
+
+	_, err := client.Analytics().Rules().RetrieveWithParams(context.Background(), nil)
+	assert.ErrorContains(t, err, "status: 409")
+}
+
 func TestAnalyticsRulesCreate(t *testing.T) {
 	createData := []*api.AnalyticsRuleCreate{
 		{

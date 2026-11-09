@@ -27,6 +27,14 @@ type AnalyticsRulesInterface interface {
 	//
 	// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
 	Retrieve(ctx context.Context) ([]*api.AnalyticsRule, error)
+	// Retrieve analytics rules.
+	//
+	// Retrieve all analytics rules. Use the optional rule_tag filter to narrow down results.
+	//
+	// HTTP: GET /analytics/rules
+	//
+	// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
+	RetrieveWithParams(ctx context.Context, params *api.RetrieveAnalyticsRulesParams) ([]*api.AnalyticsRule, error)
 }
 
 type analyticsRules struct {
@@ -115,6 +123,29 @@ func (a *analyticsRules) Retrieve(ctx context.Context) ([]*api.AnalyticsRule, er
 	for i, rule := range *response.JSON200 {
 		ruleCopy := rule
 		rules[i] = &ruleCopy
+	}
+	return rules, nil
+}
+
+// Retrieve analytics rules.
+//
+// Retrieve all analytics rules. Use the optional rule_tag filter to narrow down results.
+//
+// HTTP: GET /analytics/rules
+//
+// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
+func (a *analyticsRules) RetrieveWithParams(ctx context.Context, params *api.RetrieveAnalyticsRulesParams) ([]*api.AnalyticsRule, error) {
+	response, err := a.apiClient.RetrieveAnalyticsRulesWithResponse(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+	if response.JSON200 == nil {
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
+	}
+
+	rules := make([]*api.AnalyticsRule, len(*response.JSON200))
+	for i, rule := range *response.JSON200 {
+		rules[i] = &rule
 	}
 	return rules, nil
 }
