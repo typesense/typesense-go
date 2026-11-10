@@ -6,6 +6,9 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -444,4 +447,73 @@ func TestApiCallRetryWithRequestBody(t *testing.T) {
 	assert.Equal(t, 203, res2.StatusCode)
 
 	assert.Equal(t, serverURLs, requestURLHistory)
+}
+
+func TestApiCallDoesNotRetryAnUnreplayableBody(t *testing.T) {
+	const payload = "body data"
+
+	tests := []struct {
+		name string
+		body func(t *testing.T) io.Reader
+	}{
+		{
+			name: "reader net/http cannot replay",
+			body: func(t *testing.T) io.Reader {
+				return struct{ io.Reader }{strings.NewReader(payload)}
+			},
+		},
+		{
+			name: "file on disk",
+			body: func(t *testing.T) io.Reader {
+				t.Helper()
+				path := filepath.Join(t.TempDir(), "documents.jsonl")
+				assert.NoError(t, os.WriteFile(path, []byte(payload), 0o600))
+				file, err := os.Open(path)
+				assert.NoError(t, err)
+				t.Cleanup(func() { file.Close() })
+				return file
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			requestURLHistory := make([]string, 0, 2)
+			received := make([]string, 0, 2)
+
+			servers, serverURLs := instantiateServers([]serverHandler{
+				func(w http.ResponseWriter, r *http.Request) {
+					appendHistory(&requestURLHistory, r)
+					bodyBytes, _ := io.ReadAll(r.Body)
+					received = append(received, string(bodyBytes))
+					w.WriteHeader(500)
+				},
+				func(w http.ResponseWriter, r *http.Request) {
+					appendHistory(&requestURLHistory, r)
+					bodyBytes, _ := io.ReadAll(r.Body)
+					received = append(received, string(bodyBytes))
+					w.WriteHeader(201)
+				},
+			})
+			for _, server := range servers {
+				defer server.Close()
+			}
+
+			apiCall := newAPICall(
+				&ClientConfig{
+					Nodes:             serverURLs,
+					ConnectionTimeout: 5 * time.Second,
+				},
+			)
+			req, err := http.NewRequest(http.MethodPost, "http://example.com", test.body(t))
+			assert.NoError(t, err)
+			assert.Nil(t, req.GetBody)
+
+			res, err := apiCall.Do(req)
+			assert.NoError(t, err)
+			assert.Equal(t, 500, res.StatusCode)
+			assert.Equal(t, serverURLs[:1], requestURLHistory)
+			assert.Equal(t, []string{payload}, received)
+		})
+	}
 }
