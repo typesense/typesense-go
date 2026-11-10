@@ -27,6 +27,34 @@ type AnalyticsRulesInterface interface {
 	//
 	// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
 	Retrieve(ctx context.Context) ([]*api.AnalyticsRule, error)
+	// Retrieve analytics rules.
+	//
+	// Retrieve all analytics rules. Use the optional rule_tag filter to narrow down results.
+	//
+	// HTTP: GET /analytics/rules
+	//
+	// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
+	RetrieveWithParams(ctx context.Context, params *api.RetrieveAnalyticsRulesParams) ([]*api.AnalyticsRule, error)
+	// Create analytics rules in one request.
+	//
+	// The server answers 200 even when some rules fail. Responses come back in request order, and a rejected rule has Error set.
+	//
+	// HTTP: POST /analytics/rules
+	//
+	// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
+	//
+	//docgen:keep
+	CreateMany(ctx context.Context, rules []*api.AnalyticsRuleCreate) ([]*api.AnalyticsRuleCreateResponse, error)
+	// Create or update an analytics rule.
+	//
+	// Create the rule with the given name, or update it if it exists. An update merges into the stored rule and needs the same type, collection and event type. The name in the path wins over rule.Name.
+	//
+	// HTTP: PUT /analytics/rules/{ruleName}
+	//
+	// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
+	//
+	//docgen:keep
+	Upsert(ctx context.Context, ruleName string, rule *api.AnalyticsRuleCreate) (*api.AnalyticsRule, error)
 }
 
 type analyticsRules struct {
@@ -117,4 +145,89 @@ func (a *analyticsRules) Retrieve(ctx context.Context) ([]*api.AnalyticsRule, er
 		rules[i] = &ruleCopy
 	}
 	return rules, nil
+}
+
+// Retrieve analytics rules.
+//
+// Retrieve all analytics rules. Use the optional rule_tag filter to narrow down results.
+//
+// HTTP: GET /analytics/rules
+//
+// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
+func (a *analyticsRules) RetrieveWithParams(ctx context.Context, params *api.RetrieveAnalyticsRulesParams) ([]*api.AnalyticsRule, error) {
+	response, err := a.apiClient.RetrieveAnalyticsRulesWithResponse(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+	if response.JSON200 == nil {
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
+	}
+
+	rules := make([]*api.AnalyticsRule, len(*response.JSON200))
+	for i, rule := range *response.JSON200 {
+		rules[i] = &rule
+	}
+	return rules, nil
+}
+
+// Create analytics rules in one request.
+//
+// The server answers 200 even when some rules fail. Responses come back in request order, and a rejected rule has Error set.
+//
+// HTTP: POST /analytics/rules
+//
+// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
+//
+//docgen:keep
+func (a *analyticsRules) CreateMany(ctx context.Context, rules []*api.AnalyticsRuleCreate) ([]*api.AnalyticsRuleCreateResponse, error) {
+	jsonData, err := json.Marshal(rules)
+	if err != nil {
+		return nil, err
+	}
+
+	// The generated parser can't decode an array body into its union type.
+	httpResp, err := a.apiClient.CreateAnalyticsRuleWithBody(ctx, "application/json", bytes.NewReader(jsonData))
+	if err != nil {
+		return nil, err
+	}
+	defer httpResp.Body.Close()
+
+	responseBody, err := io.ReadAll(httpResp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if httpResp.StatusCode < 200 || httpResp.StatusCode >= 300 {
+		return nil, &HTTPError{Status: httpResp.StatusCode, Body: responseBody}
+	}
+
+	var responses []*api.AnalyticsRuleCreateResponse
+	if err := json.Unmarshal(responseBody, &responses); err != nil {
+		return nil, err
+	}
+	return responses, nil
+}
+
+// Create or update an analytics rule.
+//
+// Create the rule with the given name, or update it if it exists. An update merges into the stored rule and needs the same type, collection and event type. The name in the path wins over rule.Name.
+//
+// HTTP: PUT /analytics/rules/{ruleName}
+//
+// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
+//
+//docgen:keep
+func (a *analyticsRules) Upsert(ctx context.Context, ruleName string, rule *api.AnalyticsRuleCreate) (*api.AnalyticsRule, error) {
+	jsonData, err := json.Marshal(rule)
+	if err != nil {
+		return nil, err
+	}
+	// The spec types this body as AnalyticsRuleUpdate, which can't create a rule.
+	response, err := a.apiClient.UpsertAnalyticsRuleWithBodyWithResponse(ctx, ruleName, "application/json", bytes.NewReader(jsonData))
+	if err != nil {
+		return nil, err
+	}
+	if response.JSON200 == nil {
+		return nil, &HTTPError{Status: response.StatusCode(), Body: response.Body}
+	}
+	return response.JSON200, nil
 }

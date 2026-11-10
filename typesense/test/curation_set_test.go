@@ -5,9 +5,11 @@ package test
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/typesense/typesense-go/v4/typesense"
 	"github.com/typesense/typesense-go/v4/typesense/api"
 	"github.com/typesense/typesense-go/v4/typesense/api/pointer"
 )
@@ -116,5 +118,52 @@ func TestCurationSet(t *testing.T) {
 
 		_, err = typesenseClient.CurationSet(curationSetName).Retrieve(context.Background())
 		require.Error(t, err)
+	})
+
+	t.Run("Items", func(t *testing.T) {
+		curationSetName := newUUIDName("test-curation-set")
+		_, err := typesenseClient.CurationSets().Upsert(context.Background(), curationSetName, newCurationSetCreateSchema())
+		require.NoError(t, err)
+
+		item := &api.CurationItemCreateSchema{
+			Rule:     api.CurationRule{Query: pointer.String("phone"), Match: pointer.Any(api.Exact)},
+			Excludes: &[]api.CurationExclude{{Id: "287"}},
+		}
+		upserted, err := typesenseClient.CurationSet(curationSetName).Items().Upsert(context.Background(), "phone-promo", item)
+		require.NoError(t, err)
+		require.Equal(t, "phone-promo", upserted.Id)
+		require.Equal(t, "phone", *upserted.Rule.Query)
+
+		items, err := typesenseClient.CurationSet(curationSetName).Items().Retrieve(context.Background())
+		require.NoError(t, err)
+		require.Len(t, items, 2)
+		require.ElementsMatch(t, []string{"dummy", "phone-promo"}, []string{items[0].Id, items[1].Id})
+	})
+
+	t.Run("Item", func(t *testing.T) {
+		curationSetName := newUUIDName("test-curation-set")
+		_, err := typesenseClient.CurationSets().Upsert(context.Background(), curationSetName, newCurationSetCreateSchema())
+		require.NoError(t, err)
+		item := typesenseClient.CurationSet(curationSetName).Item("phone-promo")
+
+		_, err = item.Upsert(context.Background(), &api.CurationItemCreateSchema{
+			Rule:     api.CurationRule{Query: pointer.String("phone"), Match: pointer.Any(api.Exact)},
+			Excludes: &[]api.CurationExclude{{Id: "287"}},
+		})
+		require.NoError(t, err)
+
+		retrieved, err := item.Retrieve(context.Background())
+		require.NoError(t, err)
+		require.Equal(t, "phone-promo", retrieved.Id)
+		require.Equal(t, "phone", *retrieved.Rule.Query)
+
+		deleted, err := item.Delete(context.Background())
+		require.NoError(t, err)
+		require.Equal(t, "phone-promo", deleted.Id)
+
+		_, err = item.Retrieve(context.Background())
+		var httpErr *typesense.HTTPError
+		require.ErrorAs(t, err, &httpErr)
+		require.Equal(t, http.StatusNotFound, httpErr.Status)
 	})
 }

@@ -5,10 +5,13 @@ package test
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/typesense/typesense-go/v4/typesense"
 	"github.com/typesense/typesense-go/v4/typesense/api"
+	"github.com/typesense/typesense-go/v4/typesense/api/pointer"
 )
 
 func synonymSetCleanUp() {
@@ -99,4 +102,44 @@ func TestSynonymSet(t *testing.T) {
 		_, err = typesenseClient.SynonymSet(synonymSetName).Retrieve(context.Background())
 		require.Error(t, err)
 	})
-} 
+
+	t.Run("Items", func(t *testing.T) {
+		synonymSetName, _ := createNewSynonymSet(t)
+		item := &api.SynonymItemUpsertSchema{
+			Root:     pointer.String("smart phone"),
+			Synonyms: []string{"iphone", "android"},
+		}
+
+		upserted, err := typesenseClient.SynonymSet(synonymSetName).Items().Upsert(context.Background(), "smart-phone", item)
+		require.NoError(t, err)
+		require.Equal(t, "smart-phone", upserted.Id)
+		require.Equal(t, item.Synonyms, upserted.Synonyms)
+
+		items, err := typesenseClient.SynonymSet(synonymSetName).Items().Retrieve(context.Background())
+		require.NoError(t, err)
+		require.Len(t, items, 2)
+		require.ElementsMatch(t, []string{"dummy", "smart-phone"}, []string{items[0].Id, items[1].Id})
+	})
+
+	t.Run("Item", func(t *testing.T) {
+		synonymSetName, _ := createNewSynonymSet(t)
+		item := typesenseClient.SynonymSet(synonymSetName).Item("smart-phone")
+
+		_, err := item.Upsert(context.Background(), &api.SynonymItemUpsertSchema{Synonyms: []string{"iphone", "android"}})
+		require.NoError(t, err)
+
+		retrieved, err := item.Retrieve(context.Background())
+		require.NoError(t, err)
+		require.Equal(t, "smart-phone", retrieved.Id)
+		require.Equal(t, []string{"iphone", "android"}, retrieved.Synonyms)
+
+		deleted, err := item.Delete(context.Background())
+		require.NoError(t, err)
+		require.Equal(t, "smart-phone", deleted.Id)
+
+		_, err = item.Retrieve(context.Background())
+		var httpErr *typesense.HTTPError
+		require.ErrorAs(t, err, &httpErr)
+		require.Equal(t, http.StatusNotFound, httpErr.Status)
+	})
+}
