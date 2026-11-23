@@ -86,6 +86,8 @@ type DocumentsInterface interface {
 	// HTTP: POST /collections/{collectionName}/documents/import
 	//
 	// See: https://typesense.org/docs/latest/api/documents.html
+	//
+	//docgen:keep
 	ImportJsonl(ctx context.Context, body io.Reader, params *api.ImportDocumentsParams) (io.ReadCloser, error)
 }
 
