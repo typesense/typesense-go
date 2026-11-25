@@ -6,10 +6,14 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/typesense/typesense-go/v4/typesense/api"
 )
 
@@ -444,4 +448,144 @@ func TestApiCallRetryWithRequestBody(t *testing.T) {
 	assert.Equal(t, 203, res2.StatusCode)
 
 	assert.Equal(t, serverURLs, requestURLHistory)
+}
+
+func TestApiCallDoesNotRetryAnUnreplayableBody(t *testing.T) {
+	const payload = "body data"
+
+	tests := []struct {
+		name string
+		body func(t *testing.T) io.Reader
+	}{
+		{
+			name: "reader net/http cannot replay",
+			body: func(t *testing.T) io.Reader {
+				return struct{ io.Reader }{strings.NewReader(payload)}
+			},
+		},
+		{
+			name: "file on disk",
+			body: func(t *testing.T) io.Reader {
+				t.Helper()
+				path := filepath.Join(t.TempDir(), "documents.jsonl")
+				require.NoError(t, os.WriteFile(path, []byte(payload), 0o600))
+				file, err := os.Open(path)
+				require.NoError(t, err)
+				t.Cleanup(func() { file.Close() })
+				return file
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			requestURLHistory := make([]string, 0, 2)
+			received := make([]string, 0, 2)
+
+			servers, serverURLs := instantiateServers([]serverHandler{
+				func(w http.ResponseWriter, r *http.Request) {
+					appendHistory(&requestURLHistory, r)
+					bodyBytes, _ := io.ReadAll(r.Body)
+					received = append(received, string(bodyBytes))
+					w.WriteHeader(500)
+				},
+				func(w http.ResponseWriter, r *http.Request) {
+					appendHistory(&requestURLHistory, r)
+					bodyBytes, _ := io.ReadAll(r.Body)
+					received = append(received, string(bodyBytes))
+					w.WriteHeader(201)
+				},
+			})
+			for _, server := range servers {
+				defer server.Close()
+			}
+
+			apiCall := newAPICall(
+				&ClientConfig{
+					Nodes:             serverURLs,
+					ConnectionTimeout: 5 * time.Second,
+				},
+			)
+			req, err := http.NewRequest(http.MethodPost, "http://example.com", test.body(t))
+			require.NoError(t, err)
+			assert.Nil(t, req.GetBody)
+
+			res, err := apiCall.Do(req)
+			require.NoError(t, err)
+			require.NotNil(t, res)
+			defer res.Body.Close()
+			assert.Equal(t, 500, res.StatusCode)
+			assert.Equal(t, serverURLs[:1], requestURLHistory)
+			assert.Equal(t, []string{payload}, received)
+		})
+	}
+}
+
+func TestApiCallReturnsTheDialErrorForAnUnreplayableBody(t *testing.T) {
+	requestURLHistory := make([]string, 0, 2)
+
+	servers, serverURLs := instantiateServers([]serverHandler{
+		func(w http.ResponseWriter, r *http.Request) {
+			appendHistory(&requestURLHistory, r)
+			w.WriteHeader(500)
+		},
+		func(w http.ResponseWriter, r *http.Request) {
+			appendHistory(&requestURLHistory, r)
+			w.WriteHeader(201)
+		},
+	})
+	defer servers[1].Close()
+	// Node 1 refuses the connection, so the body is consumed by nothing.
+	servers[0].Close()
+
+	apiCall := newAPICall(
+		&ClientConfig{
+			Nodes:             serverURLs,
+			ConnectionTimeout: 5 * time.Second,
+		},
+	)
+	req, err := http.NewRequest(http.MethodPost, "http://example.com", struct{ io.Reader }{strings.NewReader("body data")})
+	require.NoError(t, err)
+	assert.Nil(t, req.GetBody)
+
+	res, err := apiCall.Do(req)
+	require.Error(t, err)
+	assert.Nil(t, res)
+	assert.Empty(t, requestURLHistory)
+}
+
+type doerFunc func(*http.Request) (*http.Response, error)
+
+func (f doerFunc) Do(req *http.Request) (*http.Response, error) { return f(req) }
+
+func TestApiCallTreatsStatusZeroAsAFailedAttempt(t *testing.T) {
+	tests := []struct {
+		name      string
+		body      io.Reader
+		wantHosts []string
+	}{
+		{name: "replayable body", body: strings.NewReader("body data"), wantHosts: []string{"node-a", "node-b"}},
+		{name: "unreplayable body", body: struct{ io.Reader }{strings.NewReader("body data")}, wantHosts: []string{"node-a"}},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			hosts := make([]string, 0, 2)
+			apiCall := NewAPICall(
+				doerFunc(func(r *http.Request) (*http.Response, error) {
+					hosts = append(hosts, r.URL.Host)
+					return &http.Response{StatusCode: 0, Body: http.NoBody, Request: r}, nil
+				}),
+				&ClientConfig{Nodes: []string{"http://node-a", "http://node-b"}},
+			)
+			req, err := http.NewRequest(http.MethodPost, "http://example.com", test.body)
+			require.NoError(t, err)
+
+			res, err := apiCall.Do(req)
+			require.NoError(t, err)
+			require.NotNil(t, res)
+			assert.Equal(t, 0, res.StatusCode)
+			assert.Equal(t, test.wantHosts, hosts)
+		})
+	}
 }

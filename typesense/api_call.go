@@ -1,10 +1,8 @@
 package typesense
 
 import (
-	"bytes"
 	"context"
 	"errors"
-	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -69,31 +67,19 @@ func (a *APICall) Do(req *http.Request) (*http.Response, error) {
 
 	var lastResponse *http.Response
 	var lastError error
-	var bodyBytes []byte
-
-	if req.GetBody != nil {
-		// Store body in case we need to retry
-		reqBody, err := req.GetBody()
-		if err != nil {
-			return nil, err
-		}
-		defer reqBody.Close()
-
-		bodyBytes, err = io.ReadAll(reqBody)
-		if err != nil {
-			return nil, err
-		}
-	}
 
 	for numTries := 0; numTries < a.numRetriesPerRequest; numTries++ {
+		if req.GetBody != nil {
+			body, err := req.GetBody()
+			if err != nil {
+				return nil, err
+			}
+			req.Body = body
+		}
+
 		node := a.getNextNode()
 
 		replaceRequestHostname(req, node.url)
-
-		if bodyBytes != nil {
-			// Create a new io.ReadCloser for each retry
-			req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
-		}
 
 		response, err := a.client.Do(req)
 
@@ -102,12 +88,16 @@ func (a *APICall) Do(req *http.Request) (*http.Response, error) {
 			return nil, err
 		}
 
-		// If connection timeouts or status 5xx, retry with the next node
-		if err != nil || response.StatusCode >= 500 {
+		// On a connection error, status 0 or a 5xx, retry with the next node
+		if err != nil || response.StatusCode < 1 || response.StatusCode >= 500 {
 			lastResponse = response
 			lastError = err
 
 			setNodeHealthCheck(node, UNHEALTHY)
+			if req.GetBody == nil && req.Body != nil && req.Body != http.NoBody {
+				// This body can't be replayed, so it must not go to another node.
+				break
+			}
 			time.Sleep(a.retryInterval)
 			continue
 		} else if response.StatusCode >= 1 && response.StatusCode <= 499 {
