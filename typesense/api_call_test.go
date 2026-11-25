@@ -521,6 +521,39 @@ func TestApiCallDoesNotRetryAnUnreplayableBody(t *testing.T) {
 	}
 }
 
+func TestApiCallReturnsTheDialErrorForAnUnreplayableBody(t *testing.T) {
+	requestURLHistory := make([]string, 0, 2)
+
+	servers, serverURLs := instantiateServers([]serverHandler{
+		func(w http.ResponseWriter, r *http.Request) {
+			appendHistory(&requestURLHistory, r)
+			w.WriteHeader(500)
+		},
+		func(w http.ResponseWriter, r *http.Request) {
+			appendHistory(&requestURLHistory, r)
+			w.WriteHeader(201)
+		},
+	})
+	defer servers[1].Close()
+	// Node 1 refuses the connection, so the body is consumed by nothing.
+	servers[0].Close()
+
+	apiCall := newAPICall(
+		&ClientConfig{
+			Nodes:             serverURLs,
+			ConnectionTimeout: 5 * time.Second,
+		},
+	)
+	req, err := http.NewRequest(http.MethodPost, "http://example.com", struct{ io.Reader }{strings.NewReader("body data")})
+	require.NoError(t, err)
+	assert.Nil(t, req.GetBody)
+
+	res, err := apiCall.Do(req)
+	require.Error(t, err)
+	assert.Nil(t, res)
+	assert.Empty(t, requestURLHistory)
+}
+
 type doerFunc func(*http.Request) (*http.Response, error)
 
 func (f doerFunc) Do(req *http.Request) (*http.Response, error) { return f(req) }
