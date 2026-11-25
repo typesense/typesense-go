@@ -3,7 +3,9 @@ package typesense
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -521,21 +523,144 @@ func TestApiCallDoesNotRetryAnUnreplayableBody(t *testing.T) {
 	}
 }
 
-func TestApiCallReturnsTheDialErrorForAnUnreplayableBody(t *testing.T) {
-	requestURLHistory := make([]string, 0, 2)
+func openTempFile(t *testing.T, content string) *os.File {
+	t.Helper()
+	path := filepath.Join(t.TempDir(), "documents.jsonl")
+	require.NoError(t, os.WriteFile(path, []byte(content), 0o600))
+	file, err := os.Open(path)
+	require.NoError(t, err)
+	t.Cleanup(func() { file.Close() })
+	return file
+}
+
+func TestApiCallFailsOverAnUnreplayableBodyOnADialError(t *testing.T) {
+	const payload = "body data"
+
+	tests := []struct {
+		name string
+		body func(t *testing.T) io.Reader
+	}{
+		{
+			name: "reader net/http cannot replay",
+			body: func(*testing.T) io.Reader { return struct{ io.Reader }{strings.NewReader(payload)} },
+		},
+		{
+			name: "file on disk",
+			body: func(t *testing.T) io.Reader { return openTempFile(t, payload) },
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			requestURLHistory := make([]string, 0, 2)
+			received := make([]string, 0, 2)
+
+			servers, serverURLs := instantiateServers([]serverHandler{
+				func(w http.ResponseWriter, r *http.Request) {
+					appendHistory(&requestURLHistory, r)
+					w.WriteHeader(500)
+				},
+				func(w http.ResponseWriter, r *http.Request) {
+					appendHistory(&requestURLHistory, r)
+					bodyBytes, _ := io.ReadAll(r.Body)
+					received = append(received, string(bodyBytes))
+					w.WriteHeader(201)
+				},
+			})
+			defer servers[1].Close()
+			// Node 1 refuses the connection.
+			servers[0].Close()
+
+			apiCall := newAPICall(
+				&ClientConfig{
+					Nodes:             serverURLs,
+					ConnectionTimeout: 5 * time.Second,
+				},
+			)
+			body := test.body(t)
+			req, err := http.NewRequest(http.MethodPost, "http://example.com", body)
+			require.NoError(t, err)
+			assert.Nil(t, req.GetBody)
+
+			res, err := apiCall.Do(req)
+			require.NoError(t, err)
+			defer res.Body.Close()
+			assert.Equal(t, 201, res.StatusCode)
+			assert.Equal(t, serverURLs[1:], requestURLHistory)
+			assert.Equal(t, []string{payload}, received)
+			if file, ok := body.(*os.File); ok {
+				_, err := file.Read(make([]byte, 1))
+				assert.ErrorIs(t, err, os.ErrClosed)
+			}
+		})
+	}
+}
+
+func TestApiCallReturnsTheDialErrorWhenEveryNodeRefusesAnUnreplayableBody(t *testing.T) {
+	servers, serverURLs := instantiateServers([]serverHandler{
+		func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(201) },
+		func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(201) },
+	})
+	for _, server := range servers {
+		server.Close()
+	}
+
+	apiCall := newAPICall(
+		&ClientConfig{
+			Nodes:             serverURLs,
+			ConnectionTimeout: 5 * time.Second,
+		},
+	)
+	file := openTempFile(t, "body data")
+	req, err := http.NewRequest(http.MethodPost, "http://example.com", file)
+	require.NoError(t, err)
+
+	res, err := apiCall.Do(req)
+	assert.Nil(t, res)
+	var opErr *net.OpError
+	require.ErrorAs(t, err, &opErr)
+	assert.Equal(t, "dial", opErr.Op)
+	_, err = file.Read(make([]byte, 1))
+	assert.ErrorIs(t, err, os.ErrClosed)
+}
+
+func TestApiCallDoesNotFailOverAPartlyReadBodyOnADialError(t *testing.T) {
+	hosts := make([]string, 0, 2)
+	apiCall := NewAPICall(
+		doerFunc(func(r *http.Request) (*http.Response, error) {
+			hosts = append(hosts, r.URL.Host)
+			_, _ = r.Body.Read(make([]byte, 4))
+			return nil, &net.OpError{Op: "dial", Net: "tcp", Err: errors.New("connection refused")}
+		}),
+		&ClientConfig{Nodes: []string{"http://node-a", "http://node-b"}},
+	)
+	req, err := http.NewRequest(http.MethodPost, "http://example.com", struct{ io.Reader }{strings.NewReader("body data")})
+	require.NoError(t, err)
+
+	res, err := apiCall.Do(req)
+	assert.Nil(t, res)
+	var opErr *net.OpError
+	require.ErrorAs(t, err, &opErr)
+	assert.Equal(t, []string{"node-a"}, hosts)
+}
+
+func TestApiCallKeepsAFailedOverBodyOpenUntilTheNodeHasReadIt(t *testing.T) {
+	payload := strings.Repeat(`{"id":"1","title":"a document"}`+"\n", 1<<18)
+	received := make(chan int, 1)
 
 	servers, serverURLs := instantiateServers([]serverHandler{
+		func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(201) },
 		func(w http.ResponseWriter, r *http.Request) {
-			appendHistory(&requestURLHistory, r)
-			w.WriteHeader(500)
-		},
-		func(w http.ResponseWriter, r *http.Request) {
-			appendHistory(&requestURLHistory, r)
-			w.WriteHeader(201)
+			// Answer before reading the body, so Do returns while it is still being sent.
+			require.NoError(t, http.NewResponseController(w).EnableFullDuplex())
+			w.WriteHeader(200)
+			w.(http.Flusher).Flush()
+			n, _ := io.Copy(io.Discard, r.Body)
+			received <- int(n)
 		},
 	})
 	defer servers[1].Close()
-	// Node 1 refuses the connection, so the body is consumed by nothing.
+	// Node 1 refuses the connection.
 	servers[0].Close()
 
 	apiCall := newAPICall(
@@ -544,14 +669,14 @@ func TestApiCallReturnsTheDialErrorForAnUnreplayableBody(t *testing.T) {
 			ConnectionTimeout: 5 * time.Second,
 		},
 	)
-	req, err := http.NewRequest(http.MethodPost, "http://example.com", struct{ io.Reader }{strings.NewReader("body data")})
+	req, err := http.NewRequest(http.MethodPost, "http://example.com", openTempFile(t, payload))
 	require.NoError(t, err)
-	assert.Nil(t, req.GetBody)
 
 	res, err := apiCall.Do(req)
-	require.Error(t, err)
-	assert.Nil(t, res)
-	assert.Empty(t, requestURLHistory)
+	require.NoError(t, err)
+	defer res.Body.Close()
+	assert.Equal(t, 200, res.StatusCode)
+	assert.Equal(t, len(payload), <-received)
 }
 
 type doerFunc func(*http.Request) (*http.Response, error)
