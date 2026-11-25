@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/typesense/typesense-go/v4/typesense/api"
 )
 
@@ -467,9 +468,9 @@ func TestApiCallDoesNotRetryAnUnreplayableBody(t *testing.T) {
 			body: func(t *testing.T) io.Reader {
 				t.Helper()
 				path := filepath.Join(t.TempDir(), "documents.jsonl")
-				assert.NoError(t, os.WriteFile(path, []byte(payload), 0o600))
+				require.NoError(t, os.WriteFile(path, []byte(payload), 0o600))
 				file, err := os.Open(path)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				t.Cleanup(func() { file.Close() })
 				return file
 			},
@@ -506,14 +507,52 @@ func TestApiCallDoesNotRetryAnUnreplayableBody(t *testing.T) {
 				},
 			)
 			req, err := http.NewRequest(http.MethodPost, "http://example.com", test.body(t))
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Nil(t, req.GetBody)
 
 			res, err := apiCall.Do(req)
-			assert.NoError(t, err)
+			require.NoError(t, err)
+			require.NotNil(t, res)
+			defer res.Body.Close()
 			assert.Equal(t, 500, res.StatusCode)
 			assert.Equal(t, serverURLs[:1], requestURLHistory)
 			assert.Equal(t, []string{payload}, received)
+		})
+	}
+}
+
+type doerFunc func(*http.Request) (*http.Response, error)
+
+func (f doerFunc) Do(req *http.Request) (*http.Response, error) { return f(req) }
+
+func TestApiCallTreatsStatusZeroAsAFailedAttempt(t *testing.T) {
+	tests := []struct {
+		name      string
+		body      io.Reader
+		wantHosts []string
+	}{
+		{name: "replayable body", body: strings.NewReader("body data"), wantHosts: []string{"node-a", "node-b"}},
+		{name: "unreplayable body", body: struct{ io.Reader }{strings.NewReader("body data")}, wantHosts: []string{"node-a"}},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			hosts := make([]string, 0, 2)
+			apiCall := NewAPICall(
+				doerFunc(func(r *http.Request) (*http.Response, error) {
+					hosts = append(hosts, r.URL.Host)
+					return &http.Response{StatusCode: 0, Body: http.NoBody, Request: r}, nil
+				}),
+				&ClientConfig{Nodes: []string{"http://node-a", "http://node-b"}},
+			)
+			req, err := http.NewRequest(http.MethodPost, "http://example.com", test.body)
+			require.NoError(t, err)
+
+			res, err := apiCall.Do(req)
+			require.NoError(t, err)
+			require.NotNil(t, res)
+			assert.Equal(t, 0, res.StatusCode)
+			assert.Equal(t, test.wantHosts, hosts)
 		})
 	}
 }

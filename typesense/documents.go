@@ -80,8 +80,9 @@ type DocumentsInterface interface {
 	//
 	// The documents to be imported must be formatted in a newline delimited JSON structure. You can feed the output file from a Typesense export operation directly as import.
 	//
-	// A body that cannot be rewound, such as an *os.File or a pipe, is sent to one node only: if that
-	// node fails the request is not retried elsewhere. Pass a *bytes.Reader to keep failover.
+	// Only a *bytes.Buffer, *bytes.Reader or *strings.Reader body fails over to another node. Any
+	// other reader, such as an *os.File or a pipe, goes to one node only, and the client closes it,
+	// so reopen a file before retrying.
 	//
 	// HTTP: POST /collections/{collectionName}/documents/import
 	//

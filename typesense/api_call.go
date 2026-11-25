@@ -75,9 +75,6 @@ func (a *APICall) Do(req *http.Request) (*http.Response, error) {
 				return nil, err
 			}
 			req.Body = body
-		} else if numTries > 0 && req.Body != nil && req.Body != http.NoBody {
-			// The previous attempt consumed a body that can't be replayed.
-			break
 		}
 
 		node := a.getNextNode()
@@ -91,12 +88,16 @@ func (a *APICall) Do(req *http.Request) (*http.Response, error) {
 			return nil, err
 		}
 
-		// If connection timeouts or status 5xx, retry with the next node
-		if err != nil || response.StatusCode >= 500 {
+		// On a connection error, status 0 or a 5xx, retry with the next node
+		if err != nil || response.StatusCode < 1 || response.StatusCode >= 500 {
 			lastResponse = response
 			lastError = err
 
 			setNodeHealthCheck(node, UNHEALTHY)
+			if req.GetBody == nil && req.Body != nil && req.Body != http.NoBody {
+				// This body can't be replayed, so it must not go to another node.
+				break
+			}
 			time.Sleep(a.retryInterval)
 			continue
 		} else if response.StatusCode >= 1 && response.StatusCode <= 499 {
