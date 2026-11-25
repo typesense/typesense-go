@@ -3,8 +3,11 @@ package typesense
 import (
 	"context"
 	"errors"
+	"io"
+	"net"
 	"net/http"
 	"net/url"
+	"sync"
 	"time"
 
 	"github.com/typesense/typesense-go/v4/typesense/api/circuit"
@@ -68,6 +71,13 @@ func (a *APICall) Do(req *http.Request) (*http.Response, error) {
 	var lastResponse *http.Response
 	var lastError error
 
+	var unreplayable *unreplayableBody
+	if req.GetBody == nil && req.Body != nil && req.Body != http.NoBody {
+		unreplayable = &unreplayableBody{body: req.Body}
+		req.Body = unreplayable
+		defer unreplayable.release()
+	}
+
 	for numTries := 0; numTries < a.numRetriesPerRequest; numTries++ {
 		if req.GetBody != nil {
 			body, err := req.GetBody()
@@ -75,6 +85,8 @@ func (a *APICall) Do(req *http.Request) (*http.Response, error) {
 				return nil, err
 			}
 			req.Body = body
+		} else if unreplayable != nil {
+			unreplayable.startAttempt()
 		}
 
 		node := a.getNextNode()
@@ -94,8 +106,7 @@ func (a *APICall) Do(req *http.Request) (*http.Response, error) {
 			lastError = err
 
 			setNodeHealthCheck(node, UNHEALTHY)
-			if req.GetBody == nil && req.Body != nil && req.Body != http.NoBody {
-				// This body can't be replayed, so it must not go to another node.
+			if unreplayable != nil && !unreplayable.resendAfter(err) {
 				break
 			}
 			time.Sleep(a.retryInterval)
@@ -109,6 +120,70 @@ func (a *APICall) Do(req *http.Request) (*http.Response, error) {
 	}
 
 	return lastResponse, lastError
+}
+
+// unreplayableBody wraps a request body that net/http can't replay. The
+// transport closes the body even when it fails to dial, so Close is held back
+// until a byte is read, which keeps the body whole for the next node.
+type unreplayableBody struct {
+	body io.ReadCloser
+
+	mu        sync.Mutex
+	read      bool
+	released  bool
+	closeHeld bool
+}
+
+func (b *unreplayableBody) Read(p []byte) (int, error) {
+	n, err := b.body.Read(p)
+	if n > 0 {
+		b.mu.Lock()
+		b.read = true
+		b.mu.Unlock()
+	}
+	return n, err
+}
+
+func (b *unreplayableBody) Close() error {
+	b.mu.Lock()
+	if !b.read && !b.released {
+		b.closeHeld = true
+		b.mu.Unlock()
+		return nil
+	}
+	b.mu.Unlock()
+	return b.body.Close()
+}
+
+// startAttempt drops a Close held from the previous attempt, because the
+// transport sending this attempt closes the body itself.
+func (b *unreplayableBody) startAttempt() {
+	b.mu.Lock()
+	b.closeHeld = false
+	b.mu.Unlock()
+}
+
+// resendAfter reports whether the body can go to another node after err, which
+// is only when the node couldn't be dialed and none of the body was read.
+func (b *unreplayableBody) resendAfter(err error) bool {
+	var opErr *net.OpError
+	if !errors.As(err, &opErr) || opErr.Op != "dial" {
+		return false
+	}
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return !b.read
+}
+
+// release lets every later Close through and forwards one that was held.
+func (b *unreplayableBody) release() {
+	b.mu.Lock()
+	b.released = true
+	held := b.closeHeld
+	b.mu.Unlock()
+	if held {
+		_ = b.body.Close()
+	}
 }
 
 func (a *APICall) getNextNode() *Node {
