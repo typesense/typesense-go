@@ -477,7 +477,7 @@ func createNewAnalyticsRule(t *testing.T, collectionName string, sourceCollectio
 	}
 
 	// Create the rule via the API
-	_, err := typesenseClient.Analytics().Rules().Create(context.Background(), []*api.AnalyticsRuleCreate{ruleCreate})
+	_, err := typesenseClient.Analytics().Rules().Create(context.Background(), ruleCreate)
 	require.NoError(t, err)
 
 	// Return the expected rule structure

@@ -14,7 +14,7 @@ import (
 
 func analyticsRulesCleanUp() {
 	// Clean up analytics rules
-	result, _ := typesenseClient.Analytics().Rules().Retrieve(context.Background())
+	result, _ := typesenseClient.Analytics().Rules().Retrieve(context.Background(), nil)
 	for _, rule := range result {
 		typesenseClient.Analytics().Rule(rule.Name).Delete(context.Background())
 	}
@@ -36,7 +36,7 @@ func TestAnalyticsRules(t *testing.T) {
 		eventName := newUUIDName("event")
 		expectedRule := createNewAnalyticsRule(t, collectionName, sourceCollectionName, eventName)
 
-		results, err := typesenseClient.Analytics().Rules().Retrieve(context.Background())
+		results, err := typesenseClient.Analytics().Rules().Retrieve(context.Background(), nil)
 		require.NoError(t, err)
 		require.True(t, len(results) >= 1, "number of rules is invalid")
 
@@ -55,7 +55,7 @@ func TestAnalyticsRules(t *testing.T) {
 		require.Equal(t, expectedRule.EventType, result.EventType)
 	})
 
-	t.Run("RetrieveWithParams", func(t *testing.T) {
+	t.Run("RetrieveByRuleTag", func(t *testing.T) {
 		collectionName := createNewCollection(t, "analytics-rules-collection")
 		sourceCollectionName := createNewCollection(t, "analytics-rules-source-collection")
 		createNewAnalyticsRule(t, collectionName, sourceCollectionName, newUUIDName("event"))
@@ -72,41 +72,34 @@ func TestAnalyticsRules(t *testing.T) {
 				Weight:       pointer.Int(1),
 			},
 		}
-		created, err := typesenseClient.Analytics().Rules().Create(context.Background(), []*api.AnalyticsRuleCreate{taggedRule})
+		created, err := typesenseClient.Analytics().Rules().Create(context.Background(), taggedRule)
 		require.NoError(t, err)
-		require.Equal(t, taggedRule.Name, created[0].Name)
+		require.Equal(t, taggedRule.Name, created.Name)
 
-		results, err := typesenseClient.Analytics().Rules().RetrieveWithParams(context.Background(), &api.RetrieveAnalyticsRulesParams{RuleTag: pointer.String(ruleTag)})
+		results, err := typesenseClient.Analytics().Rules().Retrieve(context.Background(), &api.RetrieveAnalyticsRulesParams{RuleTag: pointer.String(ruleTag)})
 		require.NoError(t, err)
 		require.Len(t, results, 1)
 		require.Equal(t, taggedRule.Name, results[0].Name)
 
-		all, err := typesenseClient.Analytics().Rules().RetrieveWithParams(context.Background(), nil)
+		all, err := typesenseClient.Analytics().Rules().Retrieve(context.Background(), nil)
 		require.NoError(t, err)
 		require.GreaterOrEqual(t, len(all), 2)
 	})
 
 	t.Run("CreateMany", func(t *testing.T) {
 		collectionName := createNewCollection(t, "analytics-rules-collection")
-		sourceCollectionName := createNewCollection(t, "analytics-rules-source-collection")
-		existingRule := createNewAnalyticsRule(t, collectionName, sourceCollectionName, newUUIDName("event"))
-
 		newRule := &api.AnalyticsRuleCreate{
 			Name:       newUUIDName("test-rule"),
 			Type:       api.Counter,
 			Collection: collectionName,
 			EventType:  "click",
-			Params:     existingRule.Params,
-		}
-		duplicateRule := &api.AnalyticsRuleCreate{
-			Name:       existingRule.Name,
-			Type:       existingRule.Type,
-			Collection: existingRule.Collection,
-			EventType:  existingRule.EventType,
-			Params:     existingRule.Params,
+			Params: &api.AnalyticsRuleCreateParams{
+				CounterField: pointer.String("num_employees"),
+				Weight:       pointer.Int(1),
+			},
 		}
 
-		responses, err := typesenseClient.Analytics().Rules().CreateMany(context.Background(), []*api.AnalyticsRuleCreate{newRule, duplicateRule})
+		responses, err := typesenseClient.Analytics().Rules().CreateMany(context.Background(), []*api.AnalyticsRuleCreate{newRule, newRule})
 		require.NoError(t, err)
 		require.Len(t, responses, 2)
 		require.Empty(t, responses[0].Error)

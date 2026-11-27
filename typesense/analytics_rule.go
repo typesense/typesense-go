@@ -23,13 +23,15 @@ type AnalyticsRuleInterface interface {
 	//
 	// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
 	Retrieve(ctx context.Context) (*api.AnalyticsRule, error)
-	// Upserts an analytics rule.
+	// Update an analytics rule.
 	//
-	// Upserts an analytics rule with the given name.
+	// Merge ruleSchema into the stored rule with this name and return the merged rule. Fields that ruleSchema leaves nil keep their stored values. The server ignores ruleSchema.Name and keeps the name in the path. It also drops params that don't apply to the rule's type, such as Weight on a popular_queries rule. When no rule has this name, the server rejects the update with status 400 and Update returns *HTTPError. Use Rules().Upsert to create a rule.
 	//
 	// HTTP: PUT /analytics/rules/{ruleName}
 	//
 	// See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
+	//
+	//docgen:keep
 	Update(ctx context.Context, ruleSchema *api.AnalyticsRuleUpdate) (*api.AnalyticsRule, error)
 }
 
@@ -74,13 +76,15 @@ func (a *analyticsRule) Retrieve(ctx context.Context) (*api.AnalyticsRule, error
 	return response.JSON200, nil
 }
 
-// Upserts an analytics rule.
+// Update an analytics rule.
 //
-// Upserts an analytics rule with the given name.
+// Merge ruleSchema into the stored rule with this name and return the merged rule. Fields that ruleSchema leaves nil keep their stored values. The server ignores ruleSchema.Name and keeps the name in the path. It also drops params that don't apply to the rule's type, such as Weight on a popular_queries rule. When no rule has this name, the server rejects the update with status 400 and Update returns *HTTPError. Use Rules().Upsert to create a rule.
 //
 // HTTP: PUT /analytics/rules/{ruleName}
 //
 // See: https://typesense.org/docs/latest/api/analytics-query-suggestions.html
+//
+//docgen:keep
 func (a *analyticsRule) Update(ctx context.Context, ruleSchema *api.AnalyticsRuleUpdate) (*api.AnalyticsRule, error) {
 	response, err := a.apiClient.UpsertAnalyticsRuleWithResponse(ctx, a.ruleName, api.UpsertAnalyticsRuleJSONRequestBody(*ruleSchema))
 	if err != nil {
