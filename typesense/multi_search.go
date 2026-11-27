@@ -29,7 +29,7 @@ type MultiSearchInterface interface {
 	PerformWithContentType(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter, contentType string) (*api.MultiSearchResponse, error)
 	// Run multiple searches as a union and return their hits merged into one result.
 	//
-	// Set union to true and decode the response as a single SearchResult, with the hits of every search in one ordered list. Fail without sending the request if searchParams sets union to false.
+	// Set union to true and decode the response as a single SearchResult, with the hits of every search in one ordered list. Fail without sending the request if searchParams sets union to false. The server reads Page, PerPage, Offset, Limit and LimitHits only from commonSearchParams and ignores them on each search.
 	//
 	// HTTP: POST /multi_search
 	//
@@ -98,7 +98,7 @@ func (m *multiSearch) PerformWithContentType(ctx context.Context, commonSearchPa
 
 // Run multiple searches as a union and return their hits merged into one result.
 //
-// Set union to true and decode the response as a single SearchResult, with the hits of every search in one ordered list. Fail without sending the request if searchParams sets union to false.
+// Set union to true and decode the response as a single SearchResult, with the hits of every search in one ordered list. Fail without sending the request if searchParams sets union to false. The server reads Page, PerPage, Offset, Limit and LimitHits only from commonSearchParams and ignores them on each search.
 //
 // HTTP: POST /multi_search
 //
