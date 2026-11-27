@@ -22,7 +22,7 @@ jobs:
           --name typesense \
           -v /tmp/typesense-data:/data \
           -v /tmp/typesense-analytics-data:/analytics-data \
-          typesense/typesense:30.0.alpha1 \
+          typesense/typesense:30.2 \
           --api-key=test_key \
           --data-dir=/data \
           --enable-search-analytics=true \

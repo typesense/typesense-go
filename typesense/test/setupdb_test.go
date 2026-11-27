@@ -1,5 +1,5 @@
-//go:build integration && !docker
-// +build integration,!docker
+//go:build integration
+// +build integration
 
 package test
 
