@@ -2919,6 +2919,38 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 		}
 
+		if params.CurationTags != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "curation_tags", runtime.ParamLocationQuery, *params.CurationTags); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.DemoteSynonymMatch != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "demote_synonym_match", runtime.ParamLocationQuery, *params.DemoteSynonymMatch); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.DropTokensMode != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "drop_tokens_mode", runtime.ParamLocationQuery, *params.DropTokensMode); err != nil {
@@ -2967,6 +2999,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 		}
 
+		if params.EnableCurations != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_curations", runtime.ParamLocationQuery, *params.EnableCurations); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.EnableHighlightV1 != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_highlight_v1", runtime.ParamLocationQuery, *params.EnableHighlightV1); err != nil {
@@ -2983,9 +3031,9 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 		}
 
-		if params.EnableOverrides != nil {
+		if params.EnableLazyFilter != nil {
 
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_overrides", runtime.ParamLocationQuery, *params.EnableOverrides); err != nil {
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_lazy_filter", runtime.ParamLocationQuery, *params.EnableLazyFilter); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -3111,9 +3159,73 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 		}
 
+		if params.FacetQueryNumTypos != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "facet_query_num_typos", runtime.ParamLocationQuery, *params.FacetQueryNumTypos); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.FacetReturnParent != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "facet_return_parent", runtime.ParamLocationQuery, *params.FacetReturnParent); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.FacetSamplePercent != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "facet_sample_percent", runtime.ParamLocationQuery, *params.FacetSamplePercent); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.FacetSampleSlope != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "facet_sample_slope", runtime.ParamLocationQuery, *params.FacetSampleSlope); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.FacetSampleThreshold != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "facet_sample_threshold", runtime.ParamLocationQuery, *params.FacetSampleThreshold); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -3194,6 +3306,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 		if params.GroupLimit != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "group_limit", runtime.ParamLocationQuery, *params.GroupLimit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.GroupMaxCandidates != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "group_max_candidates", runtime.ParamLocationQuery, *params.GroupMaxCandidates); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -3354,6 +3482,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 		if params.Limit != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.LimitHits != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit_hits", runtime.ParamLocationQuery, *params.LimitHits); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -3530,22 +3674,6 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 		if params.Offset != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.OverrideTags != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "override_tags", runtime.ParamLocationQuery, *params.OverrideTags); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -3783,6 +3911,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 
 		}
 
+		if params.RerankHybridMatches != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "rerank_hybrid_matches", runtime.ParamLocationQuery, *params.RerankHybridMatches); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.SearchCutoffMs != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "search_cutoff_ms", runtime.ParamLocationQuery, *params.SearchCutoffMs); err != nil {
@@ -3946,6 +4090,22 @@ func NewSearchCollectionRequest(server string, collectionName string, params *Se
 		if params.UseCache != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "use_cache", runtime.ParamLocationQuery, *params.UseCache); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.ValidateFieldNames != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "validate_field_names", runtime.ParamLocationQuery, *params.ValidateFieldNames); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -5007,6 +5167,38 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 		}
 
+		if params.CurationTags != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "curation_tags", runtime.ParamLocationQuery, *params.CurationTags); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.DemoteSynonymMatch != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "demote_synonym_match", runtime.ParamLocationQuery, *params.DemoteSynonymMatch); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.DropTokensMode != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "drop_tokens_mode", runtime.ParamLocationQuery, *params.DropTokensMode); err != nil {
@@ -5055,6 +5247,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 		}
 
+		if params.EnableCurations != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_curations", runtime.ParamLocationQuery, *params.EnableCurations); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.EnableHighlightV1 != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_highlight_v1", runtime.ParamLocationQuery, *params.EnableHighlightV1); err != nil {
@@ -5071,9 +5279,9 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 		}
 
-		if params.EnableOverrides != nil {
+		if params.EnableLazyFilter != nil {
 
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_overrides", runtime.ParamLocationQuery, *params.EnableOverrides); err != nil {
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "enable_lazy_filter", runtime.ParamLocationQuery, *params.EnableLazyFilter); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -5199,9 +5407,73 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 		}
 
+		if params.FacetQueryNumTypos != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "facet_query_num_typos", runtime.ParamLocationQuery, *params.FacetQueryNumTypos); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.FacetReturnParent != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "facet_return_parent", runtime.ParamLocationQuery, *params.FacetReturnParent); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.FacetSamplePercent != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "facet_sample_percent", runtime.ParamLocationQuery, *params.FacetSamplePercent); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.FacetSampleSlope != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "facet_sample_slope", runtime.ParamLocationQuery, *params.FacetSampleSlope); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.FacetSampleThreshold != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "facet_sample_threshold", runtime.ParamLocationQuery, *params.FacetSampleThreshold); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -5282,6 +5554,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 		if params.GroupLimit != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "group_limit", runtime.ParamLocationQuery, *params.GroupLimit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.GroupMaxCandidates != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "group_max_candidates", runtime.ParamLocationQuery, *params.GroupMaxCandidates); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -5442,6 +5730,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 		if params.Limit != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.LimitHits != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit_hits", runtime.ParamLocationQuery, *params.LimitHits); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -5618,22 +5922,6 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 		if params.Offset != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.OverrideTags != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "override_tags", runtime.ParamLocationQuery, *params.OverrideTags); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -5871,6 +6159,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 
 		}
 
+		if params.RerankHybridMatches != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "rerank_hybrid_matches", runtime.ParamLocationQuery, *params.RerankHybridMatches); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.SearchCutoffMs != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "search_cutoff_ms", runtime.ParamLocationQuery, *params.SearchCutoffMs); err != nil {
@@ -6034,6 +6338,22 @@ func NewMultiSearchRequestWithBody(server string, params *MultiSearchParams, con
 		if params.UseCache != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "use_cache", runtime.ParamLocationQuery, *params.UseCache); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.ValidateFieldNames != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "validate_field_names", runtime.ParamLocationQuery, *params.ValidateFieldNames); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err

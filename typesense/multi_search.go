@@ -51,6 +51,10 @@ type multiSearch struct {
 //
 // See: https://typesense.org/docs/latest/api/federated-multi-search.html
 func (m *multiSearch) Perform(ctx context.Context, commonSearchParams *api.MultiSearchParams, searchParams api.MultiSearchSearchesParameter) (*api.MultiSearchResult, error) {
+	if searchParams.Union != nil && *searchParams.Union {
+		return nil, errors.New("invalid parameter: cannot set union to true when calling Perform, use PerformUnion instead")
+	}
+
 	response, err := m.apiClient.MultiSearchWithResponse(ctx, commonSearchParams, api.MultiSearchJSONRequestBody(searchParams))
 	if err != nil {
 		return nil, err

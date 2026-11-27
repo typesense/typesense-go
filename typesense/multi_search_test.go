@@ -355,6 +355,21 @@ func TestMultiSearchOnApiClientError(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
+func TestMultiSearchPerformRejectsUnion(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
+
+	client := NewClient(WithAPIClient(mockAPIClient))
+	body := newMultiSearchBodyParams()
+	body.Union = pointer.True()
+
+	result, err := client.MultiSearch.Perform(context.Background(), newMultiSearchParams(), body)
+
+	assert.Nil(t, result)
+	assert.ErrorContains(t, err, "PerformUnion")
+}
+
 func TestMultiSearchRAG(t *testing.T) {
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/multi_search?conversation=true&conversation_id=123&conversation_model_id=conv-1&q=can+you+suggest", http.MethodPost)
