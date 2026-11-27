@@ -1,7 +1,9 @@
 package typesense
 
 import (
+	"context"
 	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"testing"
 	"time"
@@ -240,6 +242,45 @@ func TestClientConfigOptions(t *testing.T) {
 			},
 		},
 		{
+			name: "WithConfigPartialKeepsDefaults",
+			options: []ClientOption{
+				WithClientConfig(&ClientConfig{
+					ServerURL: "http://example.com",
+					APIKey:    "API_KEY_1",
+				}),
+			},
+			verify: func(t *testing.T, client *Client) {
+				assert.Equal(t, "http://example.com", client.apiConfig.ServerURL)
+				assert.Equal(t, "API_KEY_1", client.apiConfig.APIKey)
+				assert.Equal(t, defaultRetryInterval, client.apiConfig.RetryInterval)
+				assert.Equal(t, defaultHealthcheckInterval, client.apiConfig.HealthcheckInterval)
+				assert.Equal(t, defaultConnectionTimeout, client.apiConfig.ConnectionTimeout)
+				assert.Equal(t, defaultCircuitBreakerName, client.apiConfig.CircuitBreakerName)
+				assert.Equal(t, circuit.DefaultGoBreakerMaxRequests, client.apiConfig.CircuitBreakerMaxRequests)
+				assert.Equal(t, circuit.DefaultGoBreakerInterval, client.apiConfig.CircuitBreakerInterval)
+				assert.Equal(t, circuit.DefaultGoBreakerTimeout, client.apiConfig.CircuitBreakerTimeout)
+				assert.Equal(t,
+					reflect.ValueOf(circuit.DefaultReadyToTrip).Pointer(),
+					reflect.ValueOf(client.apiConfig.CircuitBreakerReadyToTrip).Pointer(),
+					"readyToTrip is not valid")
+				assert.NotNil(t, client.apiClient)
+			},
+		},
+		{
+			name: "WithConfigZeroNumRetriesKeepsEarlierOption",
+			options: []ClientOption{
+				WithNumRetries(3),
+				WithClientConfig(&ClientConfig{
+					ServerURL:  "http://example.com",
+					APIKey:     "API_KEY_1",
+					NumRetries: 0,
+				}),
+			},
+			verify: func(t *testing.T, client *Client) {
+				assert.Equal(t, 3, client.apiConfig.NumRetries)
+			},
+		},
+		{
 			name: "WithCustomHTTPClient",
 			options: []ClientOption{
 				WithCustomHTTPClient(&http.Client{
@@ -259,4 +300,22 @@ func TestClientConfigOptions(t *testing.T) {
 			tt.verify(t, client)
 		})
 	}
+}
+
+func TestWithClientConfigUsesCustomHTTPClient(t *testing.T) {
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"ok":true}`))
+	}))
+	defer server.Close()
+
+	client := NewClient(WithClientConfig(&ClientConfig{
+		ServerURL:        server.URL,
+		APIKey:           "API_KEY_1",
+		CustomHTTPClient: server.Client(),
+	}))
+
+	healthy, err := client.Health(context.Background(), time.Second)
+	assert.NoError(t, err)
+	assert.True(t, healthy)
 }
