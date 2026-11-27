@@ -56,4 +56,4 @@ func TestNLSearchModel(t *testing.T) {
 		_, err = typesenseClient.NLSearchModel(modelID).Retrieve(context.Background())
 		require.Error(t, err)
 	})
-} 
+}

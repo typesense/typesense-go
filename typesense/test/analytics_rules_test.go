@@ -18,7 +18,7 @@ func analyticsRulesCleanUp() {
 	for _, rule := range result {
 		typesenseClient.Analytics().Rule(rule.Name).Delete(context.Background())
 	}
-	
+
 	// Clean up collections
 	collections, _ := typesenseClient.Collections().Retrieve(context.Background(), nil)
 	for _, collection := range collections {

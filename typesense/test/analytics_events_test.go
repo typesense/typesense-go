@@ -18,7 +18,7 @@ func analyticsEventsCleanUp() {
 	for _, rule := range result {
 		typesenseClient.Analytics().Rule(rule.Name).Delete(context.Background())
 	}
-	
+
 	// Clean up collections
 	collections, _ := typesenseClient.Collections().Retrieve(context.Background(), nil)
 	for _, collection := range collections {
@@ -34,16 +34,16 @@ func TestAnalyticsEvents(t *testing.T) {
 		eventName := newUUIDName("event")
 		collectionName := createNewCollection(t, "analytics-rules-collection")
 		sourceCollectionName := createNewCollection(t, "analytics-rules-source-collection")
-		
+
 		expectedRule := createNewAnalyticsRule(t, collectionName, sourceCollectionName, eventName)
 
 		result, err := typesenseClient.Analytics().Events().Create(context.Background(), &api.AnalyticsEvent{
 			Name:      expectedRule.Name,
 			EventType: "click",
 			Data: api.AnalyticsEventData{
-				Q:       pointer.String("nike shoes"),
-				DocId:   pointer.String("1024"),
-				UserId:  pointer.String("111112"),
+				Q:      pointer.String("nike shoes"),
+				DocId:  pointer.String("1024"),
+				UserId: pointer.String("111112"),
 			},
 		})
 
@@ -54,16 +54,16 @@ func TestAnalyticsEvents(t *testing.T) {
 	t.Run("Retrieve", func(t *testing.T) {
 		eventName := newUUIDName("event")
 		collectionName := createNewCollection(t, "analytics-events-collection")
-		
+
 		expectedRule := createNewAnalyticsRule(t, collectionName, collectionName, eventName)
 
 		_, err := typesenseClient.Analytics().Events().Create(context.Background(), &api.AnalyticsEvent{
 			Name:      expectedRule.Name,
 			EventType: "click",
 			Data: api.AnalyticsEventData{
-				Q:       pointer.String("nike shoes"),
-				DocId:   pointer.String("1024"),
-				UserId:  pointer.String("111112"),
+				Q:      pointer.String("nike shoes"),
+				DocId:  pointer.String("1024"),
+				UserId: pointer.String("111112"),
 			},
 		})
 
@@ -72,7 +72,7 @@ func TestAnalyticsEvents(t *testing.T) {
 			Name:   expectedRule.Name,
 			N:      1000,
 		})
-		
+
 		require.NoError(t, err)
 		require.NotNil(t, result)
 		require.IsType(t, &api.AnalyticsEventsResponse{}, result)
