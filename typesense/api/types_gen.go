@@ -15,39 +15,39 @@ const (
 
 // Defines values for AnalyticsRuleType.
 const (
-	Counter        AnalyticsRuleType = "counter"
-	Log            AnalyticsRuleType = "log"
-	NohitsQueries  AnalyticsRuleType = "nohits_queries"
-	PopularQueries AnalyticsRuleType = "popular_queries"
+	AnalyticsRuleTypeCounter        AnalyticsRuleType = "counter"
+	AnalyticsRuleTypeLog            AnalyticsRuleType = "log"
+	AnalyticsRuleTypeNohitsQueries  AnalyticsRuleType = "nohits_queries"
+	AnalyticsRuleTypePopularQueries AnalyticsRuleType = "popular_queries"
 )
 
 // Defines values for CurationRuleMatch.
 const (
-	Contains CurationRuleMatch = "contains"
-	Exact    CurationRuleMatch = "exact"
+	CurationRuleMatchContains CurationRuleMatch = "contains"
+	CurationRuleMatchExact    CurationRuleMatch = "exact"
 )
 
 // Defines values for DirtyValues.
 const (
-	CoerceOrDrop   DirtyValues = "coerce_or_drop"
-	CoerceOrReject DirtyValues = "coerce_or_reject"
-	Drop           DirtyValues = "drop"
-	Reject         DirtyValues = "reject"
+	DirtyValuesCoerceOrDrop   DirtyValues = "coerce_or_drop"
+	DirtyValuesCoerceOrReject DirtyValues = "coerce_or_reject"
+	DirtyValuesDrop           DirtyValues = "drop"
+	DirtyValuesReject         DirtyValues = "reject"
 )
 
 // Defines values for DropTokensMode.
 const (
-	BothSides3  DropTokensMode = "both_sides:3"
-	LeftToRight DropTokensMode = "left_to_right"
-	RightToLeft DropTokensMode = "right_to_left"
+	DropTokensModeBothSides3  DropTokensMode = "both_sides:3"
+	DropTokensModeLeftToRight DropTokensMode = "left_to_right"
+	DropTokensModeRightToLeft DropTokensMode = "right_to_left"
 )
 
 // Defines values for IndexAction.
 const (
-	Create  IndexAction = "create"
-	Emplace IndexAction = "emplace"
-	Update  IndexAction = "update"
-	Upsert  IndexAction = "upsert"
+	IndexActionCreate  IndexAction = "create"
+	IndexActionEmplace IndexAction = "emplace"
+	IndexActionUpdate  IndexAction = "update"
+	IndexActionUpsert  IndexAction = "upsert"
 )
 
 // APIStatsResponse defines model for APIStatsResponse.

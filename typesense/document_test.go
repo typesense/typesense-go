@@ -73,13 +73,13 @@ func TestDocumentUpdate(t *testing.T) {
 
 	notNill := gomock.Not(gomock.Nil())
 	mockAPIClient.EXPECT().
-		UpdateDocument(notNill, "companies", "123", &api.UpdateDocumentParams{DirtyValues: pointer.Any(api.CoerceOrDrop)}, expectedDocument).
+		UpdateDocument(notNill, "companies", "123", &api.UpdateDocumentParams{DirtyValues: pointer.Any(api.DirtyValuesCoerceOrDrop)}, expectedDocument).
 		Return(createResponse(200, "", mockedResult), nil).
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	document := createNewDocument()
-	result, err := client.Collection("companies").Document("123").Update(context.Background(), document, &api.DocumentIndexParameters{DirtyValues: pointer.Any(api.CoerceOrDrop)})
+	result, err := client.Collection("companies").Document("123").Update(context.Background(), document, &api.DocumentIndexParameters{DirtyValues: pointer.Any(api.DirtyValuesCoerceOrDrop)})
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)

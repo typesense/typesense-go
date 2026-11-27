@@ -60,7 +60,7 @@ func TestCurationSet(t *testing.T) {
 				{
 					Rule: api.CurationRule{
 						Query: pointer.String("updated query"),
-						Match: pointer.Any(api.Exact),
+						Match: pointer.Any(api.CurationRuleMatchExact),
 					},
 					Id: pointer.String("dummy"),
 					Includes: &[]api.CurationInclude{
@@ -126,7 +126,7 @@ func TestCurationSet(t *testing.T) {
 		require.NoError(t, err)
 
 		item := &api.CurationItemCreateSchema{
-			Rule:     api.CurationRule{Query: pointer.String("phone"), Match: pointer.Any(api.Exact)},
+			Rule:     api.CurationRule{Query: pointer.String("phone"), Match: pointer.Any(api.CurationRuleMatchExact)},
 			Excludes: &[]api.CurationExclude{{Id: "287"}},
 		}
 		upserted, err := typesenseClient.CurationSet(curationSetName).Items().Upsert(context.Background(), "phone-promo", item)
@@ -147,7 +147,7 @@ func TestCurationSet(t *testing.T) {
 		item := typesenseClient.CurationSet(curationSetName).Item("phone-promo")
 
 		_, err = item.Upsert(context.Background(), &api.CurationItemCreateSchema{
-			Rule:     api.CurationRule{Query: pointer.String("phone"), Match: pointer.Any(api.Exact)},
+			Rule:     api.CurationRule{Query: pointer.String("phone"), Match: pointer.Any(api.CurationRuleMatchExact)},
 			Excludes: &[]api.CurationExclude{{Id: "287"}},
 		})
 		require.NoError(t, err)

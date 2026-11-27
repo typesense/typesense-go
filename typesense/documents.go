@@ -141,7 +141,7 @@ func (d *documents) Update(ctx context.Context, updateFields interface{}, params
 }
 
 func (d *documents) Upsert(ctx context.Context, document interface{}, params *api.DocumentIndexParameters) (map[string]interface{}, error) {
-	return d.indexDocument(ctx, document, &api.IndexDocumentParams{Action: pointer.Any(api.Upsert), DirtyValues: params.DirtyValues})
+	return d.indexDocument(ctx, document, &api.IndexDocumentParams{Action: pointer.Any(api.IndexActionUpsert), DirtyValues: params.DirtyValues})
 }
 
 // Delete a bunch of documents.
@@ -208,7 +208,7 @@ func initImportParams(params *api.ImportDocumentsParams) {
 		*params.BatchSize = defaultImportBatchSize
 	}
 	if params.Action == nil {
-		params.Action = pointer.Any(api.Create)
+		params.Action = pointer.Any(api.IndexActionCreate)
 	}
 }
 

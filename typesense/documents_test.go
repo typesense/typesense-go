@@ -53,7 +53,7 @@ func TestDocumentCreate(t *testing.T) {
 	mockedResult := createNewDocumentResponse()
 
 	notNill := gomock.Not(gomock.Nil())
-	indexParams := &api.IndexDocumentParams{DirtyValues: pointer.Any(api.CoerceOrDrop)}
+	indexParams := &api.IndexDocumentParams{DirtyValues: pointer.Any(api.DirtyValuesCoerceOrDrop)}
 	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, expectedDocument).
 		Return(&api.IndexDocumentResponse{
@@ -63,7 +63,7 @@ func TestDocumentCreate(t *testing.T) {
 
 	client := NewClient(WithAPIClient(mockAPIClient))
 	document := createNewDocument()
-	result, err := client.Collection("companies").Documents().Create(context.Background(), document, &api.DocumentIndexParameters{DirtyValues: pointer.Any(api.CoerceOrDrop)})
+	result, err := client.Collection("companies").Documents().Create(context.Background(), document, &api.DocumentIndexParameters{DirtyValues: pointer.Any(api.DirtyValuesCoerceOrDrop)})
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -122,7 +122,7 @@ func TestDocumentUpsert(t *testing.T) {
 	mockedResult := createNewDocumentResponse()
 
 	notNill := gomock.Not(gomock.Nil())
-	indexParams := &api.IndexDocumentParams{Action: pointer.Any(api.Upsert), DirtyValues: pointer.Any(api.CoerceOrDrop)}
+	indexParams := &api.IndexDocumentParams{Action: pointer.Any(api.IndexActionUpsert), DirtyValues: pointer.Any(api.DirtyValuesCoerceOrDrop)}
 	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, newDocument).
 		Return(&api.IndexDocumentResponse{
@@ -131,7 +131,7 @@ func TestDocumentUpsert(t *testing.T) {
 		Times(1)
 
 	client := NewClient(WithAPIClient(mockAPIClient))
-	result, err := client.Collection("companies").Documents().Upsert(context.Background(), newDocument, &api.DocumentIndexParameters{DirtyValues: pointer.Any(api.CoerceOrDrop)})
+	result, err := client.Collection("companies").Documents().Upsert(context.Background(), newDocument, &api.DocumentIndexParameters{DirtyValues: pointer.Any(api.DirtyValuesCoerceOrDrop)})
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedResult, result)
@@ -145,7 +145,7 @@ func TestDocumentUpsertOnApiClientErrorReturnsError(t *testing.T) {
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	notNill := gomock.Not(gomock.Nil())
-	indexParams := &api.IndexDocumentParams{Action: pointer.Any(api.Upsert)}
+	indexParams := &api.IndexDocumentParams{Action: pointer.Any(api.IndexActionUpsert)}
 	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, newDocument).
 		Return(nil, errors.New("failed request")).
@@ -164,7 +164,7 @@ func TestDocumentUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	mockAPIClient := mocks.NewMockAPIClientInterface(ctrl)
 
 	notNill := gomock.Not(gomock.Nil())
-	indexParams := &api.IndexDocumentParams{Action: pointer.Any(api.Upsert)}
+	indexParams := &api.IndexDocumentParams{Action: pointer.Any(api.IndexActionUpsert)}
 	mockAPIClient.EXPECT().
 		IndexDocumentWithResponse(notNill, "companies", indexParams, newDocument).
 		Return(&api.IndexDocumentResponse{

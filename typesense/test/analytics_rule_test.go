@@ -39,7 +39,7 @@ func TestAnalyticsRule(t *testing.T) {
 		ruleName := newUUIDName("test-rule")
 		ruleCreate := &api.AnalyticsRuleCreate{
 			Name:       ruleName,
-			Type:       api.Counter,
+			Type:       api.AnalyticsRuleTypeCounter,
 			Collection: collectionName,
 			EventType:  "click",
 			Params: &api.AnalyticsRuleCreateParams{
@@ -51,7 +51,7 @@ func TestAnalyticsRule(t *testing.T) {
 		createdRule, err := typesenseClient.Analytics().Rules().Create(context.Background(), ruleCreate)
 		require.NoError(t, err)
 		require.Equal(t, ruleName, createdRule.Name)
-		require.Equal(t, api.Counter, createdRule.Type)
+		require.Equal(t, api.AnalyticsRuleTypeCounter, createdRule.Type)
 		require.Equal(t, collectionName, createdRule.Collection)
 		require.Equal(t, "click", createdRule.EventType)
 	})
@@ -60,7 +60,7 @@ func TestAnalyticsRule(t *testing.T) {
 		collectionName := createNewCollection(t, "analytics-rules-collection")
 		ruleCreate := &api.AnalyticsRuleCreate{
 			Name:       newUUIDName("test-rule"),
-			Type:       api.Counter,
+			Type:       api.AnalyticsRuleTypeCounter,
 			Collection: collectionName,
 			EventType:  "click",
 			Params: &api.AnalyticsRuleCreateParams{

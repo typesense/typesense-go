@@ -1,0 +1,5 @@
+package: api
+generate:
+  models: true
+compatibility:
+  always-prefix-enum-values: true
