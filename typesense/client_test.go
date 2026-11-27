@@ -267,26 +267,6 @@ func TestClientConfigOptions(t *testing.T) {
 			},
 		},
 		{
-			name: "WithNilConfig",
-			options: []ClientOption{
-				WithClientConfig(nil),
-			},
-			verify: func(t *testing.T, client *Client) {
-				assert.Equal(t, defaultRetryInterval, client.apiConfig.RetryInterval)
-				assert.Equal(t, defaultHealthcheckInterval, client.apiConfig.HealthcheckInterval)
-				assert.Equal(t, defaultConnectionTimeout, client.apiConfig.ConnectionTimeout)
-				assert.Equal(t, defaultCircuitBreakerName, client.apiConfig.CircuitBreakerName)
-				assert.Equal(t, circuit.DefaultGoBreakerMaxRequests, client.apiConfig.CircuitBreakerMaxRequests)
-				assert.Equal(t, circuit.DefaultGoBreakerInterval, client.apiConfig.CircuitBreakerInterval)
-				assert.Equal(t, circuit.DefaultGoBreakerTimeout, client.apiConfig.CircuitBreakerTimeout)
-				assert.Equal(t,
-					reflect.ValueOf(circuit.DefaultReadyToTrip).Pointer(),
-					reflect.ValueOf(client.apiConfig.CircuitBreakerReadyToTrip).Pointer(),
-					"readyToTrip is not valid")
-				assert.NotNil(t, client.apiClient)
-			},
-		},
-		{
 			name: "WithConfigZeroNumRetriesKeepsEarlierOption",
 			options: []ClientOption{
 				WithNumRetries(3),

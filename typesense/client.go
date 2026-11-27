@@ -377,9 +377,6 @@ func WithCircuitBreakerOnStateChange(onStateChange circuit.GoBreakerOnStateChang
 // To set a field to zero, pass its With* option after WithClientConfig.
 func WithClientConfig(config *ClientConfig) ClientOption {
 	return func(c *Client) {
-		if config == nil {
-			return
-		}
 		if config.ServerURL != "" {
 			c.apiConfig.ServerURL = config.ServerURL
 		}
