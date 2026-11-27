@@ -1,4 +1,3 @@
-//nolint:revive // package name is part of the public API surface.
 package api
 
 type ImportDocumentResponse struct {

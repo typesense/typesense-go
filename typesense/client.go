@@ -372,9 +372,9 @@ func WithCircuitBreakerOnStateChange(onStateChange circuit.GoBreakerOnStateChang
 	}
 }
 
-// WithClientConfig allows passing multiple configs at once.
-// Zero-value fields are ignored so NewClient defaults remain effective
-// when callers provide only a partial config.
+// WithClientConfig passes several options at once.
+// A field left at zero keeps the NewClient default, or the value an earlier option set.
+// To set a field to zero, pass its With* option after WithClientConfig.
 func WithClientConfig(config *ClientConfig) ClientOption {
 	return func(c *Client) {
 		if config == nil {
@@ -389,7 +389,7 @@ func WithClientConfig(config *ClientConfig) ClientOption {
 		if config.Nodes != nil {
 			c.apiConfig.Nodes = config.Nodes
 		}
-		if config.NumRetries >= 0 {
+		if config.NumRetries != 0 {
 			c.apiConfig.NumRetries = config.NumRetries
 		}
 		if config.RetryInterval > 0 {

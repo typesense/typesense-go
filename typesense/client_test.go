@@ -1,7 +1,9 @@
 package typesense
 
 import (
+	"context"
 	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"testing"
 	"time"
@@ -285,6 +287,20 @@ func TestClientConfigOptions(t *testing.T) {
 			},
 		},
 		{
+			name: "WithConfigZeroNumRetriesKeepsEarlierOption",
+			options: []ClientOption{
+				WithNumRetries(3),
+				WithClientConfig(&ClientConfig{
+					ServerURL:  "http://example.com",
+					APIKey:     "API_KEY_1",
+					NumRetries: 0,
+				}),
+			},
+			verify: func(t *testing.T, client *Client) {
+				assert.Equal(t, 3, client.apiConfig.NumRetries)
+			},
+		},
+		{
 			name: "WithCustomHTTPClient",
 			options: []ClientOption{
 				WithCustomHTTPClient(&http.Client{
@@ -304,4 +320,22 @@ func TestClientConfigOptions(t *testing.T) {
 			tt.verify(t, client)
 		})
 	}
+}
+
+func TestWithClientConfigUsesCustomHTTPClient(t *testing.T) {
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"ok":true}`))
+	}))
+	defer server.Close()
+
+	client := NewClient(WithClientConfig(&ClientConfig{
+		ServerURL:        server.URL,
+		APIKey:           "API_KEY_1",
+		CustomHTTPClient: server.Client(),
+	}))
+
+	healthy, err := client.Health(context.Background(), time.Second)
+	assert.NoError(t, err)
+	assert.True(t, healthy)
 }
