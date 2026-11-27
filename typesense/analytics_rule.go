@@ -25,7 +25,7 @@ type AnalyticsRuleInterface interface {
 	Retrieve(ctx context.Context) (*api.AnalyticsRule, error)
 	// Update an analytics rule.
 	//
-	// Merge ruleSchema into the stored rule with this name and return the merged rule. Fields that ruleSchema leaves nil keep their stored values. When no rule has this name, the server rejects the update with status 400 and Update returns *HTTPError. Use Rules().Upsert to create a rule.
+	// Merge ruleSchema into the stored rule with this name and return the merged rule. Fields that ruleSchema leaves nil keep their stored values. The server ignores ruleSchema.Name and keeps the name in the path. It also drops params that don't apply to the rule's type, such as Weight on a popular_queries rule. When no rule has this name, the server rejects the update with status 400 and Update returns *HTTPError. Use Rules().Upsert to create a rule.
 	//
 	// HTTP: PUT /analytics/rules/{ruleName}
 	//
@@ -78,7 +78,7 @@ func (a *analyticsRule) Retrieve(ctx context.Context) (*api.AnalyticsRule, error
 
 // Update an analytics rule.
 //
-// Merge ruleSchema into the stored rule with this name and return the merged rule. Fields that ruleSchema leaves nil keep their stored values. When no rule has this name, the server rejects the update with status 400 and Update returns *HTTPError. Use Rules().Upsert to create a rule.
+// Merge ruleSchema into the stored rule with this name and return the merged rule. Fields that ruleSchema leaves nil keep their stored values. The server ignores ruleSchema.Name and keeps the name in the path. It also drops params that don't apply to the rule's type, such as Weight on a popular_queries rule. When no rule has this name, the server rejects the update with status 400 and Update returns *HTTPError. Use Rules().Upsert to create a rule.
 //
 // HTTP: PUT /analytics/rules/{ruleName}
 //

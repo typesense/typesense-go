@@ -22,7 +22,7 @@ type AnalyticsRulesInterface interface {
 	Create(ctx context.Context, rule *api.AnalyticsRuleCreate) (*api.AnalyticsRule, error)
 	// Retrieve analytics rules.
 	//
-	// Retrieve all analytics rules, or only those tagged params.RuleTag when it is set. A nil params retrieves all rules.
+	// Retrieve all analytics rules, or only the ones tagged params.RuleTag. A nil params or an empty RuleTag retrieves all rules.
 	//
 	// HTTP: GET /analytics/rules
 	//
@@ -32,7 +32,7 @@ type AnalyticsRulesInterface interface {
 	Retrieve(ctx context.Context, params *api.RetrieveAnalyticsRulesParams) ([]*api.AnalyticsRule, error)
 	// Create analytics rules in one request.
 	//
-	// The server answers 200 even when some rules fail. Responses come back in request order, and a rejected rule has Error set. An empty rules slice sends no request.
+	// The server answers 200 even when some rules fail. Responses come back in request order, and a rejected rule has Error set. The server creates each rule on its own, and a rejected rule doesn't roll back the others. An empty rules slice sends no request.
 	//
 	// HTTP: POST /analytics/rules
 	//
@@ -95,7 +95,7 @@ func (a *analyticsRules) Create(ctx context.Context, rule *api.AnalyticsRuleCrea
 
 // Retrieve analytics rules.
 //
-// Retrieve all analytics rules, or only those tagged params.RuleTag when it is set. A nil params retrieves all rules.
+// Retrieve all analytics rules, or only the ones tagged params.RuleTag. A nil params or an empty RuleTag retrieves all rules.
 //
 // HTTP: GET /analytics/rules
 //
@@ -120,7 +120,7 @@ func (a *analyticsRules) Retrieve(ctx context.Context, params *api.RetrieveAnaly
 
 // Create analytics rules in one request.
 //
-// The server answers 200 even when some rules fail. Responses come back in request order, and a rejected rule has Error set. An empty rules slice sends no request.
+// The server answers 200 even when some rules fail. Responses come back in request order, and a rejected rule has Error set. The server creates each rule on its own, and a rejected rule doesn't roll back the others. An empty rules slice sends no request.
 //
 // HTTP: POST /analytics/rules
 //
