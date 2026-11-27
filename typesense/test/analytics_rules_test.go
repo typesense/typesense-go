@@ -63,7 +63,7 @@ func TestAnalyticsRules(t *testing.T) {
 		ruleTag := newUUIDName("homepage")
 		taggedRule := &api.AnalyticsRuleCreate{
 			Name:       newUUIDName("test-rule"),
-			Type:       api.Counter,
+			Type:       api.AnalyticsRuleTypeCounter,
 			Collection: collectionName,
 			EventType:  "click",
 			RuleTag:    pointer.String(ruleTag),
@@ -90,7 +90,7 @@ func TestAnalyticsRules(t *testing.T) {
 		collectionName := createNewCollection(t, "analytics-rules-collection")
 		newRule := &api.AnalyticsRuleCreate{
 			Name:       newUUIDName("test-rule"),
-			Type:       api.Counter,
+			Type:       api.AnalyticsRuleTypeCounter,
 			Collection: collectionName,
 			EventType:  "click",
 			Params: &api.AnalyticsRuleCreateParams{
@@ -113,7 +113,7 @@ func TestAnalyticsRules(t *testing.T) {
 		ruleName := newUUIDName("test-rule")
 		rule := &api.AnalyticsRuleCreate{
 			Name:       ruleName,
-			Type:       api.Counter,
+			Type:       api.AnalyticsRuleTypeCounter,
 			Collection: collectionName,
 			EventType:  "click",
 			Params: &api.AnalyticsRuleCreateParams{

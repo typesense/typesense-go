@@ -25,7 +25,7 @@ func TestMultiSearch(t *testing.T) {
 		newDocument("131", withCompanyName("Stark Industries 5"), withNumEmployees(1000)),
 	}
 
-	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create)}
+	params := &api.ImportDocumentsParams{Action: pointer.Any(api.IndexActionCreate)}
 	_, err := typesenseClient.Collection(collectionName1).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
@@ -97,7 +97,7 @@ func TestMultiSearchGroupBy(t *testing.T) {
 		newDocument("3", withCompanyName("Company 4"), withNumEmployees(500), withCountry("England")),
 	}
 
-	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create)}
+	params := &api.ImportDocumentsParams{Action: pointer.Any(api.IndexActionCreate)}
 	_, err := typesenseClient.Collection(collectionName1).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
@@ -209,7 +209,7 @@ func TestMultiSearchWithPreset(t *testing.T) {
 		newDocument("131", withCompanyName("Stark Industries 5"), withNumEmployees(1000)),
 	}
 
-	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create)}
+	params := &api.ImportDocumentsParams{Action: pointer.Any(api.IndexActionCreate)}
 	_, err := typesenseClient.Collection(collectionName1).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
@@ -290,7 +290,7 @@ func TestMultiSearchWithStopwords(t *testing.T) {
 		newDocument("129", withCompanyName("Stark Industries 4"), withNumEmployees(1500)),
 	}
 
-	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create)}
+	params := &api.ImportDocumentsParams{Action: pointer.Any(api.IndexActionCreate)}
 	_, err := typesenseClient.Collection(collectionName1).Documents().Import(context.Background(), documents, params)
 	require.NoError(t, err)
 
@@ -362,7 +362,7 @@ func TestMultiSearchPerformUnion(t *testing.T) {
 		newDocument("129", withCompanyName("Wayne Enterprises 2"), withNumEmployees(500)),
 	}
 
-	params := &api.ImportDocumentsParams{Action: pointer.Any(api.Create)}
+	params := &api.ImportDocumentsParams{Action: pointer.Any(api.IndexActionCreate)}
 
 	_, err := typesenseClient.Collection(collectionName1).Documents().Import(context.Background(), documents1, params)
 	require.NoError(t, err)

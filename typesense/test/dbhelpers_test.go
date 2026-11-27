@@ -306,7 +306,7 @@ func newCurationSetCreateSchema() *api.CurationSetCreateSchema {
 				Id: pointer.String("dummy"),
 				Rule: api.CurationRule{
 					Query: pointer.String("apple"),
-					Match: pointer.Any(api.Exact),
+					Match: pointer.Any(api.CurationRuleMatchExact),
 				},
 				Includes: &[]api.CurationInclude{
 					{
@@ -338,7 +338,7 @@ func newCurationSetSchema(curationSetName string) *api.CurationSetSchema {
 				Id: pointer.String("dummy"),
 				Rule: api.CurationRule{
 					Query: pointer.String("apple"),
-					Match: pointer.Any(api.Exact),
+					Match: pointer.Any(api.CurationRuleMatchExact),
 				},
 				Includes: &[]api.CurationInclude{
 					{
@@ -450,7 +450,7 @@ func newPresetFromMultiSearchSearchesParameter(presetName string) *api.PresetSch
 func newAnalyticsRule(ruleName string, collectionName string, sourceCollectionName string, eventName string) *api.AnalyticsRule {
 	return &api.AnalyticsRule{
 		Name:       ruleName,
-		Type:       api.Counter,
+		Type:       api.AnalyticsRuleTypeCounter,
 		Collection: collectionName,
 		EventType:  "click",
 		Params: &api.AnalyticsRuleCreateParams{
@@ -467,7 +467,7 @@ func createNewAnalyticsRule(t *testing.T, collectionName string, sourceCollectio
 	// Create the rule using the new API
 	ruleCreate := &api.AnalyticsRuleCreate{
 		Name:       ruleName,
-		Type:       api.Counter,
+		Type:       api.AnalyticsRuleTypeCounter,
 		Collection: collectionName,
 		EventType:  "click",
 		Params: &api.AnalyticsRuleCreateParams{

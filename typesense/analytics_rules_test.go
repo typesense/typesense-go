@@ -16,7 +16,7 @@ func TestAnalyticsRulesRetrieve(t *testing.T) {
 	expectedData := []*api.AnalyticsRule{
 		{
 			Name:       "test_rule_1",
-			Type:       api.Counter,
+			Type:       api.AnalyticsRuleTypeCounter,
 			Collection: "test_collection",
 			EventType:  "click",
 			Params: &api.AnalyticsRuleCreateParams{
@@ -55,7 +55,7 @@ func TestAnalyticsRulesRetrieveSendsRuleTag(t *testing.T) {
 	expectedData := []*api.AnalyticsRule{
 		{
 			Name:       "test_rule_1",
-			Type:       api.Counter,
+			Type:       api.AnalyticsRuleTypeCounter,
 			Collection: "test_collection",
 			EventType:  "click",
 			RuleTag:    pointer.String("homepage"),
@@ -91,7 +91,7 @@ func TestAnalyticsRulesRetrieveWithNilParamsSendsNoQuery(t *testing.T) {
 func TestAnalyticsRulesCreate(t *testing.T) {
 	createData := &api.AnalyticsRuleCreate{
 		Name:       "test_rule",
-		Type:       api.Counter,
+		Type:       api.AnalyticsRuleTypeCounter,
 		Collection: "test_collection",
 		EventType:  "click",
 		Params: &api.AnalyticsRuleCreateParams{
@@ -144,7 +144,7 @@ func TestAnalyticsRulesCreateOnRejectedRuleReturnsHTTPError(t *testing.T) {
 func TestAnalyticsRulesCreateMany(t *testing.T) {
 	newRule := &api.AnalyticsRuleCreate{
 		Name:       "test_rule",
-		Type:       api.Counter,
+		Type:       api.AnalyticsRuleTypeCounter,
 		Collection: "test_collection",
 		EventType:  "click",
 		Params: &api.AnalyticsRuleCreateParams{
@@ -152,7 +152,7 @@ func TestAnalyticsRulesCreateMany(t *testing.T) {
 			Weight:       pointer.Int(10),
 		},
 	}
-	existingRule := &api.AnalyticsRuleCreate{Name: "existing_rule", Type: api.Counter, Collection: "test_collection", EventType: "click"}
+	existingRule := &api.AnalyticsRuleCreate{Name: "existing_rule", Type: api.AnalyticsRuleTypeCounter, Collection: "test_collection", EventType: "click"}
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/analytics/rules", http.MethodPost)
@@ -222,7 +222,7 @@ func TestAnalyticsRulesCreateManyOnObjectResponseReturnsError(t *testing.T) {
 func TestAnalyticsRulesUpsert(t *testing.T) {
 	upsertData := &api.AnalyticsRuleCreate{
 		Name:       "test_rule",
-		Type:       api.Counter,
+		Type:       api.AnalyticsRuleTypeCounter,
 		Collection: "test_collection",
 		EventType:  "click",
 		Params: &api.AnalyticsRuleCreateParams{
@@ -264,7 +264,7 @@ func TestAnalyticsRulesUpsertOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	})
 	defer server.Close()
 
-	_, err := client.Analytics().Rules().Upsert(context.Background(), "test_rule", &api.AnalyticsRuleCreate{Type: api.Log})
+	_, err := client.Analytics().Rules().Upsert(context.Background(), "test_rule", &api.AnalyticsRuleCreate{Type: api.AnalyticsRuleTypeLog})
 	var httpErr *HTTPError
 	assert.ErrorAs(t, err, &httpErr)
 	assert.Equal(t, http.StatusBadRequest, httpErr.Status)

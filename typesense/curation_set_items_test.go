@@ -12,7 +12,7 @@ import (
 	"github.com/typesense/typesense-go/v4/typesense/api/pointer"
 )
 
-var appleRule = api.CurationRule{Query: pointer.String("apple"), Match: pointer.Any(api.Exact)}
+var appleRule = api.CurationRule{Query: pointer.String("apple"), Match: pointer.Any(api.CurationRuleMatchExact)}
 
 func TestCurationSetItemsRetrieve(t *testing.T) {
 	expectedData := []api.CurationItemSchema{
