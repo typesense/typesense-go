@@ -14,7 +14,7 @@ import (
 
 func analyticsEventsCleanUp() {
 	// Clean up analytics rules
-	result, _ := typesenseClient.Analytics().Rules().Retrieve(context.Background())
+	result, _ := typesenseClient.Analytics().Rules().Retrieve(context.Background(), nil)
 	for _, rule := range result {
 		typesenseClient.Analytics().Rule(rule.Name).Delete(context.Background())
 	}

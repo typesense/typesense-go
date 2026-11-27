@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/typesense/typesense-go/v4/typesense/api"
 	"github.com/typesense/typesense-go/v4/typesense/api/pointer"
 )
@@ -34,7 +35,7 @@ func TestAnalyticsRulesRetrieve(t *testing.T) {
 	})
 	defer server.Close()
 
-	res, err := client.Analytics().Rules().Retrieve(context.Background())
+	res, err := client.Analytics().Rules().Retrieve(context.Background(), nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedData, res)
 }
@@ -46,11 +47,11 @@ func TestAnalyticsRulesRetrieveOnHttpStatusErrorCodeReturnsError(t *testing.T) {
 	})
 	defer server.Close()
 
-	_, err := client.Analytics().Rules().Retrieve(context.Background())
+	_, err := client.Analytics().Rules().Retrieve(context.Background(), nil)
 	assert.ErrorContains(t, err, "status: 409")
 }
 
-func TestAnalyticsRulesRetrieveWithParams(t *testing.T) {
+func TestAnalyticsRulesRetrieveSendsRuleTag(t *testing.T) {
 	expectedData := []*api.AnalyticsRule{
 		{
 			Name:       "test_rule_1",
@@ -68,7 +69,7 @@ func TestAnalyticsRulesRetrieveWithParams(t *testing.T) {
 	})
 	defer server.Close()
 
-	res, err := client.Analytics().Rules().RetrieveWithParams(context.Background(), &api.RetrieveAnalyticsRulesParams{RuleTag: pointer.String("homepage")})
+	res, err := client.Analytics().Rules().Retrieve(context.Background(), &api.RetrieveAnalyticsRulesParams{RuleTag: pointer.String("homepage")})
 	assert.NoError(t, err)
 	assert.Equal(t, expectedData, res)
 }
@@ -82,62 +83,39 @@ func TestAnalyticsRulesRetrieveWithNilParamsSendsNoQuery(t *testing.T) {
 	})
 	defer server.Close()
 
-	res, err := client.Analytics().Rules().RetrieveWithParams(context.Background(), nil)
+	res, err := client.Analytics().Rules().Retrieve(context.Background(), nil)
 	assert.NoError(t, err)
 	assert.Empty(t, res)
 }
 
-func TestAnalyticsRulesRetrieveWithParamsOnHttpStatusErrorCodeReturnsError(t *testing.T) {
-	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
-		validateRequestMetadata(t, r, "/analytics/rules", http.MethodGet)
-		w.WriteHeader(http.StatusConflict)
-	})
-	defer server.Close()
-
-	_, err := client.Analytics().Rules().RetrieveWithParams(context.Background(), nil)
-	assert.ErrorContains(t, err, "status: 409")
-}
-
 func TestAnalyticsRulesCreate(t *testing.T) {
-	createData := []*api.AnalyticsRuleCreate{
-		{
-			Name:       "test_rule",
-			Type:       api.Counter,
-			Collection: "test_collection",
-			EventType:  "click",
-			Params: &api.AnalyticsRuleCreateParams{
-				CounterField: pointer.String("popularity"),
-				Weight:       pointer.Int(10),
-			},
+	createData := &api.AnalyticsRuleCreate{
+		Name:       "test_rule",
+		Type:       api.Counter,
+		Collection: "test_collection",
+		EventType:  "click",
+		Params: &api.AnalyticsRuleCreateParams{
+			CounterField: pointer.String("popularity"),
+			Weight:       pointer.Int(10),
 		},
 	}
-
-	expectedData := []*api.AnalyticsRule{
-		{
-			Name:       "test_rule",
-			Type:       api.Counter,
-			Collection: "test_collection",
-			EventType:  "click",
-			Params: &api.AnalyticsRuleCreateParams{
-				CounterField: pointer.String("popularity"),
-				Weight:       pointer.Int(10),
-			},
-		},
+	expectedData := &api.AnalyticsRule{
+		Name:       createData.Name,
+		Type:       createData.Type,
+		Collection: createData.Collection,
+		EventType:  createData.EventType,
+		Params:     createData.Params,
 	}
 
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/analytics/rules", http.MethodPost)
 
-		var reqBody []api.AnalyticsRuleCreate
-		err := json.NewDecoder(r.Body).Decode(&reqBody)
-		assert.NoError(t, err)
-		assert.Equal(t, len(createData), len(reqBody))
-		assert.Equal(t, createData[0].Name, reqBody[0].Name)
-
-		data := jsonEncode(t, expectedData)
+		var reqBody api.AnalyticsRuleCreate
+		assert.NoError(t, json.NewDecoder(r.Body).Decode(&reqBody))
+		assert.Equal(t, *createData, reqBody)
 
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(data)
+		w.Write([]byte(`{"name": "test_rule", "type": "counter", "collection": "test_collection", "event_type": "click", "params": {"counter_field": "popularity", "weight": 10}}`))
 	})
 	defer server.Close()
 
@@ -146,15 +124,21 @@ func TestAnalyticsRulesCreate(t *testing.T) {
 	assert.Equal(t, expectedData, res)
 }
 
-func TestAnalyticsRulesCreateOnHttpStatusErrorCodeReturnsError(t *testing.T) {
+func TestAnalyticsRulesCreateOnRejectedRuleReturnsHTTPError(t *testing.T) {
 	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
 		validateRequestMetadata(t, r, "/analytics/rules", http.MethodPost)
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"message": "Rule already exists"}`))
 	})
 	defer server.Close()
 
-	_, err := client.Analytics().Rules().Create(context.Background(), []*api.AnalyticsRuleCreate{})
-	assert.ErrorContains(t, err, "status: 400")
+	res, err := client.Analytics().Rules().Create(context.Background(), &api.AnalyticsRuleCreate{Name: "test_rule"})
+	assert.Nil(t, res)
+	var httpErr *HTTPError
+	require.ErrorAs(t, err, &httpErr)
+	assert.Equal(t, http.StatusBadRequest, httpErr.Status)
+	assert.JSONEq(t, `{"message": "Rule already exists"}`, string(httpErr.Body))
 }
 
 func TestAnalyticsRulesCreateMany(t *testing.T) {
@@ -206,8 +190,21 @@ func TestAnalyticsRulesCreateManyOnHttpStatusErrorCodeReturnsError(t *testing.T)
 	})
 	defer server.Close()
 
-	_, err := client.Analytics().Rules().CreateMany(context.Background(), []*api.AnalyticsRuleCreate{})
+	_, err := client.Analytics().Rules().CreateMany(context.Background(), []*api.AnalyticsRuleCreate{{Name: "test_rule"}})
 	assert.ErrorContains(t, err, "status: 400")
+}
+
+func TestAnalyticsRulesCreateManyWithNoRulesSendsNoRequest(t *testing.T) {
+	server, client := newTestServerAndClient(func(w http.ResponseWriter, r *http.Request) {
+		t.Errorf("unexpected request: %s %s", r.Method, r.URL)
+	})
+	defer server.Close()
+
+	for _, rules := range [][]*api.AnalyticsRuleCreate{nil, {}} {
+		res, err := client.Analytics().Rules().CreateMany(context.Background(), rules)
+		assert.NoError(t, err)
+		assert.Empty(t, res)
+	}
 }
 
 func TestAnalyticsRulesCreateManyOnObjectResponseReturnsError(t *testing.T) {
