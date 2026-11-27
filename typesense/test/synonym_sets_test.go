@@ -76,4 +76,4 @@ func TestSynonymSets(t *testing.T) {
 		require.Equal(t, "dummy", foundSynonymSet.Items[0].Id)
 		require.Equal(t, []string{"foo", "bar", "baz"}, foundSynonymSet.Items[0].Synonyms)
 	})
-} 
+}
