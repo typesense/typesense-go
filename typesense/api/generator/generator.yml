@@ -650,6 +650,8 @@ components:
           type: array
         field_name:
           type: string
+        sampled:
+          type: boolean
         stats:
           $ref: '#/components/schemas/FacetCountsStats'
       type: object
@@ -813,11 +815,6 @@ components:
               description: |
                 The collection to search in.
               type: string
-            rerank_hybrid_matches:
-              default: false
-              description: |
-                When true, computes both text match and vector distance scores for all matches in hybrid search. Documents found only through keyword search will get a vector distance score, and documents found only through vector search will get a text match score.
-              type: boolean
             x-typesense-api-key:
               description: A separate search API key for each search within a multi_search request
               type: string
@@ -842,6 +839,13 @@ components:
           description: |
             The Id of Conversation Model to be used.
           type: string
+        curation_tags:
+          description: Comma separated list of tags to trigger the curations rules that match the tags.
+          type: string
+        demote_synonym_match:
+          description: |
+            When set to true, search results that matched via synonyms will be demoted in ranking, appearing below results that have a direct match. Default: false
+          type: boolean
         drop_tokens_mode:
           $ref: '#/components/schemas/DropTokensMode'
         drop_tokens_threshold:
@@ -853,10 +857,14 @@ components:
           description: |
             Flag for enabling/disabling analytics aggregation for specific search queries (for e.g. those originating from a test script).
           type: boolean
-        enable_overrides:
+        enable_curations:
           default: false
           description: |
-            If you have some overrides defined but want to disable all of them during query time, you can do that by setting this parameter to false
+            If you have some curation sets defined but want to disable all of them during query time, you can do that by setting this parameter to false
+          type: boolean
+        enable_lazy_filter:
+          description: |
+            Applies the filtering operation incrementally / lazily. Set this to true when you are potentially filtering on large values but the tokens in the query are expected to match very few documents. Default: false
           type: boolean
         enable_synonyms:
           description: |
@@ -884,10 +892,26 @@ components:
         facet_query:
           description: Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
           type: string
+        facet_query_num_typos:
+          description: |
+            Controls the fuzziness of the facet query filter. Default: 2.
+          type: integer
         facet_return_parent:
           description: |
             Comma separated string of nested facet fields whose parent object should be returned in facet response.
           type: string
+        facet_sample_percent:
+          description: |
+            Percentage of hits that will be used to estimate facet counts. Default: 100.
+          type: integer
+        facet_sample_slope:
+          description: |
+            Controls how steeply facet_sample_percent falls as the collection grows. facet_sample_threshold should be non-zero for facet_sample_slope to be effective. Default: 0.
+          type: number
+        facet_sample_threshold:
+          description: |
+            Minimum number of hits above which the facet counts are sampled. Default: 0.
+          type: integer
         facet_strategy:
           description: |
             Choose the underlying faceting strategy used. Comma separated string of allows values: exhaustive, top_values or automatic (default).
@@ -898,7 +922,7 @@ components:
           type: string
         filter_curated_hits:
           description: |
-            Whether the filter_by condition of the search query should be applicable to curated results (override definitions, pinned hits, hidden hits, etc.). Default: false
+            Whether the filter_by condition of the search query should be applicable to curated results (curation definitions, pinned hits, hidden hits, etc.). Default: false
           type: boolean
         group_by:
           description: You can aggregate search results into groups or buckets by specify one or more `group_by` fields. Separate multiple fields with a comma. To group on a particular field, it must be a faceted field.
@@ -907,6 +931,10 @@ components:
           description: |
             Maximum number of hits to be returned for every group. If the `group_limit` is set as `K` then only the top K hits in each group are returned in the response. Default: 3
           type: integer
+        group_max_candidates:
+          description: |
+            Overrides the behavior of group_by queries where found value is an approximation. When group_max_candidates is passed, found will be accurate up until its value.
+          type: integer
         group_missing_values:
           description: |
             Setting this parameter to true will place all documents that have a null value in the group_by field, into a single group. Setting this parameter to false, will cause each document with a null value in the group_by field to not be grouped with other documents. Default: true
@@ -914,7 +942,7 @@ components:
         hidden_hits:
           description: |
             A list of records to unconditionally hide from search results. A list of `record_id`s to hide. Eg: to hide records with IDs 123 and 456, you'd specify `123,456`.
-            You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
+            You could also use the Curation feature to override search results based on rules. Curations are applied first, followed by `pinned_hits` and finally `hidden_hits`.
           type: string
         highlight_affix_num_tokens:
           description: |
@@ -945,6 +973,10 @@ components:
           description: |
             Number of hits to fetch. Can be used as an alternative to the per_page parameter. Default: 10.
           type: integer
+        limit_hits:
+          description: |
+            Maximum number of hits that can be fetched from the collection. page * per_page should be less than this number for the search request to return results.
+          type: integer
         max_extra_prefix:
           description: There are also 2 parameters that allow you to control the extent of infix searching max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before or after the query that can be present in the token. For example query "K2100" has 2 extra symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
           type: integer
@@ -953,6 +985,9 @@ components:
           type: integer
         max_facet_values:
           description: Maximum number of facet values to be returned.
+          type: integer
+        max_filter_by_candidates:
+          description: Controls the number of similar words that Typesense considers during fuzzy search on filter_by values. Useful for controlling prefix matches like company_name:Acm*.
           type: integer
         min_len_1typo:
           description: |
@@ -969,9 +1004,6 @@ components:
         offset:
           description: Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
           type: integer
-        override_tags:
-          description: Comma separated list of tags to trigger the curations rules that match the tags.
-          type: string
         page:
           description: Results from this specific page number would be fetched.
           type: integer
@@ -981,7 +1013,7 @@ components:
         pinned_hits:
           description: |
             A list of records to unconditionally include in the search results at specific positions. An example use case would be to feature or promote certain items on the top of search results. A list of `record_id:hit_position`. Eg: to include a record with ID 123 at Position 1 and another record with ID 456 at Position 5, you'd specify `123:1,456:5`.
-            You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
+            You could also use the Curation feature to override search results based on rules. Curations are applied first, followed by `pinned_hits` and finally `hidden_hits`.
           type: string
         pre_segmented_query:
           default: false
@@ -1028,6 +1060,11 @@ components:
           description: |
             Timeout (in milliseconds) for fetching remote embeddings.
           type: integer
+        rerank_hybrid_matches:
+          default: false
+          description: |
+            When true, computes both text match and vector distance scores for all matches in hybrid search. Documents found only through keyword search will get a vector distance score, and documents found only through vector search will get a text match score.
+          type: boolean
         search_cutoff_ms:
           description: |
             Typesense will attempt to return results early if the cutoff time has elapsed. This is not a strict guarantee and facet computation is not bound by this parameter.
@@ -1062,6 +1099,10 @@ components:
           description: |
             Enable server side caching of search query results. By default, caching is disabled.
           type: boolean
+        validate_field_names:
+          description: |
+            Controls whether Typesense should validate if the fields exist in the schema. When set to false, Typesense will not throw an error if a field is missing. This is useful for programmatic grouping where not all fields may exist.
+          type: boolean
         vector_query:
           description: |
             Vector query expression for fetching documents "closest" to a given query/document vector.
@@ -1075,10 +1116,6 @@ components:
       properties:
         conversation:
           $ref: '#/components/schemas/SearchResultConversation'
-        hits:
-          items:
-            $ref: '#/components/schemas/SearchResultHit'
-          type: array
         results:
           items:
             $ref: '#/components/schemas/MultiSearchResultItem'
@@ -1319,6 +1356,13 @@ components:
           description: |
             The Id of Conversation Model to be used.
           type: string
+        curation_tags:
+          description: Comma separated list of tags to trigger the curations rules that match the tags.
+          type: string
+        demote_synonym_match:
+          description: |
+            When set to true, search results that matched via synonyms will be demoted in ranking, appearing below results that have a direct match. Default: false
+          type: boolean
         drop_tokens_mode:
           $ref: '#/components/schemas/DropTokensMode'
         drop_tokens_threshold:
@@ -1330,15 +1374,19 @@ components:
           description: |
             Flag for enabling/disabling analytics aggregation for specific search queries (for e.g. those originating from a test script).
           type: boolean
+        enable_curations:
+          default: false
+          description: |
+            If you have some curation sets defined but want to disable all of them during query time, you can do that by setting this parameter to false
+          type: boolean
         enable_highlight_v1:
           default: true
           description: |
             Flag for enabling/disabling the deprecated, old highlight structure in the response. Default: true
           type: boolean
-        enable_overrides:
-          default: false
+        enable_lazy_filter:
           description: |
-            If you have some overrides defined but want to disable all of them during query time, you can do that by setting this parameter to false
+            Applies the filtering operation incrementally / lazily. Set this to true when you are potentially filtering on large values but the tokens in the query are expected to match very few documents. Default: false
           type: boolean
         enable_synonyms:
           description: |
@@ -1366,10 +1414,26 @@ components:
         facet_query:
           description: Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
           type: string
+        facet_query_num_typos:
+          description: |
+            Controls the fuzziness of the facet query filter. Default: 2.
+          type: integer
         facet_return_parent:
           description: |
             Comma separated string of nested facet fields whose parent object should be returned in facet response.
           type: string
+        facet_sample_percent:
+          description: |
+            Percentage of hits that will be used to estimate facet counts. Default: 100.
+          type: integer
+        facet_sample_slope:
+          description: |
+            Controls how steeply facet_sample_percent falls as the collection grows. facet_sample_threshold should be non-zero for facet_sample_slope to be effective. Default: 0.
+          type: number
+        facet_sample_threshold:
+          description: |
+            Minimum number of hits above which the facet counts are sampled. Default: 0.
+          type: integer
         facet_strategy:
           description: |
             Choose the underlying faceting strategy used. Comma separated string of allows values: exhaustive, top_values or automatic (default).
@@ -1380,7 +1444,7 @@ components:
           type: string
         filter_curated_hits:
           description: |
-            Whether the filter_by condition of the search query should be applicable to curated results (override definitions, pinned hits, hidden hits, etc.). Default: false
+            Whether the filter_by condition of the search query should be applicable to curated results (curation definitions, pinned hits, hidden hits, etc.). Default: false
           type: boolean
         group_by:
           description: You can aggregate search results into groups or buckets by specify one or more `group_by` fields. Separate multiple fields with a comma. To group on a particular field, it must be a faceted field.
@@ -1389,6 +1453,10 @@ components:
           description: |
             Maximum number of hits to be returned for every group. If the `group_limit` is set as `K` then only the top K hits in each group are returned in the response. Default: 3
           type: integer
+        group_max_candidates:
+          description: |
+            Overrides the behavior of group_by queries where found value is an approximation. When group_max_candidates is passed, found will be accurate up until its value.
+          type: integer
         group_missing_values:
           description: |
             Setting this parameter to true will place all documents that have a null value in the group_by field, into a single group. Setting this parameter to false, will cause each document with a null value in the group_by field to not be grouped with other documents. Default: true
@@ -1396,7 +1464,7 @@ components:
         hidden_hits:
           description: |
             A list of records to unconditionally hide from search results. A list of `record_id`s to hide. Eg: to hide records with IDs 123 and 456, you'd specify `123,456`.
-            You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
+            You could also use the Curation feature to override search results based on rules. Curations are applied first, followed by `pinned_hits` and finally `hidden_hits`.
           type: string
         highlight_affix_num_tokens:
           description: |
@@ -1426,6 +1494,10 @@ components:
         limit:
           description: |
             Number of hits to fetch. Can be used as an alternative to the per_page parameter. Default: 10.
+          type: integer
+        limit_hits:
+          description: |
+            Maximum number of hits that can be fetched from the collection. page * per_page should be less than this number for the search request to return results.
           type: integer
         max_candidates:
           description: |
@@ -1464,9 +1536,6 @@ components:
         offset:
           description: Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
           type: integer
-        override_tags:
-          description: Comma separated list of tags to trigger the curations rules that match the tags.
-          type: string
         page:
           description: Results from this specific page number would be fetched.
           type: integer
@@ -1476,7 +1545,7 @@ components:
         pinned_hits:
           description: |
             A list of records to unconditionally include in the search results at specific positions. An example use case would be to feature or promote certain items on the top of search results. A list of `record_id:hit_position`. Eg: to include a record with ID 123 at Position 1 and another record with ID 456 at Position 5, you'd specify `123:1,456:5`.
-            You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
+            You could also use the Curation feature to override search results based on rules. Curations are applied first, followed by `pinned_hits` and finally `hidden_hits`.
           type: string
         pre_segmented_query:
           description: |
@@ -1522,6 +1591,11 @@ components:
           description: |
             Timeout (in milliseconds) for fetching remote embeddings.
           type: integer
+        rerank_hybrid_matches:
+          default: false
+          description: |
+            When true, computes both text match and vector distance scores for all matches in hybrid search. Documents found only through keyword search will get a vector distance score, and documents found only through vector search will get a text match score.
+          type: boolean
         search_cutoff_ms:
           description: |
             Typesense will attempt to return results early if the cutoff time has elapsed. This is not a strict guarantee and facet computation is not bound by this parameter.
@@ -1565,6 +1639,10 @@ components:
           description: |
             Enable server side caching of search query results. By default, caching is disabled.
           type: boolean
+        validate_field_names:
+          description: |
+            Controls whether Typesense should validate if the fields exist in the schema. When set to false, Typesense will not throw an error if a field is missing. This is useful for programmatic grouping where not all fields may exist.
+          type: boolean
         vector_query:
           description: |
             Vector query expression for fetching documents "closest" to a given query/document vector.
@@ -1577,6 +1655,8 @@ components:
     SearchRequestParams:
       properties:
         collection_name:
+          type: string
+        first_q:
           type: string
         per_page:
           type: integer
@@ -2863,6 +2943,14 @@ paths:
           schema:
             type: string
         - in: query
+          name: curation_tags
+          schema:
+            type: string
+        - in: query
+          name: demote_synonym_match
+          schema:
+            type: boolean
+        - in: query
           name: drop_tokens_mode
           schema:
             $ref: '#/components/schemas/DropTokensMode'
@@ -2875,11 +2963,15 @@ paths:
           schema:
             type: boolean
         - in: query
+          name: enable_curations
+          schema:
+            type: boolean
+        - in: query
           name: enable_highlight_v1
           schema:
             type: boolean
         - in: query
-          name: enable_overrides
+          name: enable_lazy_filter
           schema:
             type: boolean
         - in: query
@@ -2911,9 +3003,25 @@ paths:
           schema:
             type: string
         - in: query
+          name: facet_query_num_typos
+          schema:
+            type: integer
+        - in: query
           name: facet_return_parent
           schema:
             type: string
+        - in: query
+          name: facet_sample_percent
+          schema:
+            type: integer
+        - in: query
+          name: facet_sample_slope
+          schema:
+            type: number
+        - in: query
+          name: facet_sample_threshold
+          schema:
+            type: integer
         - in: query
           name: facet_strategy
           schema:
@@ -2932,6 +3040,10 @@ paths:
             type: string
         - in: query
           name: group_limit
+          schema:
+            type: integer
+        - in: query
+          name: group_max_candidates
           schema:
             type: integer
         - in: query
@@ -2972,6 +3084,10 @@ paths:
             type: string
         - in: query
           name: limit
+          schema:
+            type: integer
+        - in: query
+          name: limit_hits
           schema:
             type: integer
         - in: query
@@ -3018,10 +3134,6 @@ paths:
           name: offset
           schema:
             type: integer
-        - in: query
-          name: override_tags
-          schema:
-            type: string
         - in: query
           name: page
           schema:
@@ -3079,6 +3191,10 @@ paths:
           schema:
             type: integer
         - in: query
+          name: rerank_hybrid_matches
+          schema:
+            type: boolean
+        - in: query
           name: search_cutoff_ms
           schema:
             type: integer
@@ -3120,6 +3236,10 @@ paths:
             type: integer
         - in: query
           name: use_cache
+          schema:
+            type: boolean
+        - in: query
+          name: validate_field_names
           schema:
             type: boolean
         - in: query
@@ -3693,6 +3813,14 @@ paths:
           schema:
             type: string
         - in: query
+          name: curation_tags
+          schema:
+            type: string
+        - in: query
+          name: demote_synonym_match
+          schema:
+            type: boolean
+        - in: query
           name: drop_tokens_mode
           schema:
             $ref: '#/components/schemas/DropTokensMode'
@@ -3705,11 +3833,15 @@ paths:
           schema:
             type: boolean
         - in: query
+          name: enable_curations
+          schema:
+            type: boolean
+        - in: query
           name: enable_highlight_v1
           schema:
             type: boolean
         - in: query
-          name: enable_overrides
+          name: enable_lazy_filter
           schema:
             type: boolean
         - in: query
@@ -3741,9 +3873,25 @@ paths:
           schema:
             type: string
         - in: query
+          name: facet_query_num_typos
+          schema:
+            type: integer
+        - in: query
           name: facet_return_parent
           schema:
             type: string
+        - in: query
+          name: facet_sample_percent
+          schema:
+            type: integer
+        - in: query
+          name: facet_sample_slope
+          schema:
+            type: number
+        - in: query
+          name: facet_sample_threshold
+          schema:
+            type: integer
         - in: query
           name: facet_strategy
           schema:
@@ -3762,6 +3910,10 @@ paths:
             type: string
         - in: query
           name: group_limit
+          schema:
+            type: integer
+        - in: query
+          name: group_max_candidates
           schema:
             type: integer
         - in: query
@@ -3802,6 +3954,10 @@ paths:
             type: string
         - in: query
           name: limit
+          schema:
+            type: integer
+        - in: query
+          name: limit_hits
           schema:
             type: integer
         - in: query
@@ -3848,10 +4004,6 @@ paths:
           name: offset
           schema:
             type: integer
-        - in: query
-          name: override_tags
-          schema:
-            type: string
         - in: query
           name: page
           schema:
@@ -3909,6 +4061,10 @@ paths:
           schema:
             type: integer
         - in: query
+          name: rerank_hybrid_matches
+          schema:
+            type: boolean
+        - in: query
           name: search_cutoff_ms
           schema:
             type: integer
@@ -3950,6 +4106,10 @@ paths:
             type: integer
         - in: query
           name: use_cache
+          schema:
+            type: boolean
+        - in: query
+          name: validate_field_names
           schema:
             type: boolean
         - in: query

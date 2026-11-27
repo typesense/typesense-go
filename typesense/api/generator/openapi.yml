@@ -2723,7 +2723,7 @@ components:
           items:
             $ref: "#/components/schemas/SearchResultHit"
         request_params:
-            $ref: "#/components/schemas/SearchRequestParams"
+          $ref: "#/components/schemas/SearchRequestParams"
         conversation:
           $ref: "#/components/schemas/SearchResultConversation"
         union_request_params:
@@ -2743,6 +2743,8 @@ components:
         - per_page
       properties:
         collection_name:
+          type: string
+        first_q:
           type: string
         q:
           type: string
@@ -3046,10 +3048,6 @@ components:
             $ref: "#/components/schemas/MultiSearchResultItem"
         conversation:
           $ref: "#/components/schemas/SearchResultConversation"
-        hits:
-          items:
-            $ref: '#/components/schemas/SearchResultHit'
-          type: array
     MultiSearchResultItem:
       allOf:
       - $ref: "#/components/schemas/SearchResult"
@@ -3075,6 +3073,13 @@ components:
           description: A list of `string` fields that should be queried
             against. Multiple fields are separated with a comma.
           type: string
+
+        validate_field_names:
+          description: >
+            Controls whether Typesense should validate if the fields exist in the schema.
+            When set to false, Typesense will not throw an error if a field is missing.
+            This is useful for programmatic grouping where not all fields may exist.
+          type: boolean
 
         nl_query:
           description: Whether to use natural language processing to parse the query.
@@ -3136,6 +3141,14 @@ components:
           type: string
           example: "num_employees:>100 && country: [USA, UK]"
 
+        enable_lazy_filter:
+          description: >
+            Applies the filtering operation incrementally / lazily.
+            Set this to true when you are potentially filtering on large values
+            but the tokens in the query are expected to match very few documents.
+            Default: false
+          type: boolean
+
         max_filter_by_candidates:
           description:
             Controls the number of similar words that Typesense considers during fuzzy search
@@ -3171,6 +3184,11 @@ components:
             by `category`, you can set `facet_query=category:shoe` to return only
             facet values that contain the prefix "shoe".
           type: string
+
+        facet_query_num_typos:
+          description: >
+            Controls the fuzziness of the facet query filter. Default: 2.
+          type: integer
 
         num_typos:
           description: >
@@ -3216,6 +3234,12 @@ components:
             Setting this parameter to false, will cause each document with a null value in the group_by field to not be grouped with other documents.
             Default: true
           type: boolean
+
+        group_max_candidates:
+          description: >
+            Overrides the behavior of group_by queries where found value is an approximation.
+            When group_max_candidates is passed, found will be accurate up until its value.
+          type: integer
 
         include_fields:
           description: List of fields from the document to include in the search result
@@ -3294,7 +3318,7 @@ components:
         filter_curated_hits:
           type: boolean
           description: >
-            Whether the filter_by condition of the search query should be applicable to curated results (override definitions, pinned hits, hidden hits, etc.). Default: false
+            Whether the filter_by condition of the search query should be applicable to curated results (curation definitions, pinned hits, hidden hits, etc.). Default: false
         enable_synonyms:
           type: boolean
           description: >
@@ -3303,6 +3327,11 @@ components:
           type: boolean
           description: >
             Allow synonym resolution on word prefixes in the query. Default: false
+        demote_synonym_match:
+          type: boolean
+          description: >
+            When set to true, search results that matched via synonyms will be demoted in ranking,
+            appearing below results that have a direct match. Default: false
         synonym_num_typos:
           type: integer
           description: >
@@ -3317,8 +3346,8 @@ components:
             at Position 1 and another record with ID 456 at Position 5,
             you'd specify `123:1,456:5`.
 
-            You could also use the Overrides feature to override search results based
-            on rules. Overrides are applied first, followed by `pinned_hits` and
+            You could also use the Curation feature to override search results based
+            on rules. Curations are applied first, followed by `pinned_hits` and
             finally `hidden_hits`.
           type: string
 
@@ -3328,12 +3357,12 @@ components:
             A list of `record_id`s to hide. Eg: to hide records with IDs 123 and 456,
             you'd specify `123,456`.
 
-            You could also use the Overrides feature to override search results based
-            on rules. Overrides are applied first, followed by `pinned_hits` and
+            You could also use the Curation feature to override search results based
+            on rules. Curations are applied first, followed by `pinned_hits` and
             finally `hidden_hits`.
           type: string
 
-        override_tags:
+        curation_tags:
           description: Comma separated list of tags to trigger the curations rules that match the tags.
           type: string
 
@@ -3342,6 +3371,14 @@ components:
             A list of custom fields that must be highlighted even if you don't query
             for them
           type: string
+
+        rerank_hybrid_matches:
+          type: boolean
+          description: >
+            When true, computes both text match and vector distance scores for all matches in hybrid search.
+            Documents found only through keyword search will get a vector distance score, and
+            documents found only through vector search will get a text match score.
+          default: false
 
         split_join_tokens:
           description: >
@@ -3366,9 +3403,9 @@ components:
             the name of the existing Preset.
           type: string
 
-        enable_overrides:
+        enable_curations:
           description: >
-            If you have some overrides defined but want to disable all of them during
+            If you have some curation sets defined but want to disable all of them during
             query time, you can do that by setting this parameter to false
           type: boolean
           default: false
@@ -3408,6 +3445,11 @@ components:
           description: >
             Typesense will attempt to return results early if the cutoff time has elapsed.
             This is not a strict guarantee and facet computation is not bound by this parameter.
+          type: integer
+        limit_hits:
+          description: >
+            Maximum number of hits that can be fetched from the collection.
+            page * per_page should be less than this number for the search request to return results.
           type: integer
         use_cache:
           description: >
@@ -3454,6 +3496,20 @@ components:
           description: >
             Comma separated string of nested facet fields whose parent object should be returned in facet response.
           type: string
+        facet_sample_percent:
+          description: >
+            Percentage of hits that will be used to estimate facet counts. Default: 100.
+          type: integer
+        facet_sample_threshold:
+          description: >
+            Minimum number of hits above which the facet counts are sampled. Default: 0.
+          type: integer
+        facet_sample_slope:
+          description: >
+            Controls how steeply facet_sample_percent falls as the collection grows.
+            facet_sample_threshold should be non-zero for facet_sample_slope to be effective.
+            Default: 0.
+          type: number
         voice_query:
           description: >
             The base64 encoded audio file in 16 khz 16-bit WAV format.
@@ -3539,6 +3595,20 @@ components:
           type: string
           example: "num_employees:>100 && country: [USA, UK]"
 
+        enable_lazy_filter:
+          description: >
+            Applies the filtering operation incrementally / lazily.
+            Set this to true when you are potentially filtering on large values
+            but the tokens in the query are expected to match very few documents.
+            Default: false
+          type: boolean
+
+        max_filter_by_candidates:
+          description:
+            Controls the number of similar words that Typesense considers during fuzzy search
+            on filter_by values. Useful for controlling prefix matches like company_name:Acm*.
+          type: integer
+
         sort_by:
           description:
             A list of numerical fields and their corresponding sort orders
@@ -3567,6 +3637,11 @@ components:
             by `category`, you can set `facet_query=category:shoe` to return only
             facet values that contain the prefix "shoe".
           type: string
+
+        facet_query_num_typos:
+          description: >
+            Controls the fuzziness of the facet query filter. Default: 2.
+          type: integer
 
         num_typos:
           description: >
@@ -3612,6 +3687,12 @@ components:
             Setting this parameter to false, will cause each document with a null value in the group_by field to not be grouped with other documents.
             Default: true
           type: boolean
+
+        group_max_candidates:
+          description: >
+            Overrides the behavior of group_by queries where found value is an approximation.
+            When group_max_candidates is passed, found will be accurate up until its value.
+          type: integer
 
         include_fields:
           description: List of fields from the document to include in the search result
@@ -3671,7 +3752,7 @@ components:
         filter_curated_hits:
           type: boolean
           description: >
-            Whether the filter_by condition of the search query should be applicable to curated results (override definitions, pinned hits, hidden hits, etc.). Default: false
+            Whether the filter_by condition of the search query should be applicable to curated results (curation definitions, pinned hits, hidden hits, etc.). Default: false
         enable_synonyms:
           type: boolean
           description: >
@@ -3688,6 +3769,11 @@ components:
           type: boolean
           description: >
             Allow synonym resolution on word prefixes in the query. Default: false
+        demote_synonym_match:
+          type: boolean
+          description: >
+            When set to true, search results that matched via synonyms will be demoted in ranking,
+            appearing below results that have a direct match. Default: false
         synonym_num_typos:
           type: integer
           description: >
@@ -3702,8 +3788,8 @@ components:
             at Position 1 and another record with ID 456 at Position 5,
             you'd specify `123:1,456:5`.
 
-            You could also use the Overrides feature to override search results based
-            on rules. Overrides are applied first, followed by `pinned_hits` and
+            You could also use the Curation feature to override search results based
+            on rules. Curations are applied first, followed by `pinned_hits` and
             finally `hidden_hits`.
           type: string
 
@@ -3713,12 +3799,12 @@ components:
             A list of `record_id`s to hide. Eg: to hide records with IDs 123 and 456,
             you'd specify `123,456`.
 
-            You could also use the Overrides feature to override search results based
-            on rules. Overrides are applied first, followed by `pinned_hits` and
+            You could also use the Curation feature to override search results based
+            on rules. Curations are applied first, followed by `pinned_hits` and
             finally `hidden_hits`.
           type: string
 
-        override_tags:
+        curation_tags:
           description: Comma separated list of tags to trigger the curations rules that match the tags.
           type: string
 
@@ -3727,6 +3813,14 @@ components:
             A list of custom fields that must be highlighted even if you don't query
             for them
           type: string
+
+        rerank_hybrid_matches:
+          type: boolean
+          description: >
+            When true, computes both text match and vector distance scores for all matches in hybrid search.
+            Documents found only through keyword search will get a vector distance score, and
+            documents found only through vector search will get a text match score.
+          default: false
 
         pre_segmented_query:
           description: >
@@ -3744,9 +3838,9 @@ components:
             the name of the existing Preset.
           type: string
 
-        enable_overrides:
+        enable_curations:
           description: >
-            If you have some overrides defined but want to disable all of them during
+            If you have some curation sets defined but want to disable all of them during
             query time, you can do that by setting this parameter to false
           type: boolean
           default: false
@@ -3786,6 +3880,11 @@ components:
           description: >
             Typesense will attempt to return results early if the cutoff time has elapsed.
             This is not a strict guarantee and facet computation is not bound by this parameter.
+          type: integer
+        limit_hits:
+          description: >
+            Maximum number of hits that can be fetched from the collection.
+            page * per_page should be less than this number for the search request to return results.
           type: integer
         use_cache:
           description: >
@@ -3832,6 +3931,20 @@ components:
           description: >
             Comma separated string of nested facet fields whose parent object should be returned in facet response.
           type: string
+        facet_sample_percent:
+          description: >
+            Percentage of hits that will be used to estimate facet counts. Default: 100.
+          type: integer
+        facet_sample_threshold:
+          description: >
+            Minimum number of hits above which the facet counts are sampled. Default: 0.
+          type: integer
+        facet_sample_slope:
+          description: >
+            Controls how steeply facet_sample_percent falls as the collection grows.
+            facet_sample_threshold should be non-zero for facet_sample_slope to be effective.
+            Default: 0.
+          type: number
         voice_query:
           description: >
             The base64 encoded audio file in 16 khz 16-bit WAV format.
@@ -3848,6 +3961,13 @@ components:
           description: >
             The Id of a previous conversation to continue, this tells Typesense to include prior context when communicating with the LLM.
           type: string
+        validate_field_names:
+          description: >
+            Controls whether Typesense should validate if the fields exist in the schema.
+            When set to false, Typesense will not throw an error if a field is missing.
+            This is useful for programmatic grouping where not all fields may exist.
+          type: boolean
+
     MultiSearchSearchesParameter:
       type: object
       required:
@@ -3873,13 +3993,6 @@ components:
             x-typesense-api-key:
               type: string
               description: A separate search API key for each search within a multi_search request
-            rerank_hybrid_matches:
-              type: boolean
-              description: >
-                When true, computes both text match and vector distance scores for all matches in hybrid search.
-                Documents found only through keyword search will get a vector distance score, and
-                documents found only through vector search will get a text match score.
-              default: false
     FacetCounts:
       type: object
       properties:
@@ -3898,6 +4011,8 @@ components:
                 type: object
         field_name:
           type: string
+        sampled:
+          type: boolean
         stats:
           type: object
           properties:

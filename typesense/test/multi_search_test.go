@@ -88,31 +88,6 @@ func TestMultiSearch(t *testing.T) {
 	}
 }
 
-func TestMultiSearchUnionTopLevelErrorReturnsHTTPError(t *testing.T) {
-	_, err := typesenseClient.MultiSearch.Perform(
-		context.Background(),
-		&api.MultiSearchParams{
-			Q: pointer.String("query"),
-		},
-		api.MultiSearchSearchesParameter{
-			Searches: []api.MultiSearchCollectionParameters{
-				{
-					Collection: pointer.String("non-existent"),
-				},
-			},
-			Union: pointer.True(),
-		},
-	)
-	require.Error(t, err)
-
-	var httpErr *typesense.HTTPError
-	require.True(t, errors.As(err, &httpErr))
-	require.Equal(t, 404, httpErr.Status)
-	require.Contains(t, string(httpErr.Body), `"code"`)
-	require.Contains(t, string(httpErr.Body), `"error"`)
-	require.Contains(t, string(httpErr.Body), "collection not found")
-}
-
 func TestMultiSearchGroupBy(t *testing.T) {
 	collectionName1 := createNewCollection(t, "companies")
 	documents := []interface{}{

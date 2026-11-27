@@ -551,6 +551,7 @@ type FacetCounts struct {
 		Value       *string                 `json:"value,omitempty"`
 	} `json:"counts,omitempty"`
 	FieldName *string           `json:"field_name,omitempty"`
+	Sampled   *bool             `json:"sampled,omitempty"`
 	Stats     *FacetCountsStats `json:"stats,omitempty"`
 }
 
@@ -646,6 +647,12 @@ type MultiSearchCollectionParameters struct {
 	// ConversationModelId The Id of Conversation Model to be used.
 	ConversationModelId *string `json:"conversation_model_id,omitempty"`
 
+	// CurationTags Comma separated list of tags to trigger the curations rules that match the tags.
+	CurationTags *string `json:"curation_tags,omitempty"`
+
+	// DemoteSynonymMatch When set to true, search results that matched via synonyms will be demoted in ranking, appearing below results that have a direct match. Default: false
+	DemoteSynonymMatch *bool `json:"demote_synonym_match,omitempty"`
+
 	// DropTokensMode Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries up to 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
 	DropTokensMode *DropTokensMode `json:"drop_tokens_mode,omitempty"`
 
@@ -655,8 +662,11 @@ type MultiSearchCollectionParameters struct {
 	// EnableAnalytics Flag for enabling/disabling analytics aggregation for specific search queries (for e.g. those originating from a test script).
 	EnableAnalytics *bool `json:"enable_analytics,omitempty"`
 
-	// EnableOverrides If you have some overrides defined but want to disable all of them during query time, you can do that by setting this parameter to false
-	EnableOverrides *bool `json:"enable_overrides,omitempty"`
+	// EnableCurations If you have some curation sets defined but want to disable all of them during query time, you can do that by setting this parameter to false
+	EnableCurations *bool `json:"enable_curations,omitempty"`
+
+	// EnableLazyFilter Applies the filtering operation incrementally / lazily. Set this to true when you are potentially filtering on large values but the tokens in the query are expected to match very few documents. Default: false
+	EnableLazyFilter *bool `json:"enable_lazy_filter,omitempty"`
 
 	// EnableSynonyms If you have some synonyms defined but want to disable all of them for a particular search query, set enable_synonyms to false. Default: true
 	EnableSynonyms *bool `json:"enable_synonyms,omitempty"`
@@ -679,8 +689,20 @@ type MultiSearchCollectionParameters struct {
 	// FacetQuery Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
 	FacetQuery *string `json:"facet_query,omitempty"`
 
+	// FacetQueryNumTypos Controls the fuzziness of the facet query filter. Default: 2.
+	FacetQueryNumTypos *int `json:"facet_query_num_typos,omitempty"`
+
 	// FacetReturnParent Comma separated string of nested facet fields whose parent object should be returned in facet response.
 	FacetReturnParent *string `json:"facet_return_parent,omitempty"`
+
+	// FacetSamplePercent Percentage of hits that will be used to estimate facet counts. Default: 100.
+	FacetSamplePercent *int `json:"facet_sample_percent,omitempty"`
+
+	// FacetSampleSlope Controls how steeply facet_sample_percent falls as the collection grows. facet_sample_threshold should be non-zero for facet_sample_slope to be effective. Default: 0.
+	FacetSampleSlope *float32 `json:"facet_sample_slope,omitempty"`
+
+	// FacetSampleThreshold Minimum number of hits above which the facet counts are sampled. Default: 0.
+	FacetSampleThreshold *int `json:"facet_sample_threshold,omitempty"`
 
 	// FacetStrategy Choose the underlying faceting strategy used. Comma separated string of allows values: exhaustive, top_values or automatic (default).
 	FacetStrategy *string `json:"facet_strategy,omitempty"`
@@ -688,7 +710,7 @@ type MultiSearchCollectionParameters struct {
 	// FilterBy Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
 	FilterBy *string `json:"filter_by,omitempty"`
 
-	// FilterCuratedHits Whether the filter_by condition of the search query should be applicable to curated results (override definitions, pinned hits, hidden hits, etc.). Default: false
+	// FilterCuratedHits Whether the filter_by condition of the search query should be applicable to curated results (curation definitions, pinned hits, hidden hits, etc.). Default: false
 	FilterCuratedHits *bool `json:"filter_curated_hits,omitempty"`
 
 	// GroupBy You can aggregate search results into groups or buckets by specify one or more `group_by` fields. Separate multiple fields with a comma. To group on a particular field, it must be a faceted field.
@@ -697,11 +719,14 @@ type MultiSearchCollectionParameters struct {
 	// GroupLimit Maximum number of hits to be returned for every group. If the `group_limit` is set as `K` then only the top K hits in each group are returned in the response. Default: 3
 	GroupLimit *int `json:"group_limit,omitempty"`
 
+	// GroupMaxCandidates Overrides the behavior of group_by queries where found value is an approximation. When group_max_candidates is passed, found will be accurate up until its value.
+	GroupMaxCandidates *int `json:"group_max_candidates,omitempty"`
+
 	// GroupMissingValues Setting this parameter to true will place all documents that have a null value in the group_by field, into a single group. Setting this parameter to false, will cause each document with a null value in the group_by field to not be grouped with other documents. Default: true
 	GroupMissingValues *bool `json:"group_missing_values,omitempty"`
 
 	// HiddenHits A list of records to unconditionally hide from search results. A list of `record_id`s to hide. Eg: to hide records with IDs 123 and 456, you'd specify `123,456`.
-	// You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
+	// You could also use the Curation feature to override search results based on rules. Curations are applied first, followed by `pinned_hits` and finally `hidden_hits`.
 	HiddenHits *string `json:"hidden_hits,omitempty"`
 
 	// HighlightAffixNumTokens The number of tokens that should surround the highlighted text on each side. Default: 4
@@ -728,6 +753,9 @@ type MultiSearchCollectionParameters struct {
 	// Limit Number of hits to fetch. Can be used as an alternative to the per_page parameter. Default: 10.
 	Limit *int `json:"limit,omitempty"`
 
+	// LimitHits Maximum number of hits that can be fetched from the collection. page * per_page should be less than this number for the search request to return results.
+	LimitHits *int `json:"limit_hits,omitempty"`
+
 	// MaxExtraPrefix There are also 2 parameters that allow you to control the extent of infix searching max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before or after the query that can be present in the token. For example query "K2100" has 2 extra symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
 	MaxExtraPrefix *int `json:"max_extra_prefix,omitempty"`
 
@@ -736,6 +764,9 @@ type MultiSearchCollectionParameters struct {
 
 	// MaxFacetValues Maximum number of facet values to be returned.
 	MaxFacetValues *int `json:"max_facet_values,omitempty"`
+
+	// MaxFilterByCandidates Controls the number of similar words that Typesense considers during fuzzy search on filter_by values. Useful for controlling prefix matches like company_name:Acm*.
+	MaxFilterByCandidates *int `json:"max_filter_by_candidates,omitempty"`
 
 	// MinLen1typo Minimum word length for 1-typo correction to be applied. The value of num_typos is still treated as the maximum allowed typos.
 	MinLen1typo *int `json:"min_len_1typo,omitempty"`
@@ -749,9 +780,6 @@ type MultiSearchCollectionParameters struct {
 	// Offset Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
 	Offset *int `json:"offset,omitempty"`
 
-	// OverrideTags Comma separated list of tags to trigger the curations rules that match the tags.
-	OverrideTags *string `json:"override_tags,omitempty"`
-
 	// Page Results from this specific page number would be fetched.
 	Page *int `json:"page,omitempty"`
 
@@ -759,7 +787,7 @@ type MultiSearchCollectionParameters struct {
 	PerPage *int `json:"per_page,omitempty"`
 
 	// PinnedHits A list of records to unconditionally include in the search results at specific positions. An example use case would be to feature or promote certain items on the top of search results. A list of `record_id:hit_position`. Eg: to include a record with ID 123 at Position 1 and another record with ID 456 at Position 5, you'd specify `123:1,456:5`.
-	// You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
+	// You could also use the Curation feature to override search results based on rules. Curations are applied first, followed by `pinned_hits` and finally `hidden_hits`.
 	PinnedHits *string `json:"pinned_hits,omitempty"`
 
 	// PreSegmentedQuery You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself before indexing and querying.
@@ -826,6 +854,9 @@ type MultiSearchCollectionParameters struct {
 	// UseCache Enable server side caching of search query results. By default, caching is disabled.
 	UseCache *bool `json:"use_cache,omitempty"`
 
+	// ValidateFieldNames Controls whether Typesense should validate if the fields exist in the schema. When set to false, Typesense will not throw an error if a field is missing. This is useful for programmatic grouping where not all fields may exist.
+	ValidateFieldNames *bool `json:"validate_field_names,omitempty"`
+
 	// VectorQuery Vector query expression for fetching documents "closest" to a given query/document vector.
 	VectorQuery *string `json:"vector_query,omitempty"`
 
@@ -850,6 +881,12 @@ type MultiSearchParameters struct {
 	// ConversationModelId The Id of Conversation Model to be used.
 	ConversationModelId *string `json:"conversation_model_id,omitempty"`
 
+	// CurationTags Comma separated list of tags to trigger the curations rules that match the tags.
+	CurationTags *string `json:"curation_tags,omitempty"`
+
+	// DemoteSynonymMatch When set to true, search results that matched via synonyms will be demoted in ranking, appearing below results that have a direct match. Default: false
+	DemoteSynonymMatch *bool `json:"demote_synonym_match,omitempty"`
+
 	// DropTokensMode Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries up to 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
 	DropTokensMode *DropTokensMode `json:"drop_tokens_mode,omitempty"`
 
@@ -859,8 +896,11 @@ type MultiSearchParameters struct {
 	// EnableAnalytics Flag for enabling/disabling analytics aggregation for specific search queries (for e.g. those originating from a test script).
 	EnableAnalytics *bool `json:"enable_analytics,omitempty"`
 
-	// EnableOverrides If you have some overrides defined but want to disable all of them during query time, you can do that by setting this parameter to false
-	EnableOverrides *bool `json:"enable_overrides,omitempty"`
+	// EnableCurations If you have some curation sets defined but want to disable all of them during query time, you can do that by setting this parameter to false
+	EnableCurations *bool `json:"enable_curations,omitempty"`
+
+	// EnableLazyFilter Applies the filtering operation incrementally / lazily. Set this to true when you are potentially filtering on large values but the tokens in the query are expected to match very few documents. Default: false
+	EnableLazyFilter *bool `json:"enable_lazy_filter,omitempty"`
 
 	// EnableSynonyms If you have some synonyms defined but want to disable all of them for a particular search query, set enable_synonyms to false. Default: true
 	EnableSynonyms *bool `json:"enable_synonyms,omitempty"`
@@ -883,8 +923,20 @@ type MultiSearchParameters struct {
 	// FacetQuery Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
 	FacetQuery *string `json:"facet_query,omitempty"`
 
+	// FacetQueryNumTypos Controls the fuzziness of the facet query filter. Default: 2.
+	FacetQueryNumTypos *int `json:"facet_query_num_typos,omitempty"`
+
 	// FacetReturnParent Comma separated string of nested facet fields whose parent object should be returned in facet response.
 	FacetReturnParent *string `json:"facet_return_parent,omitempty"`
+
+	// FacetSamplePercent Percentage of hits that will be used to estimate facet counts. Default: 100.
+	FacetSamplePercent *int `json:"facet_sample_percent,omitempty"`
+
+	// FacetSampleSlope Controls how steeply facet_sample_percent falls as the collection grows. facet_sample_threshold should be non-zero for facet_sample_slope to be effective. Default: 0.
+	FacetSampleSlope *float32 `json:"facet_sample_slope,omitempty"`
+
+	// FacetSampleThreshold Minimum number of hits above which the facet counts are sampled. Default: 0.
+	FacetSampleThreshold *int `json:"facet_sample_threshold,omitempty"`
 
 	// FacetStrategy Choose the underlying faceting strategy used. Comma separated string of allows values: exhaustive, top_values or automatic (default).
 	FacetStrategy *string `json:"facet_strategy,omitempty"`
@@ -892,7 +944,7 @@ type MultiSearchParameters struct {
 	// FilterBy Filter conditions for refining youropen api validator search results. Separate multiple conditions with &&.
 	FilterBy *string `json:"filter_by,omitempty"`
 
-	// FilterCuratedHits Whether the filter_by condition of the search query should be applicable to curated results (override definitions, pinned hits, hidden hits, etc.). Default: false
+	// FilterCuratedHits Whether the filter_by condition of the search query should be applicable to curated results (curation definitions, pinned hits, hidden hits, etc.). Default: false
 	FilterCuratedHits *bool `json:"filter_curated_hits,omitempty"`
 
 	// GroupBy You can aggregate search results into groups or buckets by specify one or more `group_by` fields. Separate multiple fields with a comma. To group on a particular field, it must be a faceted field.
@@ -901,11 +953,14 @@ type MultiSearchParameters struct {
 	// GroupLimit Maximum number of hits to be returned for every group. If the `group_limit` is set as `K` then only the top K hits in each group are returned in the response. Default: 3
 	GroupLimit *int `json:"group_limit,omitempty"`
 
+	// GroupMaxCandidates Overrides the behavior of group_by queries where found value is an approximation. When group_max_candidates is passed, found will be accurate up until its value.
+	GroupMaxCandidates *int `json:"group_max_candidates,omitempty"`
+
 	// GroupMissingValues Setting this parameter to true will place all documents that have a null value in the group_by field, into a single group. Setting this parameter to false, will cause each document with a null value in the group_by field to not be grouped with other documents. Default: true
 	GroupMissingValues *bool `json:"group_missing_values,omitempty"`
 
 	// HiddenHits A list of records to unconditionally hide from search results. A list of `record_id`s to hide. Eg: to hide records with IDs 123 and 456, you'd specify `123,456`.
-	// You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
+	// You could also use the Curation feature to override search results based on rules. Curations are applied first, followed by `pinned_hits` and finally `hidden_hits`.
 	HiddenHits *string `json:"hidden_hits,omitempty"`
 
 	// HighlightAffixNumTokens The number of tokens that should surround the highlighted text on each side. Default: 4
@@ -932,6 +987,9 @@ type MultiSearchParameters struct {
 	// Limit Number of hits to fetch. Can be used as an alternative to the per_page parameter. Default: 10.
 	Limit *int `json:"limit,omitempty"`
 
+	// LimitHits Maximum number of hits that can be fetched from the collection. page * per_page should be less than this number for the search request to return results.
+	LimitHits *int `json:"limit_hits,omitempty"`
+
 	// MaxExtraPrefix There are also 2 parameters that allow you to control the extent of infix searching max_extra_prefix and max_extra_suffix which specify the maximum number of symbols before or after the query that can be present in the token. For example query "K2100" has 2 extra symbols in "6PK2100". By default, any number of prefixes/suffixes can be present for a match.
 	MaxExtraPrefix *int `json:"max_extra_prefix,omitempty"`
 
@@ -940,6 +998,9 @@ type MultiSearchParameters struct {
 
 	// MaxFacetValues Maximum number of facet values to be returned.
 	MaxFacetValues *int `json:"max_facet_values,omitempty"`
+
+	// MaxFilterByCandidates Controls the number of similar words that Typesense considers during fuzzy search on filter_by values. Useful for controlling prefix matches like company_name:Acm*.
+	MaxFilterByCandidates *int `json:"max_filter_by_candidates,omitempty"`
 
 	// MinLen1typo Minimum word length for 1-typo correction to be applied. The value of num_typos is still treated as the maximum allowed typos.
 	MinLen1typo *int `json:"min_len_1typo,omitempty"`
@@ -953,9 +1014,6 @@ type MultiSearchParameters struct {
 	// Offset Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
 	Offset *int `json:"offset,omitempty"`
 
-	// OverrideTags Comma separated list of tags to trigger the curations rules that match the tags.
-	OverrideTags *string `json:"override_tags,omitempty"`
-
 	// Page Results from this specific page number would be fetched.
 	Page *int `json:"page,omitempty"`
 
@@ -963,7 +1021,7 @@ type MultiSearchParameters struct {
 	PerPage *int `json:"per_page,omitempty"`
 
 	// PinnedHits A list of records to unconditionally include in the search results at specific positions. An example use case would be to feature or promote certain items on the top of search results. A list of `record_id:hit_position`. Eg: to include a record with ID 123 at Position 1 and another record with ID 456 at Position 5, you'd specify `123:1,456:5`.
-	// You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
+	// You could also use the Curation feature to override search results based on rules. Curations are applied first, followed by `pinned_hits` and finally `hidden_hits`.
 	PinnedHits *string `json:"pinned_hits,omitempty"`
 
 	// PreSegmentedQuery You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself before indexing and querying.
@@ -1000,6 +1058,9 @@ type MultiSearchParameters struct {
 	// RemoteEmbeddingTimeoutMs Timeout (in milliseconds) for fetching remote embeddings.
 	RemoteEmbeddingTimeoutMs *int `json:"remote_embedding_timeout_ms,omitempty"`
 
+	// RerankHybridMatches When true, computes both text match and vector distance scores for all matches in hybrid search. Documents found only through keyword search will get a vector distance score, and documents found only through vector search will get a text match score.
+	RerankHybridMatches *bool `json:"rerank_hybrid_matches,omitempty"`
+
 	// SearchCutoffMs Typesense will attempt to return results early if the cutoff time has elapsed. This is not a strict guarantee and facet computation is not bound by this parameter.
 	SearchCutoffMs *int `json:"search_cutoff_ms,omitempty"`
 
@@ -1027,6 +1088,9 @@ type MultiSearchParameters struct {
 	// UseCache Enable server side caching of search query results. By default, caching is disabled.
 	UseCache *bool `json:"use_cache,omitempty"`
 
+	// ValidateFieldNames Controls whether Typesense should validate if the fields exist in the schema. When set to false, Typesense will not throw an error if a field is missing. This is useful for programmatic grouping where not all fields may exist.
+	ValidateFieldNames *bool `json:"validate_field_names,omitempty"`
+
 	// VectorQuery Vector query expression for fetching documents "closest" to a given query/document vector.
 	VectorQuery *string `json:"vector_query,omitempty"`
 
@@ -1037,7 +1101,6 @@ type MultiSearchParameters struct {
 // MultiSearchResult defines model for MultiSearchResult.
 type MultiSearchResult struct {
 	Conversation *SearchResultConversation `json:"conversation,omitempty"`
-	Hits         *[]SearchResultHit        `json:"hits,omitempty"`
 	Results      []MultiSearchResultItem   `json:"results"`
 }
 
@@ -1360,6 +1423,12 @@ type SearchParameters struct {
 	// ConversationModelId The Id of Conversation Model to be used.
 	ConversationModelId *string `json:"conversation_model_id,omitempty"`
 
+	// CurationTags Comma separated list of tags to trigger the curations rules that match the tags.
+	CurationTags *string `json:"curation_tags,omitempty"`
+
+	// DemoteSynonymMatch When set to true, search results that matched via synonyms will be demoted in ranking, appearing below results that have a direct match. Default: false
+	DemoteSynonymMatch *bool `json:"demote_synonym_match,omitempty"`
+
 	// DropTokensMode Dictates the direction in which the words in the query must be dropped when the original words in the query do not appear in any document. Values: right_to_left (default), left_to_right, both_sides:3 A note on both_sides:3 - for queries up to 3 tokens (words) in length, this mode will drop tokens from both sides and exhaustively rank all matching results. If query length is greater than 3 words, Typesense will just fallback to default behavior of right_to_left
 	DropTokensMode *DropTokensMode `json:"drop_tokens_mode,omitempty"`
 
@@ -1369,11 +1438,14 @@ type SearchParameters struct {
 	// EnableAnalytics Flag for enabling/disabling analytics aggregation for specific search queries (for e.g. those originating from a test script).
 	EnableAnalytics *bool `json:"enable_analytics,omitempty"`
 
+	// EnableCurations If you have some curation sets defined but want to disable all of them during query time, you can do that by setting this parameter to false
+	EnableCurations *bool `json:"enable_curations,omitempty"`
+
 	// EnableHighlightV1 Flag for enabling/disabling the deprecated, old highlight structure in the response. Default: true
 	EnableHighlightV1 *bool `json:"enable_highlight_v1,omitempty"`
 
-	// EnableOverrides If you have some overrides defined but want to disable all of them during query time, you can do that by setting this parameter to false
-	EnableOverrides *bool `json:"enable_overrides,omitempty"`
+	// EnableLazyFilter Applies the filtering operation incrementally / lazily. Set this to true when you are potentially filtering on large values but the tokens in the query are expected to match very few documents. Default: false
+	EnableLazyFilter *bool `json:"enable_lazy_filter,omitempty"`
 
 	// EnableSynonyms If you have some synonyms defined but want to disable all of them for a particular search query, set enable_synonyms to false. Default: true
 	EnableSynonyms *bool `json:"enable_synonyms,omitempty"`
@@ -1396,8 +1468,20 @@ type SearchParameters struct {
 	// FacetQuery Facet values that are returned can now be filtered via this parameter. The matching facet text is also highlighted. For example, when faceting by `category`, you can set `facet_query=category:shoe` to return only facet values that contain the prefix "shoe".
 	FacetQuery *string `json:"facet_query,omitempty"`
 
+	// FacetQueryNumTypos Controls the fuzziness of the facet query filter. Default: 2.
+	FacetQueryNumTypos *int `json:"facet_query_num_typos,omitempty"`
+
 	// FacetReturnParent Comma separated string of nested facet fields whose parent object should be returned in facet response.
 	FacetReturnParent *string `json:"facet_return_parent,omitempty"`
+
+	// FacetSamplePercent Percentage of hits that will be used to estimate facet counts. Default: 100.
+	FacetSamplePercent *int `json:"facet_sample_percent,omitempty"`
+
+	// FacetSampleSlope Controls how steeply facet_sample_percent falls as the collection grows. facet_sample_threshold should be non-zero for facet_sample_slope to be effective. Default: 0.
+	FacetSampleSlope *float32 `json:"facet_sample_slope,omitempty"`
+
+	// FacetSampleThreshold Minimum number of hits above which the facet counts are sampled. Default: 0.
+	FacetSampleThreshold *int `json:"facet_sample_threshold,omitempty"`
 
 	// FacetStrategy Choose the underlying faceting strategy used. Comma separated string of allows values: exhaustive, top_values or automatic (default).
 	FacetStrategy *string `json:"facet_strategy,omitempty"`
@@ -1405,7 +1489,7 @@ type SearchParameters struct {
 	// FilterBy Filter conditions for refining your open api validator search results. Separate multiple conditions with &&.
 	FilterBy *string `json:"filter_by,omitempty"`
 
-	// FilterCuratedHits Whether the filter_by condition of the search query should be applicable to curated results (override definitions, pinned hits, hidden hits, etc.). Default: false
+	// FilterCuratedHits Whether the filter_by condition of the search query should be applicable to curated results (curation definitions, pinned hits, hidden hits, etc.). Default: false
 	FilterCuratedHits *bool `json:"filter_curated_hits,omitempty"`
 
 	// GroupBy You can aggregate search results into groups or buckets by specify one or more `group_by` fields. Separate multiple fields with a comma. To group on a particular field, it must be a faceted field.
@@ -1414,11 +1498,14 @@ type SearchParameters struct {
 	// GroupLimit Maximum number of hits to be returned for every group. If the `group_limit` is set as `K` then only the top K hits in each group are returned in the response. Default: 3
 	GroupLimit *int `json:"group_limit,omitempty"`
 
+	// GroupMaxCandidates Overrides the behavior of group_by queries where found value is an approximation. When group_max_candidates is passed, found will be accurate up until its value.
+	GroupMaxCandidates *int `json:"group_max_candidates,omitempty"`
+
 	// GroupMissingValues Setting this parameter to true will place all documents that have a null value in the group_by field, into a single group. Setting this parameter to false, will cause each document with a null value in the group_by field to not be grouped with other documents. Default: true
 	GroupMissingValues *bool `json:"group_missing_values,omitempty"`
 
 	// HiddenHits A list of records to unconditionally hide from search results. A list of `record_id`s to hide. Eg: to hide records with IDs 123 and 456, you'd specify `123,456`.
-	// You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
+	// You could also use the Curation feature to override search results based on rules. Curations are applied first, followed by `pinned_hits` and finally `hidden_hits`.
 	HiddenHits *string `json:"hidden_hits,omitempty"`
 
 	// HighlightAffixNumTokens The number of tokens that should surround the highlighted text on each side. Default: 4
@@ -1444,6 +1531,9 @@ type SearchParameters struct {
 
 	// Limit Number of hits to fetch. Can be used as an alternative to the per_page parameter. Default: 10.
 	Limit *int `json:"limit,omitempty"`
+
+	// LimitHits Maximum number of hits that can be fetched from the collection. page * per_page should be less than this number for the search request to return results.
+	LimitHits *int `json:"limit_hits,omitempty"`
 
 	// MaxCandidates Control the number of words that Typesense considers for typo and prefix searching.
 	MaxCandidates *int `json:"max_candidates,omitempty"`
@@ -1478,9 +1568,6 @@ type SearchParameters struct {
 	// Offset Identifies the starting point to return hits from a result set. Can be used as an alternative to the page parameter.
 	Offset *int `json:"offset,omitempty"`
 
-	// OverrideTags Comma separated list of tags to trigger the curations rules that match the tags.
-	OverrideTags *string `json:"override_tags,omitempty"`
-
 	// Page Results from this specific page number would be fetched.
 	Page *int `json:"page,omitempty"`
 
@@ -1488,7 +1575,7 @@ type SearchParameters struct {
 	PerPage *int `json:"per_page,omitempty"`
 
 	// PinnedHits A list of records to unconditionally include in the search results at specific positions. An example use case would be to feature or promote certain items on the top of search results. A list of `record_id:hit_position`. Eg: to include a record with ID 123 at Position 1 and another record with ID 456 at Position 5, you'd specify `123:1,456:5`.
-	// You could also use the Overrides feature to override search results based on rules. Overrides are applied first, followed by `pinned_hits` and finally `hidden_hits`.
+	// You could also use the Curation feature to override search results based on rules. Curations are applied first, followed by `pinned_hits` and finally `hidden_hits`.
 	PinnedHits *string `json:"pinned_hits,omitempty"`
 
 	// PreSegmentedQuery You can index content from any logographic language into Typesense if you are able to segment / split the text into space-separated words yourself before indexing and querying.
@@ -1525,6 +1612,9 @@ type SearchParameters struct {
 	// RemoteEmbeddingTimeoutMs Timeout (in milliseconds) for fetching remote embeddings.
 	RemoteEmbeddingTimeoutMs *int `json:"remote_embedding_timeout_ms,omitempty"`
 
+	// RerankHybridMatches When true, computes both text match and vector distance scores for all matches in hybrid search. Documents found only through keyword search will get a vector distance score, and documents found only through vector search will get a text match score.
+	RerankHybridMatches *bool `json:"rerank_hybrid_matches,omitempty"`
+
 	// SearchCutoffMs Typesense will attempt to return results early if the cutoff time has elapsed. This is not a strict guarantee and facet computation is not bound by this parameter.
 	SearchCutoffMs *int `json:"search_cutoff_ms,omitempty"`
 
@@ -1558,6 +1648,9 @@ type SearchParameters struct {
 	// UseCache Enable server side caching of search query results. By default, caching is disabled.
 	UseCache *bool `json:"use_cache,omitempty"`
 
+	// ValidateFieldNames Controls whether Typesense should validate if the fields exist in the schema. When set to false, Typesense will not throw an error if a field is missing. This is useful for programmatic grouping where not all fields may exist.
+	ValidateFieldNames *bool `json:"validate_field_names,omitempty"`
+
 	// VectorQuery Vector query expression for fetching documents "closest" to a given query/document vector.
 	VectorQuery *string `json:"vector_query,omitempty"`
 
@@ -1568,6 +1661,7 @@ type SearchParameters struct {
 // SearchRequestParams defines model for SearchRequestParams.
 type SearchRequestParams struct {
 	CollectionName string                         `json:"collection_name"`
+	FirstQ         *string                        `json:"first_q,omitempty"`
 	PerPage        int                            `json:"per_page"`
 	Q              string                         `json:"q"`
 	VoiceQuery     *SearchRequestParamsVoiceQuery `json:"voice_query,omitempty"`
@@ -1853,11 +1947,14 @@ type SearchCollectionParams struct {
 	Conversation                       *bool           `form:"conversation,omitempty" json:"conversation,omitempty"`
 	ConversationId                     *string         `form:"conversation_id,omitempty" json:"conversation_id,omitempty"`
 	ConversationModelId                *string         `form:"conversation_model_id,omitempty" json:"conversation_model_id,omitempty"`
+	CurationTags                       *string         `form:"curation_tags,omitempty" json:"curation_tags,omitempty"`
+	DemoteSynonymMatch                 *bool           `form:"demote_synonym_match,omitempty" json:"demote_synonym_match,omitempty"`
 	DropTokensMode                     *DropTokensMode `form:"drop_tokens_mode,omitempty" json:"drop_tokens_mode,omitempty"`
 	DropTokensThreshold                *int            `form:"drop_tokens_threshold,omitempty" json:"drop_tokens_threshold,omitempty"`
 	EnableAnalytics                    *bool           `form:"enable_analytics,omitempty" json:"enable_analytics,omitempty"`
+	EnableCurations                    *bool           `form:"enable_curations,omitempty" json:"enable_curations,omitempty"`
 	EnableHighlightV1                  *bool           `form:"enable_highlight_v1,omitempty" json:"enable_highlight_v1,omitempty"`
-	EnableOverrides                    *bool           `form:"enable_overrides,omitempty" json:"enable_overrides,omitempty"`
+	EnableLazyFilter                   *bool           `form:"enable_lazy_filter,omitempty" json:"enable_lazy_filter,omitempty"`
 	EnableSynonyms                     *bool           `form:"enable_synonyms,omitempty" json:"enable_synonyms,omitempty"`
 	EnableTyposForAlphaNumericalTokens *bool           `form:"enable_typos_for_alpha_numerical_tokens,omitempty" json:"enable_typos_for_alpha_numerical_tokens,omitempty"`
 	EnableTyposForNumericalTokens      *bool           `form:"enable_typos_for_numerical_tokens,omitempty" json:"enable_typos_for_numerical_tokens,omitempty"`
@@ -1865,12 +1962,17 @@ type SearchCollectionParams struct {
 	ExhaustiveSearch                   *bool           `form:"exhaustive_search,omitempty" json:"exhaustive_search,omitempty"`
 	FacetBy                            *string         `form:"facet_by,omitempty" json:"facet_by,omitempty"`
 	FacetQuery                         *string         `form:"facet_query,omitempty" json:"facet_query,omitempty"`
+	FacetQueryNumTypos                 *int            `form:"facet_query_num_typos,omitempty" json:"facet_query_num_typos,omitempty"`
 	FacetReturnParent                  *string         `form:"facet_return_parent,omitempty" json:"facet_return_parent,omitempty"`
+	FacetSamplePercent                 *int            `form:"facet_sample_percent,omitempty" json:"facet_sample_percent,omitempty"`
+	FacetSampleSlope                   *float32        `form:"facet_sample_slope,omitempty" json:"facet_sample_slope,omitempty"`
+	FacetSampleThreshold               *int            `form:"facet_sample_threshold,omitempty" json:"facet_sample_threshold,omitempty"`
 	FacetStrategy                      *string         `form:"facet_strategy,omitempty" json:"facet_strategy,omitempty"`
 	FilterBy                           *string         `form:"filter_by,omitempty" json:"filter_by,omitempty"`
 	FilterCuratedHits                  *bool           `form:"filter_curated_hits,omitempty" json:"filter_curated_hits,omitempty"`
 	GroupBy                            *string         `form:"group_by,omitempty" json:"group_by,omitempty"`
 	GroupLimit                         *int            `form:"group_limit,omitempty" json:"group_limit,omitempty"`
+	GroupMaxCandidates                 *int            `form:"group_max_candidates,omitempty" json:"group_max_candidates,omitempty"`
 	GroupMissingValues                 *bool           `form:"group_missing_values,omitempty" json:"group_missing_values,omitempty"`
 	HiddenHits                         *string         `form:"hidden_hits,omitempty" json:"hidden_hits,omitempty"`
 	HighlightAffixNumTokens            *int            `form:"highlight_affix_num_tokens,omitempty" json:"highlight_affix_num_tokens,omitempty"`
@@ -1881,6 +1983,7 @@ type SearchCollectionParams struct {
 	IncludeFields                      *string         `form:"include_fields,omitempty" json:"include_fields,omitempty"`
 	Infix                              *string         `form:"infix,omitempty" json:"infix,omitempty"`
 	Limit                              *int            `form:"limit,omitempty" json:"limit,omitempty"`
+	LimitHits                          *int            `form:"limit_hits,omitempty" json:"limit_hits,omitempty"`
 	MaxCandidates                      *int            `form:"max_candidates,omitempty" json:"max_candidates,omitempty"`
 	MaxExtraPrefix                     *int            `form:"max_extra_prefix,omitempty" json:"max_extra_prefix,omitempty"`
 	MaxExtraSuffix                     *int            `form:"max_extra_suffix,omitempty" json:"max_extra_suffix,omitempty"`
@@ -1892,7 +1995,6 @@ type SearchCollectionParams struct {
 	NlQuery                            *bool           `form:"nl_query,omitempty" json:"nl_query,omitempty"`
 	NumTypos                           *string         `form:"num_typos,omitempty" json:"num_typos,omitempty"`
 	Offset                             *int            `form:"offset,omitempty" json:"offset,omitempty"`
-	OverrideTags                       *string         `form:"override_tags,omitempty" json:"override_tags,omitempty"`
 	Page                               *int            `form:"page,omitempty" json:"page,omitempty"`
 	PerPage                            *int            `form:"per_page,omitempty" json:"per_page,omitempty"`
 	PinnedHits                         *string         `form:"pinned_hits,omitempty" json:"pinned_hits,omitempty"`
@@ -1907,6 +2009,7 @@ type SearchCollectionParams struct {
 	QueryByWeights                     *string         `form:"query_by_weights,omitempty" json:"query_by_weights,omitempty"`
 	RemoteEmbeddingNumTries            *int            `form:"remote_embedding_num_tries,omitempty" json:"remote_embedding_num_tries,omitempty"`
 	RemoteEmbeddingTimeoutMs           *int            `form:"remote_embedding_timeout_ms,omitempty" json:"remote_embedding_timeout_ms,omitempty"`
+	RerankHybridMatches                *bool           `form:"rerank_hybrid_matches,omitempty" json:"rerank_hybrid_matches,omitempty"`
 	SearchCutoffMs                     *int            `form:"search_cutoff_ms,omitempty" json:"search_cutoff_ms,omitempty"`
 	SnippetThreshold                   *int            `form:"snippet_threshold,omitempty" json:"snippet_threshold,omitempty"`
 	SortBy                             *string         `form:"sort_by,omitempty" json:"sort_by,omitempty"`
@@ -1918,6 +2021,7 @@ type SearchCollectionParams struct {
 	TextMatchType                      *string         `form:"text_match_type,omitempty" json:"text_match_type,omitempty"`
 	TypoTokensThreshold                *int            `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
 	UseCache                           *bool           `form:"use_cache,omitempty" json:"use_cache,omitempty"`
+	ValidateFieldNames                 *bool           `form:"validate_field_names,omitempty" json:"validate_field_names,omitempty"`
 	VectorQuery                        *string         `form:"vector_query,omitempty" json:"vector_query,omitempty"`
 	VoiceQuery                         *string         `form:"voice_query,omitempty" json:"voice_query,omitempty"`
 }
@@ -1942,11 +2046,14 @@ type MultiSearchParams struct {
 	Conversation                       *bool           `form:"conversation,omitempty" json:"conversation,omitempty"`
 	ConversationId                     *string         `form:"conversation_id,omitempty" json:"conversation_id,omitempty"`
 	ConversationModelId                *string         `form:"conversation_model_id,omitempty" json:"conversation_model_id,omitempty"`
+	CurationTags                       *string         `form:"curation_tags,omitempty" json:"curation_tags,omitempty"`
+	DemoteSynonymMatch                 *bool           `form:"demote_synonym_match,omitempty" json:"demote_synonym_match,omitempty"`
 	DropTokensMode                     *DropTokensMode `form:"drop_tokens_mode,omitempty" json:"drop_tokens_mode,omitempty"`
 	DropTokensThreshold                *int            `form:"drop_tokens_threshold,omitempty" json:"drop_tokens_threshold,omitempty"`
 	EnableAnalytics                    *bool           `form:"enable_analytics,omitempty" json:"enable_analytics,omitempty"`
+	EnableCurations                    *bool           `form:"enable_curations,omitempty" json:"enable_curations,omitempty"`
 	EnableHighlightV1                  *bool           `form:"enable_highlight_v1,omitempty" json:"enable_highlight_v1,omitempty"`
-	EnableOverrides                    *bool           `form:"enable_overrides,omitempty" json:"enable_overrides,omitempty"`
+	EnableLazyFilter                   *bool           `form:"enable_lazy_filter,omitempty" json:"enable_lazy_filter,omitempty"`
 	EnableSynonyms                     *bool           `form:"enable_synonyms,omitempty" json:"enable_synonyms,omitempty"`
 	EnableTyposForAlphaNumericalTokens *bool           `form:"enable_typos_for_alpha_numerical_tokens,omitempty" json:"enable_typos_for_alpha_numerical_tokens,omitempty"`
 	EnableTyposForNumericalTokens      *bool           `form:"enable_typos_for_numerical_tokens,omitempty" json:"enable_typos_for_numerical_tokens,omitempty"`
@@ -1954,12 +2061,17 @@ type MultiSearchParams struct {
 	ExhaustiveSearch                   *bool           `form:"exhaustive_search,omitempty" json:"exhaustive_search,omitempty"`
 	FacetBy                            *string         `form:"facet_by,omitempty" json:"facet_by,omitempty"`
 	FacetQuery                         *string         `form:"facet_query,omitempty" json:"facet_query,omitempty"`
+	FacetQueryNumTypos                 *int            `form:"facet_query_num_typos,omitempty" json:"facet_query_num_typos,omitempty"`
 	FacetReturnParent                  *string         `form:"facet_return_parent,omitempty" json:"facet_return_parent,omitempty"`
+	FacetSamplePercent                 *int            `form:"facet_sample_percent,omitempty" json:"facet_sample_percent,omitempty"`
+	FacetSampleSlope                   *float32        `form:"facet_sample_slope,omitempty" json:"facet_sample_slope,omitempty"`
+	FacetSampleThreshold               *int            `form:"facet_sample_threshold,omitempty" json:"facet_sample_threshold,omitempty"`
 	FacetStrategy                      *string         `form:"facet_strategy,omitempty" json:"facet_strategy,omitempty"`
 	FilterBy                           *string         `form:"filter_by,omitempty" json:"filter_by,omitempty"`
 	FilterCuratedHits                  *bool           `form:"filter_curated_hits,omitempty" json:"filter_curated_hits,omitempty"`
 	GroupBy                            *string         `form:"group_by,omitempty" json:"group_by,omitempty"`
 	GroupLimit                         *int            `form:"group_limit,omitempty" json:"group_limit,omitempty"`
+	GroupMaxCandidates                 *int            `form:"group_max_candidates,omitempty" json:"group_max_candidates,omitempty"`
 	GroupMissingValues                 *bool           `form:"group_missing_values,omitempty" json:"group_missing_values,omitempty"`
 	HiddenHits                         *string         `form:"hidden_hits,omitempty" json:"hidden_hits,omitempty"`
 	HighlightAffixNumTokens            *int            `form:"highlight_affix_num_tokens,omitempty" json:"highlight_affix_num_tokens,omitempty"`
@@ -1970,6 +2082,7 @@ type MultiSearchParams struct {
 	IncludeFields                      *string         `form:"include_fields,omitempty" json:"include_fields,omitempty"`
 	Infix                              *string         `form:"infix,omitempty" json:"infix,omitempty"`
 	Limit                              *int            `form:"limit,omitempty" json:"limit,omitempty"`
+	LimitHits                          *int            `form:"limit_hits,omitempty" json:"limit_hits,omitempty"`
 	MaxCandidates                      *int            `form:"max_candidates,omitempty" json:"max_candidates,omitempty"`
 	MaxExtraPrefix                     *int            `form:"max_extra_prefix,omitempty" json:"max_extra_prefix,omitempty"`
 	MaxExtraSuffix                     *int            `form:"max_extra_suffix,omitempty" json:"max_extra_suffix,omitempty"`
@@ -1981,7 +2094,6 @@ type MultiSearchParams struct {
 	NlQuery                            *bool           `form:"nl_query,omitempty" json:"nl_query,omitempty"`
 	NumTypos                           *string         `form:"num_typos,omitempty" json:"num_typos,omitempty"`
 	Offset                             *int            `form:"offset,omitempty" json:"offset,omitempty"`
-	OverrideTags                       *string         `form:"override_tags,omitempty" json:"override_tags,omitempty"`
 	Page                               *int            `form:"page,omitempty" json:"page,omitempty"`
 	PerPage                            *int            `form:"per_page,omitempty" json:"per_page,omitempty"`
 	PinnedHits                         *string         `form:"pinned_hits,omitempty" json:"pinned_hits,omitempty"`
@@ -1996,6 +2108,7 @@ type MultiSearchParams struct {
 	QueryByWeights                     *string         `form:"query_by_weights,omitempty" json:"query_by_weights,omitempty"`
 	RemoteEmbeddingNumTries            *int            `form:"remote_embedding_num_tries,omitempty" json:"remote_embedding_num_tries,omitempty"`
 	RemoteEmbeddingTimeoutMs           *int            `form:"remote_embedding_timeout_ms,omitempty" json:"remote_embedding_timeout_ms,omitempty"`
+	RerankHybridMatches                *bool           `form:"rerank_hybrid_matches,omitempty" json:"rerank_hybrid_matches,omitempty"`
 	SearchCutoffMs                     *int            `form:"search_cutoff_ms,omitempty" json:"search_cutoff_ms,omitempty"`
 	SnippetThreshold                   *int            `form:"snippet_threshold,omitempty" json:"snippet_threshold,omitempty"`
 	SortBy                             *string         `form:"sort_by,omitempty" json:"sort_by,omitempty"`
@@ -2007,6 +2120,7 @@ type MultiSearchParams struct {
 	TextMatchType                      *string         `form:"text_match_type,omitempty" json:"text_match_type,omitempty"`
 	TypoTokensThreshold                *int            `form:"typo_tokens_threshold,omitempty" json:"typo_tokens_threshold,omitempty"`
 	UseCache                           *bool           `form:"use_cache,omitempty" json:"use_cache,omitempty"`
+	ValidateFieldNames                 *bool           `form:"validate_field_names,omitempty" json:"validate_field_names,omitempty"`
 	VectorQuery                        *string         `form:"vector_query,omitempty" json:"vector_query,omitempty"`
 	VoiceQuery                         *string         `form:"voice_query,omitempty" json:"voice_query,omitempty"`
 }
